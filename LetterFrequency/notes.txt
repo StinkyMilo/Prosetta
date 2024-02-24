@@ -1,0 +1,9 @@
+Data set from https://www.kaggle.com/datasets/rtatman/english-word-frequency?resource=download
+
+Given a set of aliases, go through each word and find which, if any, aliases it triggers
+If a word triggers an alias, add its frequency to that alias's score. A word can trigger multiple aliases
+Generate a pie chart breaking down the frequencies for single words.
+
+If you have time, try it for each sequence of two words. See if the results change. You'd add the product
+of their frequencies in order to be consistent. Well this would work if the frequencies were normalized
+but they're not. probably for the best given the size of the numbers.
