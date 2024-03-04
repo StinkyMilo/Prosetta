@@ -28,12 +28,10 @@ def reset_interp():
     for com in commands:
         interp.append(Progress(com))
 
-
-reset_interp()
-
 letters = 'abcdefghijklmnopqrstuvwxyz'
 
 def interpret(text):
+    reset_interp()
     output = []
     text=text.lower()
     text = text.split()
