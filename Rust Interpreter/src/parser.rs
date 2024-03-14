@@ -5,6 +5,7 @@ mod builtins;
 mod builtins_data;
 mod eq;
 mod num;
+mod var;
 
 #[path = "parsing_tests.rs"]
 mod tests;
@@ -293,7 +294,7 @@ impl<'a> Parser<'a> {
         let (word, rest) = get_next_word(&slice, 0);
 
         // run step function
-        let result = match self.last_result {
+        let mut result = match self.last_result {
             LastMatchResult::None | LastMatchResult::Continue => {
                 frame.2.step(&mut env, &word, &rest)
             },
@@ -305,6 +306,11 @@ impl<'a> Parser<'a> {
 
         self.last_locs = env.locs.take();
         
+        // reached end of line - upgrade result to failed
+        if word.len() == 0 && matches!(result, MatchResult::ContinueFail){
+            result = MatchResult::Failed;
+        }
+
         match result {
             // I matched - return to last expr on stack with success
             MatchResult::Matched(index) => {
@@ -342,29 +348,32 @@ impl<'a> Parser<'a> {
             // I failed but could parse on future words
             MatchResult::ContinueFail => {
                 let stack_index = self.stack.len() - 1;
-                let expr_index = &mut self.stack[stack_index];
+                let frame = &mut self.stack[stack_index];
                 // change match starting location to after word
-                expr_index.1 = rest.pos;
+                frame.1 = rest.pos;
 
                 self.last_result = LastMatchResult::Continue;
 
-                ParserResult::ContinueFail(self.exprs[expr_index.0].get_name())
+                ParserResult::ContinueFail(frame.2.get_name())
             }
             // I failed and will not parse on future words
             MatchResult::Failed => {
-                let expr_index = self.stack.pop().unwrap().0;
+                let frame = self.stack.pop().unwrap();
 
                 let next_expr = self.stack.last().map_or(0, |x| x.0);
-                self.exprs.vec.truncate(next_expr);
+                // if state has not been replaced - remove from arena
+                if !frame.2.do_replace(){
+                    self.exprs.vec.truncate(next_expr);
+                }
 
                 self.last_result = LastMatchResult::Failed;
                 // failed final stat - couldn't parse anything on line
                 if self.stack.is_empty() {
                     self.parsing_line = false;
-                    ParserResult::FailedLine(self.exprs[expr_index].get_name())
+                    ParserResult::FailedLine(frame.2.get_name())
                 } else {
                     // setup result for next step
-                    ParserResult::Failed(self.exprs[expr_index].get_name())
+                    ParserResult::Failed(frame.2.get_name())
                 }
             }
         }

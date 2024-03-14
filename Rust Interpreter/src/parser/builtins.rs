@@ -15,11 +15,17 @@ pub struct NoneState {
 impl ParseState for NoneState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
         debug_assert!(self.data.names.len() < u16::MAX as usize);
+
+        // reset on new word
+        self.reset();
+
         // if expr  - check if varible name
         if self.data.is_expr {
-            let var = match_var(env, word, rest);
-            if let Some(end) = var {
-                return MatchResult::Matched(end);
+            let mut var_state = var::VarState::new();
+            // check if word is varible
+            // continue if it is
+            if var_state.check(env, word) {
+                return MatchResult::Continue(word.pos, Box::new(var_state));
             }
         }
         self.match_built_in(env, word, rest)
@@ -65,6 +71,13 @@ impl NoneState {
             matched: 0,
         }
     }
+    fn reset(&mut self){
+        let length = self.data.names.len();
+        self.progress= vec![0u8; length];
+        self.locs= vec![Some(Vec::new()); length];
+        self.offset=0;
+        self.matched=0;
+    }
     pub fn new_stat() -> Self {
         Self::new(&STAT_DATA)
     }
@@ -83,14 +96,14 @@ impl NoneState {
             // try match
             while self.matched != 0 {
                 self.matched -= 1;
-                return self.find_best_match(env,offset, rest.pos);
+                return self.find_best_match(env, offset, rest.pos);
             }
         }
         // try match next word
         MatchResult::ContinueFail
     }
 
-    fn find_best_match(&mut self,env: &mut Enviroment, offset: usize,  rest: usize) -> MatchResult {
+    fn find_best_match(&mut self, env: &mut Enviroment, offset: usize, rest: usize) -> MatchResult {
         let mut min_size = usize::MAX;
         let mut min_locations = usize::MAX;
         let mut min_index = u16::MAX;
@@ -113,11 +126,10 @@ impl NoneState {
             }
         }
         self.offset = offset;
-        env.locs =  self.locs[min_index as usize].take();
+        env.locs = self.locs[min_index as usize].take();
         //set up stack
         (self.data.func)(
-            min_index,
-            rest,
+            min_index, rest,
             // move locs out of state without copy
         )
     }
@@ -141,19 +153,6 @@ impl NoneState {
     }
 }
 
-fn match_var(env: &mut Enviroment, word: &Slice, rest: &Slice) -> Option<usize> {
-    // is varible in scope
-    if env.vars.contains(word.str) {
-        *env.expr = Expr::Var {
-            name_start: word.pos,
-            name: word.str.to_owned(),
-        };
-        Some(rest.pos)
-    } else {
-        // future words could be varible names
-        None
-    }
-}
 // fn step_stat(
 //     env: &mut Enviroment,
 //     result: MatchChildResult,
