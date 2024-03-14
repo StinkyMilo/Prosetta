@@ -392,98 +392,217 @@ mod tests {
         )
     }
 
-    //     #[test]
-    //     fn test_1() {
-    //         assert_eq!(
-    //             parse_line(
-    //                 &HashSet::new(),
-    //                 &new_slice(
-    //                     "Equals inch innumerably. Rabbitfish hide close at hand. ",
-    //                     0
-    //                 )
-    //             ),
-    //             (
-    //                 54,
-    //                 vec![Expr::Eq {
-    //                     locs: vec![0, 1],
-    //                     name_start: 7,
-    //                     name: "inch".as_bytes().to_vec(),
-    //                     value_index: 1
-    //                 },
-    //                 Expr::Num {
-    //                     locs: vec![13, 15, 16],
-    //                     str_start: 25,
-    //                     str: "Rabbitfish".as_bytes().to_vec()
-    //                 }],
-    //                 vec![0]
-    //             )
-    //         );
-    //     }
+    #[test]
+    fn test_parse_line_5() {
+        let text =
+            "Pick your pace. Go longer,  longer,  yet longer. Take the road below you.".to_string();
+        let mut binding = text.as_bytes();
+        let mut parser = Parser::new(&mut binding);
+        parser.vars.insert("inch".as_bytes().to_vec());
+        parser.vars.insert("miles".as_bytes().to_vec());
+        parser.vars.insert("furlongs".as_bytes().to_vec());
+        parser.vars.insert("longer".as_bytes().to_vec());
+        assert_eq!(parser.step(), ParserResult::Continue("Circle")); //Pick
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //your
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //your
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //pace
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //Go
 
-    //     #[test]
-    //     fn test_var() {
-    //         assert_eq!(
-    //             parse_line(
-    //                 &HashSet::from(["inch".as_bytes().to_vec()]),
-    //                 &new_slice("Dont equal foot. inch your way further.", 0)
-    //             ),
-    //             (
-    //                 38,
-    //                 vec![Expr::Eq {
-    //                     locs: vec![5, 6],
-    //                     name_start: 11,
-    //                     name: "foot".as_bytes().to_vec(),
-    //                     value_index:1
-    //                 },
-    //                 Expr::Var {
-    //                     name_start: 17,
-    //                     name: "inch".as_bytes().to_vec()
-    //                 }],
-    //                 vec![0]
-    //             )
-    //         );
-    //         assert_eq!(
-    //             parse_line(
-    //                 &HashSet::new(),
-    //                 &new_slice("Dont equal inch. Rabbitfish hardly exist", 0)
-    //             ),
-    //             (40,Expr::None)
-    //         );
-    //     }
+        assert_eq!(parser.step(), ParserResult::Continue("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //longer
 
-    //     #[test]
-    //     fn test_2() {
-    //         assert_eq!(
-    //             parse_line(
-    //                 &HashSet::from(["inch".as_bytes().to_vec()]),
-    //                 &new_slice(
-    //                     "Equations miles across amuse you as you inch, inch again, heating, heaving.",
-    //                     0
-    //                 )
-    //             ),
-    //             (
-    //                 38,
-    //                 vec![Expr::Eq {
-    //                     locs: vec![0, 1],
-    //                     name_start: 10,
-    //                     name: "miles".as_bytes().to_vec(),
-    //                     value_index:1
-    //                 },
-    //                 Expr::Mult {
-    //                         locs: vec![24, 25],
-    //                         a_index:2,
-    //                         b_index:3
-    //                     },
-    //                 Expr::Var {
-    //                     name_start: 40,
-    //                     name: "inch".as_bytes().to_vec()
-    //                 },
-    //                 Expr::Var {
-    //                     name_start: 46,
-    //                     name: "inch".as_bytes().to_vec()
-    //                 }],
-    //                 vec![0]
-    //             )
-    //         );
-    //     }
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //longer (2)
+        assert_eq!(parser.step(), ParserResult::Continue("Var")); //longer (2)
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //longer (2)
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //longer (2)
+
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //yet
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //yet
+        assert_eq!(parser.step(), ParserResult::Continue("Var")); //longer (3)
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //longer (3)
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //longer (3)
+
+        assert_eq!(parser.step(), ParserResult::Matched("Circle")); //Take the
+
+        assert_eq!(parser.step(), ParserResult::MatchedLine("NoneStat")); //
+
+        assert_eq!(
+            linq_like_writer::write_one(&parser.exprs),
+            "(circle@0,1 (var \"longer\"@19) (var \"longer\"@28) (var \"longer\"@41))"
+        )
+    }
+
+    #[test]
+    fn test_parse_line_6() {
+        let text = "Point East. Only two miles longer, to furlongs more ahead.".to_string();
+        let mut binding = text.as_bytes();
+        let mut parser = Parser::new(&mut binding);
+        parser.vars.insert("inch".as_bytes().to_vec());
+        parser.vars.insert("miles".as_bytes().to_vec());
+        parser.vars.insert("furlongs".as_bytes().to_vec());
+        parser.vars.insert("longer".as_bytes().to_vec());
+        assert_eq!(parser.step(), ParserResult::Continue("Circle")); //Point
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //East
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //East
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //Only
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //two
+
+        assert_eq!(parser.step(), ParserResult::Continue("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //miles
+
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //longer
+        assert_eq!(parser.step(), ParserResult::Continue("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //longer
+
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //to
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //to
+        assert_eq!(parser.step(), ParserResult::Continue("Var")); //furlongs
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //furlongs
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //furlongs
+
+        assert_eq!(parser.step(), ParserResult::Matched("Circle")); //more ahead
+
+        assert_eq!(parser.step(), ParserResult::MatchedLine("NoneStat")); //
+
+        assert_eq!(
+            linq_like_writer::write_one(&parser.exprs),
+            "(circle@0,2 (var \"miles\"@21) (var \"longer\"@27) (var \"furlongs\"@38))"
+        )
+    }
+
+    #[test]
+    fn test_parse_line_7() {
+        let text =
+            "Point West. And no longer do miles hang before you. But longer furlongs await ahead."
+                .to_string();
+        let mut binding = text.as_bytes();
+        let mut parser = Parser::new(&mut binding);
+        parser.vars.insert("inch".as_bytes().to_vec());
+        parser.vars.insert("miles".as_bytes().to_vec());
+        parser.vars.insert("furlongs".as_bytes().to_vec());
+        parser.vars.insert("longer".as_bytes().to_vec());
+        assert_eq!(parser.step(), ParserResult::Continue("Circle")); //Point
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //West
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //West
+        assert_eq!(parser.step(), ParserResult::Continue("Add")); //And
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //no
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //no
+
+        assert_eq!(parser.step(), ParserResult::Continue("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //longer
+
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //no
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //no
+        assert_eq!(parser.step(), ParserResult::Continue("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //miles
+
+        assert_eq!(parser.step(), ParserResult::Matched("Add")); //hang
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //hang
+
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //before
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //before
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //you
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //But
+
+        assert_eq!(parser.step(), ParserResult::Continue("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //longer
+
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //furlongs
+        assert_eq!(parser.step(), ParserResult::Continue("Var")); //furlongs
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //furlongs
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //furlongs
+
+        assert_eq!(parser.step(), ParserResult::Matched("Circle")); // await ahead
+        assert_eq!(parser.step(), ParserResult::MatchedLine("NoneStat")); //
+
+        assert_eq!(
+            linq_like_writer::write_one(&parser.exprs),
+            "(circle@0,2 (add@12,13,14 (var \"longer\"@19) (var \"miles\"@29)) (var \"longer\"@56) (var \"furlongs\"@63))"
+        )
+    }
+
+    #[test]
+    fn test_parse_line_8() {
+        let text =
+            "Like miles before and longer miles after, home remains away from view. And longer miles await ahead. And even longer miles stretch behind."
+                .to_string();
+        let mut binding = text.as_bytes();
+        let mut parser = Parser::new(&mut binding);
+        parser.vars.insert("inch".as_bytes().to_vec());
+        parser.vars.insert("miles".as_bytes().to_vec());
+        parser.vars.insert("furlongs".as_bytes().to_vec());
+        parser.vars.insert("longer".as_bytes().to_vec());
+        assert_eq!(parser.step(), ParserResult::Continue("Line")); //Like
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //miles
+        assert_eq!(parser.step(), ParserResult::Continue("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //miles
+
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //before
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //before
+
+        assert_eq!(parser.step(), ParserResult::Continue("Add")); //And
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //longer
+        assert_eq!(parser.step(), ParserResult::Continue("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //longer
+
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //miles
+        assert_eq!(parser.step(), ParserResult::Continue("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //miles
+        assert_eq!(parser.step(), ParserResult::Matched("Add")); //after, home
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //
+
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //remains
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //remains
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //away
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //from
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //view
+
+        assert_eq!(parser.step(), ParserResult::Continue("Add")); //And
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //longer
+        assert_eq!(parser.step(), ParserResult::Continue("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //longer
+
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //miles
+        assert_eq!(parser.step(), ParserResult::Continue("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //miles
+        assert_eq!(parser.step(), ParserResult::Matched("Add")); //await ahead
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //
+
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //And
+        assert_eq!(parser.step(), ParserResult::Continue("Add")); //And
+
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //even
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //even
+
+        assert_eq!(parser.step(), ParserResult::Continue("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //longer
+
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //miles
+        assert_eq!(parser.step(), ParserResult::Continue("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //miles
+        assert_eq!(parser.step(), ParserResult::Matched("Add")); //stretch
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); // behind
+
+        assert_eq!(parser.step(), ParserResult::Matched("Line")); // behind
+        assert_eq!(parser.step(), ParserResult::MatchedLine("NoneStat")); //
+
+        assert_eq!(
+            linq_like_writer::write_one(&parser.exprs),
+            "(line@0,1 (var \"miles\"@5) (add@18,19,20 (var \"longer\"@22) (var \"miles\"@29)) (add@71,72,73 (var \"longer\"@75) \
+            (var \"miles\"@82)) (add@101,102,103 (var \"longer\"@110) (var \"miles\"@117)))"
+        )
+    }
 }

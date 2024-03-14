@@ -41,8 +41,8 @@ fn setup_stat(num: u16, index: usize) -> MatchResult {
         index,
         match num {
             0 => Box::new(eq::EqState::new()) as Box<dyn ParseState>,
-            1 => todo!(),
-            2 => todo!(),
+            1 => Box::new(circle::CircleState::new()),
+            2 => Box::new(line::LineState::new()),
             _ => unimplemented!(),
         },
     )
