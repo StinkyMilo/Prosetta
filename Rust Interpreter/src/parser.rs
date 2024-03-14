@@ -7,6 +7,9 @@ mod eq;
 mod num;
 mod var;
 
+mod line;
+mod circle;
+
 #[path = "parsing_tests.rs"]
 mod tests;
 

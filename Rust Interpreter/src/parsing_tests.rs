@@ -24,13 +24,13 @@ mod tests {
         vars: &'a HashSet<Vec<u8>>,
         expr: &'a mut Expr,
         child_index: usize,
-        locs: Option<Vec<usize>>
+        locs: Option<Vec<usize>>,
     ) -> Enviroment<'a> {
         Enviroment {
             vars,
             expr,
             child_index,
-            locs
+            locs,
         }
     }
 
@@ -61,7 +61,7 @@ mod tests {
 
         assert_eq!(
             get_next_word(&new_slice(" asdf", 2), 0),
-           (new_slice("asdf", 3), new_slice("", 7))
+            (new_slice("asdf", 3), new_slice("", 7))
         );
 
         assert_eq!(
@@ -71,16 +71,34 @@ mod tests {
     }
     #[test]
     fn test_get_next_word_fails() {
-        assert_eq!(get_next_word(&new_slice("", 2), 0), (new_slice("", 2), new_slice("", 2)));
-        assert_eq!(get_next_word(&new_slice(" ", 4), 0), (new_slice("", 5), new_slice("", 5)));
-        assert_eq!(get_next_word(&new_slice(" ", 8), 0), (new_slice("", 9), new_slice("",9)));
+        assert_eq!(
+            get_next_word(&new_slice("", 2), 0),
+            (new_slice("", 2), new_slice("", 2))
+        );
+        assert_eq!(
+            get_next_word(&new_slice(" ", 4), 0),
+            (new_slice("", 5), new_slice("", 5))
+        );
+        assert_eq!(
+            get_next_word(&new_slice(" ", 8), 0),
+            (new_slice("", 9), new_slice("", 9))
+        );
     }
 
     #[test]
     fn test_get_next_word_out() {
-        assert_eq!(get_next_word(&new_slice("a ", 0), 2), (new_slice("", 2), new_slice("", 2)));
-        assert_eq!(get_next_word(&new_slice("a ", 0), 3), (new_slice("", 2), new_slice("", 2)));
-        assert_eq!(get_next_word(&new_slice("a ", 0), 4), (new_slice("", 2), new_slice("", 2)));
+        assert_eq!(
+            get_next_word(&new_slice("a ", 0), 2),
+            (new_slice("", 2), new_slice("", 2))
+        );
+        assert_eq!(
+            get_next_word(&new_slice("a ", 0), 3),
+            (new_slice("", 2), new_slice("", 2))
+        );
+        assert_eq!(
+            get_next_word(&new_slice("a ", 0), 4),
+            (new_slice("", 2), new_slice("", 2))
+        );
     }
 
     #[test]
@@ -222,13 +240,16 @@ mod tests {
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr"));
         assert_eq!(parser.step(), ParserResult::Matched("Equals"));
         assert_eq!(parser.step(), ParserResult::MatchedLine("NoneStat"));
-        assert_eq!(linq_like_writer::write_one(&parser.exprs),"(eq@0,1 \"inch\"@7 (num@13,15,16 \"rabbitfish\"@25))")
+        assert_eq!(
+            linq_like_writer::write_one(&parser.exprs),
+            "(eq@0,1 \"inch\"@7 (num@13,15,16 \"rabbitfish\"@25))"
+        )
     }
-
 
     #[test]
     fn test_parse_line_2() {
-        let text = "Equations miles across amuse you as you inch, inch again, heating, heaving.".to_string();
+        let text = "Equations miles across amuse you as you inch, inch again, heating, heaving."
+            .to_string();
         let mut binding = text.as_bytes();
         let mut parser = Parser::new(&mut binding);
         parser.vars.insert("inch".as_bytes().to_vec());
@@ -245,17 +266,21 @@ mod tests {
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //inch (2)
         assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //inch (2)
         assert_eq!(parser.step(), ParserResult::Continue("Var")); //inch (2)
-        assert_eq!(parser.step(), ParserResult::Matched("Var"));  //inch (2)
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //inch (2)
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //inch (2)
         assert_eq!(parser.step(), ParserResult::Matched("Mult")); //heating
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //heating
         assert_eq!(parser.step(), ParserResult::Matched("Equals")); //heaving
         assert_eq!(parser.step(), ParserResult::MatchedLine("NoneStat")); //heaving
-        assert_eq!(linq_like_writer::write_one(&parser.exprs),"(eq@0,1 \"miles\"@10 (mult@24,25 (var \"inch\"@40) (var \"inch\"@46)))")
+        assert_eq!(
+            linq_like_writer::write_one(&parser.exprs),
+            "(eq@0,1 \"miles\"@10 (mult@24,25 (var \"inch\"@40) (var \"inch\"@46)))"
+        )
     }
     #[test]
     fn test_parse_line_2_no_var() {
-        let text = "Equations miles across amuse you as you inch, inch again, heating, heaving.".to_string();
+        let text = "Equations miles across amuse you as you inch, inch again, heating, heaving."
+            .to_string();
         let mut binding = text.as_bytes();
         let mut parser = Parser::new(&mut binding);
         assert_eq!(parser.step(), ParserResult::Continue("Equals")); // Equations
@@ -298,34 +323,73 @@ mod tests {
         assert_eq!(parser.step(), ParserResult::ContinueFail("NoneStat")); //heaving
         assert_eq!(parser.step(), ParserResult::FailedLine("NoneStat")); //eof
 
-        assert_eq!(parser.exprs.vec.len(),0);
+        assert_eq!(parser.exprs.vec.len(), 0);
     }
 
     #[test]
     fn test_parse_line_3() {
-        let text = "Equate furlongs to ambiguity; disencumber your heels. Inch farther, farther.".to_string();
+        let text = "Equate furlongs to ambiguity; disencumber your heels. Inch farther, farther."
+            .to_string();
         let mut binding = text.as_bytes();
         let mut parser = Parser::new(&mut binding);
         parser.vars.insert("inch".as_bytes().to_vec());
         parser.vars.insert("miles".as_bytes().to_vec());
-        assert_eq!(parser.step(), ParserResult::Continue("Equals"));
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr"));
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr"));
-        assert_eq!(parser.step(), ParserResult::Continue("Mult"));
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr"));
-        assert_eq!(parser.step(), ParserResult::Continue("Num"));
-        assert_eq!(parser.step(), ParserResult::Matched("Num"));
-        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr"));
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr"));
-        assert_eq!(parser.step(), ParserResult::Continue("Var"));
-        assert_eq!(parser.step(), ParserResult::Matched("Var"));
-        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr"));
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr"));
-        assert_eq!(parser.step(), ParserResult::Continue("Mult"));
-        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr"));
-        assert_eq!(parser.step(), ParserResult::Matched("Equals"));
-        assert_eq!(parser.step(), ParserResult::MatchedLine("NoneStat"));
-        assert_eq!(linq_like_writer::write_one(&parser.exprs),"(eq@0,1 \"miles\"@10 (mult@24,25 (var \"inch\"@40) (var \"inch\"@46)))")
+        assert_eq!(parser.step(), ParserResult::Continue("Equals")); //Equate furlongs
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //to
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //to
+        assert_eq!(parser.step(), ParserResult::Continue("Mult")); //ambiguity
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //disencumber
+        assert_eq!(parser.step(), ParserResult::Continue("Num")); //disencumber
+        assert_eq!(parser.step(), ParserResult::Matched("Num")); //disencumber your heels
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //disencumber your heels
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //Inch
+        assert_eq!(parser.step(), ParserResult::Continue("Var")); //Inch
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //Inch
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //Inch
+        assert_eq!(parser.step(), ParserResult::Matched("Mult")); //farther
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //farther
+        assert_eq!(parser.step(), ParserResult::Matched("Equals")); //farther (2)
+        assert_eq!(parser.step(), ParserResult::MatchedLine("NoneStat")); //farther (2)
+        assert_eq!(
+            linq_like_writer::write_one(&parser.exprs),
+            "(eq@0,1 \"furlongs\"@7 (mult@20,24 (num@34,36,37 \"your\"@42) (var \"inch\"@54)))"
+        )
+    }
+
+    #[test]
+    fn test_parse_line_4() {
+        let text =
+            "Equip longer armour. For miles, you swing your pendulum as you head home, harrowed."
+                .to_string();
+        let mut binding = text.as_bytes();
+        let mut parser = Parser::new(&mut binding);
+        parser.vars.insert("inch".as_bytes().to_vec());
+        parser.vars.insert("miles".as_bytes().to_vec());
+        parser.vars.insert("furlongs".as_bytes().to_vec());
+        assert_eq!(parser.step(), ParserResult::Continue("Equals")); //Equip longer
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //armour
+        assert_eq!(parser.step(), ParserResult::Continue("Mult")); //armour
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //armour
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //For
+        assert_eq!(parser.step(), ParserResult::Continue("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::Matched("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //miles
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //you
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //you
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //swing
+        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //your
+        assert_eq!(parser.step(), ParserResult::Continue("Num")); //pendulum as you head
+        assert_eq!(parser.step(), ParserResult::Matched("Num")); //pendulum as you head
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //pendulum as you head
+        assert_eq!(parser.step(), ParserResult::Matched("Mult")); //home
+        assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //home
+        assert_eq!(parser.step(), ParserResult::Matched("Equals")); //harrowed
+        assert_eq!(parser.step(), ParserResult::MatchedLine("NoneStat")); //harrowed
+
+        assert_eq!(
+            linq_like_writer::write_one(&parser.exprs),
+            "(eq@0,1 \"longer\"@6 (mult@15,17 (var \"miles\"@25) (num@49,51,54 \"as\"@56)))"
+        )
     }
 
     //     #[test]

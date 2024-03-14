@@ -6,12 +6,15 @@ pub struct VarState {
 }
 impl ParseState for VarState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
+        //get lowercase
+        let lower = word.str.to_ascii_lowercase();
+
         // is varible in scope
         // or is already checked
-        if self.is_checked||env.vars.contains(word.str) {
+        if self.is_checked||env.vars.contains(&lower) {
             *env.expr = Expr::Var {
                 name_start: word.pos,
-                name: word.str.to_owned(),
+                name: lower,
             };
             MatchResult::Matched(rest.pos)
         } else {
@@ -44,7 +47,7 @@ impl VarState {
         VarState {is_checked:false}
     }
     pub fn check(&mut self, env: &mut Enviroment, word: &Slice,)->bool{
-        self.is_checked = env.vars.contains(word.str);
+        self.is_checked = env.vars.contains(&word.str.to_ascii_lowercase());
         self.is_checked
     }
 }
