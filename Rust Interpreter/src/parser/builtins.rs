@@ -71,12 +71,12 @@ impl NoneState {
             matched: 0,
         }
     }
-    fn reset(&mut self){
+    fn reset(&mut self) {
         let length = self.data.names.len();
-        self.progress= vec![0u8; length];
-        self.locs= vec![Some(Vec::new()); length];
-        self.offset=0;
-        self.matched=0;
+        self.progress = vec![0u8; length];
+        self.locs = vec![Some(Vec::new()); length];
+        self.offset = 0;
+        self.matched = 0;
     }
     pub fn new_stat() -> Self {
         Self::new(&STAT_DATA)
@@ -127,6 +127,9 @@ impl NoneState {
         }
         self.offset = offset;
         env.locs = self.locs[min_index as usize].take();
+        for index in env.locs.as_mut().unwrap() {
+            *index += env.global_index;
+        }
         //set up stack
         (self.data.func)(
             min_index, rest,

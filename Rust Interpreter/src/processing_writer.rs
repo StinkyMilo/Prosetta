@@ -1,7 +1,7 @@
 use crate::commands::*;
 #[allow(dead_code)]
 
-pub fn write(exprs: &Vec<Expr>, line_starts: &Vec<usize>) -> String {
+pub fn write(exprs: &ExprArena, line_starts: &Vec<usize>) -> String {
     let mut str = r#"void setup(){
     size(400, 400);
 }
@@ -14,7 +14,7 @@ void pcircle(int x,int y,int r){
     circle(x,y,r*2);
 }
 
-void draw(){
+void draw(){ 
     background(255);
 "#
     .to_string();
@@ -25,7 +25,7 @@ void draw(){
     str + "}"
 }
 
-fn write_stat(exprs: &Vec<Expr>, start: usize) -> String {
+fn write_stat(exprs: &ExprArena, start: usize) -> String {
     match &exprs[start] {
         Expr::NoneStat => ";\n".to_string(),
         Expr::Eq {
@@ -63,7 +63,7 @@ fn write_stat(exprs: &Vec<Expr>, start: usize) -> String {
     }
 }
 
-fn write_expr(exprs: &Vec<Expr>, index: usize) -> String {
+fn write_expr(exprs: &ExprArena, index: usize) -> String {
     match &exprs[index] {
         Expr::NoneExpr => "todo()".to_string(),
         Expr::Var { name, .. } => String::from_utf8_lossy(&name).to_string(),

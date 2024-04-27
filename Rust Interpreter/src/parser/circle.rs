@@ -27,19 +27,17 @@ impl ParseState for CircleState {
         rest: &Slice,
     ) -> MatchResult {
         if did_child_match {
-            if self.children==2 {
+            if self.children == 2 {
                 // matched second child - find h
                 let close = find_h_close(&word, 0).or_else(|| find_h_close(&rest, 0));
                 match close {
                     // will never be a h to find even on future words
                     None => MatchResult::Failed,
-                    Some(slice) => {
-                        MatchResult::Matched(slice.pos)
-                    }
+                    Some(slice) => MatchResult::Matched(slice.pos),
                 }
             } else {
                 // matched first child - setup second child
-                self.set_child_indexes(env.expr, self.children,env.child_index);
+                self.set_child_indexes(env.expr, self.children, env.child_index);
                 self.children += 1;
                 MatchResult::Continue(word.pos, Box::new(builtins::NoneState::new_expr()))
             }
@@ -58,23 +56,27 @@ impl ParseState for CircleState {
     }
 }
 
-impl CircleState{
-    pub fn new()->Self{
-        CircleState{children:0}
+impl CircleState {
+    pub fn new() -> Self {
+        CircleState { children: 0 }
     }
 }
 
-impl CircleState{
-    fn set_child_indexes(&self,expr:&mut Expr,field_index:u8,child_index:usize){
+impl CircleState {
+    fn set_child_indexes(&self, expr: &mut Expr, field_index: u8, child_index: usize) {
         match expr {
-            Expr::Circle {y_index, r_index ,..}=>{
-                match field_index {
-                    0=>*y_index=child_index,
-                    1=>*r_index=child_index,
-                    _=>{unimplemented!()}
+            Expr::Circle {
+                y_index, r_index, ..
+            } => match field_index {
+                0 => *y_index = child_index,
+                1 => *r_index = child_index,
+                _ => {
+                    unimplemented!()
                 }
             },
-            _=>{unimplemented!()}
+            _ => {
+                unimplemented!()
+            }
         }
     }
 }

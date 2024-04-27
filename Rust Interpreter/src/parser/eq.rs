@@ -5,11 +5,11 @@ pub struct EqState {}
 impl ParseState for EqState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
         // set expr
-       *env.expr = Expr::Eq {
-            name_start:word.pos,
-            name:word.str.to_owned(),
-            value_index:env.child_index,
-            locs:env.locs.take().unwrap_or_default()
+        *env.expr = Expr::Eq {
+            name_start: word.pos + env.global_index,
+            name: word.str.to_owned(),
+            value_index: env.child_index,
+            locs: env.locs.take().unwrap_or_default(),
         };
         // setup child state
         MatchResult::Continue(rest.pos, Box::new(builtins::NoneState::new_expr()))
@@ -28,9 +28,7 @@ impl ParseState for EqState {
             match close {
                 // will never be a h to find even on future words
                 None => MatchResult::Failed,
-                Some(slice) => {
-                    MatchResult::Matched(slice.pos)
-                }
+                Some(slice) => MatchResult::Matched(slice.pos),
             }
         } else {
             // child expr failed

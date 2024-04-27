@@ -45,14 +45,12 @@ impl ParseState for BiFuncState {
                 match close {
                     // will never be a h to find even on future words
                     None => MatchResult::Failed,
-                    Some(slice) => {
-                        MatchResult::Matched(slice.pos)
-                    }
+                    Some(slice) => MatchResult::Matched(slice.pos),
                 }
             } else {
                 // matched first child - setup second child
                 self.has_matched_first = true;
-                self.set_b_index(env.expr,env.child_index);
+                self.set_b_index(env.expr, env.child_index);
                 MatchResult::Continue(word.pos, Box::new(builtins::NoneState::new_expr()))
             }
         } else {
@@ -87,12 +85,14 @@ impl BiFuncState {
         Self::new(BiFunctionType::Mult)
     }
 
-    fn set_b_index(&self,expr:&mut Expr,child_index:usize){
+    fn set_b_index(&self, expr: &mut Expr, child_index: usize) {
         match expr {
-            Expr::Add{b_index,..}|Expr::Mult {  b_index,.. }=>{
-                *b_index=child_index;
-            },
-            _=>{unimplemented!()}
+            Expr::Add { b_index, .. } | Expr::Mult { b_index, .. } => {
+                *b_index = child_index;
+            }
+            _ => {
+                unimplemented!()
+            }
         }
     }
 }

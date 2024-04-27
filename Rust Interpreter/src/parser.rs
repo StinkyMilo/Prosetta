@@ -7,8 +7,8 @@ mod eq;
 mod num;
 mod var;
 
-mod line;
 mod circle;
+mod line;
 
 #[path = "parsing_tests.rs"]
 mod tests;
@@ -101,6 +101,7 @@ struct Enviroment<'a> {
     expr: &'a mut Expr,
     locs: Option<Vec<usize>>,
     child_index: usize,
+    global_index: usize,
 }
 
 #[derive(PartialEq)]
@@ -232,23 +233,25 @@ impl<'a> Parser<'a> {
     }
 
     fn setup_first(&mut self) -> bool {
+        self.pos += self.curr_line.len();
         self.curr_line = String::new();
         let has_read = self.source.read_line(&mut self.curr_line).is_ok();
-        if has_read {
+        let found_data = has_read && self.curr_line.trim().len() > 0;
+        if found_data {
             // push match stat on first step of line
             let index = self.exprs.vec.len();
 
             self.exprs.vec.push(Expr::NoneStat);
 
             self.stack
-                .push((index, self.pos, Box::new(builtins::NoneState::new_stat())));
+                .push((index, 0, Box::new(builtins::NoneState::new_stat())));
             self.stat_starts.push(index);
 
             self.parsing_line = true;
-            self.last_locs=None;
-            self.last_result=LastMatchResult::None;
+            self.last_locs = None;
+            self.last_result = LastMatchResult::None;
         }
-        has_read
+        found_data
     }
 
     pub fn step(&mut self) -> ParserResult {
@@ -259,11 +262,17 @@ impl<'a> Parser<'a> {
                 return ParserResult::NoInput;
             }
         }
-        let _debug = format!("{:?}", Vec::from_iter(self.stack.iter().map(|x|(x.0,x.1))));
-        let _debug2 = format!("{:?}",  Vec::from_iter(self.stack.iter().map(|x|x.2.get_name())));
+        let _debug = format!(
+            "{:?}",
+            Vec::from_iter(self.stack.iter().map(|x| (x.0, x.1)))
+        );
+        let _debug2 = format!(
+            "{:?}",
+            Vec::from_iter(self.stack.iter().map(|x| x.2.get_name()))
+        );
         let _expr = format!("{:?}", self.exprs.vec);
         let _expr2 = linq_like_writer::write(&self.exprs, &self.stat_starts);
-        let _last = format!("{:?}",self.last_result);
+        let _last = format!("{:?}", self.last_result);
         black_box(&_debug);
         black_box(&_debug2);
         black_box(&_expr);
@@ -284,11 +293,12 @@ impl<'a> Parser<'a> {
             vars: &self.vars,
             locs: self.last_locs.take(),
             child_index: next_child,
+            global_index: self.pos,
         };
 
         // setup slice
         let line = self.curr_line.as_bytes();
-        let start = frame.1 - self.pos;
+        let start = frame.1;
         let slice = Slice {
             str: &line[start..],
             pos: start,
@@ -300,7 +310,7 @@ impl<'a> Parser<'a> {
         let mut result = match self.last_result {
             LastMatchResult::None | LastMatchResult::Continue => {
                 frame.2.step(&mut env, &word, &rest)
-            },
+            }
             LastMatchResult::Matched => frame.2.step_match(&mut env, true, &word, &rest),
             LastMatchResult::Failed => frame.2.step_match(&mut env, false, &word, &rest),
         };
@@ -308,9 +318,9 @@ impl<'a> Parser<'a> {
         // run aftermath
 
         self.last_locs = env.locs.take();
-        
+
         // reached end of line - upgrade result to failed
-        if word.len() == 0 && matches!(result, MatchResult::ContinueFail){
+        if word.len() == 0 && matches!(result, MatchResult::ContinueFail) {
             result = MatchResult::Failed;
         }
 
@@ -323,7 +333,12 @@ impl<'a> Parser<'a> {
 
                 // matched final stat
                 if self.stack.is_empty() {
+                    let start_index = *self.stat_starts.last().unwrap();
                     self.parsing_line = false;
+                    // add to varibles
+                    if let Expr::Eq { name, .. } = &self.exprs[start_index] {
+                        self.vars.insert(name.to_owned());
+                    }
                     ParserResult::MatchedLine(state.2.get_name())
                 } else {
                     // setup result for next step
@@ -365,7 +380,7 @@ impl<'a> Parser<'a> {
 
                 let next_expr = self.stack.last().map_or(0, |x| x.0);
                 // if state has not been replaced - remove from arena
-                if !frame.2.do_replace(){
+                if !frame.2.do_replace() {
                     self.exprs.vec.truncate(next_expr);
                 }
 
@@ -382,36 +397,3 @@ impl<'a> Parser<'a> {
         }
     }
 }
-
-// fn get_name_from_state(expr: &Expr, state: &dyn ParseState) -> &'static str {
-//     if state.is_none_expr_state() {
-//         state.get_name()
-//     } else {
-//         expr.get_name()
-//     }
-// }
-
-// functions
-// fn get_step_fn(env: &Enviroment) -> StepFunction {
-//     match &*env.state {
-//         StateContext::Matching(BuiltinMatchState { is_expr, .. }) => {
-//             if *is_expr {
-//                 step_expr
-//             } else {
-//                 step_stat
-//             }
-//         }
-//         state => match &*env.expr {
-//             Expr::NoneStat => step_stat,
-//             Expr::NoneExpr => step_expr,
-//             Expr::Num { .. } => step_num,
-//             Expr::Eq { .. } => step_eq,
-//             Expr::Var { .. } => step_var,
-//             Expr::Mult { .. } => step_mult,
-//             Expr::Add { .. } => step_add,
-//             // (Expr::Add { .. }, _) => step_add,
-//             // (Expr::Mult { .. }, _) => step_mult,
-//             expr => panic!("State ({expr:?},{state:?}) should not happen"),
-//         },
-//     }
-// }

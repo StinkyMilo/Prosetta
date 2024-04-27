@@ -1,6 +1,5 @@
 use std::ops::Index;
 
-
 #[derive(PartialEq, Debug)]
 pub enum Expr {
     NoneStat,
@@ -47,40 +46,40 @@ pub enum Expr {
     },
 }
 
-impl Expr{
-    pub fn get_name(&self)->&'static str{
-        match self{
+impl Expr {
+    pub fn get_name(&self) -> &'static str {
+        match self {
             Expr::NoneStat => "NoneStat",
             Expr::NoneExpr => "NoneExpr",
-            Expr::Eq {..} => "Equals",
-            Expr::Line {.. } => "Line",
-            Expr::Circle {..} => "Circle",
-            Expr::Var { ..} =>"Var",
+            Expr::Eq { .. } => "Equals",
+            Expr::Line { .. } => "Line",
+            Expr::Circle { .. } => "Circle",
+            Expr::Var { .. } => "Var",
             Expr::Num { .. } => "Num",
             Expr::Mult { .. } => "Mult",
             Expr::Add { .. } => "Add",
         }
     }
-    pub fn is_none(&self)->bool{
-        match self{
+    pub fn is_none(&self) -> bool {
+        match self {
             Expr::NoneStat => true,
             Expr::NoneExpr => true,
-            _=>false
+            _ => false,
         }
     }
 }
 
 #[derive(Debug)]
-pub struct ExprArena{
-    pub vec:Vec<Expr>
+pub struct ExprArena {
+    pub vec: Vec<Expr>,
 }
 impl Index<usize> for ExprArena {
     type Output = Expr;
 
-    fn index(&self, index:usize) -> &Self::Output { 
-        if index<self.vec.len(){
+    fn index(&self, index: usize) -> &Self::Output {
+        if index < self.vec.len() {
             &self.vec[index]
-        }else{
+        } else {
             &Expr::NoneExpr
         }
     }

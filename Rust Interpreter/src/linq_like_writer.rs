@@ -1,3 +1,5 @@
+use std::usize;
+
 use crate::commands::*;
 
 fn join_locs(locs: &Vec<usize>) -> String {
@@ -20,8 +22,13 @@ pub fn write(exprs: &ExprArena, line_starts: &Vec<usize>) -> String {
     str
 }
 #[allow(dead_code)]
-pub fn write_one(exprs: &ExprArena) -> String {
+pub fn write_first(exprs: &ExprArena) -> String {
     write_expr(exprs, 0)
+}
+
+#[allow(dead_code)]
+pub fn write_one(exprs: &ExprArena, index: usize) -> String {
+    write_expr(exprs, index)
 }
 
 fn write_expr(exprs: &ExprArena, index: usize) -> String {

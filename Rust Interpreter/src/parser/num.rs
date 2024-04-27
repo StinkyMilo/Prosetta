@@ -8,7 +8,7 @@ impl ParseState for NumState {
         let close = find_h_close(rest, 0);
         if let Some(close) = close {
             *env.expr = Expr::Num {
-                str_start: word.pos,
+                str_start: word.pos + env.global_index,
                 str: word.str.to_owned().to_ascii_lowercase(),
                 locs: env.locs.take().unwrap_or_default(),
             };
