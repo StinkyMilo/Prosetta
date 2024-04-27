@@ -1,5 +1,5 @@
 use std::{
-    io::{self, Write},
+    io::{self, Read, Write},
     mem,
 };
 
@@ -63,6 +63,7 @@ fn main() {
         "   java program:\n{}",
         processing_writer::write(&parser.exprs, &parser.stat_starts)
     );
+    let _ = input.read(&mut [0u8]).unwrap();
 }
 
 // while !matches!(
