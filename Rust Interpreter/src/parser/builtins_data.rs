@@ -9,35 +9,43 @@ pub struct BuiltinData {
     pub is_expr: bool,
 }
 
-const EXPR_COMS: [&'static [u8]; 3] = ["num".as_bytes(), "mu".as_bytes(), "and".as_bytes()];
+const EXPR_COMS: [&'static [u8]; 5] = [
+    "num".as_bytes(),
+    "mu".as_bytes(),
+    "and".as_bytes(),
+    "sub".as_bytes(),
+    "lit".as_bytes(),
+];
 const STAT_COMS: [&'static [u8]; 3] = ["eq".as_bytes(), "pi".as_bytes(), "li".as_bytes()];
 
 pub const EXPR_DATA: BuiltinData = BuiltinData {
-    names: &["num".as_bytes(), "mu".as_bytes(), "and".as_bytes()],
+    names: &EXPR_COMS,
     func: setup_expr,
     is_expr: true,
 };
 
 fn setup_expr(num: u16, index: usize) -> MatchResult {
-    MatchResult::Continue(
+    MatchResult::ContinueWith(
         index,
         match num {
             0 => Box::new(num::NumState::new()) as Box<dyn ParseState>,
             1 => Box::new(add_mult::BiFuncState::new_mult()) as Box<dyn ParseState>,
             2 => Box::new(add_mult::BiFuncState::new_add()) as Box<dyn ParseState>,
+            3 => Box::new(add_mult::BiFuncState::new_sub()) as Box<dyn ParseState>,
+            4 => Box::new(num_lit::LitNumState::new()) as Box<dyn ParseState>,
             _ => unimplemented!(),
         },
     )
 }
 
 pub const STAT_DATA: BuiltinData = BuiltinData {
-    names: &["eq".as_bytes(), "pi".as_bytes(), "li".as_bytes()],
+    names: &STAT_COMS,
     func: setup_stat,
     is_expr: false,
 };
 
 fn setup_stat(num: u16, index: usize) -> MatchResult {
-    MatchResult::Continue(
+    MatchResult::ContinueWith(
         index,
         match num {
             0 => Box::new(eq::EqState::new()) as Box<dyn ParseState>,

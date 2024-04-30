@@ -3,6 +3,7 @@ use super::*;
 #[derive(Debug)]
 pub enum BiFunctionType {
     Add,
+    Sub,
     Mult,
 }
 
@@ -25,10 +26,15 @@ impl ParseState for BiFuncState {
                 a_index: env.child_index,
                 b_index: usize::MAX,
             },
+            BiFunctionType::Sub => Expr::Sub {
+                locs,
+                a_index: env.child_index,
+                b_index: usize::MAX,
+            },
         };
 
         // setup child state
-        MatchResult::Continue(word.pos, Box::new(builtins::NoneState::new_expr()))
+        MatchResult::ContinueWith(word.pos, Box::new(builtins::NoneState::new_expr()))
     }
 
     fn step_match(
@@ -51,7 +57,7 @@ impl ParseState for BiFuncState {
                 // matched first child - setup second child
                 self.has_matched_first = true;
                 self.set_b_index(env.expr, env.child_index);
-                MatchResult::Continue(word.pos, Box::new(builtins::NoneState::new_expr()))
+                MatchResult::ContinueWith(word.pos, Box::new(builtins::NoneState::new_expr()))
             }
         } else {
             // if either child match fails - I will never match
@@ -63,6 +69,7 @@ impl ParseState for BiFuncState {
         match self.fn_type {
             BiFunctionType::Add => "Add",
             BiFunctionType::Mult => "Mult",
+            BiFunctionType::Sub => "Sub",
         }
     }
     fn do_replace(&self) -> bool {
@@ -84,10 +91,14 @@ impl BiFuncState {
     pub fn new_mult() -> Self {
         Self::new(BiFunctionType::Mult)
     }
+    
+    pub fn new_sub() -> Self {
+        Self::new(BiFunctionType::Sub)
+    }
 
     fn set_b_index(&self, expr: &mut Expr, child_index: usize) {
         match expr {
-            Expr::Add { b_index, .. } | Expr::Mult { b_index, .. } => {
+            Expr::Add { b_index, .. } | Expr::Mult { b_index, .. } | Expr::Sub { b_index, .. }=> {
                 *b_index = child_index;
             }
             _ => {

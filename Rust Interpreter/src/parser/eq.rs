@@ -12,7 +12,7 @@ impl ParseState for EqState {
             locs: env.locs.take().unwrap_or_default(),
         };
         // setup child state
-        MatchResult::Continue(rest.pos, Box::new(builtins::NoneState::new_expr()))
+        MatchResult::ContinueWith(rest.pos, Box::new(builtins::NoneState::new_expr()))
     }
 
     fn step_match(

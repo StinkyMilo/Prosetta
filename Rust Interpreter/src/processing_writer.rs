@@ -82,6 +82,14 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             write_expr(exprs, *a_index),
             write_expr(exprs, *b_index)
         ),
+        Expr::Sub {
+            a_index, b_index, ..
+        } => format!(
+            "{}-{}",
+            write_expr(exprs, *a_index),
+            write_expr(exprs, *b_index)
+        ),
+        Expr::LitNum { value, .. } => format!("{}", value),
         expr => panic!("found starting expresion {expr:?} in non starting position"),
     }
 }

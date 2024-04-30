@@ -235,9 +235,9 @@ mod tests {
         let text = "Equals inch innumerably. Rabbitfish hide in Hell.".to_string();
         let mut binding = text.as_bytes();
         let mut parser = Parser::new(&mut binding);
-        assert_eq!(parser.step(), ParserResult::Continue("Equals"));
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr"));
-        assert_eq!(parser.step(), ParserResult::Continue("Num"));
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Equals"));
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr"));
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Num"));
         assert_eq!(parser.step(), ParserResult::Matched("Num"));
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr"));
         assert_eq!(parser.step(), ParserResult::Matched("Equals"));
@@ -256,19 +256,19 @@ mod tests {
         let mut binding = text.as_bytes();
         let mut parser = Parser::new(&mut binding);
         parser.vars.insert("inch".as_bytes().to_vec());
-        assert_eq!(parser.step(), ParserResult::Continue("Equals")); //Equations
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Equals")); //Equations
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //across
         assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //across
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //across
-        assert_eq!(parser.step(), ParserResult::Continue("Mult")); //amuse
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Mult")); //amuse
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //you
         assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //you
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //you
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //as
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //you
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //inch
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //as
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //you
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //inch
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //inch
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //inch (2)
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //inch (2)
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //inch (2)
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //inch (2)
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //inch (2)
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //inch (2)
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //inch (2)
         assert_eq!(parser.step(), ParserResult::Matched("Mult")); //heating
@@ -287,44 +287,44 @@ mod tests {
             .to_string();
         let mut binding = text.as_bytes();
         let mut parser = Parser::new(&mut binding);
-        assert_eq!(parser.step(), ParserResult::Continue("Equals")); // Equations
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); // Equations
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); // across
-        assert_eq!(parser.step(), ParserResult::Continue("Mult")); //amuse
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //amuse
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //you
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //as
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //you
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //inch
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //inch
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //again
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //heating
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //heaving
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Equals")); // Equations
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); // Equations
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); // across
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Mult")); //amuse
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //amuse
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //you
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //as
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //you
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //inch
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //inch
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //again
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //heating
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //heaving
         assert_eq!(parser.step(), ParserResult::Failed("NoneExpr")); //eof
         assert_eq!(parser.step(), ParserResult::Failed("Mult")); //eof
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //amuse
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //you
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //as
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //you
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //inch
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //inch
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //again
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //heating
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //heaving
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //amuse
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //you
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //as
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //you
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //inch
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //inch
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //again
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //heating
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //heaving
         assert_eq!(parser.step(), ParserResult::Failed("NoneExpr")); //eof
         assert_eq!(parser.step(), ParserResult::Failed("Equals")); //eof
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneStat")); //Equations
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneStat")); //miles
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneStat")); //across
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneStat")); //amuse
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneStat")); //you
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneStat")); //as
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneStat")); //you
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneStat")); //inch
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneStat")); //inch
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneStat")); //again
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneStat")); //heating
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneStat")); //heaving
+        assert_eq!(parser.step(), ParserResult::Continue("NoneStat")); //Equations
+        assert_eq!(parser.step(), ParserResult::Continue("NoneStat")); //miles
+        assert_eq!(parser.step(), ParserResult::Continue("NoneStat")); //across
+        assert_eq!(parser.step(), ParserResult::Continue("NoneStat")); //amuse
+        assert_eq!(parser.step(), ParserResult::Continue("NoneStat")); //you
+        assert_eq!(parser.step(), ParserResult::Continue("NoneStat")); //as
+        assert_eq!(parser.step(), ParserResult::Continue("NoneStat")); //you
+        assert_eq!(parser.step(), ParserResult::Continue("NoneStat")); //inch
+        assert_eq!(parser.step(), ParserResult::Continue("NoneStat")); //inch
+        assert_eq!(parser.step(), ParserResult::Continue("NoneStat")); //again
+        assert_eq!(parser.step(), ParserResult::Continue("NoneStat")); //heating
+        assert_eq!(parser.step(), ParserResult::Continue("NoneStat")); //heaving
         assert_eq!(parser.step(), ParserResult::FailedLine("NoneStat")); //eof
 
         assert_eq!(parser.exprs.vec.len(), 0);
@@ -338,16 +338,16 @@ mod tests {
         let mut parser = Parser::new(&mut binding);
         parser.vars.insert("inch".as_bytes().to_vec());
         parser.vars.insert("miles".as_bytes().to_vec());
-        assert_eq!(parser.step(), ParserResult::Continue("Equals")); //Equate furlongs
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Equals")); //Equate furlongs
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //to
         assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //to
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //to
-        assert_eq!(parser.step(), ParserResult::Continue("Mult")); //ambiguity
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //disencumber
-        assert_eq!(parser.step(), ParserResult::Continue("Num")); //disencumber
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Mult")); //ambiguity
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //disencumber
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Num")); //disencumber
         assert_eq!(parser.step(), ParserResult::Matched("Num")); //disencumber your heels
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //disencumber your heels
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //Inch
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //Inch
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //Inch
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //Inch
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //Inch
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //Inch
         assert_eq!(parser.step(), ParserResult::Matched("Mult")); //farther
@@ -370,19 +370,19 @@ mod tests {
         parser.vars.insert("inch".as_bytes().to_vec());
         parser.vars.insert("miles".as_bytes().to_vec());
         parser.vars.insert("furlongs".as_bytes().to_vec());
-        assert_eq!(parser.step(), ParserResult::Continue("Equals")); //Equip longer
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //armour
-        assert_eq!(parser.step(), ParserResult::Continue("Mult")); //armour
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //armour
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //For
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Equals")); //Equip longer
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //armour
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Mult")); //armour
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //armour
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //For
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //miles
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //miles
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //miles
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //you
         assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //you
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //you
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //swing
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //your
-        assert_eq!(parser.step(), ParserResult::Continue("Num")); //pendulum as you head
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //swing
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //your
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Num")); //pendulum as you head
         assert_eq!(parser.step(), ParserResult::Matched("Num")); //pendulum as you head
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //pendulum as you head
         assert_eq!(parser.step(), ParserResult::Matched("Mult")); //home
@@ -406,24 +406,24 @@ mod tests {
         parser.vars.insert("miles".as_bytes().to_vec());
         parser.vars.insert("furlongs".as_bytes().to_vec());
         parser.vars.insert("longer".as_bytes().to_vec());
-        assert_eq!(parser.step(), ParserResult::Continue("Circle")); //Pick
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Circle")); //Pick
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //your
         assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //your
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //your
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //pace
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //Go
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //pace
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //Go
 
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //longer
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //longer
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //longer
 
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //longer (2)
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //longer (2)
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //longer (2)
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //longer (2)
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //longer (2)
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //longer (2)
 
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //yet
         assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //yet
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //yet
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //longer (3)
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //longer (3)
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //longer (3)
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //longer (3)
 
@@ -439,31 +439,31 @@ mod tests {
 
     #[test]
     fn test_parse_line_6() {
-        let text = "Point East. Only two miles longer, to furlongs more ahead.".to_string();
+        let text = "Point East. but few miles longer, to furlongs more ahead.".to_string();
         let mut binding = text.as_bytes();
         let mut parser = Parser::new(&mut binding);
         parser.vars.insert("inch".as_bytes().to_vec());
         parser.vars.insert("miles".as_bytes().to_vec());
         parser.vars.insert("furlongs".as_bytes().to_vec());
         parser.vars.insert("longer".as_bytes().to_vec());
-        assert_eq!(parser.step(), ParserResult::Continue("Circle")); //Point
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Circle")); //Point
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //East
         assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //East
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //East
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //Only
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //two
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //but
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //few
 
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //miles
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //miles
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //miles
 
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //longer
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //longer
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //longer
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //longer
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //longer
 
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //to
         assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //to
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //to
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //furlongs
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //furlongs
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //furlongs
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //furlongs
 
@@ -473,7 +473,7 @@ mod tests {
 
         assert_eq!(
             linq_like_writer::write_first(&parser.exprs),
-            "(circle@0,2 (var \"miles\"@21) (var \"longer\"@27) (var \"furlongs\"@38))"
+            "(circle@0,2 (var \"miles\"@20) (var \"longer\"@26) (var \"furlongs\"@37))"
         )
     }
 
@@ -488,37 +488,37 @@ mod tests {
         parser.vars.insert("miles".as_bytes().to_vec());
         parser.vars.insert("furlongs".as_bytes().to_vec());
         parser.vars.insert("longer".as_bytes().to_vec());
-        assert_eq!(parser.step(), ParserResult::Continue("Circle")); //Point
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Circle")); //Point
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //West
         assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //West
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //West
-        assert_eq!(parser.step(), ParserResult::Continue("Add")); //And
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Add")); //And
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //no
         assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //no
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //no
 
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //longer
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //longer
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //longer
 
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //no
         assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //no
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //no
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //miles
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //miles
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //miles
 
         assert_eq!(parser.step(), ParserResult::Matched("Add")); //hang
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //hang
 
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //before
         assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //before
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //before
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //you
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //But
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //you
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //But
 
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //longer
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //longer
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //longer
 
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //furlongs
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //furlongs
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //furlongs
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //furlongs
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //furlongs
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //furlongs
 
@@ -542,59 +542,59 @@ mod tests {
         parser.vars.insert("miles".as_bytes().to_vec());
         parser.vars.insert("furlongs".as_bytes().to_vec());
         parser.vars.insert("longer".as_bytes().to_vec());
-        assert_eq!(parser.step(), ParserResult::Continue("Line")); //Like
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //miles
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Line")); //Like
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //miles
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //miles
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //miles
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //miles
 
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //before
         assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //before
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //before
 
-        assert_eq!(parser.step(), ParserResult::Continue("Add")); //And
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //longer
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Add")); //And
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //longer
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //longer
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //longer
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //longer
 
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //miles
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //miles
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //miles
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //miles
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //miles
         assert_eq!(parser.step(), ParserResult::Matched("Add")); //after, home
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //
 
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //remains
         assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //remains
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //remains
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //away
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //from
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //view
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //away
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //from
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //view
 
-        assert_eq!(parser.step(), ParserResult::Continue("Add")); //And
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //longer
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Add")); //And
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //longer
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //longer
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //longer
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //longer
 
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //miles
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //miles
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //miles
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //miles
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //miles
         assert_eq!(parser.step(), ParserResult::Matched("Add")); //await ahead
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //
 
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //And
-        assert_eq!(parser.step(), ParserResult::Continue("Add")); //And
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //And
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Add")); //And
 
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //even
         assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //even
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //even
 
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //longer
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //longer
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //longer
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //longer
 
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //miles
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //miles
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //miles
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //miles
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //miles
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //miles
         assert_eq!(parser.step(), ParserResult::Matched("Add")); //stretch
@@ -616,27 +616,27 @@ mod tests {
             .to_string();
         let mut binding = text.as_bytes();
         let mut parser = Parser::new(&mut binding);
-        assert_eq!(parser.step(), ParserResult::Continue("Equals"));
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr"));
-        assert_eq!(parser.step(), ParserResult::Continue("Num"));
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Equals"));
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr"));
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Num"));
         assert_eq!(parser.step(), ParserResult::Matched("Num"));
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr"));
         assert_eq!(parser.step(), ParserResult::Matched("Equals"));
         assert_eq!(parser.step(), ParserResult::MatchedLine("NoneStat"));
 
-        assert_eq!(parser.step(), ParserResult::Continue("Equals")); //Equations
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Equals")); //Equations
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //across
         assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //across
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //across
-        assert_eq!(parser.step(), ParserResult::Continue("Mult")); //amuse
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Mult")); //amuse
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //you
         assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //you
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //you
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //as
-        assert_eq!(parser.step(), ParserResult::ContinueFail("NoneExpr")); //you
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //inch
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //as
+        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //you
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //inch
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //inch
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //inch (2)
-        assert_eq!(parser.step(), ParserResult::Continue("NoneExpr")); //inch (2)
-        assert_eq!(parser.step(), ParserResult::Continue("Var")); //inch (2)
+        assert_eq!(parser.step(), ParserResult::ContinueWith("NoneExpr")); //inch (2)
+        assert_eq!(parser.step(), ParserResult::ContinueWith("Var")); //inch (2)
         assert_eq!(parser.step(), ParserResult::Matched("Var")); //inch (2)
         assert_eq!(parser.step(), ParserResult::Matched("NoneExpr")); //inch (2)
         assert_eq!(parser.step(), ParserResult::Matched("Mult")); //heating

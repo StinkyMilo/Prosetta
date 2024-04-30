@@ -19,7 +19,7 @@ impl ParseState for VarState {
             MatchResult::Matched(rest.pos)
         } else {
             // future words could be varible names
-            MatchResult::ContinueFail
+            MatchResult::Continue
         }
     }
 
@@ -30,7 +30,7 @@ impl ParseState for VarState {
         _word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
-        // has child to match - fn should never be called
+        // has no child to match - fn should never be called
         unimplemented!()
     }
 

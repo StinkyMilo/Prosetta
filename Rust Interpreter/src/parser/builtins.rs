@@ -25,7 +25,13 @@ impl ParseState for NoneState {
             // check if word is varible
             // continue if it is
             if var_state.check(env, word) {
-                return MatchResult::Continue(word.pos, Box::new(var_state));
+                return MatchResult::ContinueWith(word.pos, Box::new(var_state));
+            }
+            // check if word is literal number
+            // continue if it is
+            let mut num_state = num_literal::LiteralNumState::new();
+            if num_state.check(env, word) {
+                return MatchResult::ContinueWith(word.pos, Box::new(num_state));
             }
         }
         self.match_built_in(env, word, rest)
@@ -100,7 +106,7 @@ impl NoneState {
             }
         }
         // try match next word
-        MatchResult::ContinueFail
+        MatchResult::Continue
     }
 
     fn find_best_match(&mut self, env: &mut Enviroment, offset: usize, rest: usize) -> MatchResult {

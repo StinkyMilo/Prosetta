@@ -10,8 +10,14 @@ mod var;
 mod circle;
 mod line;
 
-#[path = "parsing_tests.rs"]
-mod tests;
+mod num_lit;
+mod num_literal;
+
+#[path = "parsing_tests1.rs"]
+mod parsing_tests1;
+
+#[path = "parsing_tests2.rs"]
+mod parsing_tests2;
 
 use std::{
     collections::HashSet,
@@ -70,8 +76,8 @@ trait ParseState: Debug {
 #[derive(Debug)]
 enum MatchResult {
     Matched(usize),
-    Continue(usize, Box<dyn ParseState>),
-    ContinueFail,
+    ContinueWith(usize, Box<dyn ParseState>),
+    Continue,
     Failed,
 }
 
@@ -91,8 +97,8 @@ pub enum ParserResult {
     FailedLine(&'static str),
 
     Matched(&'static str),
+    ContinueWith(&'static str),
     Continue(&'static str),
-    ContinueFail(&'static str),
     Failed(&'static str),
 }
 
@@ -320,7 +326,7 @@ impl<'a> Parser<'a> {
         self.last_locs = env.locs.take();
 
         // reached end of line - upgrade result to failed
-        if word.len() == 0 && matches!(result, MatchResult::ContinueFail) {
+        if word.len() == 0 && matches!(result, MatchResult::Continue) {
             result = MatchResult::Failed;
         }
 
@@ -348,7 +354,7 @@ impl<'a> Parser<'a> {
                 }
             }
             // continue parsing child
-            MatchResult::Continue(index, state) => {
+            MatchResult::ContinueWith(index, state) => {
                 let mut expr_index = self.exprs.vec.len();
                 let name = state.get_name();
                 // replace none exprs
@@ -361,10 +367,10 @@ impl<'a> Parser<'a> {
 
                 self.last_result = LastMatchResult::None;
 
-                ParserResult::Continue(name)
+                ParserResult::ContinueWith(name)
             }
             // I failed but could parse on future words
-            MatchResult::ContinueFail => {
+            MatchResult::Continue => {
                 let stack_index = self.stack.len() - 1;
                 let frame = &mut self.stack[stack_index];
                 // change match starting location to after word
@@ -372,13 +378,14 @@ impl<'a> Parser<'a> {
 
                 self.last_result = LastMatchResult::Continue;
 
-                ParserResult::ContinueFail(frame.2.get_name())
+                ParserResult::Continue(frame.2.get_name())
             }
             // I failed and will not parse on future words
             MatchResult::Failed => {
                 let frame = self.stack.pop().unwrap();
 
                 let next_expr = self.stack.last().map_or(0, |x| x.0);
+
                 // if state has not been replaced - remove from arena
                 if !frame.2.do_replace() {
                     self.exprs.vec.truncate(next_expr);
@@ -388,6 +395,8 @@ impl<'a> Parser<'a> {
                 // failed final stat - couldn't parse anything on line
                 if self.stack.is_empty() {
                     self.parsing_line = false;
+                    self.exprs.vec.truncate(frame.0);
+                    self.stat_starts.pop();
                     ParserResult::FailedLine(frame.2.get_name())
                 } else {
                     // setup result for next step

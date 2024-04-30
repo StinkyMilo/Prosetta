@@ -8,7 +8,9 @@ fn join_locs(locs: &Vec<usize>) -> String {
     } else {
         let mut iter = locs.into_iter();
         let first = iter.next().unwrap();
-        iter.fold(first.to_string(), |a, b| a + &"," + &b.to_string())
+        iter.fold("@".to_string() + &first.to_string(), |a, b| {
+            a + &"," + &b.to_string()
+        })
     }
 }
 
@@ -41,7 +43,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             name,
             value_index,
         } => format!(
-            "(eq@{} \"{}\"@{} {})",
+            "(eq{} \"{}\"@{} {})",
             join_locs(&locs),
             String::from_utf8_lossy(&name),
             name_start,
@@ -54,7 +56,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             x2_index,
             y2_index,
         } => format!(
-            "(line@{} {} {} {} {})",
+            "(line{} {} {} {} {})",
             join_locs(&locs),
             write_expr(exprs, *x_index),
             write_expr(exprs, *y_index),
@@ -67,7 +69,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             y_index,
             r_index,
         } => format!(
-            "(circle@{} {} {} {})",
+            "(circle{} {} {} {})",
             join_locs(&locs),
             write_expr(exprs, *x_index),
             write_expr(exprs, *y_index),
@@ -83,7 +85,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             str_start,
             str,
         } => format!(
-            "(num@{} \"{}\"@{})",
+            "(num{} \"{}\"@{})",
             join_locs(locs),
             String::from_utf8_lossy(str),
             str_start
@@ -93,7 +95,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             a_index,
             b_index,
         } => format!(
-            "(mult@{} {} {})",
+            "(mult{} {} {})",
             join_locs(locs),
             write_expr(exprs, *a_index),
             write_expr(exprs, *b_index)
@@ -103,10 +105,32 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             a_index,
             b_index,
         } => format!(
-            "(add@{} {} {})",
+            "(add{} {} {})",
             join_locs(locs),
             write_expr(exprs, *a_index),
             write_expr(exprs, *b_index)
+        ),
+        Expr::Sub {
+            locs,
+            a_index,
+            b_index,
+        } => format!(
+            "(sub{} {} {})",
+            join_locs(locs),
+            write_expr(exprs, *a_index),
+            write_expr(exprs, *b_index)
+        ),
+        Expr::LitNum {
+            locs,
+            str_start,
+            str_length,
+            value,
+        } => format!(
+            "(litnum{} {}@{}${})",
+            join_locs(locs),
+            value,
+            str_start,
+            str_length
         ),
         //expr => panic!("found {expr:?} which has no branch"),
     }

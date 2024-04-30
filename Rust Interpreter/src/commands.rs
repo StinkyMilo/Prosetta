@@ -24,6 +24,7 @@ pub enum Expr {
         y_index: usize,
         r_index: usize,
     },
+
     //expr
     Var {
         name_start: usize,
@@ -44,6 +45,17 @@ pub enum Expr {
         a_index: usize,
         b_index: usize,
     },
+    Sub {
+        locs: Vec<usize>,
+        a_index: usize,
+        b_index: usize,
+    },
+    LitNum {
+        locs: Vec<usize>,
+        str_start: usize,
+        str_length: usize,
+        value: i64,
+    },
 }
 
 impl Expr {
@@ -58,6 +70,8 @@ impl Expr {
             Expr::Num { .. } => "Num",
             Expr::Mult { .. } => "Mult",
             Expr::Add { .. } => "Add",
+            Expr::Sub { .. } => "Sub",
+            Expr::LitNum { .. } => "LitNum",
         }
     }
     pub fn is_none(&self) -> bool {

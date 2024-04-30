@@ -48,7 +48,8 @@ fn main() {
 
     loop {
         match parser.step() {
-            ParserResult::MatchedLine(_) | ParserResult::FailedLine(_) => print(&parser),
+            ParserResult::MatchedLine(_) => print(&parser),
+            ParserResult::FailedLine(_) => println!("   parse failed"),
             ParserResult::NoInput => break,
             _ => {}
         }
@@ -78,3 +79,7 @@ fn main() {
 //     linq_like_writer::write(&parser.exprs, &parser.stat_starts)
 // );
 // std::io::stdout().flush().unwrap();
+
+//eq eleven num cabbagehead h h 
+//eq twelve and eleven num i h h h
+//eq nice mu and eleven twelve h num dad h h h
