@@ -1,5 +1,4 @@
 use super::*;
-
 #[derive(Debug)]
 
 pub struct LiteralNumState {
@@ -8,7 +7,6 @@ pub struct LiteralNumState {
 
 impl ParseState for LiteralNumState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
-
         // if not checked - try
         if self.value.is_none() {
             self.value = get_number(word.str)
@@ -17,7 +15,7 @@ impl ParseState for LiteralNumState {
         // check
         if let Some(value) = self.value {
             *env.expr = Expr::LitNum {
-                locs:Vec::new(),
+                locs: Vec::new(),
                 str_start: word.pos + env.global_index,
                 str_length: word.len(),
                 value,
@@ -59,7 +57,34 @@ impl LiteralNumState {
     }
 }
 
-pub fn get_number(word: &[u8]) -> Option<i64> {
+fn get_number(word: &[u8]) -> Option<i64> {
+    get_number_word(word).or_else(|| get_number_literal(word))
+}
+
+pub fn get_number_literal(mut word: &[u8]) -> Option<i64> {
+    let mut neg = 1i64;
+    if word.starts_with(b"-") {
+        neg = -1;
+        word = &word[1..]
+    }
+
+    let number = || String::from_utf8(word[2..].to_vec()).ok();
+    let num = {
+        if word.starts_with(b"0x") {
+            i64::from_str_radix(&number()?, 16)
+        } else if word.starts_with(b"0o") {
+            i64::from_str_radix(&number()?, 8)
+        } else if word.starts_with(b"0b") {
+            i64::from_str_radix(&number()?, 2)
+        } else {
+            let number = String::from_utf8(word.to_vec()).ok()?;
+            i64::from_str_radix(&number, 10)
+        }
+    };
+    num.ok().and_then(|num| Some(num * neg))
+}
+
+pub fn get_number_word(word: &[u8]) -> Option<i64> {
     Some(match &*word.to_ascii_lowercase() {
         b"zero" => 0,
         b"one" => 1,

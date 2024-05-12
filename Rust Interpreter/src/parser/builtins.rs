@@ -54,13 +54,9 @@ impl ParseState for NoneState {
     }
 
     fn get_name(&self) -> &'static str {
-        let expr = if self.data.is_expr {
-            Expr::NoneExpr
-        } else {
-            Expr::NoneStat
-        };
-        expr.get_name()
+        self.data.state_name
     }
+
     fn do_replace(&self) -> bool {
         true
     }
@@ -90,6 +86,9 @@ impl NoneState {
     pub fn new_expr() -> Self {
         Self::new(&EXPR_DATA)
     }
+    pub fn new_expr_cont() -> Self {
+        Self::new(&EXPR_DATA_CONT)
+    }
 }
 
 impl NoneState {
@@ -105,8 +104,13 @@ impl NoneState {
                 return self.find_best_match(env, offset, rest.pos);
             }
         }
-        // try match next word
-        MatchResult::Continue
+        // if default continue
+        if self.data.default_continue {
+            MatchResult::Continue
+        // else fail
+        } else {
+            MatchResult::Failed
+        }
     }
 
     fn find_best_match(&mut self, env: &mut Enviroment, offset: usize, rest: usize) -> MatchResult {
@@ -115,7 +119,7 @@ impl NoneState {
         let mut min_index = u16::MAX;
         for j in 0..self.data.names.len() {
             // has finished matching
-            if self.progress[j] == self.data.names[j].len() as u8 {
+            if self.progress[j] == self.data.names[j].len() as u8 && self.locs[j].is_some() {
                 let matching_locs = self.locs[j].as_ref().unwrap();
 
                 let size = matching_locs.last().unwrap() - matching_locs[0];

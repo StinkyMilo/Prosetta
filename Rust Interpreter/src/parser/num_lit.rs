@@ -9,7 +9,7 @@ pub struct LitNumState {
 impl ParseState for LitNumState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
         // check if number
-        if let Some(new_digit) = num_literal::get_number(word.str) {
+        if let Some(new_digit) = num_literal::get_number_word(word.str) {
             self.first = true;
 
             //set up or update command

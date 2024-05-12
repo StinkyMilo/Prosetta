@@ -44,36 +44,31 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             value_index,
         } => format!(
             "(eq{} \"{}\"@{} {})",
-            join_locs(&locs),
+            join_locs(locs),
             String::from_utf8_lossy(&name),
             name_start,
             write_expr(exprs, *value_index)
         ),
         Expr::Line {
             locs,
-            x_index,
-            y_index,
-            x2_index,
-            y2_index,
+            indexes
         } => format!(
             "(line{} {} {} {} {})",
-            join_locs(&locs),
-            write_expr(exprs, *x_index),
-            write_expr(exprs, *y_index),
-            write_expr(exprs, *x2_index),
-            write_expr(exprs, *y2_index)
+            join_locs(locs),
+            write_expr(exprs, indexes[0]),
+            write_expr(exprs, indexes[1]),
+            write_expr(exprs, indexes[2]),
+            write_expr(exprs, indexes[3])
         ),
         Expr::Circle {
             locs,
-            x_index,
-            y_index,
-            r_index,
+            indexes
         } => format!(
             "(circle{} {} {} {})",
-            join_locs(&locs),
-            write_expr(exprs, *x_index),
-            write_expr(exprs, *y_index),
-            write_expr(exprs, *r_index)
+            join_locs(locs),
+            write_expr(exprs, indexes[0]),
+            write_expr(exprs, indexes[1]),
+            write_expr(exprs, indexes[2])
         ),
         Expr::Var { name_start, name } => format!(
             "(var \"{}\"@{})",
@@ -90,36 +85,24 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             String::from_utf8_lossy(str),
             str_start
         ),
-        Expr::Mult {
+        Expr::BiFunction {
             locs,
-            a_index,
-            b_index,
-        } => format!(
-            "(mult{} {} {})",
-            join_locs(locs),
-            write_expr(exprs, *a_index),
-            write_expr(exprs, *b_index)
-        ),
-        Expr::Add {
-            locs,
-            a_index,
-            b_index,
-        } => format!(
-            "(add{} {} {})",
-            join_locs(locs),
-            write_expr(exprs, *a_index),
-            write_expr(exprs, *b_index)
-        ),
-        Expr::Sub {
-            locs,
-            a_index,
-            b_index,
-        } => format!(
-            "(sub{} {} {})",
-            join_locs(locs),
-            write_expr(exprs, *a_index),
-            write_expr(exprs, *b_index)
-        ),
+            func_type,
+            indexes,
+            ..
+        } => {
+            let name = match func_type {
+                BiFunctionType::Add => "add",
+                BiFunctionType::Sub => "sub",
+                BiFunctionType::Mult => "mult",
+            };
+            format!(
+                "({}{} {})",
+                name,
+                join_locs(locs),
+                write_exprs(exprs, indexes)
+            )
+        }
         Expr::LitNum {
             locs,
             str_start,
@@ -134,4 +117,13 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         ),
         //expr => panic!("found {expr:?} which has no branch"),
     }
+}
+
+fn write_exprs(exprs: &ExprArena, indexes: &Vec<usize>) -> String {
+    let mut ret = String::new();
+    for index in indexes {
+        ret += &(write_expr(exprs, *index) + " ");
+    }
+    ret.pop();
+    ret
 }

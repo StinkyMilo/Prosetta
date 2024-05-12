@@ -10,13 +10,11 @@ impl ParseState for CircleState {
 
         *env.expr = Expr::Circle {
             locs,
-            x_index: env.child_index,
-            y_index: usize::MAX,
-            r_index: usize::MAX,
+            indexes: [env.child_index, usize::MAX, usize::MAX],
         };
 
         // setup child state
-        MatchResult::ContinueWith(word.pos, Box::new(builtins::NoneState::new_expr()))
+        MatchResult::ContinueWith(word.pos, Box::new(builtins::NoneState::new_expr_cont()))
     }
 
     fn step_match(
@@ -37,9 +35,9 @@ impl ParseState for CircleState {
                 }
             } else {
                 // matched first child - setup second child
-                self.set_child_indexes(env.expr, self.children, env.child_index);
                 self.children += 1;
-                MatchResult::ContinueWith(word.pos, Box::new(builtins::NoneState::new_expr()))
+                self.add_child(env.expr, self.children, env.child_index);
+                MatchResult::ContinueWith(word.pos, Box::new(builtins::NoneState::new_expr_cont()))
             }
         } else {
             // if either child match fails - I will never match
@@ -63,17 +61,17 @@ impl CircleState {
 }
 
 impl CircleState {
-    fn set_child_indexes(&self, expr: &mut Expr, field_index: u8, child_index: usize) {
+    fn add_child(&self, expr: &mut Expr, field_index: u8, child_index: usize) {
         match expr {
             Expr::Circle {
-                y_index, r_index, ..
-            } => match field_index {
-                0 => *y_index = child_index,
-                1 => *r_index = child_index,
-                _ => {
-                    unimplemented!()
-                }
-            },
+                indexes,..
+            } => //match field_index {
+            //     0 => *y_index = child_index,
+            //     1 => *r_index = child_index,
+            //     _ => {
+            //         unimplemented!()
+            //     }
+                indexes[field_index as usize]=child_index,
             _ => {
                 unimplemented!()
             }

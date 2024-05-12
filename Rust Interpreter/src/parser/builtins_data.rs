@@ -7,6 +7,8 @@ pub struct BuiltinData {
     pub names: &'static [&'static [u8]],
     pub func: BuildInSetUp,
     pub is_expr: bool,
+    pub default_continue: bool,
+    pub state_name: &'static str,
 }
 
 const EXPR_COMS: [&'static [u8]; 5] = [
@@ -22,6 +24,16 @@ pub const EXPR_DATA: BuiltinData = BuiltinData {
     names: &EXPR_COMS,
     func: setup_expr,
     is_expr: true,
+    default_continue: false,
+    state_name: "NoneExpr",
+};
+
+pub const EXPR_DATA_CONT: BuiltinData = BuiltinData {
+    names: &EXPR_COMS,
+    func: setup_expr,
+    is_expr: true,
+    default_continue: true,
+    state_name: "NoneExprCont",
 };
 
 fn setup_expr(num: u16, index: usize) -> MatchResult {
@@ -42,6 +54,8 @@ pub const STAT_DATA: BuiltinData = BuiltinData {
     names: &STAT_COMS,
     func: setup_stat,
     is_expr: false,
+    default_continue: true,
+    state_name: "NoneStat",
 };
 
 fn setup_stat(num: u16, index: usize) -> MatchResult {

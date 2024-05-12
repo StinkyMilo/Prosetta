@@ -1,164 +1,91 @@
-// use crate::commands::*;
-// use crate::processing_writer;
+#[allow(dead_code)]
 
-// fn get_ast1() -> Vec<Stat> {
-//     vec![
-//         Stat::Eq {
-//             name: b"inch".to_vec(),
-//             value: 1
-//             locs: vec![],
-//             name_start: 0,
-//         },
-//         Expr::Num {
-//             str: b"Rabbitfish".to_vec(),
-//             locs: vec![],
-//             str_start: 0,
-//         },
-//         Stat::Eq {
-//             name: b"miles".to_vec(),
-//             value: Box::new(Expr::Mult {
-//                 a: Box::new(Expr::Var {
-//                     name: b"inch".to_vec(),
-//                     name_start: 0,
-//                 }),
-//                 b: Box::new(Expr::Var {
-//                     name: b"inch".to_vec(),
-//                     name_start: 0,
-//                 }),
-//                 locs: vec![],
-//             }),
-//             locs: vec![],
-//             name_start: 0,
-//         },
-//         Stat::Eq {
-//             name: b"furlongs".to_vec(),
-//             value: Box::new(Expr::Mult {
-//                 a: Box::new(Expr::Num {
-//                     str: b"your".to_vec(),
-//                     locs: vec![],
-//                     str_start: 0,
-//                 }),
-//                 b: Box::new(Expr::Var {
-//                     name: b"inch".to_vec(),
-//                     name_start: 0,
-//                 }),
-//                 locs: vec![],
-//             }),
-//             locs: vec![],
-//             name_start: 0,
-//         },
-//         Stat::Eq {
-//             name: b"longer".to_vec(),
-//             value: Box::new(Expr::Mult {
-//                 a: Box::new(Expr::Var {
-//                     name: b"miles".to_vec(),
-//                     name_start: 0,
-//                 }),
-//                 b: Box::new(Expr::Num {
-//                     str: b"as".to_vec(),
-//                     locs: vec![],
-//                     str_start: 0,
-//                 }),
-//                 locs: vec![],
-//             }),
-//             locs: vec![],
-//             name_start: 0,
-//         },
-//         Stat::Circle {
-//             x: Box::new(Expr::Var {
-//                 name: b"longer".to_vec(),
-//                 name_start: 0,
-//             }),
-//             y: Box::new(Expr::Var {
-//                 name: b"longer".to_vec(),
-//                 name_start: 0,
-//             }),
-//             r: Box::new(Expr::Var {
-//                 name: b"longer".to_vec(),
-//                 name_start: 0,
-//             }),
-//             locs: vec![],
-//         },
-//         Stat::Circle {
-//             x: Box::new(Expr::Var {
-//                 name: b"miles".to_vec(),
-//                 name_start: 0,
-//             }),
-//             y: Box::new(Expr::Var {
-//                 name: b"longer".to_vec(),
-//                 name_start: 0,
-//             }),
-//             r: Box::new(Expr::Var {
-//                 name: b"furlongs".to_vec(),
-//                 name_start: 0,
-//             }),
-//             locs: vec![],
-//         },
-//         Stat::Circle {
-//             x: Box::new(Expr::Add {
-//                 a: Box::new(Expr::Var {
-//                     name: b"longer".to_vec(),
-//                     name_start: 0,
-//                 }),
-//                 b: Box::new(Expr::Var {
-//                     name: b"miles".to_vec(),
-//                     name_start: 0,
-//                 }),
-//                 locs: vec![],
-//             }),
-//             y: Box::new(Expr::Var {
-//                 name: b"longer".to_vec(),
-//                 name_start: 0,
-//             }),
-//             r: Box::new(Expr::Var {
-//                 name: b"furlongs".to_vec(),
-//                 name_start: 0,
-//             }),
-//             locs: vec![],
-//         },
-//         Stat::Line {
-//             x: Box::new(Expr::Var {
-//                 name: b"miles".to_vec(),
-//                 name_start: 0,
-//             }),
-//             y: Box::new(Expr::Add {
-//                 a: Box::new(Expr::Var {
-//                     name: b"longer".to_vec(),
-//                     name_start: 0,
-//                 }),
-//                 b: Box::new(Expr::Var {
-//                     name: b"miles".to_vec(),
-//                     name_start: 0,
-//                 }),
-//                 locs: vec![],
-//             }),
-//             x2: Box::new(Expr::Add {
-//                 a: Box::new(Expr::Var {
-//                     name: b"longer".to_vec(),
-//                     name_start: 0,
-//                 }),
-//                 b: Box::new(Expr::Var {
-//                     name: b"miles".to_vec(),
-//                     name_start: 0,
-//                 }),
-//                 locs: vec![],
-//             }),
-//             y2: Box::new(Expr::Add {
-//                 a: Box::new(Expr::Var {
-//                     name: b"longer".to_vec(),
-//                     name_start: 0,
-//                 }),
-//                 b: Box::new(Expr::Var {
-//                     name: b"miles".to_vec(),
-//                     name_start: 0,
-//                 }),
-//                 locs: vec![],
-//             }),
-//             locs: vec![],
-//         },
-//     ]
-// }
+#[cfg(test)]
+pub mod test_lib {
 
-// pub fn test_ast1(){
-//     print!("{}",processing_writer::write(&get_ast1()));
-// }
+    use crate::commands::Expr;
+
+    use crate::parser::*;
+
+    use std::collections::HashSet;
+
+    pub fn assert_step_inner(
+        parser: &mut Parser,
+        exp_result: ParserResult,
+        exp_state: &str,
+        exp_word: &str,
+        file: &str,
+        line: u32,
+    ) {
+        let result = parser.step();
+        let state = parser.get_state();
+        let word = std::str::from_utf8(parser.get_word()).unwrap();
+        let message = &format!(
+            "result was {:?}(\"{}\",\"{}\"). expected {:?}(\"{}\",\"{}\") at {}:{}",
+            result, state, word, exp_result, exp_state, exp_word, file, line
+        );
+
+        assert_eq!(result, exp_result, "{}", message);
+        assert_eq!(state, exp_state, "{}", message);
+        assert_eq!(word, exp_word, "{}", message);
+    }
+
+    pub fn new_slice(str: &str, start: usize) -> Slice {
+        Slice {
+            str: str.as_ref(),
+            pos: start,
+        }
+    }
+
+    pub fn new_sub_slice(str: &str, start: usize) -> Slice {
+        let bytes: &[u8] = str.as_ref();
+        Slice {
+            str: &bytes[start..],
+            pos: start,
+        }
+    }
+
+    pub fn new_env<'a>(
+        vars: &'a HashSet<Vec<u8>>,
+        expr: &'a mut Expr,
+        child_index: usize,
+        locs: Option<Vec<usize>>,
+    ) -> Enviroment<'a> {
+        Enviroment {
+            vars,
+            expr,
+            child_index,
+            locs,
+            global_index: 0,
+        }
+    }
+}
+
+// use crate::testing::test_lib::*;
+
+macro_rules! add_vars {
+    ($parser:ident, $var:expr) => {
+        $parser.vars.insert($var.as_bytes().to_vec());
+    };
+    ($parser:ident, $var:expr, $($vars:expr),+) => {
+        $crate::testing::add_vars! ($parser, $var );
+        $crate::testing::add_vars! ($parser, $($vars), + );
+    };
+}
+pub(crate) use add_vars;
+
+#[cfg(test)]
+macro_rules! assert_step {
+    ($parser:ident,$step_result:ident,$state:expr,$word:expr) => {
+        $crate::testing::test_lib::assert_step_inner(
+            &mut $parser,
+            ParserResult::$step_result,
+            $state,
+            $word,
+            file!(),
+            line!(),
+        );
+    };
+}
+#[cfg(test)]
+pub(crate) use assert_step;

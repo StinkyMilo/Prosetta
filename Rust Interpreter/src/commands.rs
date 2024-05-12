@@ -1,5 +1,12 @@
 use std::ops::Index;
 
+#[derive(PartialEq, Debug, Clone, Copy)]
+pub enum BiFunctionType {
+    Add,
+    Sub,
+    Mult,
+}
+
 #[derive(PartialEq, Debug)]
 pub enum Expr {
     NoneStat,
@@ -13,16 +20,11 @@ pub enum Expr {
     },
     Line {
         locs: Vec<usize>,
-        x_index: usize,
-        y_index: usize,
-        x2_index: usize,
-        y2_index: usize,
+        indexes:[usize;4],
     },
     Circle {
         locs: Vec<usize>,
-        x_index: usize,
-        y_index: usize,
-        r_index: usize,
+        indexes:[usize;3],
     },
 
     //expr
@@ -35,20 +37,10 @@ pub enum Expr {
         str_start: usize,
         str: Vec<u8>,
     },
-    Mult {
+    BiFunction {
+        func_type: BiFunctionType,
         locs: Vec<usize>,
-        a_index: usize,
-        b_index: usize,
-    },
-    Add {
-        locs: Vec<usize>,
-        a_index: usize,
-        b_index: usize,
-    },
-    Sub {
-        locs: Vec<usize>,
-        a_index: usize,
-        b_index: usize,
+        indexes: Vec<usize>,
     },
     LitNum {
         locs: Vec<usize>,
@@ -59,21 +51,23 @@ pub enum Expr {
 }
 
 impl Expr {
-    pub fn get_name(&self) -> &'static str {
-        match self {
-            Expr::NoneStat => "NoneStat",
-            Expr::NoneExpr => "NoneExpr",
-            Expr::Eq { .. } => "Equals",
-            Expr::Line { .. } => "Line",
-            Expr::Circle { .. } => "Circle",
-            Expr::Var { .. } => "Var",
-            Expr::Num { .. } => "Num",
-            Expr::Mult { .. } => "Mult",
-            Expr::Add { .. } => "Add",
-            Expr::Sub { .. } => "Sub",
-            Expr::LitNum { .. } => "LitNum",
-        }
-    }
+    // pub fn get_name(&self) -> &'static str {
+    //     match self {
+    //         Expr::NoneStat => "NoneStat",
+    //         Expr::NoneExpr => "NoneExpr",
+    //         Expr::Eq { .. } => "Equals",
+    //         Expr::Line { .. } => "Line",
+    //         Expr::Circle { .. } => "Circle",
+    //         Expr::Var { .. } => "Var",
+    //         Expr::Num { .. } => "Num",
+    //         Expr::BiFunction { func_type, .. } => match func_type {
+    //             BiFunctionType::Add => "Add",
+    //             BiFunctionType::Sub => "Sub",
+    //             BiFunctionType::Mult => "Mult",
+    //         },
+    //         Expr::LitNum { .. } => "LitNum",
+    //     }
+    // }
     pub fn is_none(&self) -> bool {
         match self {
             Expr::NoneStat => true,

@@ -1,38 +1,22 @@
 use super::*;
 
 #[derive(Debug)]
-pub enum BiFunctionType {
-    Add,
-    Sub,
-    Mult,
-}
-
-#[derive(Debug)]
 pub struct BiFuncState {
-    has_matched_first: bool,
+    last_child_index: usize,
     fn_type: BiFunctionType,
+    cont: bool,
 }
 impl ParseState for BiFuncState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, _rest: &Slice) -> MatchResult {
-        let locs = env.locs.take().unwrap_or_default();
-        *env.expr = match self.fn_type {
-            BiFunctionType::Add => Expr::Add {
+        if !self.cont {
+            let locs = env.locs.take().unwrap_or_default();
+            *env.expr = Expr::BiFunction {
+                func_type: self.fn_type,
                 locs,
-                a_index: env.child_index,
-                b_index: usize::MAX,
-            },
-            BiFunctionType::Mult => Expr::Mult {
-                locs,
-                a_index: env.child_index,
-                b_index: usize::MAX,
-            },
-            BiFunctionType::Sub => Expr::Sub {
-                locs,
-                a_index: env.child_index,
-                b_index: usize::MAX,
-            },
-        };
-
+                indexes: Vec::new(),
+            };
+            self.last_child_index = env.child_index;
+        }
         // setup child state
         MatchResult::ContinueWith(word.pos, Box::new(builtins::NoneState::new_expr()))
     }
@@ -44,24 +28,23 @@ impl ParseState for BiFuncState {
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult {
+        // if child matched - find next child
         if did_child_match {
-            if self.has_matched_first {
-                // matched second child - find h
-                let close = find_h_close(&word, 0).or_else(|| find_h_close(&rest, 0));
-                match close {
-                    // will never be a h to find even on future words
-                    None => MatchResult::Failed,
-                    Some(slice) => MatchResult::Matched(slice.pos),
-                }
+            self.add_child(env.expr, self.last_child_index);
+            self.last_child_index = env.child_index;
+            MatchResult::ContinueWith(word.pos, Box::new(builtins::NoneState::new_expr()))
+        // if word contains h - end
+        } else if find_h_close(word, 0).is_some() {
+            // if has 2 or more children - match otherwise fail
+            if self.get_child_count(env.expr) >= 2 {
+                MatchResult::Matched(rest.pos)
             } else {
-                // matched first child - setup second child
-                self.has_matched_first = true;
-                self.set_b_index(env.expr, env.child_index);
-                MatchResult::ContinueWith(word.pos, Box::new(builtins::NoneState::new_expr()))
+                MatchResult::Failed
             }
+        // if no h - continue
         } else {
-            // if either child match fails - I will never match
-            MatchResult::Failed
+            self.cont = true;
+            MatchResult::Continue
         }
     }
 
@@ -79,8 +62,9 @@ impl ParseState for BiFuncState {
 impl BiFuncState {
     fn new(fn_type: BiFunctionType) -> Self {
         BiFuncState {
-            has_matched_first: false,
+            last_child_index: usize::MAX,
             fn_type,
+            cont: false,
         }
     }
 
@@ -88,22 +72,24 @@ impl BiFuncState {
         Self::new(BiFunctionType::Add)
     }
 
-    pub fn new_mult() -> Self {
-        Self::new(BiFunctionType::Mult)
-    }
-    
     pub fn new_sub() -> Self {
         Self::new(BiFunctionType::Sub)
     }
 
-    fn set_b_index(&self, expr: &mut Expr, child_index: usize) {
+    pub fn new_mult() -> Self {
+        Self::new(BiFunctionType::Mult)
+    }
+
+    fn add_child(&self, expr: &mut Expr, child_index: usize) {
         match expr {
-            Expr::Add { b_index, .. } | Expr::Mult { b_index, .. } | Expr::Sub { b_index, .. }=> {
-                *b_index = child_index;
-            }
-            _ => {
-                unimplemented!()
-            }
+            Expr::BiFunction { indexes, .. } => indexes.push(child_index),
+            _ => unimplemented!(),
+        }
+    }
+    fn get_child_count(&self, expr: &mut Expr) -> usize {
+        match expr {
+            Expr::BiFunction { indexes, .. } => indexes.len(),
+            _ => unimplemented!(),
         }
     }
 }

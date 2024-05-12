@@ -13,11 +13,14 @@ mod line;
 mod num_lit;
 mod num_literal;
 
-#[path = "parsing_tests1.rs"]
-mod parsing_tests1;
+#[path = "parsing_tests_word_funcs.rs"]
+mod parsing_tests_word_funcs;
 
-#[path = "parsing_tests2.rs"]
-mod parsing_tests2;
+#[path = "parsing_tests_milo.rs"]
+mod parsing_tests_milo;
+
+#[path = "parsing_tests_other.rs"]
+mod parsing_tests_other;
 
 use std::{
     collections::HashSet,
@@ -57,7 +60,7 @@ struct BuiltinMatchState {
 //         StateContext::None
 //     }
 // }
-trait ParseState: Debug {
+pub trait ParseState: Debug {
     /// call first time to setup the state
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult;
 
@@ -74,7 +77,7 @@ trait ParseState: Debug {
 }
 
 #[derive(Debug)]
-enum MatchResult {
+pub enum MatchResult {
     Matched(usize),
     ContinueWith(usize, Box<dyn ParseState>),
     Continue,
@@ -92,28 +95,29 @@ enum LastMatchResult {
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum ParserResult {
     NoInput,
+    Start,
 
-    MatchedLine(&'static str),
-    FailedLine(&'static str),
+    MatchedLine,
+    FailedLine,
 
-    Matched(&'static str),
-    ContinueWith(&'static str),
-    Continue(&'static str),
-    Failed(&'static str),
+    Matched,
+    ContinueWith,
+    Continue,
+    Failed,
 }
 
-struct Enviroment<'a> {
-    vars: &'a VarSet,
-    expr: &'a mut Expr,
-    locs: Option<Vec<usize>>,
-    child_index: usize,
-    global_index: usize,
+pub struct Enviroment<'a> {
+    pub vars: &'a VarSet,
+    pub expr: &'a mut Expr,
+    pub locs: Option<Vec<usize>>,
+    pub child_index: usize,
+    pub global_index: usize,
 }
 
 #[derive(PartialEq)]
-struct Slice<'a> {
-    str: &'a [u8],
-    pos: usize,
+pub struct Slice<'a> {
+    pub str: &'a [u8],
+    pub pos: usize,
 }
 
 impl<'a> fmt::Debug for Slice<'a> {
@@ -146,16 +150,20 @@ impl<'a> Slice<'a> {
     }
 }
 
-fn get_next_word<'a>(slice: &'a Slice<'a>, mut start: usize) -> (Slice<'a>, Slice<'a>) {
+fn is_valid_word_char(char:u8)->bool{
+    char.is_ascii_alphanumeric() || char == b'-'
+}
+
+fn get_next_word<'a>(slice: &Slice<'a>, mut start: usize) -> (Slice<'a>, Slice<'a>) {
     // find start of word
     start = start.min(slice.len());
-    while start < slice.len() && !slice.str[start].is_ascii_alphanumeric() {
+    while start < slice.len() && !is_valid_word_char(slice.str[start]) {
         start += 1;
     }
 
     // find end of word
     let mut end = start;
-    while end < slice.len() && slice.str[end].is_ascii_alphanumeric() {
+    while end < slice.len() && is_valid_word_char(slice.str[end]) {
         end += 1;
     }
 
@@ -176,7 +184,7 @@ fn find_word_end<'a>(slice: &'a Slice<'a>, start: usize) -> Slice<'a> {
     // find end of word
 
     let mut end = start.min(slice.len());
-    while end < slice.len() && slice.str[end].is_ascii_alphanumeric() {
+    while end < slice.len() && is_valid_word_char(slice.str[end]) {
         end += 1;
     }
     //let test = end < slice.len();
@@ -199,17 +207,20 @@ fn find_h_close<'a>(slice: &'a Slice<'a>, start: usize) -> Option<Slice<'_>> {
     test.then(|| find_word_end(slice, end))
 }
 
+// (expr_index, string_index, state)
+pub type State = (usize, usize, Box<dyn ParseState>);
+
 #[derive(Debug)]
 pub struct Parser<'a> {
     pub exprs: ExprArena,
     pub stat_starts: Vec<usize>,
 
-    // (expr_index, string_index, state)
-    stack: Vec<(usize, usize, Box<dyn ParseState>)>,
+    stack: Vec<State>,
+    last_state: Option<State>,
 
     pub vars: VarSet,
 
-    curr_line: String,
+    curr_line: Vec<u8>,
     source: &'a mut dyn ParseSource,
     parsing_line: bool,
 
@@ -224,9 +235,10 @@ impl<'a> Parser<'a> {
         Parser {
             exprs: ExprArena { vec: Vec::new() },
             stack: Vec::new(),
+            last_state: None,
             vars: VarSet::new(),
             stat_starts: Vec::new(),
-            curr_line: String::new(),
+            curr_line: Vec::new(),
             pos: 0,
             source,
             parsing_line: false,
@@ -238,34 +250,35 @@ impl<'a> Parser<'a> {
         self.source = source;
     }
 
-    fn setup_first(&mut self) -> bool {
-        self.pos += self.curr_line.len();
-        self.curr_line = String::new();
-        let has_read = self.source.read_line(&mut self.curr_line).is_ok();
-        let found_data = has_read && self.curr_line.trim().len() > 0;
-        if found_data {
-            // push match stat on first step of line
-            let index = self.exprs.vec.len();
-
-            self.exprs.vec.push(Expr::NoneStat);
-
-            self.stack
-                .push((index, 0, Box::new(builtins::NoneState::new_stat())));
-            self.stat_starts.push(index);
-
-            self.parsing_line = true;
-            self.last_locs = None;
-            self.last_result = LastMatchResult::None;
-        }
-        found_data
+    pub fn get_last_state<'b>(&'b self) -> Option<&'b State> {
+        self.last_state.as_ref().or_else(|| self.stack.last())
     }
 
+    pub fn get_state(&self) -> &'static str {
+        self.get_last_state()
+            .map_or(&"None", |state| state.2.get_name())
+    }
+
+    pub fn get_word<'b>(&'b self) -> &'b [u8] {
+        // (if self.last_result == LastMatchResult::Failed {
+        //     self.get_last_state()
+        // } else {
+        //     self.stack.last()
+        // })
+        self.get_last_state()
+            .map_or(b"", |state| Self::get_slice(&self.curr_line, state.1).0.str)
+    }
+}
+
+impl<'a> Parser<'a> {
     pub fn step(&mut self) -> ParserResult {
         let is_first = !self.parsing_line;
         if is_first {
             // push match stat on first step of line
             if !self.setup_first() {
                 return ParserResult::NoInput;
+            } else {
+                return ParserResult::Start;
             }
         }
         let _debug = format!(
@@ -278,11 +291,21 @@ impl<'a> Parser<'a> {
         );
         let _expr = format!("{:?}", self.exprs.vec);
         let _expr2 = linq_like_writer::write(&self.exprs, &self.stat_starts);
+        let _expr_short = format!(
+            "{:?}",
+            self.exprs.vec.iter().map(|e| {
+                let mut str = format!("{:?}", e);
+                str.truncate(str.find(" ").unwrap_or(str.len()));
+                str
+            })
+        );
         let _last = format!("{:?}", self.last_result);
         black_box(&_debug);
         black_box(&_debug2);
         black_box(&_expr);
         black_box(&_expr2);
+
+        self.last_state = None;
         // get curr frame
         let stack_index = self.stack.len() - 1;
         let frame = &mut self.stack[stack_index];
@@ -303,14 +326,8 @@ impl<'a> Parser<'a> {
         };
 
         // setup slice
-        let line = self.curr_line.as_bytes();
-        let start = frame.1;
-        let slice = Slice {
-            str: &line[start..],
-            pos: start,
-        };
 
-        let (word, rest) = get_next_word(&slice, 0);
+        let (word, rest) = Self::get_slice(&self.curr_line, frame.1);
 
         // run step function
         let mut result = match self.last_result {
@@ -322,7 +339,6 @@ impl<'a> Parser<'a> {
         };
 
         // run aftermath
-
         self.last_locs = env.locs.take();
 
         // reached end of line - upgrade result to failed
@@ -332,77 +348,123 @@ impl<'a> Parser<'a> {
 
         match result {
             // I matched - return to last expr on stack with success
-            MatchResult::Matched(index) => {
-                let state = self.stack.pop().unwrap();
-                //let state = self.stack_state.pop().unwrap();
-                //let expr = &self.exprs[expr_index];
-
-                // matched final stat
-                if self.stack.is_empty() {
-                    let start_index = *self.stat_starts.last().unwrap();
-                    self.parsing_line = false;
-                    // add to varibles
-                    if let Expr::Eq { name, .. } = &self.exprs[start_index] {
-                        self.vars.insert(name.to_owned());
-                    }
-                    ParserResult::MatchedLine(state.2.get_name())
-                } else {
-                    // setup result for next step
-                    self.last_result = LastMatchResult::Matched;
-                    self.stack.last_mut().unwrap().1 = index;
-                    ParserResult::Matched(state.2.get_name())
-                }
-            }
+            MatchResult::Matched(index) => self.matched_func(index),
             // continue parsing child
-            MatchResult::ContinueWith(index, state) => {
-                let mut expr_index = self.exprs.vec.len();
-                let name = state.get_name();
-                // replace none exprs
-                if self.exprs[expr_index - 1].is_none() {
-                    self.exprs.vec.pop();
-                    expr_index -= 1;
-                }
-                self.exprs.vec.push(Expr::NoneExpr);
-                self.stack.push((expr_index, index, state));
-
-                self.last_result = LastMatchResult::None;
-
-                ParserResult::ContinueWith(name)
-            }
-            // I failed but could parse on future words
-            MatchResult::Continue => {
-                let stack_index = self.stack.len() - 1;
-                let frame = &mut self.stack[stack_index];
-                // change match starting location to after word
-                frame.1 = rest.pos;
-
-                self.last_result = LastMatchResult::Continue;
-
-                ParserResult::Continue(frame.2.get_name())
-            }
-            // I failed and will not parse on future words
-            MatchResult::Failed => {
-                let frame = self.stack.pop().unwrap();
-
-                let next_expr = self.stack.last().map_or(0, |x| x.0);
-
-                // if state has not been replaced - remove from arena
-                if !frame.2.do_replace() {
-                    self.exprs.vec.truncate(next_expr);
-                }
-
-                self.last_result = LastMatchResult::Failed;
-                // failed final stat - couldn't parse anything on line
-                if self.stack.is_empty() {
-                    self.parsing_line = false;
-                    self.exprs.vec.truncate(frame.0);
-                    self.stat_starts.pop();
-                    ParserResult::FailedLine(frame.2.get_name())
-                } else {
-                    // setup result for next step
-                    ParserResult::Failed(frame.2.get_name())
-                }
-            }
+            MatchResult::ContinueWith(index, state) => self.continue_with_func(index, state),
+            // continue with me
+            MatchResult::Continue => self.continue_func(rest.pos),
+            // I failed, go back on stack with fail
+            MatchResult::Failed => self.failed_func(),
         }
     }
+
+    fn failed_func(&mut self) -> ParserResult {
+        let state = self.stack.pop().unwrap();
+
+        let state_pos = state.0;
+        self.exprs.vec.truncate(state_pos);
+        //let _test = format!("{:?}", state);
+
+        self.last_state = Some(state);
+
+        self.last_result = LastMatchResult::Failed;
+        // failed final stat - couldn't parse anything on line
+        if self.stack.is_empty() {
+            self.parsing_line = false;
+            self.stat_starts.pop();
+            ParserResult::FailedLine
+        } else {
+            // setup result for next step
+            ParserResult::Failed
+        }
+    }
+
+    fn continue_func(&mut self, new_index: usize) -> ParserResult {
+        let stack_index = self.stack.len() - 1;
+        let frame = &mut self.stack[stack_index];
+        // change match starting location to after word
+        frame.1 = new_index;
+
+        self.last_result = LastMatchResult::Continue;
+
+        ParserResult::Continue
+    }
+
+    fn continue_with_func(&mut self, index: usize, state: Box<dyn ParseState>) -> ParserResult {
+        let mut expr_index = self.exprs.vec.len();
+
+        // replace none exprs
+        if self.exprs.vec.last().is_some_and(|e|e.is_none()) {
+            self.exprs.vec.pop();
+            expr_index -= 1;
+        }
+        self.exprs.vec.push(Expr::NoneExpr);
+        self.stack.push((expr_index, index, state));
+
+        self.last_result = LastMatchResult::None;
+
+        ParserResult::ContinueWith
+    }
+
+    fn matched_func(&mut self, index: usize) -> ParserResult {
+        let state = self.stack.pop().unwrap();
+        self.last_state = Some(state);
+
+        // matched final stat
+        if self.stack.is_empty() {
+            let start_index = *self.stat_starts.last().unwrap();
+            self.parsing_line = false;
+            // add to varibles
+            if let Expr::Eq { name, .. } = &self.exprs[start_index] {
+                self.vars.insert(name.to_owned());
+            }
+            ParserResult::MatchedLine
+        } else {
+            // setup result for next step
+            self.last_result = LastMatchResult::Matched;
+            self.stack.last_mut().unwrap().1 = index;
+            ParserResult::Matched
+        }
+    }
+
+    fn get_slice(line: &[u8], start: usize) -> (Slice, Slice) {
+        //let line = line.as_bytes();
+        let slice = Slice {
+            str: &line[start..],
+            pos: start,
+        };
+        get_next_word(&slice, 0)
+    }
+
+    fn setup_first(&mut self) -> bool {
+        self.pos += self.curr_line.len();
+        self.curr_line = Vec::new();
+        let has_read = self.source.read_until(b'\n', &mut self.curr_line).is_ok();
+        let found_data = has_read && trim_ascii_whitespace(&self.curr_line).len() > 0;
+        if found_data {
+            // push match stat on first step of line
+            let index = self.exprs.vec.len();
+
+            self.exprs.vec.push(Expr::NoneStat);
+
+            self.stack
+                .push((index, 0, Box::new(builtins::NoneState::new_stat())));
+            self.stat_starts.push(index);
+
+            self.parsing_line = true;
+            self.last_locs = None;
+            self.last_result = LastMatchResult::None;
+        }
+        found_data
+    }
+}
+
+// https://stackoverflow.com/questions/31101915/how-to-implement-trim-for-vecu8
+pub fn trim_ascii_whitespace(x: &[u8]) -> &[u8] {
+    let from = match x.iter().position(|x| !x.is_ascii_whitespace()) {
+        Some(i) => i,
+        None => return &x[0..0],
+    };
+    let to = x.iter().rposition(|x| !x.is_ascii_whitespace()).unwrap();
+    &x[from..=to]
 }
