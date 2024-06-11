@@ -1,13 +1,3 @@
-commands = {
-    'pr':'(print',
-    'pi':'(circle',
-    'h':')',
-    'li':'(line',
-    'eq':'(def $',
-    'num':'(length $',
-    'mu':'(*',
-    'and':'(+'
-}
 class Progress:
     def __init__(self,alias):
         self.alias = alias
@@ -22,7 +12,7 @@ class Progress:
 
 interp = []
 variables = set()
-def reset_interp():
+def reset_interp(commands):
     global interp
     interp = []
     for com in commands:
@@ -30,17 +20,13 @@ def reset_interp():
         
 letters = 'abcdefghijklmnopqrstuvwxyz'
 
-def triggers(word):
-    reset_interp()
+def triggers(word,commands):
+    reset_interp(commands)
     triggers = []
     for letter in word:
         for progress in interp:
             if progress.letter == letter and progress.inc():
                 triggers.append(progress.alias)
-                reset_interp()
-                # No further letters viewed if the command looks at the next line
-                if '$' in commands[progress.alias]:
-                    return triggers
-                break
+                reset_interp(commands)
     return triggers
 
