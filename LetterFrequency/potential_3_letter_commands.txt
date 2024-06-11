@@ -11,6 +11,6 @@ Sub: subtract (#143)
 Log: log (#138) - override for different bases
 Exp: exponentiation (#124)
 Mod: modulo (#256)
-Num: literal number (#411)
+Lit: literal number (#186)
 Not: ignore all text up until the next punctuation (#17) - could be useful, could also get in the way
 any punctuation (commas, periods, semicolons, etc.): equivalent of close parentheses
