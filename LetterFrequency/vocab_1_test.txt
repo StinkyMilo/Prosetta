@@ -1,15 +1,16 @@
 ## Task: Print the Fibonacci Sequence
 
-was i lit zero.
-was a lit one.
-was b lit one.
+was i lit zero..
+was a lit one..
+was b lit one..
 was temp.
-whi les i lit hundred.
+whi les i lit hundred..
     sta
         pri a.
         was temp b.
-        was b add a b.
+        was b add a b..
         was a temp.
+        was i add i lit one...
     .
 .
 
@@ -21,3 +22,5 @@ He wasted days pleading against a vast, empty void.
     (was "days" (int "a"))
 There was no answer.
     (was "no")
+I worship the empty miles between 
+    (whi (les ))
