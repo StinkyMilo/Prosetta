@@ -107,6 +107,10 @@ fn write_expr(
                 BiFunctionType::Add => ("+", 10 * 2),
                 BiFunctionType::Sub => ("-", 10 * 2),
                 BiFunctionType::Mult => ("*", 11 * 2),
+                BiFunctionType::Div => ("/",11*2),
+                BiFunctionType::Mod => ("%",11*2),
+                BiFunctionType::Expr => ("expr",11*2),
+                BiFunctionType::Log =>("log",11*2),
             };
             write_var_len_operator(
                 exprs,

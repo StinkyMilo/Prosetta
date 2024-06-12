@@ -2,7 +2,7 @@
 
 mod add_mult;
 mod alias;
-mod alias_data;
+pub(crate) mod alias_data;
 mod eq;
 mod num;
 mod var;

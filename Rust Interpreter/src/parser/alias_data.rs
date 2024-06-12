@@ -37,7 +37,7 @@ fn setup_stat(num: u16, index: usize) -> MatchResult {
 
 #[derive(Debug)]
 pub struct BuiltinData {
-    pub names: Vec<&'static [u8]>,
+    pub aliases: AliasSelector,
     pub func: BuildInSetUp,
     pub is_expr: bool,
     pub default_continue: bool,
@@ -46,9 +46,34 @@ pub struct BuiltinData {
 
 #[derive(Debug)]
 pub struct AliasData {
-    pub expr: BuiltinData,
-    pub expr_cont: BuiltinData,
-    pub stat: BuiltinData,
+    pub expr: Vec<&'static [u8]>,
+    pub stat: Vec<&'static [u8]>,
+}
+pub type AliasNames = Vec<&'static [u8]>;
+type AliasSelector = fn(&AliasData) -> &AliasNames;
+
+impl AliasData {
+    pub const EXPR: BuiltinData = BuiltinData {
+        aliases: |data| &data.expr,
+        func: setup_expr,
+        is_expr: true,
+        default_continue: false,
+        state_name: "NoneExpr",
+    };
+    pub const EXPR_CONT: BuiltinData = BuiltinData {
+        aliases: |data| &data.expr,
+        func: setup_expr,
+        is_expr: true,
+        default_continue: true,
+        state_name: "NoneExprCont",
+    };
+    pub const STAT: BuiltinData = BuiltinData {
+        aliases: |data| &data.stat,
+        func: setup_stat,
+        is_expr: false,
+        default_continue: true,
+        state_name: "NoneStat",
+    };
 }
 
 impl AliasData {
@@ -59,34 +84,11 @@ impl AliasData {
             expr_vec.push(NOT_ALIAS);
         }
 
-        let expr = BuiltinData {
-            names: expr_vec,
-            func: setup_expr,
-            is_expr: true,
-            default_continue: false,
-            state_name: "NoneExpr",
-        };
-
-        let expr_cont = BuiltinData {
-            names: expr_vec,
-            func: setup_expr,
-            is_expr: true,
-            default_continue: true,
-            state_name: "NoneExprCont",
-        };
-
-        let stat = BuiltinData {
-            names: Vec::from(BASE_EXPR_ALIASES),
-            func: setup_stat,
-            is_expr: false,
-            default_continue: true,
-            state_name: "NoneStat",
-        };
+        let stat_vec = Vec::from(STAT_ALIASES);
 
         AliasData {
-            expr,
-            expr_cont,
-            stat,
+            expr: expr_vec,
+            stat: stat_vec,
         }
     }
 }

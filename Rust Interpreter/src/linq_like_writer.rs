@@ -95,6 +95,10 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                 BiFunctionType::Add => "add",
                 BiFunctionType::Sub => "sub",
                 BiFunctionType::Mult => "mult",
+                BiFunctionType::Div => "div",
+                BiFunctionType::Mod => "mod",
+                BiFunctionType::Expr => "expr",
+                BiFunctionType::Log => "log",
             };
             format!(
                 "({}{} {})",
@@ -115,6 +119,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             str_start,
             str_length
         ),
+        Expr::Arc { locs, indexes } => todo!(),
         //expr => panic!("found {expr:?} which has no branch"),
     }
 }

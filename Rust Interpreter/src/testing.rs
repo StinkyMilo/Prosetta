@@ -1,12 +1,11 @@
 #[allow(dead_code)]
-
 #[cfg(test)]
 pub mod test_lib {
 
     use crate::commands::Expr;
 
     use crate::parser::*;
-
+    use alias_data::AliasData;
     use std::collections::HashSet;
 
     pub fn assert_step_inner(
@@ -50,6 +49,7 @@ pub mod test_lib {
         expr: &'a mut Expr,
         child_index: usize,
         locs: Option<Vec<usize>>,
+        aliases: &'a AliasData,
     ) -> Enviroment<'a> {
         Enviroment {
             vars,
@@ -57,7 +57,7 @@ pub mod test_lib {
             child_index,
             locs,
             global_index: 0,
-            aliases:AliasData::new(ParserFlags::default())
+            aliases,
         }
     }
 }

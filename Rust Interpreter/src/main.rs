@@ -32,7 +32,7 @@ fn main() {
 
     let mut args: Vec<String> = std::env::args().skip(1).collect();
 
-    for mut e in args {
+    for e in &mut args {
         e.make_ascii_lowercase();
     }
 

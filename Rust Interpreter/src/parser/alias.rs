@@ -1,13 +1,11 @@
 use super::*;
 use alias_data::*;
 
-type AliasSelector = for<'a> fn(&'a Enviroment<'a>) -> &'a BuiltinData;
-
 /// used for both NoneStat and NoneExpr
 /// finds next buildin function
 #[derive(Debug)]
 pub struct NoneState {
-    data: AliasSelector,
+    data: &'static BuiltinData,
     progress: Vec<u8>,
     locs: Vec<Option<Vec<usize>>>,
     offset: usize,
@@ -16,10 +14,11 @@ pub struct NoneState {
 
 impl ParseState for NoneState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
-        debug_assert!(self.data.names.len() < u16::MAX as usize);
+        let aliases = (self.data.aliases)(env.aliases);
+        debug_assert!(aliases.len() < u16::MAX as usize);
 
         // reset on new word
-        self.reset();
+        self.reset(aliases.len());
 
         // if expr  - check if varible name
         if self.data.is_expr {
@@ -65,47 +64,50 @@ impl ParseState for NoneState {
 }
 
 impl NoneState {
-    fn new(data: AliasSelector) -> Self {
-        let length = (data.names).len();
+    fn new(data: &'static BuiltinData) -> Self {
+        //let length = (data.names).len();
         Self {
             data,
-            progress: vec![0u8; length],
-            locs: vec![Some(Vec::new()); length],
+            progress: Vec::new(),
+            locs: Vec::new(),
             offset: 0,
             matched: 0,
         }
     }
-    fn reset(&mut self) {
-        *self = Self::new(self.data);
+    fn reset(&mut self, length: usize) {
+        self.progress = vec![0u8; length];
+        self.locs = vec![Some(Vec::new()); length];
+        self.offset = 0;
+        self.matched = 0;
     }
     pub fn new_stat() -> Self {
-        Self::new(|env| &env.aliases.stat)
+        Self::new(&AliasData::STAT)
     }
     pub fn new_expr() -> Self {
-        Self::new(|env| &env.aliases.expr)
+        Self::new(&AliasData::EXPR)
     }
     pub fn new_expr_cont() -> Self {
-        Self::new(|env| &env.aliases.expr_cont)
+        Self::new(&AliasData::EXPR_CONT)
     }
 }
 
 impl NoneState {
     /// matches buildin functions based on self.data
     fn match_alias(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
-        let data = (self.data)(env);
+        let aliases = (self.data.aliases)(env.aliases);
 
         // run until end of word
         for offset in self.offset..word.len() {
-            self.match_letters(&data, word, offset);
+            self.match_letters(&aliases, word, offset);
 
             // try match
             while self.matched != 0 {
                 self.matched -= 1;
-                return self.find_best_match(env, &data, offset, rest.pos);
+                return self.find_best_match(env, &aliases, offset, rest.pos);
             }
         }
         // if default continue
-        if data.default_continue {
+        if self.data.default_continue {
             MatchResult::Continue
         // else fail
         } else {
@@ -116,16 +118,16 @@ impl NoneState {
     fn find_best_match(
         &mut self,
         env: &mut Enviroment,
-        data: &BuiltinData,
+        aliases: &AliasNames,
         offset: usize,
         rest: usize,
     ) -> MatchResult {
         let mut min_size = usize::MAX;
         let mut min_locations = usize::MAX;
         let mut min_index = u16::MAX;
-        for j in 0..data.names.len() {
+        for j in 0..aliases.len() {
             // has finished matching
-            if self.progress[j] == data.names[j].len() as u8 && self.locs[j].is_some() {
+            if self.progress[j] == aliases[j].len() as u8 && self.locs[j].is_some() {
                 let matching_locs = self.locs[j].as_ref().unwrap();
 
                 let size = matching_locs.last().unwrap() - matching_locs[0];
@@ -153,17 +155,17 @@ impl NoneState {
         )
     }
 
-    fn match_letters(&mut self, data: &BuiltinData, word: &Slice<'_>, offset: usize) {
+    fn match_letters(&mut self, aliases: &AliasNames, word: &Slice<'_>, offset: usize) {
         // does letter match any commands
-        for i in 0..data.names.len() {
+        for i in 0..aliases.len() {
             // does letter match
-            if self.progress[i] < data.names[i].len() as u8
-                && word.str[offset].to_ascii_lowercase() == data.names[i][self.progress[i] as usize]
+            if self.progress[i] < aliases[i].len() as u8
+                && word.str[offset].to_ascii_lowercase() == aliases[i][self.progress[i] as usize]
             {
                 self.progress[i] += 1;
                 // add locations to locations (locs)
                 self.locs[i].as_mut().unwrap().push(word.pos + offset);
-                if self.progress[i] == data.names[i].len() as u8 {
+                if self.progress[i] == aliases[i].len() as u8 {
                     self.matched += 1;
                 }
             }
