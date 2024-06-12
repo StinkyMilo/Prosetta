@@ -37,8 +37,16 @@ Fre: For each loop (word, list, statementUsingWord) (#73) -- The "word" is the n
 -- The main one is that in this lisp-like syntax I don't really see the advantage over while.
 -- The other is that "for" got a score of over 1%, which I think is a little too high.
 
+## Functions ##
+Fun: Function declaration (name, arguments, statement) (#313) -- Name, Arguments are words until the statement begins 
+-- Next word after fun is the function name, next words are arguments until "sta" is found in a word.
+-- Things like this are what make me think maybe we should just stick to one command per word max.
+
 ## Other ##
 Pri: print (#29)
 Was: variable declaration (#58)
+Sta: Begin statement, like an opening parenthesis but only for blocks of code where it's needed (#18) 
+-- An alternative idea to Sta is to count all capital letters as beginnings of statements, 
+-- but that would be a bit weird judging that parentheses close them, so you'd need to find proper nouns mid-sentence. 
 Not: ignore all text up until the next punctuation (#17) - could be useful, could also get in the way
 any punctuation (commas, periods, semicolons, etc.): equivalent of close parentheses
