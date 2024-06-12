@@ -12,5 +12,10 @@ Log: log (#138) - override for different bases
 Exp: exponentiation (#124)
 Mod: modulo (#256)
 Lit: literal number (#186)
+Lis: List constructor, can place arbitrarily many arguments and they will form a list (#56)
+Ind: List index access operator to access the nth element of a list (#85)
+App: List append operator (list, value, index?) (#87) --location is optional, default is end of list. Other values shift. not the same as replace
+Rep: List set operator "replace" (list, index, value) (#90) -- replaces index with value
+Del: List delete operator. (list, index?) (#317) -- defaults to removing first value, otherwise removes at index. Other values shift.
 Not: ignore all text up until the next punctuation (#17) - could be useful, could also get in the way
 any punctuation (commas, periods, semicolons, etc.): equivalent of close parentheses
