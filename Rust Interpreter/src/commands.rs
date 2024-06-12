@@ -5,6 +5,15 @@ pub enum BiFunctionType {
     Add,
     Sub,
     Mult,
+    Div,
+    Mod,
+    Expr,
+    Log
+}
+
+pub enum Prints{
+    Var(String),
+    Word(String)
 }
 
 #[derive(PartialEq, Debug)]
@@ -18,13 +27,17 @@ pub enum Expr {
         name: Vec<u8>,
         value_index: usize,
     },
+    Arc {
+        locs: Vec<usize>,
+        indexes: [usize; 4],
+    },
     Line {
         locs: Vec<usize>,
-        indexes:[usize;4],
+        indexes: [usize; 4],
     },
     Circle {
         locs: Vec<usize>,
-        indexes:[usize;3],
+        indexes: [usize; 3],
     },
 
     //expr

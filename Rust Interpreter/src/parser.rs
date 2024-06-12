@@ -1,8 +1,8 @@
 #![allow(dead_code)]
 
 mod add_mult;
-mod builtins;
-mod builtins_data;
+mod alias;
+mod alias_data;
 mod eq;
 mod num;
 mod var;
@@ -31,6 +31,8 @@ use std::{
 
 use crate::{commands::*, linq_like_writer};
 
+use alias_data::{AliasData};
+
 //type MatchResult<T> = Option<(usize, T)>;
 type VarSet = HashSet<Vec<u8>>;
 //type ParseFn = fn(this: &Parser,&VarSet, &Slice<'_>, Vec<usize>) -> MatchResult;
@@ -39,6 +41,11 @@ type StepFunction =
 
 pub trait ParseSource: BufRead + Debug {}
 impl<T: BufRead + Debug> ParseSource for T {}
+
+#[derive(Default, Debug)]
+pub struct ParserFlags {
+    pub not: bool,
+}
 
 #[derive(PartialEq, Debug)]
 struct BuiltinMatchState {
@@ -112,6 +119,7 @@ pub struct Enviroment<'a> {
     pub locs: Option<Vec<usize>>,
     pub child_index: usize,
     pub global_index: usize,
+    pub aliases: &'a AliasData,
 }
 
 #[derive(PartialEq)]
@@ -150,7 +158,7 @@ impl<'a> Slice<'a> {
     }
 }
 
-fn is_valid_word_char(char:u8)->bool{
+fn is_valid_word_char(char: u8) -> bool {
     char.is_ascii_alphanumeric() || char == b'-'
 }
 
@@ -227,11 +235,12 @@ pub struct Parser<'a> {
     pos: usize,
     last_result: LastMatchResult,
     last_locs: Option<Vec<usize>>,
+    aliases: AliasData,
 }
 
 type ParseFunc = fn() -> MatchResult;
 impl<'a> Parser<'a> {
-    pub fn new(source: &'a mut dyn ParseSource) -> Self {
+    pub fn new(source: &'a mut dyn ParseSource, flags:ParserFlags) -> Self {
         Parser {
             exprs: ExprArena { vec: Vec::new() },
             stack: Vec::new(),
@@ -244,6 +253,7 @@ impl<'a> Parser<'a> {
             parsing_line: false,
             last_result: LastMatchResult::None,
             last_locs: None,
+            aliases: AliasData::new(Default::default()),
         }
     }
     pub fn change_source(&mut self, source: &'a mut dyn ParseSource) {
@@ -323,6 +333,7 @@ impl<'a> Parser<'a> {
             locs: self.last_locs.take(),
             child_index: next_child,
             global_index: self.pos,
+            aliases:&self.aliases
         };
 
         // setup slice
@@ -394,7 +405,7 @@ impl<'a> Parser<'a> {
         let mut expr_index = self.exprs.vec.len();
 
         // replace none exprs
-        if self.exprs.vec.last().is_some_and(|e|e.is_none()) {
+        if self.exprs.vec.last().is_some_and(|e| e.is_none()) {
             self.exprs.vec.pop();
             expr_index -= 1;
         }
@@ -448,7 +459,7 @@ impl<'a> Parser<'a> {
             self.exprs.vec.push(Expr::NoneStat);
 
             self.stack
-                .push((index, 0, Box::new(builtins::NoneState::new_stat())));
+                .push((index, 0, Box::new(alias::NoneState::new(&self.aliases.stat))));
             self.stat_starts.push(index);
 
             self.parsing_line = true;

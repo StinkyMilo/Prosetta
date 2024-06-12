@@ -1,7 +1,9 @@
 use std::{
-    io::{self, Read},
+    io::{self, Read, Write},
     mem,
 };
+
+use parser::ParserFlags;
 
 use crate::parser::{Parser, ParserResult};
 
@@ -17,16 +19,29 @@ mod error_messages;
 
 //use crate::commands::*;
 
-// fn print(parser: &Parser) {
-//     println!(
-//         "   parsed: {}",
-//         linq_like_writer::write_one(&parser.exprs, *parser.stat_starts.last().unwrap())
-//     );
-//     std::io::stdout().flush().unwrap();
-// }
+fn print(parser: &Parser) {
+    println!(
+        "   parsed: {}",
+        linq_like_writer::write_one(&parser.exprs, *parser.stat_starts.last().unwrap())
+    );
+    std::io::stdout().flush().unwrap();
+}
 
 fn main() {
     println!("size of parser: {}", mem::size_of::<Parser>());
+
+    let mut args: Vec<String> = std::env::args().skip(1).collect();
+
+    for mut e in args {
+        e.make_ascii_lowercase();
+    }
+
+    args.sort();
+
+    let flags = ParserFlags {
+        not: args.binary_search(&"not".to_string()).is_ok(),
+    };
+
     // println!(
     //     "name of eq: {}",
     //     format!("{:#?}",(&commands::Expr::Eq {
@@ -44,32 +59,32 @@ fn main() {
     //println!("{}",processing_writer::write(&stats))
     //let s:String = Default::default();
 
-    let mut parser = Parser::new(&mut input);
+    let mut parser = Parser::new(&mut input, flags);
 
     //parser.vars.insert("inch".as_bytes().to_vec());
     crate::testing::add_vars!(parser, "inch", "miles", "furlongs", "longer");
     //let mut result = parser.step();
 
-    // loop {
-    //     match parser.step() {
-    //         ParserResult::MatchedLine => print(&parser),
-    //         ParserResult::FailedLine => println!("   parse failed"),
-    //         ParserResult::NoInput => break,
-    //         _ => {}
-    //     }
-    // }
-
     loop {
         match parser.step() {
+            ParserResult::MatchedLine => print(&parser),
+            ParserResult::FailedLine => println!("   parse failed"),
             ParserResult::NoInput => break,
-            state => println!(
-                "assert_step!(parser, {:?}, \"{}\", \"{}\");",
-                state,
-                parser.get_state(),
-                std::str::from_utf8(parser.get_word()).unwrap()
-            ),
+            _ => {}
         }
     }
+
+    // loop {
+    //     match parser.step() {
+    //         ParserResult::NoInput => break,
+    //         state => println!(
+    //             "assert_step!(parser, {:?}, \"{}\", \"{}\");",
+    //             state,
+    //             parser.get_state(),
+    //             std::str::from_utf8(parser.get_word()).unwrap()
+    //         ),
+    //     }
+    // }
 
     //println!();
     //println!("== {:?}", parser.exprs.vec);

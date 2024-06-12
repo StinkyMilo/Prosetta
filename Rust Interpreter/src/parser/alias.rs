@@ -1,18 +1,18 @@
 use super::*;
-use builtins_data::*;
+use alias_data::*;
 
 /// used for both NoneStat and NoneExpr
 /// finds next buildin function
 #[derive(Debug)]
-pub struct NoneState {
-    data: &'static BuiltinData,
+pub struct NoneState<'a> {
+    data: &'a BuiltinData,
     progress: Vec<u8>,
     locs: Vec<Option<Vec<usize>>>,
     offset: usize,
     matched: u16,
 }
 
-impl ParseState for NoneState {
+impl<'a> ParseState for NoneState<'a> {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
         debug_assert!(self.data.names.len() < u16::MAX as usize);
 
@@ -34,7 +34,7 @@ impl ParseState for NoneState {
                 return MatchResult::ContinueWith(word.pos, Box::new(num_state));
             }
         }
-        self.match_built_in(env, word, rest)
+        self.match_alias(env, word, rest)
     }
 
     fn step_match(
@@ -49,7 +49,7 @@ impl ParseState for NoneState {
             MatchResult::Matched(word.pos)
         } else {
             // child did not match - continue searching
-            self.match_built_in(env, word, rest)
+            self.match_alias(env, word, rest)
         }
     }
 
@@ -62,8 +62,8 @@ impl ParseState for NoneState {
     }
 }
 
-impl NoneState {
-    fn new(data: &'static BuiltinData) -> Self {
+impl<'a> NoneState<'a> {
+    pub fn new(data: &'a BuiltinData) -> Self {
         let length = data.names.len();
         Self {
             data,
@@ -80,20 +80,20 @@ impl NoneState {
         self.offset = 0;
         self.matched = 0;
     }
-    pub fn new_stat() -> Self {
-        Self::new(&STAT_DATA)
+    pub fn new_stat(env: &'a Enviroment) -> Self {
+        Self::new(&env.aliases.stat)
     }
-    pub fn new_expr() -> Self {
-        Self::new(&EXPR_DATA)
+    pub fn new_expr(env: &'a Enviroment) -> Self {
+        Self::new(&env.aliases.expr)
     }
-    pub fn new_expr_cont() -> Self {
-        Self::new(&EXPR_DATA_CONT)
+    pub fn new_expr_cont(env: &'a Enviroment) -> Self {
+        Self::new(&env.aliases.expr_cont)
     }
 }
 
-impl NoneState {
+impl<'a> NoneState<'a> {
     /// matches buildin functions based on self.data
-    fn match_built_in(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
+    fn match_alias(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
         // run until end of word
         for offset in self.offset..word.len() {
             self.match_letters(word, offset);
