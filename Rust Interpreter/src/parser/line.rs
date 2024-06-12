@@ -14,7 +14,7 @@ impl ParseState for LineState {
         };
 
         // setup child state
-        MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont(env)))
+        MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont()))
     }
 
     fn step_match(
@@ -37,7 +37,7 @@ impl ParseState for LineState {
                 // matched first child - setup second child
                 self.children += 1;
                 self.set_child_indexes(env.expr, self.children, env.child_index);
-                MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont(env)))
+                MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont()))
             }
         } else {
             // if either child match fails - I will never match

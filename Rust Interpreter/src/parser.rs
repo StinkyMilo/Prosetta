@@ -31,7 +31,7 @@ use std::{
 
 use crate::{commands::*, linq_like_writer};
 
-use alias_data::{AliasData};
+use alias_data::AliasData;
 
 //type MatchResult<T> = Option<(usize, T)>;
 type VarSet = HashSet<Vec<u8>>;
@@ -113,7 +113,7 @@ pub enum ParserResult {
     Failed,
 }
 
-pub struct Enviroment<'a> {
+pub struct Enviroment<'a>{
     pub vars: &'a VarSet,
     pub expr: &'a mut Expr,
     pub locs: Option<Vec<usize>>,
@@ -240,7 +240,7 @@ pub struct Parser<'a> {
 
 type ParseFunc = fn() -> MatchResult;
 impl<'a> Parser<'a> {
-    pub fn new(source: &'a mut dyn ParseSource, flags:ParserFlags) -> Self {
+    pub fn new(source: &'a mut dyn ParseSource, flags: ParserFlags) -> Self {
         Parser {
             exprs: ExprArena { vec: Vec::new() },
             stack: Vec::new(),
@@ -333,7 +333,7 @@ impl<'a> Parser<'a> {
             locs: self.last_locs.take(),
             child_index: next_child,
             global_index: self.pos,
-            aliases:&self.aliases
+            aliases: &self.aliases,
         };
 
         // setup slice
@@ -458,8 +458,11 @@ impl<'a> Parser<'a> {
 
             self.exprs.vec.push(Expr::NoneStat);
 
-            self.stack
-                .push((index, 0, Box::new(alias::NoneState::new(&self.aliases.stat))));
+            self.stack.push((
+                index,
+                0,
+                Box::new(alias::NoneState::new_stat()),
+            ));
             self.stat_starts.push(index);
 
             self.parsing_line = true;

@@ -8,7 +8,7 @@ pub struct BiFuncState {
 }
 
 impl ParseState for BiFuncState {
-    fn step<'a>(&mut self, env: &'a mut Enviroment, word: &Slice, _rest: &Slice) -> MatchResult {
+    fn step(&mut self, env: &mut Enviroment, word: &Slice, _rest: &Slice) -> MatchResult {
         if !self.cont {
             let locs = env.locs.take().unwrap_or_default();
             *env.expr = Expr::BiFunction {
@@ -19,12 +19,12 @@ impl ParseState for BiFuncState {
             self.last_child_index = env.child_index;
         }
         // setup child state
-        MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr(env)))
+        MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr()))
     }
 
-    fn step_match<'a>(
+    fn step_match(
         &mut self,
-        env: &'a mut Enviroment,
+        env: &mut Enviroment,
         did_child_match: bool,
         word: &Slice,
         rest: &Slice,
@@ -33,7 +33,7 @@ impl ParseState for BiFuncState {
         if did_child_match {
             self.add_child(env.expr, self.last_child_index);
             self.last_child_index = env.child_index;
-            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr(env)))
+            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr()))
         // if word contains h - end
         } else if find_h_close(word, 0).is_some() {
             // if has 2 or more children - match otherwise fail

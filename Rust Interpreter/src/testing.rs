@@ -57,6 +57,7 @@ pub mod test_lib {
             child_index,
             locs,
             global_index: 0,
+            aliases:AliasData::new(ParserFlags::default())
         }
     }
 }
