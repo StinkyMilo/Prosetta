@@ -20,7 +20,7 @@ def reset_interp(commands):
         
 letters = 'abcdefghijklmnopqrstuvwxyz'
 
-def triggers(word,commands):
+def triggers(word,commands,only_one=False):
     reset_interp(commands)
     triggers = []
     for letter in word:
@@ -28,5 +28,9 @@ def triggers(word,commands):
             if progress.letter == letter and progress.inc():
                 triggers.append(progress.alias)
                 reset_interp(commands)
+                if only_one:
+                    return progress.alias
+    if only_one:
+        return None
     return triggers
 

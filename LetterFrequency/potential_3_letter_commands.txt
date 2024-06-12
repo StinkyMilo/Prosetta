@@ -50,3 +50,13 @@ Sta: Begin statement, like an opening parenthesis but only for blocks of code wh
 -- but that would be a bit weird judging that parentheses close them, so you'd need to find proper nouns mid-sentence. 
 Not: ignore all text up until the next punctuation (#17) - could be useful, could also get in the way
 any punctuation (commas, periods, semicolons, etc.): equivalent of close parentheses
+
+## Misc. ideas ##
+For punctuation, we can also separate punctuation into classes.
+Commas, periods, and semicolons are one close paren.
+Exclamation points and question marks are 2.
+Also a close parenthesis that closes nothing is just skipped over.
+NOT should go until the next punctuation and also skip that next punctuation.
+I'm now leaning toward each word triggering only one alias (whichever finishes first)
+That way we don't overcomplicate things.
+When there's only one argument, can we make closing the parentheses optional?

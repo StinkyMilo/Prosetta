@@ -1,0 +1,23 @@
+## Task: Print the Fibonacci Sequence
+
+was i lit zero.
+was a lit one.
+was b lit one.
+was temp.
+whi les i lit hundred.
+    sta
+        pri a.
+        was temp b.
+        was b add a b.
+        was a temp.
+    .
+.
+
+I was confused as the subject pointed his hand. His finger vanished into the dark...
+    (was "confused" (sub (int "his") (int "the")))
+He was a naive little one, that boy.
+    (was "a" (lit one))
+He wasted days pleading against a vast, empty void.
+    (was "days" (int "a"))
+There was no answer.
+    (was "no")
