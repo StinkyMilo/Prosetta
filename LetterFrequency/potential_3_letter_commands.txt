@@ -60,3 +60,4 @@ NOT should go until the next punctuation and also skip that next punctuation.
 I'm now leaning toward each word triggering only one alias (whichever finishes first)
 That way we don't overcomplicate things.
 When there's only one argument, can we make closing the parentheses optional?
+Maybe an alias that just ignores the next punctuation, and maybe it stacks additively?

@@ -14,13 +14,32 @@ whi les i lit hundred..
     .
 .
 
-I was confused as the subject pointed his hand. His finger vanished into the dark...
-    (was "confused" (sub (int "his") (int "the")))
-He was a naive little one, that boy.
-    (was "a" (lit one))
+I was lonely as the subject pointed his hand. His finger vanished into the dark...
+    (was "lonely" (sub (int "his") (int "the")))
+He was but a naive little one, that boy.
+    (was "but" (lit one))
 He wasted days pleading against a vast, empty void.
     (was "days" (int "a"))
 There was no answer.
     (was "no")
-I worship the empty miles between 
-    (whi (les ))
+I worship the empty miles between lonely light and a hundred years' darkness,
+    (whi (les "lonely" (lit hundred)
+in the space between spaces.
+        )
+I stayed
+        (statement 
+in the emptiness darkness provides but I didn't linger.
+            (pri "but")
+I wasted no days with my idolatry.
+            (was "no" "days")
+Wars waged as days advanced but days were too fast. Soon they slowed to centuries.
+            (was "days" (add "but" "days"))
+
+            (was "but" "no")
+
+            (was "lonely" (add "lonely" (lit one)))
+    
+        )
+
+    )
+    
