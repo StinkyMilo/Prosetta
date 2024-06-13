@@ -1,14 +1,17 @@
 #![allow(dead_code)]
 
-mod add_mult;
 mod alias;
 pub(crate) mod alias_data;
-mod eq;
-mod num;
+mod not;
+mod operator;
+mod set;
 mod var;
+mod word_num;
 
 mod circle;
 mod line;
+mod print;
+mod rect;
 
 mod num_lit;
 mod num_literal;
@@ -113,7 +116,7 @@ pub enum ParserResult {
     Failed,
 }
 
-pub struct Enviroment<'a>{
+pub struct Enviroment<'a> {
     pub vars: &'a VarSet,
     pub expr: &'a mut Expr,
     pub locs: Option<Vec<usize>>,
@@ -203,16 +206,22 @@ fn find_word_end<'a>(slice: &'a Slice<'a>, start: usize) -> Slice<'a> {
     }
 }
 
-// returns the rest after finding the end of an h word
-fn find_h_close<'a>(slice: &'a Slice<'a>, start: usize) -> Option<Slice<'_>> {
-    // find h
+const END_CHARS: &[u8] = b".?!,";
+
+// returns the rest after finding the end of an sentence
+fn find_close<'a>(slice: &'a Slice<'a>, start: usize) -> Option<Slice<'_>> {
+    // find end char
     let mut end = start;
-    while end < slice.len() && slice.str[end] != b'h' && slice.str[end] != b'H' {
+    while end < slice.len() && !END_CHARS.contains(&slice.str[end]) {
         end += 1;
     }
     let test = end < slice.len();
-    // find end of h word
-    test.then(|| find_word_end(slice, end))
+    end += 1;
+    // find end of period
+    test.then(|| Slice {
+        str: &slice.str[end..],
+        pos: slice.pos + end,
+    })
 }
 
 // (expr_index, string_index, state)
@@ -426,7 +435,7 @@ impl<'a> Parser<'a> {
             let start_index = *self.stat_starts.last().unwrap();
             self.parsing_line = false;
             // add to varibles
-            if let Expr::Eq { name, .. } = &self.exprs[start_index] {
+            if let Expr::Set { name, .. } = &self.exprs[start_index] {
                 self.vars.insert(name.to_owned());
             }
             ParserResult::MatchedLine
@@ -458,11 +467,8 @@ impl<'a> Parser<'a> {
 
             self.exprs.vec.push(Expr::NoneStat);
 
-            self.stack.push((
-                index,
-                0,
-                Box::new(alias::NoneState::new_stat()),
-            ));
+            self.stack
+                .push((index, 0, Box::new(alias::NoneState::new_stat())));
             self.stat_starts.push(index);
 
             self.parsing_line = true;

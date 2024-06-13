@@ -1,17 +1,17 @@
 use super::*;
 
 #[derive(Debug)]
-pub struct BiFuncState {
+pub struct OperatorState {
     last_child_index: usize,
-    fn_type: BiFunctionType,
+    fn_type: OperatorType,
     cont: bool,
 }
 
-impl ParseState for BiFuncState {
+impl ParseState for OperatorState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, _rest: &Slice) -> MatchResult {
         if !self.cont {
             let locs = env.locs.take().unwrap_or_default();
-            *env.expr = Expr::BiFunction {
+            *env.expr = Expr::Operator {
                 func_type: self.fn_type,
                 locs,
                 indexes: Vec::new(),
@@ -35,7 +35,7 @@ impl ParseState for BiFuncState {
             self.last_child_index = env.child_index;
             MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr()))
         // if word contains h - end
-        } else if find_h_close(word, 0).is_some() {
+        } else if find_close(word, 0).is_some() {
             // if has 2 or more children - match otherwise fail
             if self.get_child_count(env.expr) >= 2 {
                 MatchResult::Matched(rest.pos)
@@ -51,50 +51,69 @@ impl ParseState for BiFuncState {
 
     fn get_name(&self) -> &'static str {
         match self.fn_type {
-            BiFunctionType::Add => "Add",
-            BiFunctionType::Mult => "Mult",
-            BiFunctionType::Sub => "Sub",
-            BiFunctionType::Div => "Div",
-            BiFunctionType::Mod => "Mod",
-            BiFunctionType::Expr => "Expr",
-            BiFunctionType::Log => "Log",
+            OperatorType::Add => "Add",
+            OperatorType::Mult => "Mult",
+            OperatorType::Sub => "Sub",
+            OperatorType::Div => "Div",
+            OperatorType::Mod => "Mod",
+            OperatorType::Exp => "Exp",
+            OperatorType::Log => "Log",
         }
     }
     fn do_replace(&self) -> bool {
         false
     }
 }
-impl BiFuncState {
-    fn new(fn_type: BiFunctionType) -> Self {
-        BiFuncState {
+
+impl OperatorState {
+    fn new(fn_type: OperatorType) -> Self {
+        OperatorState {
             last_child_index: usize::MAX,
             fn_type,
             cont: false,
         }
     }
 
-    pub fn new_add() -> Self {
-        Self::new(BiFunctionType::Add)
-    }
-
-    pub fn new_sub() -> Self {
-        Self::new(BiFunctionType::Sub)
-    }
-
-    pub fn new_mult() -> Self {
-        Self::new(BiFunctionType::Mult)
-    }
-
     fn add_child(&self, expr: &mut Expr, child_index: usize) {
         match expr {
-            Expr::BiFunction { indexes, .. } => indexes.push(child_index),
+            Expr::Operator { indexes, .. } => indexes.push(child_index),
             _ => unimplemented!(),
         }
     }
     fn get_child_count(&self, expr: &mut Expr) -> usize {
         match expr {
-            Expr::BiFunction { indexes, .. } => indexes.len(),
+            Expr::Operator { indexes, .. } => indexes.len(),
             _ => unimplemented!(),
         }
+    }
+}
+
+impl OperatorState {
+    pub fn new_add() -> Self {
+        Self::new(OperatorType::Add)
+    }
+
+    pub fn new_sub() -> Self {
+        Self::new(OperatorType::Sub)
+    }
+
+    pub fn new_mult() -> Self {
+        Self::new(OperatorType::Mult)
+    }
+
+    pub fn new_div() -> Self {
+        Self::new(OperatorType::Div)
+    }
+
+    pub fn new_mod() -> Self {
+        Self::new(OperatorType::Mod)
+    }
+
+    pub fn new_exp() -> Self {
+        Self::new(OperatorType::Exp)
+    }
+
+    pub fn new_log() -> Self {
+        Self::new(OperatorType::Log)
     }
 }

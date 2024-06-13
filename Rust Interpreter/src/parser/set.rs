@@ -5,7 +5,7 @@ pub struct EqState {}
 impl ParseState for EqState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
         // set expr
-        *env.expr = Expr::Eq {
+        *env.expr = Expr::Set {
             name_start: word.pos + env.global_index,
             name: word.str.to_owned(),
             value_index: env.child_index,
@@ -24,7 +24,7 @@ impl ParseState for EqState {
     ) -> MatchResult {
         if did_child_match {
             // find closing h to end
-            let close = find_h_close(&word, 0).or_else(|| find_h_close(&rest, 0));
+            let close = find_close(&word, 0).or_else(|| find_close(&rest, 0));
             match close {
                 // will never be a h to find even on future words
                 None => MatchResult::Failed,

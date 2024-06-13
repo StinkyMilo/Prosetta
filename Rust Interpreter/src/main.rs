@@ -11,7 +11,7 @@ mod bounds_writer;
 mod commands;
 mod linq_like_writer;
 mod parser;
-mod processing_writer;
+//mod processing_writer;
 mod testing;
 
 mod error_messages;
@@ -92,10 +92,10 @@ fn main() {
         "   whole program:\n{}",
         linq_like_writer::write(&parser.exprs, &parser.stat_starts)
     );
-    println!(
-        "   java program:\n{}",
-        processing_writer::write(&parser.exprs, &parser.stat_starts)
-    );
+    // println!(
+    //     "   java program:\n{}",
+    //     processing_writer::write(&parser.exprs, &parser.stat_starts)
+    // );
     let _ = input.read(&mut [0u8]).unwrap();
 }
 

@@ -27,7 +27,7 @@ impl ParseState for LineState {
         if did_child_match {
             if self.children == 3 {
                 // matched second child - find h
-                let close = find_h_close(&word, 0).or_else(|| find_h_close(&rest, 0));
+                let close = find_close(&word, 0).or_else(|| find_close(&rest, 0));
                 match close {
                     // will never be a h to find even on future words
                     None => MatchResult::Failed,

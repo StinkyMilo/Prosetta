@@ -107,44 +107,41 @@ mod tests {
     }
 
     #[test]
-    fn test_find_h_close_after() {
+    fn test_find_end_close_after() {
         assert_eq!(
-            find_h_close(&new_slice(" a h b ", 0), 0),
+            find_close(&new_slice(" a . b ", 0), 0),
             Some(new_slice(" b ", 4))
         );
         assert_eq!(
-            find_h_close(&new_slice(" a H b ", 0), 0),
+            find_close(&new_slice(" a . b ", 0), 0),
             Some(new_slice(" b ", 4))
         );
         assert_eq!(
-            find_h_close(&new_slice(" a hb c", 0), 0),
-            Some(new_slice(" c", 5))
+            find_close(&new_slice(" a .b c", 0), 0),
+            Some(new_slice("b c", 4))
         );
         assert_eq!(
-            find_h_close(&new_slice(" a bhc d", 0), 0),
-            Some(new_slice(" d", 6))
+            find_close(&new_slice(" a b.c d", 0), 0),
+            Some(new_slice("c d", 5))
         );
     }
 
     #[test]
-    fn test_find_h_close_fails() {
-        assert_eq!(find_h_close(&new_slice("h", 0), 0), Some(new_slice("", 1)));
-        assert_eq!(find_h_close(&new_slice("ha", 0), 0), Some(new_slice("", 2)));
+    fn test_find_end_close_fails() {
+        assert_eq!(find_close(&new_slice("", 0), 0), None);
+        assert_eq!(find_close(&new_slice(".", 0), 0), Some(new_slice("", 1)));
+        assert_eq!(find_close(&new_slice(".a", 0), 0), Some(new_slice("a", 1)));
         assert_eq!(
-            find_h_close(&new_slice("haa", 0), 0),
-            Some(new_slice("", 3))
+            find_close(&new_slice(".aa", 0), 0),
+            Some(new_slice("aa", 1))
         );
-        assert_eq!(
-            find_h_close(&new_slice("haa ", 0), 0),
-            Some(new_slice(" ", 3))
-        );
-        assert_eq!(find_h_close(&new_slice("a b c d", 0), 0), None);
+        assert_eq!(find_close(&new_slice("a b c d", 0), 0), None);
     }
 
     #[test]
-    fn test_find_h_close_out() {
-        assert_eq!(find_h_close(&new_slice("a ", 0), 2), None);
-        assert_eq!(find_h_close(&new_slice("a ", 0), 3), None);
-        assert_eq!(find_h_close(&new_slice("a ", 0), 4), None);
+    fn test_find_end_close_out() {
+        assert_eq!(find_close(&new_slice("a ", 0), 2), None);
+        assert_eq!(find_close(&new_slice("a ", 0), 3), None);
+        assert_eq!(find_close(&new_slice("a ", 0), 4), None);
     }
 }

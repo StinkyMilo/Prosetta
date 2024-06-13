@@ -2,12 +2,12 @@ use super::*;
 
 /// state for num
 #[derive(Debug)]
-pub struct NumState {}
-impl ParseState for NumState {
+pub struct WordNumState {}
+impl ParseState for WordNumState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
-        let close = find_h_close(rest, 0);
+        let close = find_close(rest, 0);
         if let Some(close) = close {
-            *env.expr = Expr::Num {
+            *env.expr = Expr::WordNum {
                 str_start: word.pos + env.global_index,
                 str: word.str.to_owned().to_ascii_lowercase(),
                 locs: env.locs.take().unwrap_or_default(),
@@ -39,9 +39,9 @@ impl ParseState for NumState {
         false
     }
 }
-impl NumState {
+impl WordNumState {
     pub fn new() -> Self {
-        NumState {}
+        WordNumState {}
     }
 }
 

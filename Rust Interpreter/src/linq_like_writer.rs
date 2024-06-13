@@ -1,4 +1,4 @@
-use std::usize;
+use std::{fmt::format, usize};
 
 use crate::commands::*;
 
@@ -37,68 +37,56 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
     match &exprs[index] {
         Expr::NoneStat => "(todo stat)".to_string(),
         Expr::NoneExpr => "(todo expr)".to_string(),
-        Expr::Eq {
+        Expr::Set {
             locs,
             name_start,
             name,
             value_index,
         } => format!(
-            "(eq{} \"{}\"@{} {})",
+            "(set{} \"{}\"@{} {})",
             join_locs(locs),
             String::from_utf8_lossy(&name),
             name_start,
             write_expr(exprs, *value_index)
         ),
-        Expr::Line {
-            locs,
-            indexes
-        } => format!(
-            "(line{} {} {} {} {})",
-            join_locs(locs),
-            write_expr(exprs, indexes[0]),
-            write_expr(exprs, indexes[1]),
-            write_expr(exprs, indexes[2]),
-            write_expr(exprs, indexes[3])
-        ),
-        Expr::Circle {
-            locs,
-            indexes
-        } => format!(
-            "(circle{} {} {} {})",
-            join_locs(locs),
-            write_expr(exprs, indexes[0]),
-            write_expr(exprs, indexes[1]),
-            write_expr(exprs, indexes[2])
-        ),
+        Expr::Line { locs, indexes } => {
+            format!("(line{} {})", join_locs(locs), write_exprs(exprs, indexes),)
+        }
+        Expr::Arc { locs, indexes } => {
+            format!("(arc{} {})", join_locs(locs), write_exprs(exprs, indexes),)
+        }
+        Expr::Rect { locs, indexes } => {
+            format!("(rect{} {})", join_locs(locs), write_exprs(exprs, indexes),)
+        }
         Expr::Var { name_start, name } => format!(
             "(var \"{}\"@{})",
             String::from_utf8_lossy(&name).to_string(),
             name_start
         ),
-        Expr::Num {
+        Expr::WordNum {
             locs,
             str_start,
             str,
         } => format!(
-            "(num{} \"{}\"@{})",
+            "(wordnum{} \"{}\"@{})",
             join_locs(locs),
             String::from_utf8_lossy(str),
             str_start
         ),
-        Expr::BiFunction {
+        Expr::Operator {
             locs,
             func_type,
             indexes,
             ..
         } => {
             let name = match func_type {
-                BiFunctionType::Add => "add",
-                BiFunctionType::Sub => "sub",
-                BiFunctionType::Mult => "mult",
-                BiFunctionType::Div => "div",
-                BiFunctionType::Mod => "mod",
-                BiFunctionType::Expr => "expr",
-                BiFunctionType::Log => "log",
+                OperatorType::Add => "add",
+                OperatorType::Sub => "sub",
+                OperatorType::Mult => "mult",
+                OperatorType::Div => "div",
+                OperatorType::Mod => "mod",
+                OperatorType::Exp => "exp",
+                OperatorType::Log => "log",
             };
             format!(
                 "({}{} {})",
@@ -119,15 +107,30 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             str_start,
             str_length
         ),
-        Expr::Arc { locs, indexes } => todo!(),
-        //expr => panic!("found {expr:?} which has no branch"),
+        Expr::Print { locs, data } => {
+            format!("(print{} {})", join_locs(locs), write_prints(exprs, data))
+        }
     }
 }
 
-fn write_exprs(exprs: &ExprArena, indexes: &Vec<usize>) -> String {
+fn write_prints(exprs: &ExprArena, data: &Vec<Prints>) -> String {
+    let mut ret = String::new();
+    for print in data {
+        ret += &match print {
+            Prints::Var(index) => write_expr(exprs, *index) + " ",
+            Prints::Word(str, index) => format!("\"{}\"@{} ", str, index),
+        }
+    }
+    ret.pop();
+    ret
+}
+
+fn write_exprs(exprs: &ExprArena, indexes: &[usize]) -> String {
     let mut ret = String::new();
     for index in indexes {
-        ret += &(write_expr(exprs, *index) + " ");
+        if *index != usize::MAX {
+            ret += &(write_expr(exprs, *index) + " ");
+        }
     }
     ret.pop();
     ret

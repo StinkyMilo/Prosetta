@@ -1,36 +1,51 @@
 use super::*;
 
-type BuildInSetUp = fn(num: u16, index: usize) -> MatchResult;
+macro_rules! get_state {
+    ($state:expr) => {
+        Box::new($state) as Box<dyn ParseState>
+    };
+}
 
-const BASE_EXPR_ALIASES: [&'static [u8]; 7] =
-    [b"int", b"tim", b"add", b"sub", b"lit", b"ide", b"mod"];
+type BuildInSetUp = fn(alias: &'static [u8], index: usize) -> MatchResult;
+
+const BASE_EXPR_ALIASES: [&'static [u8]; 9] = [
+    b"int", b"tim", b"add", b"sub", b"lit", b"ide", b"mod", b"log", b"exp",
+];
 
 const NOT_ALIAS: &'static [u8] = b"not";
 
 const STAT_ALIASES: [&'static [u8]; 5] = [b"arc", b"lin", b"was", b"rec", b"pri"];
 
-fn setup_expr(num: u16, index: usize) -> MatchResult {
+fn setup_expr(alias: &'static [u8], index: usize) -> MatchResult {
     MatchResult::ContinueWith(
         index,
-        match num {
-            0 => Box::new(num::NumState::new()) as Box<dyn ParseState>,
-            1 => Box::new(add_mult::BiFuncState::new_mult()) as Box<dyn ParseState>,
-            2 => Box::new(add_mult::BiFuncState::new_add()) as Box<dyn ParseState>,
-            3 => Box::new(add_mult::BiFuncState::new_sub()) as Box<dyn ParseState>,
-            4 => Box::new(num_lit::LitNumState::new()) as Box<dyn ParseState>,
-            _ => unimplemented!(),
+        match alias {
+            b"add" => get_state!(operator::OperatorState::new_add()),
+            b"sub" => get_state!(operator::OperatorState::new_sub()),
+            b"tim" => get_state!(operator::OperatorState::new_mult()),
+            b"ide" => get_state!(operator::OperatorState::new_div()),
+            b"mod" => get_state!(operator::OperatorState::new_mod()),
+            b"exp" => get_state!(operator::OperatorState::new_exp()),
+            b"log" => get_state!(operator::OperatorState::new_log()),
+
+            b"lit" => get_state!(num_lit::LitNumState::new()),
+            b"int" => get_state!(word_num::WordNumState::new()),
+            b"not" => get_state!(not::NotState::new()),
+            _ => panic!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
         },
     )
 }
 
-fn setup_stat(num: u16, index: usize) -> MatchResult {
+fn setup_stat(alias: &'static [u8], index: usize) -> MatchResult {
     MatchResult::ContinueWith(
         index,
-        match num {
-            0 => Box::new(eq::EqState::new()) as Box<dyn ParseState>,
-            1 => Box::new(circle::CircleState::new()),
-            2 => Box::new(line::LineState::new()),
-            _ => unimplemented!(),
+        match alias {
+            b"arc" => get_state!(circle::CircleState::new()),
+            b"lin" => get_state!(line::LineState::new()),
+            b"was" => get_state!(set::EqState::new()),
+            b"rec" => get_state!(rect::RectState::new()),
+            b"pri" => get_state!(print::PrintState::new()),
+            _ => panic!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
         },
     )
 }

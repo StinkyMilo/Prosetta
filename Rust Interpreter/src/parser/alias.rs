@@ -150,7 +150,8 @@ impl NoneState {
         }
         //set up stack
         (self.data.func)(
-            min_index, rest,
+            aliases[min_index as usize],
+            rest,
             // move locs out of state without copy
         )
     }

@@ -34,7 +34,7 @@ impl ParseState for LitNumState {
             MatchResult::Continue
             //if not number, check h
         } else {
-            let close = find_h_close(&word, 0).or_else(|| find_h_close(&rest, 0));
+            let close = find_close(&word, 0).or_else(|| find_close(&rest, 0));
             match close {
                 // will never be a h to find even on future words
                 None => MatchResult::Failed,

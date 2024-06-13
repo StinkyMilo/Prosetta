@@ -8,9 +8,9 @@ impl ParseState for CircleState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, _rest: &Slice) -> MatchResult {
         let locs = env.locs.take().unwrap_or_default();
 
-        *env.expr = Expr::Circle {
+        *env.expr = Expr::Arc {
             locs,
-            indexes: [env.child_index, usize::MAX, usize::MAX],
+            indexes: [env.child_index, usize::MAX, usize::MAX, usize::MAX],
         };
 
         // setup child state
@@ -27,7 +27,7 @@ impl ParseState for CircleState {
         if did_child_match {
             if self.children == 2 {
                 // matched second child - find h
-                let close = find_h_close(&word, 0).or_else(|| find_h_close(&rest, 0));
+                let close = find_close(&word, 0).or_else(|| find_close(&rest, 0));
                 match close {
                     // will never be a h to find even on future words
                     None => MatchResult::Failed,
@@ -63,7 +63,7 @@ impl CircleState {
 impl CircleState {
     fn add_child(&self, expr: &mut Expr, field_index: u8, child_index: usize) {
         match expr {
-            Expr::Circle {
+            Expr::Arc {
                 indexes,..
             } => //match field_index {
             //     0 => *y_index = child_index,

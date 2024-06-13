@@ -60,7 +60,7 @@ void draw(){
 fn write_stat(exprs: &ExprArena, start: usize, flags: &mut FuncFlags) -> String {
     match &exprs[start] {
         Expr::NoneStat => ";\n".to_string(),
-        Expr::Eq {
+        Expr::Set {
             name, value_index, ..
         } => format!(
             "var {}={};\n",
@@ -74,7 +74,7 @@ fn write_stat(exprs: &ExprArena, start: usize, flags: &mut FuncFlags) -> String 
             write_expr(exprs, indexes[2], 0, flags),
             write_expr(exprs, indexes[3], 0, flags)
         ),
-        Expr::Circle { indexes, .. } => {
+        Expr::Arc { indexes, .. } => {
             *flags |= FuncFlags::uses_circle;
             format!(
                 "pcircle({},{},{});\n",
@@ -99,18 +99,16 @@ fn write_expr(
             "todo()".to_string()
         }
         Expr::Var { name, .. } => String::from_utf8_lossy(&name).to_string(),
-        Expr::Num { str, .. } => format!("\"{}\".length()", String::from_utf8_lossy(&str)),
-        Expr::BiFunction {
+        Expr::WordNum { str, .. } => format!("\"{}\".length()", String::from_utf8_lossy(&str)),
+        Expr::Operator {
             func_type, indexes, ..
         } => {
             let func_data = match func_type {
-                BiFunctionType::Add => ("+", 10 * 2),
-                BiFunctionType::Sub => ("-", 10 * 2),
-                BiFunctionType::Mult => ("*", 11 * 2),
-                BiFunctionType::Div => ("/",11*2),
-                BiFunctionType::Mod => ("%",11*2),
-                BiFunctionType::Expr => ("expr",11*2),
-                BiFunctionType::Log =>("log",11*2),
+                OperatorType::Add => ("+", 10 * 2),
+                OperatorType::Sub => ("-", 10 * 2),
+                OperatorType::Mult => ("*", 11 * 2),
+                OperatorType::Div => ("/",11*2),
+                OperatorType::Mod => ("%",11*2),
             };
             write_var_len_operator(
                 exprs,
