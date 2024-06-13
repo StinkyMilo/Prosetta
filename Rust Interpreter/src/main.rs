@@ -7,14 +7,15 @@ use parser::ParserFlags;
 
 use crate::parser::{Parser, ParserResult};
 
-mod bounds_writer;
 mod commands;
-mod linq_like_writer;
 mod parser;
+mod writers;
 //mod processing_writer;
 mod testing;
 
 mod error_messages;
+
+use writers::linq_like_writer;
 //mod testing;
 
 //use crate::commands::*;

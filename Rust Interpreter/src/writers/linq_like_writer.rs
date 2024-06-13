@@ -1,5 +1,3 @@
-use std::{fmt::format, usize};
-
 use crate::commands::*;
 
 fn join_locs(locs: &Vec<usize>) -> String {

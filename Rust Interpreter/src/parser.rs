@@ -262,7 +262,7 @@ impl<'a> Parser<'a> {
             parsing_line: false,
             last_result: LastMatchResult::None,
             last_locs: None,
-            aliases: AliasData::new(Default::default()),
+            aliases: AliasData::new(flags),
         }
     }
     pub fn change_source(&mut self, source: &'a mut dyn ParseSource) {
