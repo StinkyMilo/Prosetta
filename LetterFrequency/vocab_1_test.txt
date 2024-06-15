@@ -92,5 +92,16 @@ from cruel bitter thought and cursed man.
     (arc 
     cruel thought cursed)
 
-(arc (add thought cruel) thought cursed)
+And so in lack of overlords but yet
+still wrought by curse the agriculturists
+admitted thought that life is not so bad.
+Despite new vocal eccentricities,
+Their burdens lifted free of mages cruel.
+
+    (arc 
+    (add thought (not "so bad.")
+    cruel) 
+    
+    thought cursed)
+
 (arc (add thought cruel) (add thought cruel) (add thought cruel))
