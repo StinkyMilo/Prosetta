@@ -81,8 +81,9 @@ And so the peasants organized revolt.
     (int 2) 
     cruel)
     ) -- 200
-    
-(arc v4 v4 v4)
-(arc v2 v4 v3)
-(arc (add v4 v2) v4 v3)
-(arc (add v4 v2) (add v4 v2) (add v4 v2))
+
+
+(arc think think think)
+(arc cruel think cursed)
+(arc (add think cruel) think cursed)
+(arc (add think cruel) (add think cruel) (add think cruel))
