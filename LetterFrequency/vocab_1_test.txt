@@ -82,7 +82,7 @@ And so the peasants organized revolt.
     cruel)
     ) -- 200
 
-They searched for mages all while speaking verse;
+They searched for mages speaking just in verse;
 they thought and thought and thought 'where could they be?'
     (arc 
     thought thought thought)
@@ -96,12 +96,12 @@ And so in lack of overlords but yet
 still wrought by curse the agriculturists
 admitted thought that life is not so bad.
 Despite new vocal eccentricities,
-Their burdens lifted free of mages cruel.
-
+their burdens lifted free of mages cruel.
+They thought that they were cursed but in fact
     (arc 
     (add thought (not "so bad.")
     cruel) 
-    
     thought cursed)
 
-(arc (add thought cruel) (add thought cruel) (add thought cruel))
+
+(lin cruel (add thought cruel) (add thought cruel) (add thought cruel))
