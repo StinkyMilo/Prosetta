@@ -71,12 +71,17 @@ intent most fair, the peasants: they dissent!
     (b) you need a pause but you can't close your sentence yet.
     For now, I've simply decided semicolons and hyphens will be ignored.
 
-The wizards thought it boon to speak in verse
+The wizards think it boon to speak in verse
 but overestimate the peasant's skill;
-
+'there is no point to it' the peasants thought.
+'What cruel poetry they thrust on us.'
+And so the peasants organized revolt.
     (was "think" 
     (tim 
-    (int 2) cruel)) -- 200
+    (int 2) 
+    cruel)
+    ) -- 200
+    
 (arc v4 v4 v4)
 (arc v2 v4 v3)
 (arc (add v4 v2) v4 v3)
