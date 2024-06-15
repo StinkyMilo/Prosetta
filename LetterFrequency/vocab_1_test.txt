@@ -34,7 +34,7 @@ I wasted no days with my idolatry.
             (was "no" "days")
 Wars waged as days advanced but days were too fast. Soon they slowed to centuries.
             (was "days" (add "but" "days"))
-
+The boy was naive but no fool.
             (was "but" "no")
 
             (was "lonely" (add "lonely" (lit one)))
@@ -43,3 +43,41 @@ Wars waged as days advanced but days were too fast. Soon they slowed to centurie
 
     )
     
+
+No control flow. Let's draw a smiley face again.
+
+The wizards utter 'paint iambically.'
+The peasants hadn't choice but to obey.
+    (was "utter" (int "iambically") -- 10
+    )
+    I'm thinking double quotes should be how we enter a string, but we might want dialogue 
+    as code sometimes, so perhaps single quotes can be ignored.
+
+The wizards' cruel entertainments chant
+and utter utter nonsense, void of weight.
+    (was "cruel" (tim 
+    utter utter)) -- 100
+
+The wizards' cursed victims utter trash;
+the mages stand offended that despite
+intent most fair, the peasants: they dissent!
+    (was "cursed" (tim utter 
+
+    (int "most"))) -- 40
+    The colon couldn't close any function so it is ignored
+    Cursed pronounced the two syllable way: "cur-sed"
+    I'm doubting the punctuation rule for closing statements.
+    It becomes bothersome when (a) you need to close multiple statements, and when
+    (b) you need a pause but you can't close your sentence yet.
+    For now, I've simply decided semicolons and hyphens will be ignored.
+
+The wizards thought it boon to speak in verse
+but overestimate the peasant's skill;
+
+    (was "think" 
+    (tim 
+    (int 2) cruel)) -- 200
+(arc v4 v4 v4)
+(arc v2 v4 v3)
+(arc (add v4 v2) v4 v3)
+(arc (add v4 v2) (add v4 v2) (add v4 v2))
