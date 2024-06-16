@@ -97,11 +97,26 @@ still wrought by curse the agriculturists
 admitted thought that life is not so bad.
 Despite new vocal eccentricities,
 their burdens lifted free of mages cruel.
-They thought that they were cursed but in fact
+They thought that they were cursed, but in fact
     (arc 
-    (add thought (not "so bad.")
+    (add thought ~~"not so bad."~~
     cruel) 
     thought cursed)
 
+the wizards had abandonded cruel thought,
+and left the peasants free of emperor.
+    (was "had" (add cruel thought)
+    )
 
-(lin cruel (add thought cruel) (add thought cruel) (add thought cruel))
+And so their revolution had achieved
+a world where peasants had to speak in verse
+but answered not to any cruel lord
+for they had long since gone, with nothing left
+but a society that slowly learned
+restriction fosters creativity.
+    (lin had
+    had 
+    cruel
+    had) ~~"nothing left 
+    but a society that slowly learned
+    restriction fosters creativity."~~
