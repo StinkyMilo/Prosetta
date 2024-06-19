@@ -1,152 +1,155 @@
-use std::{fmt::format, usize};
+use std::io::BufRead;
 
-use crate::commands::*;
+use crate::{commands::*, parser::ParserSource};
 
-use super::syntax_renderers::Renderer;
+use super::syntax_renderers::{Renderer, TermColor};
 
-struct SyntaxLinter {
-    renderer: Box<dyn Renderer>,
+const BASE_COLOR: (TermColor, bool) = (TermColor::White, true);
+
+const LOC_COLOR: [(TermColor, bool); 3] = [
+    (TermColor::Yellow, true),
+    (TermColor::Purple, true),
+    (TermColor::Blue, true),
+];
+
+const STRING_COLOR: (TermColor, bool) = (TermColor::Yellow, false);
+
+const VAR_COLOR: (TermColor, bool) = (TermColor::Green, false);
+const NUM_COLOR: (TermColor, bool) = (TermColor::Green, true);
+
+pub struct SyntaxLinter<T: Renderer> {
+    renderer: T,
+    index: usize,
 }
 
-impl SyntaxLinter {
-    pub fn new(renderer: Box<dyn Renderer>) -> Self {
-        Self { renderer }
+#[allow(dead_code)]
+impl<T: Renderer> SyntaxLinter<T> {
+    pub fn new() -> Self {
+        Self {
+            renderer: Default::default(),
+            index: 0,
+        }
     }
-    pub fn into_string(self) -> String {
+    pub fn into_string(self) -> Vec<u8> {
         self.renderer.into_string()
     }
 }
 
-fn join_locs(locs: &Vec<usize>) -> String {
-    if locs.is_empty() {
-        "".to_string()
-    } else {
-        let mut iter = locs.into_iter();
-        let first = iter.next().unwrap();
-        iter.fold("@".to_string() + &first.to_string(), |a, b| {
-            a + &"," + &b.to_string()
-        })
+#[allow(dead_code)]
+impl<T: Renderer> SyntaxLinter<T> {
+    pub fn write(&mut self, exprs: &ExprArena, line_starts: &Vec<usize>, source: &mut ParserSource) {
+        for statement in line_starts {
+            self.write_expr(source, exprs, *statement, 0);
+        }
     }
 }
 
-#[allow(dead_code)]
-pub fn write(exprs: &ExprArena, line_starts: &Vec<usize>) -> String {
-    let mut str = "".to_string();
-    for statement in line_starts {
-        str += &write_expr(exprs, *statement);
-        str += "\n";
+impl<T: Renderer> SyntaxLinter<T> {
+    fn write_up_to(&mut self, source: &mut ParserSource, index: usize) {
+        self.write_up_to_as(source, index, BASE_COLOR);
     }
-    str
-}
-#[allow(dead_code)]
-pub fn write_first(exprs: &ExprArena) -> String {
-    write_expr(exprs, 0)
-}
+    fn write_up_to_as(&mut self, source: &mut ParserSource, index: usize, color: (TermColor, bool)) {
+        let num = index
+            .checked_sub(self.index)
+            .expect("index is before the writing index");
+        let mut buf = vec![0u8; num];
+        source
+            .read_exact(buf.as_mut())
+            .expect("found end of buffer");
+        self.renderer.add_with(&buf, color);
+        self.index = index;
+    }
+    fn write_as(&mut self, source: &mut dyn BufRead, num: usize, color: (TermColor, bool)) {
+        let mut buf = vec![0u8; num];
+        source
+            .read_exact(buf.as_mut())
+            .expect("found end of buffer");
+        self.renderer.add_with(&buf, color);
+        self.index += num;
+    }
 
-#[allow(dead_code)]
-pub fn write_one(exprs: &ExprArena, index: usize) -> String {
-    write_expr(exprs, index)
-}
+    fn write_locs(&mut self, source: &mut dyn BufRead, locs: &Vec<usize>, stack_index: usize) {
+        let color = LOC_COLOR[stack_index % 3];
+        for loc in locs {
+            self.write_up_to(source, *loc);
+            self.write_up_to_as(source, *loc, color);
+        }
+    }
 
-fn write_expr(exprs: &ExprArena, index: usize) -> String {
-    match &exprs[index] {
-        Expr::NoneStat => "(todo stat)".to_string(),
-        Expr::NoneExpr => "(todo expr)".to_string(),
-        Expr::Set {
-            locs,
-            name_start,
-            name,
-            value_index,
-        } => format!(
-            "(set{} \"{}\"@{} {})",
-            join_locs(locs),
-            String::from_utf8_lossy(&name),
-            name_start,
-            write_expr(exprs, *value_index)
-        ),
-        Expr::Line { locs, indexes } => {
-            format!("(line{} {})", join_locs(locs), write_exprs(exprs, indexes),)
+    fn write_exprs(
+        &mut self,
+        source: &mut dyn BufRead,
+        exprs: &ExprArena,
+        indexes: &[usize],
+        stack_index: usize,
+    ) {
+        for index in indexes {
+            self.write_expr(source, exprs, *index, stack_index);
         }
-        Expr::Arc { locs, indexes } => {
-            format!("(arc{} {})", join_locs(locs), write_exprs(exprs, indexes),)
-        }
-        Expr::Rect { locs, indexes } => {
-            format!("(rect{} {})", join_locs(locs), write_exprs(exprs, indexes),)
-        }
-        Expr::Var { name_start, name } => format!(
-            "(var \"{}\"@{})",
-            String::from_utf8_lossy(&name).to_string(),
-            name_start
-        ),
-        Expr::WordNum {
-            locs,
-            str_start,
-            str,
-        } => format!(
-            "(wordnum{} \"{}\"@{})",
-            join_locs(locs),
-            String::from_utf8_lossy(str),
-            str_start
-        ),
-        Expr::Operator {
-            locs,
-            func_type,
-            indexes,
-            ..
-        } => {
-            let name = match func_type {
-                OperatorType::Add => "add",
-                OperatorType::Sub => "sub",
-                OperatorType::Mult => "mult",
-                OperatorType::Div => "div",
-                OperatorType::Mod => "mod",
-                OperatorType::Exp => "exp",
-                OperatorType::Log => "log",
-            };
-            format!(
-                "({}{} {})",
+    }
+
+    fn write_expr(
+        &mut self,
+        source: &mut dyn BufRead,
+        exprs: &ExprArena,
+        index: usize,
+        stack_index: usize,
+    ) {
+        match &exprs[index] {
+            Expr::Set {
+                locs,
+                name_start,
                 name,
-                join_locs(locs),
-                write_exprs(exprs, indexes)
-            )
-        }
-        Expr::LitNum {
-            locs,
-            str_start,
-            str_length,
-            value,
-        } => format!(
-            "(litnum{} {}@{}${})",
-            join_locs(locs),
-            value,
-            str_start,
-            str_length
-        ),
-        Expr::Print { locs, data } => {
-            format!("(print{} {})", join_locs(locs), write_prints(exprs, data))
-        }
+                value_index,
+            } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_up_to(source, *name_start);
+                self.write_as(source, name.len(), VAR_COLOR);
+                self.write_expr(source, exprs, *value_index, stack_index + 1)
+            }
+            Expr::Line { locs, indexes } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+            }
+            Expr::Arc { locs, indexes } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+            }
+            Expr::Rect { locs, indexes } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+            }
+            Expr::Var { name_start, name } => {
+                self.write_up_to(source, *name_start);
+                self.write_as(source, name.len(), VAR_COLOR);
+            }
+            Expr::WordNum {
+                locs,
+                str_start,
+                str,
+            } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_up_to(source, *str_start);
+                self.write_as(source, str.len(), STRING_COLOR);
+            }
+            Expr::Operator { locs, indexes, .. } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+            }
+            Expr::LitNum {
+                locs,
+                str_start,
+                str_length,
+                ..
+            } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_up_to(source, *str_start);
+                self.write_as(source, *str_length, NUM_COLOR);
+            }
+            Expr::Print { locs, .. } => {
+                self.write_locs(source, locs, stack_index);
+            }
+            Expr::NoneExpr | Expr::NoneStat => {}
+        };
     }
-}
-
-fn write_prints(exprs: &ExprArena, data: &Vec<Prints>) -> String {
-    let mut ret = String::new();
-    for print in data {
-        ret += &match print {
-            Prints::Var(index) => write_expr(exprs, *index) + " ",
-            Prints::Word(str, index) => format!("\"{}\"@{} ", str, index),
-        }
-    }
-    ret.pop();
-    ret
-}
-
-fn write_exprs(exprs: &ExprArena, indexes: &[usize]) -> String {
-    let mut ret = String::new();
-    for index in indexes {
-        if *index != usize::MAX {
-            ret += &(write_expr(exprs, *index) + " ");
-        }
-    }
-    ret.pop();
-    ret
 }

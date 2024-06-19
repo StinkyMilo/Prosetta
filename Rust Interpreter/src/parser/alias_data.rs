@@ -1,11 +1,5 @@
 use super::*;
 
-macro_rules! get_state {
-    ($state:expr) => {
-        Box::new($state) as Box<dyn ParseState>
-    };
-}
-
 type BuildInSetUp = fn(alias: &'static [u8], index: usize) -> MatchResult;
 
 const BASE_EXPR_ALIASES: [&'static [u8]; 9] = [

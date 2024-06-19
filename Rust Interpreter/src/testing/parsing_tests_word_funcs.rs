@@ -3,6 +3,8 @@ mod tests {
     use crate::parser::*;
     use crate::testing::test_lib::*;
 
+    // get_next_word
+
     #[test]
     fn test_get_next_word_simple() {
         assert_eq!(
@@ -70,6 +72,7 @@ mod tests {
         );
     }
 
+    // find_word_end
     #[test]
     fn test_find_word_end_after() {
         assert_eq!(
@@ -106,6 +109,7 @@ mod tests {
         assert_eq!(find_word_end(&new_slice("a  ", 0), 4), new_slice("", 3));
     }
 
+    // find_end_close
     #[test]
     fn test_find_end_close_after() {
         assert_eq!(
@@ -143,5 +147,105 @@ mod tests {
         assert_eq!(find_close(&new_slice("a ", 0), 2), None);
         assert_eq!(find_close(&new_slice("a ", 0), 3), None);
         assert_eq!(find_close(&new_slice("a ", 0), 4), None);
+    }
+
+    // get_next_slice
+    #[test]
+    fn test_get_next_slice_simple() {
+        assert_eq!(
+            get_next_slice(&new_slice("asdf   ", 2), 0),
+            (new_slice("asdf", 2), new_slice("   ", 6))
+        );
+
+        assert_eq!(
+            get_next_slice(&new_slice(" asdf  ", 1), 0),
+            (new_slice("asdf", 2), new_slice("  ", 6))
+        );
+
+        assert_eq!(
+            get_next_slice(&new_slice("  asdf ", 0), 0),
+            (new_slice("asdf", 2), new_slice(" ", 6))
+        );
+    }
+
+    #[test]
+    fn test_get_next_slice_no_space_end() {
+        assert_eq!(
+            get_next_slice(&new_slice("asdf", 2), 0),
+            (new_slice("asdf", 2), new_slice("", 6))
+        );
+
+        assert_eq!(
+            get_next_slice(&new_slice(" asdf", 2), 0),
+            (new_slice("asdf", 3), new_slice("", 7))
+        );
+
+        assert_eq!(
+            get_next_slice(&new_slice("  asdf", 2), 0),
+            (new_slice("asdf", 4), new_slice("", 8))
+        );
+    }
+    #[test]
+    fn test_get_next_slice_fails() {
+        assert_eq!(
+            get_next_slice(&new_slice("", 2), 0),
+            (new_slice("", 2), new_slice("", 2))
+        );
+        assert_eq!(
+            get_next_slice(&new_slice(" ", 4), 0),
+            (new_slice("", 5), new_slice("", 5))
+        );
+        assert_eq!(
+            get_next_slice(&new_slice(" ", 8), 0),
+            (new_slice("", 9), new_slice("", 9))
+        );
+    }
+
+    #[test]
+    fn test_get_next_slice_out() {
+        assert_eq!(
+            get_next_slice(&new_slice("a ", 0), 2),
+            (new_slice("", 2), new_slice("", 2))
+        );
+        assert_eq!(
+            get_next_slice(&new_slice("a ", 0), 3),
+            (new_slice("", 2), new_slice("", 2))
+        );
+        assert_eq!(
+            get_next_slice(&new_slice("a ", 0), 4),
+            (new_slice("", 2), new_slice("", 2))
+        );
+    }
+
+    #[test]
+    fn test_get_next_slice_close() {
+        assert_eq!(
+            get_next_slice(&new_slice(".a", 2), 0),
+            (new_slice(".", 2), new_slice("a", 3))
+        );
+        assert_eq!(
+            get_next_slice(&new_slice(" .a ", 1), 0),
+            (new_slice(".", 2), new_slice("a ", 3))
+        );
+        assert_eq!(
+            get_next_slice(&new_slice("  .a  ", 0), 0),
+            (new_slice(".", 2), new_slice("a  ", 3))
+        );
+    }
+
+    #[test]
+    fn test_get_next_slice_double_close() {
+        assert_eq!(
+            get_next_slice(&new_slice("..a", 2), 0),
+            (new_slice(".", 2), new_slice(".a", 3))
+        );
+        assert_eq!(
+            get_next_slice(&new_slice(" ..a ", 1), 0),
+            (new_slice(".", 2), new_slice(".a ", 3))
+        );
+        assert_eq!(
+            get_next_slice(&new_slice("  ..a  ", 0), 0),
+            (new_slice(".", 2), new_slice(".a  ", 3))
+        );
     }
 }

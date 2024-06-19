@@ -6,7 +6,7 @@ pub struct PrintState {}
 
 impl ParseState for PrintState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
-        unimplemented!()
+        todo!()
     }
 
     fn step_match(
@@ -16,9 +16,9 @@ impl ParseState for PrintState {
         _word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
-        // has no child to match - fn should never be called
-        unimplemented!()
+        todo!()
     }
+
 
     fn get_name(&self) -> &'static str {
         "Not"

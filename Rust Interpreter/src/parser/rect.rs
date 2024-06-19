@@ -6,7 +6,7 @@ pub struct RectState {}
 
 impl ParseState for RectState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
-        unimplemented!()
+        todo!()
     }
 
     fn step_match(
@@ -16,8 +16,7 @@ impl ParseState for RectState {
         _word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
-        // has no child to match - fn should never be called
-        unimplemented!()
+        todo!()
     }
 
     fn get_name(&self) -> &'static str {

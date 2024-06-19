@@ -1,29 +1,27 @@
+use crate::io::SeekFrom;
 use std::{
-    io::{self, Read, Write},
+    io::{self, Cursor, Read, Write},
     mem,
 };
 
-use parser::ParserFlags;
+use crate::parser::{Parser, ParserFlags, ParserResult};
 
-use crate::parser::{Parser, ParserResult};
+#[path = "testing/testing.rs"]
+mod testing;
 
 mod commands;
 mod parser;
 mod writers;
-//mod processing_writer;
-mod testing;
 
 mod error_messages;
 
+use parser::ParserSource;
 use writers::linq_like_writer;
-//mod testing;
-
-//use crate::commands::*;
 
 fn print(parser: &Parser) {
     println!(
         "   parsed: {}",
-        linq_like_writer::write_one(&parser.exprs, *parser.stat_starts.last().unwrap())
+        linq_like_writer::write_one(&parser.data.exprs, *parser.data.stat_starts.last().unwrap())
     );
     std::io::stdout().flush().unwrap();
 }
@@ -55,49 +53,59 @@ fn main() {
     println!("Input text to be parsed:");
     //let mut buf= Vec::new();
     //testing::test_ast1();
-    let mut input = io::stdin().lock();
+   // let mut input =io::stdin().lock();
     //let stats = parser_state::parse(&mut input);
     //println!("{}",processing_writer::write(&stats))
     //let s:String = Default::default();
 
-    let mut parser = Parser::new(&mut input, flags);
+    let mut parser = Parser::new(ParserSource::from_stdin(), flags);
 
     //parser.vars.insert("inch".as_bytes().to_vec());
-    crate::testing::add_vars!(parser, "inch", "miles", "furlongs", "longer");
+    //crate::testing::add_vars!(parser, "inch", "miles", "furlongs", "longer");
     //let mut result = parser.step();
-
-    loop {
-        match parser.step() {
-            ParserResult::MatchedLine => print(&parser),
-            ParserResult::FailedLine => println!("   parse failed"),
-            ParserResult::NoInput => break,
-            _ => {}
-        }
-    }
 
     // loop {
     //     match parser.step() {
+    //         ParserResult::MatchedLine => print(&parser),
+    //         ParserResult::FailedLine => println!("   parse failed"),
     //         ParserResult::NoInput => break,
-    //         state => println!(
-    //             "assert_step!(parser, {:?}, \"{}\", \"{}\");",
-    //             state,
-    //             parser.get_state(),
-    //             std::str::from_utf8(parser.get_word()).unwrap()
-    //         ),
+    //         _ => {}
     //     }
     // }
 
+    loop {
+        match parser.step() {
+            ParserResult::NoInput => break,
+            state => println!(
+                "assert_step!(parser, {:?}, \"{}\", \"{}\");",
+                state,
+                parser.get_state(),
+                std::str::from_utf8(parser.get_word()).unwrap()
+            ),
+        }
+    }
+
+    let data = parser.into_data();
+    //input.seek(SeekFrom::Start);
     //println!();
     //println!("== {:?}", parser.exprs.vec);
     println!(
         "   whole program:\n{}",
-        linq_like_writer::write(&parser.exprs, &parser.stat_starts)
+        linq_like_writer::write(&data.exprs, &data.stat_starts)
     );
+    // let mut lint = writers::syntax_lint::SyntaxLinter::<
+    //     writers::syntax_renderers::wind_renderer::WindowsRenderer,
+    // >::new();
+    // lint.write(&data.exprs, &data.stat_starts);
+    // println!(
+    //     "   whole program:\n{}",
+    //     linq_like_writer::write(&data.exprs, &data.stat_starts)
+    // );
     // println!(
     //     "   java program:\n{}",
     //     processing_writer::write(&parser.exprs, &parser.stat_starts)
     // );
-    let _ = input.read(&mut [0u8]).unwrap();
+    let _ = io::stdin().read(&mut [0u8]).unwrap();
 }
 
 // while !matches!(

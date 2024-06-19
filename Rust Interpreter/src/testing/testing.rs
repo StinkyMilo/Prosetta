@@ -4,7 +4,7 @@ pub mod test_lib {
 
     use crate::commands::Expr;
 
-    use crate::parser::*;
+    use crate::parser::{Parser, *};
     use alias_data::AliasData;
     use std::collections::HashSet;
 
@@ -58,6 +58,14 @@ pub mod test_lib {
             locs,
             global_index: 0,
             aliases,
+        }
+    }
+    pub fn assert_result(parser: &mut Parser) -> ParserResult {
+        loop {
+            let result = parser.step();
+            if result.is_end() {
+                return result;
+            }
         }
     }
 }

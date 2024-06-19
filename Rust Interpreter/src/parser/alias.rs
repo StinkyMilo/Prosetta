@@ -1,6 +1,13 @@
 use super::*;
 use alias_data::*;
 
+#[derive(Debug, PartialEq)]
+enum MatchState {
+    Var,
+    Num,
+    FindAliases,
+}
+
 /// used for both NoneStat and NoneExpr
 /// finds next buildin function
 #[derive(Debug)]
@@ -10,6 +17,7 @@ pub struct NoneState {
     locs: Vec<Option<Vec<usize>>>,
     offset: usize,
     matched: u16,
+    next_match_state: MatchState,
 }
 
 impl ParseState for NoneState {
@@ -20,22 +28,7 @@ impl ParseState for NoneState {
         // reset on new word
         self.reset(aliases.len());
 
-        // if expr  - check if varible name
-        if self.data.is_expr {
-            let mut var_state = var::VarState::new();
-            // check if word is varible
-            // continue if it is
-            if var_state.check(env, word) {
-                return MatchResult::ContinueWith(word.pos, Box::new(var_state));
-            }
-            // check if word is literal number
-            // continue if it is
-            let mut num_state = num_literal::LiteralNumState::new();
-            if num_state.check(env, word) {
-                return MatchResult::ContinueWith(word.pos, Box::new(num_state));
-            }
-        }
-        self.match_alias(env, word, rest)
+        self.run_match_state(env, word, rest)
     }
 
     fn step_match(
@@ -50,7 +43,7 @@ impl ParseState for NoneState {
             MatchResult::Matched(word.pos)
         } else {
             // child did not match - continue searching
-            self.match_alias(env, word, rest)
+            self.run_match_state(env, word, rest)
         }
     }
 
@@ -65,13 +58,13 @@ impl ParseState for NoneState {
 
 impl NoneState {
     fn new(data: &'static BuiltinData) -> Self {
-        //let length = (data.names).len();
         Self {
             data,
             progress: Vec::new(),
             locs: Vec::new(),
             offset: 0,
             matched: 0,
+            next_match_state: MatchState::FindAliases,
         }
     }
     fn reset(&mut self, length: usize) {
@@ -79,6 +72,12 @@ impl NoneState {
         self.locs = vec![Some(Vec::new()); length];
         self.offset = 0;
         self.matched = 0;
+        // if expr need to check if var or num
+        self.next_match_state = if self.data.is_expr {
+            MatchState::Var
+        } else {
+            MatchState::FindAliases
+        }
     }
     pub fn new_stat() -> Self {
         Self::new(&AliasData::STAT)
@@ -92,6 +91,30 @@ impl NoneState {
 }
 
 impl NoneState {
+    /// matches based on MatchState
+
+    fn run_match_state(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
+        let (new_state, ret) = match self.next_match_state {
+            // is word a varible
+            MatchState::Var => (
+                MatchState::Num,
+                MatchResult::ContinueWith(word.pos, get_state!(var::VarState::new())),
+            ),
+            // is word a literal number
+            MatchState::Num => (
+                MatchState::FindAliases,
+                MatchResult::ContinueWith(
+                    word.pos,
+                    get_state!(num_literal::LiteralNumState::new()),
+                ),
+            ),
+            // else check aliases
+            MatchState::FindAliases => (MatchState::FindAliases, self.match_alias(env, word, rest)),
+        };
+        self.next_match_state = new_state;
+        ret
+    }
+
     /// matches buildin functions based on self.data
     fn match_alias(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
         let aliases = (self.data.aliases)(env.aliases);
@@ -106,6 +129,7 @@ impl NoneState {
                 return self.find_best_match(env, &aliases, offset, rest.pos);
             }
         }
+
         // if default continue
         if self.data.default_continue {
             MatchResult::Continue

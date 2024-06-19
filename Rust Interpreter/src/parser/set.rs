@@ -23,10 +23,10 @@ impl ParseState for EqState {
         rest: &Slice,
     ) -> MatchResult {
         if did_child_match {
-            // find closing h to end
+            // find ending close
             let close = find_close(&word, 0).or_else(|| find_close(&rest, 0));
             match close {
-                // will never be a h to find even on future words
+                // will never be a period to find even on future words
                 None => MatchResult::Failed,
                 Some(slice) => MatchResult::Matched(slice.pos),
             }
@@ -45,51 +45,9 @@ impl ParseState for EqState {
         false
     }
 }
+
 impl EqState {
     pub fn new() -> Self {
-        EqState {}
+        Self {}
     }
 }
-// fn step_eq(
-//     env: &mut Enviroment,
-//     result: LastMatchResult,
-//     word: &Slice,
-//     rest: &Slice,
-// ) -> MatchResult {
-//     match result {
-//         // first time
-//         LastMatchResult::None => {
-//             let Expr::Eq {
-//                 name_start,
-//                 name,
-//                 value_index,
-//                 ..
-//             } = env.expr
-//             else {
-//                 unimplemented!()
-//             };
-//             *name_start = word.pos;
-//             *name = word.str.to_owned();
-//             *value_index = env.child_index;
-//             // setup expr child
-//             MatchResult::Continue(rest.pos, Expr::NoneExpr, StateContext::None)
-//         }
-//         // child expr matched
-//         LastMatchResult::Matched => {
-//             let close = find_h_close(&word, 0).or_else(|| find_h_close(&rest, 0));
-//             match close {
-//                 // will never be a h to find even on future words
-//                 None => MatchResult::Failed,
-//                 Some(slice) => {
-//                     // let Expr::Eq {  .. } = env.expr else {
-//                     //     unimplemented!()
-//                     // };
-//                     MatchResult::Matched(slice.pos)
-//                 }
-//             }
-//         }
-//         // child expr failed
-//         // if child match fail, I can never succeed
-//         LastMatchResult::Failed => MatchResult::Failed,
-//     }
-// }

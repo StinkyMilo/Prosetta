@@ -1,4 +1,11 @@
 #![allow(dead_code)]
+#[path = "parser_source.rs"]
+pub(crate) mod parser_source;
+pub(crate) use parser_source::*;
+// other stucts
+#[path = "parser_structs.rs"]
+pub(crate) mod parser_structs;
+pub(crate) use parser_structs::*;
 
 mod alias;
 pub(crate) mod alias_data;
@@ -16,229 +23,36 @@ mod rect;
 mod num_lit;
 mod num_literal;
 
-#[path = "parsing_tests_word_funcs.rs"]
-mod parsing_tests_word_funcs;
+#[path = "testing/parsing_tests_simple.rs"]
+mod parsing_tests_simple;
 
-#[path = "parsing_tests_milo.rs"]
+#[path = "testing/parsing_tests_milo.rs"]
 mod parsing_tests_milo;
 
-#[path = "parsing_tests_other.rs"]
+#[path = "testing/parsing_tests_other.rs"]
 mod parsing_tests_other;
 
-use std::{
-    collections::HashSet,
-    fmt::{self, Debug},
-    hint::black_box,
-    io::BufRead,
-};
+use std::{fmt::Debug, hint::black_box};
 
 use crate::{commands::*, linq_like_writer};
 
 use alias_data::AliasData;
 
 //type MatchResult<T> = Option<(usize, T)>;
-type VarSet = HashSet<Vec<u8>>;
-//type ParseFn = fn(this: &Parser,&VarSet, &Slice<'_>, Vec<usize>) -> MatchResult;
-type StepFunction =
-    fn(env: &mut Enviroment, result: LastMatchResult, word: &Slice, rest: &Slice) -> MatchResult;
-
-pub trait ParseSource: BufRead + Debug {}
-impl<T: BufRead + Debug> ParseSource for T {}
-
-#[derive(Default, Debug)]
-pub struct ParserFlags {
-    pub not: bool,
-}
-
-#[derive(PartialEq, Debug)]
-struct BuiltinMatchState {
-    progress: Vec<u8>,
-    locs: Vec<Option<Vec<usize>>>,
-    offset: usize,
-    matched: u16,
-    is_expr: bool,
-}
-
-// #[derive(PartialEq, Debug)]
-// enum StateContext {
-//     None,
-//     MultStep { step_num: u8 },
-//     Matching(BuiltinMatchState),
-// }
-// impl Default for StateContext {
-//     fn default() -> Self {
-//         StateContext::None
-//     }
-// }
-pub trait ParseState: Debug {
-    /// call first time to setup the state
-    fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult;
-
-    /// call rest of times after match
-    fn step_match(
-        &mut self,
-        env: &mut Enviroment,
-        did_child_match: bool,
-        word: &Slice,
-        rest: &Slice,
-    ) -> MatchResult;
-    fn get_name(&self) -> &'static str;
-    fn do_replace(&self) -> bool;
-}
-
 #[derive(Debug)]
-pub enum MatchResult {
-    Matched(usize),
-    ContinueWith(usize, Box<dyn ParseState>),
-    Continue,
-    Failed,
+pub struct ParsedData<'a> {
+    pub exprs: ExprArena,
+    pub stat_starts: Vec<usize>,
+    pub vars: VarSet,
+    pub source: ParserSource<'a>,
 }
-
-#[derive(PartialEq, Debug, Clone, Copy)]
-enum LastMatchResult {
-    None,
-    Matched,
-    Failed,
-    Continue,
-}
-
-#[derive(PartialEq, Debug, Clone, Copy)]
-pub enum ParserResult {
-    NoInput,
-    Start,
-
-    MatchedLine,
-    FailedLine,
-
-    Matched,
-    ContinueWith,
-    Continue,
-    Failed,
-}
-
-pub struct Enviroment<'a> {
-    pub vars: &'a VarSet,
-    pub expr: &'a mut Expr,
-    pub locs: Option<Vec<usize>>,
-    pub child_index: usize,
-    pub global_index: usize,
-    pub aliases: &'a AliasData,
-}
-
-#[derive(PartialEq)]
-pub struct Slice<'a> {
-    pub str: &'a [u8],
-    pub pos: usize,
-}
-
-impl<'a> fmt::Debug for Slice<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Slice")
-            .field("str", &String::from_utf8_lossy(&self.str))
-            .field("pos", &self.pos)
-            .finish()
-    }
-}
-
-impl<'a> Slice<'a> {
-    fn len(&self) -> usize {
-        self.str.len()
-    }
-    fn end(&self) -> usize {
-        self.pos + self.str.len()
-    }
-    fn offset(&self, offset: usize) -> Slice {
-        Slice {
-            str: &self.str[offset..],
-            pos: self.pos + offset,
-        }
-    }
-    fn extend(&self) -> Slice {
-        Slice {
-            str: &self.str[self.pos..],
-            pos: self.pos,
-        }
-    }
-}
-
-fn is_valid_word_char(char: u8) -> bool {
-    char.is_ascii_alphanumeric() || char == b'-'
-}
-
-fn get_next_word<'a>(slice: &Slice<'a>, mut start: usize) -> (Slice<'a>, Slice<'a>) {
-    // find start of word
-    start = start.min(slice.len());
-    while start < slice.len() && !is_valid_word_char(slice.str[start]) {
-        start += 1;
-    }
-
-    // find end of word
-    let mut end = start;
-    while end < slice.len() && is_valid_word_char(slice.str[end]) {
-        end += 1;
-    }
-
-    (
-        Slice {
-            str: &slice.str[start..end],
-            pos: slice.pos + start,
-        },
-        Slice {
-            str: &slice.str[end..],
-            pos: slice.pos + end,
-        },
-    )
-}
-
-// returns the rest after the end of the word
-fn find_word_end<'a>(slice: &'a Slice<'a>, start: usize) -> Slice<'a> {
-    // find end of word
-
-    let mut end = start.min(slice.len());
-    while end < slice.len() && is_valid_word_char(slice.str[end]) {
-        end += 1;
-    }
-    //let test = end < slice.len();
-    //end = end.min(slice.len());
-    Slice {
-        str: &slice.str[end..],
-        pos: slice.pos + end,
-    }
-}
-
-const END_CHARS: &[u8] = b".?!,";
-
-// returns the rest after finding the end of an sentence
-fn find_close<'a>(slice: &'a Slice<'a>, start: usize) -> Option<Slice<'_>> {
-    // find end char
-    let mut end = start;
-    while end < slice.len() && !END_CHARS.contains(&slice.str[end]) {
-        end += 1;
-    }
-    let test = end < slice.len();
-    end += 1;
-    // find end of period
-    test.then(|| Slice {
-        str: &slice.str[end..],
-        pos: slice.pos + end,
-    })
-}
-
-// (expr_index, string_index, state)
-pub type State = (usize, usize, Box<dyn ParseState>);
 
 #[derive(Debug)]
 pub struct Parser<'a> {
-    pub exprs: ExprArena,
-    pub stat_starts: Vec<usize>,
-
+    pub data: ParsedData<'a>,
     stack: Vec<State>,
     last_state: Option<State>,
 
-    pub vars: VarSet,
-
-    curr_line: Vec<u8>,
-    source: &'a mut dyn ParseSource,
     parsing_line: bool,
 
     pos: usize,
@@ -249,25 +63,26 @@ pub struct Parser<'a> {
 
 type ParseFunc = fn() -> MatchResult;
 impl<'a> Parser<'a> {
-    pub fn new(source: &'a mut dyn ParseSource, flags: ParserFlags) -> Self {
+    pub fn new(source: ParserSource<'a>, flags: ParserFlags) -> Self {
         Parser {
-            exprs: ExprArena { vec: Vec::new() },
+            data: ParsedData {
+                exprs: ExprArena { vec: Vec::new() },
+                stat_starts: Vec::new(),
+                vars: VarSet::new(),
+                source,
+            },
             stack: Vec::new(),
             last_state: None,
-            vars: VarSet::new(),
-            stat_starts: Vec::new(),
-            curr_line: Vec::new(),
             pos: 0,
-            source,
             parsing_line: false,
             last_result: LastMatchResult::None,
             last_locs: None,
             aliases: AliasData::new(flags),
         }
     }
-    pub fn change_source(&mut self, source: &'a mut dyn ParseSource) {
-        self.source = source;
-    }
+    // pub fn change_source(&mut self, source: &'a mut dyn ParserSource) {
+    //     self.source = source;
+    // }
 
     pub fn get_last_state<'b>(&'b self) -> Option<&'b State> {
         self.last_state.as_ref().or_else(|| self.stack.last())
@@ -284,8 +99,13 @@ impl<'a> Parser<'a> {
         // } else {
         //     self.stack.last()
         // })
-        self.get_last_state()
-            .map_or(b"", |state| Self::get_slice(&self.curr_line, state.1).0.str)
+        self.get_last_state().map_or(b"", |state| {
+            Self::get_slice(self.data.source.get_line(), state.1).0.str
+        })
+    }
+    pub fn into_data(mut self) -> ParsedData<'a> {
+        self.data.source.drop_input();
+        self.data
     }
 }
 
@@ -308,11 +128,11 @@ impl<'a> Parser<'a> {
             "{:?}",
             Vec::from_iter(self.stack.iter().map(|x| x.2.get_name()))
         );
-        let _expr = format!("{:?}", self.exprs.vec);
-        let _expr2 = linq_like_writer::write(&self.exprs, &self.stat_starts);
+        let _expr = format!("{:?}", self.data.exprs.vec);
+        let _expr2 = linq_like_writer::write(&self.data.exprs, &self.data.stat_starts);
         let _expr_short = format!(
             "{:?}",
-            self.exprs.vec.iter().map(|e| {
+            self.data.exprs.vec.iter().map(|e| {
                 let mut str = format!("{:?}", e);
                 str.truncate(str.find(" ").unwrap_or(str.len()));
                 str
@@ -330,15 +150,15 @@ impl<'a> Parser<'a> {
         let frame = &mut self.stack[stack_index];
         let mut expr = &mut Expr::NoneExpr;
 
-        let next_child = self.exprs.vec.len();
+        let next_child = self.data.exprs.vec.len();
 
-        if frame.0 < self.exprs.vec.len() {
-            expr = &mut self.exprs.vec[frame.0];
+        if frame.0 < self.data.exprs.vec.len() {
+            expr = &mut self.data.exprs.vec[frame.0];
         }
         // setup env
         let mut env = Enviroment {
             expr,
-            vars: &self.vars,
+            vars: &self.data.vars,
             locs: self.last_locs.take(),
             child_index: next_child,
             global_index: self.pos,
@@ -347,7 +167,7 @@ impl<'a> Parser<'a> {
 
         // setup slice
 
-        let (word, rest) = Self::get_slice(&self.curr_line, frame.1);
+        let (word, rest) = Self::get_slice(self.data.source.get_line(), frame.1);
 
         // run step function
         let mut result = match self.last_result {
@@ -382,7 +202,7 @@ impl<'a> Parser<'a> {
         let state = self.stack.pop().unwrap();
 
         let state_pos = state.0;
-        self.exprs.vec.truncate(state_pos);
+        self.data.exprs.vec.truncate(state_pos);
         //let _test = format!("{:?}", state);
 
         self.last_state = Some(state);
@@ -391,7 +211,7 @@ impl<'a> Parser<'a> {
         // failed final stat - couldn't parse anything on line
         if self.stack.is_empty() {
             self.parsing_line = false;
-            self.stat_starts.pop();
+            self.data.stat_starts.pop();
             ParserResult::FailedLine
         } else {
             // setup result for next step
@@ -411,14 +231,14 @@ impl<'a> Parser<'a> {
     }
 
     fn continue_with_func(&mut self, index: usize, state: Box<dyn ParseState>) -> ParserResult {
-        let mut expr_index = self.exprs.vec.len();
+        let mut expr_index = self.data.exprs.vec.len();
 
         // replace none exprs
-        if self.exprs.vec.last().is_some_and(|e| e.is_none()) {
-            self.exprs.vec.pop();
+        if self.data.exprs.vec.last().is_some_and(|e| e.is_none()) {
+            self.data.exprs.vec.pop();
             expr_index -= 1;
         }
-        self.exprs.vec.push(Expr::NoneExpr);
+        self.data.exprs.vec.push(Expr::NoneExpr);
         self.stack.push((expr_index, index, state));
 
         self.last_result = LastMatchResult::None;
@@ -432,11 +252,11 @@ impl<'a> Parser<'a> {
 
         // matched final stat
         if self.stack.is_empty() {
-            let start_index = *self.stat_starts.last().unwrap();
+            let start_index = *self.data.stat_starts.last().unwrap();
             self.parsing_line = false;
             // add to varibles
-            if let Expr::Set { name, .. } = &self.exprs[start_index] {
-                self.vars.insert(name.to_owned());
+            if let Expr::Set { name, .. } = &self.data.exprs[start_index] {
+                self.data.vars.insert(name.to_owned());
             }
             ParserResult::MatchedLine
         } else {
@@ -453,29 +273,33 @@ impl<'a> Parser<'a> {
             str: &line[start..],
             pos: start,
         };
-        get_next_word(&slice, 0)
+        get_next_slice(&slice, 0)
     }
 
     fn setup_first(&mut self) -> bool {
-        self.pos += self.curr_line.len();
-        self.curr_line = Vec::new();
-        let has_read = self.source.read_until(b'\n', &mut self.curr_line).is_ok();
-        let found_data = has_read && trim_ascii_whitespace(&self.curr_line).len() > 0;
-        if found_data {
-            // push match stat on first step of line
-            let index = self.exprs.vec.len();
+        let line = self.data.source.get_line();
+        self.pos += line.len();
+        let data = self.data.source.new_line();
+        if let Some(data) = data {
+            let found_data = trim_ascii_whitespace(data).len() > 0;
+            if found_data {
+                // push match stat on first step of line
+                let index = self.data.exprs.vec.len();
 
-            self.exprs.vec.push(Expr::NoneStat);
+                self.data.exprs.vec.push(Expr::NoneStat);
 
-            self.stack
-                .push((index, 0, Box::new(alias::NoneState::new_stat())));
-            self.stat_starts.push(index);
+                self.stack
+                    .push((index, 0, Box::new(alias::NoneState::new_stat())));
+                self.data.stat_starts.push(index);
 
-            self.parsing_line = true;
-            self.last_locs = None;
-            self.last_result = LastMatchResult::None;
+                self.parsing_line = true;
+                self.last_locs = None;
+                self.last_result = LastMatchResult::None;
+            }
+            found_data
+        } else {
+            false
         }
-        found_data
     }
 }
 

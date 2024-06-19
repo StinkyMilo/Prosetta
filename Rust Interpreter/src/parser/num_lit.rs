@@ -21,7 +21,7 @@ impl ParseState for LitNumState {
             } = env.expr
             {
                 *value = *value * 10 + new_digit;
-                *str_length = word.end() - *str_start - env.global_index;
+                *str_length = word.end() - *str_start + env.global_index;
             } else {
                 let locs = env.locs.take().unwrap_or_default();
                 *env.expr = Expr::LitNum {
