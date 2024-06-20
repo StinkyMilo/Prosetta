@@ -5,8 +5,8 @@ use super::*;
 pub struct NotState {}
 
 impl ParseState for NotState {
-    fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
-        unimplemented!()
+    fn step(&mut self, _env: &mut Enviroment, _word: &Slice, _rest: &Slice) -> MatchResult {
+        todo!()
     }
 
     fn step_match(
@@ -17,7 +17,7 @@ impl ParseState for NotState {
         _rest: &Slice,
     ) -> MatchResult {
         // has no child to match - fn should never be called
-        unimplemented!()
+        todo!()
     }
 
     fn get_name(&self) -> &'static str {

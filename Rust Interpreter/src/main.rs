@@ -1,6 +1,5 @@
-use crate::io::SeekFrom;
 use std::{
-    io::{self, Cursor, Read, Write},
+    io::{self, Read, Write},
     mem,
 };
 
@@ -8,6 +7,8 @@ use crate::parser::{Parser, ParserFlags, ParserResult};
 
 #[path = "testing/testing.rs"]
 mod testing;
+
+mod playground;
 
 mod commands;
 mod parser;
@@ -27,6 +28,9 @@ fn print(parser: &Parser) {
 }
 
 fn main() {
+    //playground::print_test();
+    //return;
+
     println!("size of parser: {}", mem::size_of::<Parser>());
 
     let mut args: Vec<String> = std::env::args().skip(1).collect();
@@ -53,7 +57,7 @@ fn main() {
     println!("Input text to be parsed:");
     //let mut buf= Vec::new();
     //testing::test_ast1();
-   // let mut input =io::stdin().lock();
+    // let mut input =io::stdin().lock();
     //let stats = parser_state::parse(&mut input);
     //println!("{}",processing_writer::write(&stats))
     //let s:String = Default::default();
@@ -86,6 +90,12 @@ fn main() {
     }
 
     let data = parser.into_data();
+    let iter = data.source.get_iter();
+    println!(
+        "    text input:\n\"{}\"",
+        std::str::from_utf8(iter.cloned().collect::<Vec<_>>().as_slice()).unwrap()
+    );
+    let iter = data.source.get_iter();
     //input.seek(SeekFrom::Start);
     //println!();
     //println!("== {:?}", parser.exprs.vec);
@@ -93,14 +103,14 @@ fn main() {
         "   whole program:\n{}",
         linq_like_writer::write(&data.exprs, &data.stat_starts)
     );
-    // let mut lint = writers::syntax_lint::SyntaxLinter::<
-    //     writers::syntax_renderers::wind_renderer::WindowsRenderer,
-    // >::new();
-    // lint.write(&data.exprs, &data.stat_starts);
-    // println!(
-    //     "   whole program:\n{}",
-    //     linq_like_writer::write(&data.exprs, &data.stat_starts)
-    // );
+    let mut lint = writers::syntax_lint::SyntaxLinter::<
+        writers::syntax_renderers::wind_renderer::WindowsRenderer,
+    >::new();
+    lint.write(&data.exprs, &data.stat_starts, iter);
+    println!(
+        "   linted:\n{}",
+        std::str::from_utf8(&lint.into_string()).unwrap()
+    );
     // println!(
     //     "   java program:\n{}",
     //     processing_writer::write(&parser.exprs, &parser.stat_starts)
@@ -120,7 +130,3 @@ fn main() {
 //     linq_like_writer::write(&parser.exprs, &parser.stat_starts)
 // );
 // std::io::stdout().flush().unwrap();
-
-//eq eleven num cabbagehead h h
-//eq twelve and eleven num i h h h
-//eq nice mu and eleven twelve h num dad h h h

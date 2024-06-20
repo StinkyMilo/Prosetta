@@ -16,7 +16,6 @@ pub type StepFunction =
 // pub trait ParserSource: BufRead + Debug {}
 // impl<T: BufRead + Debug> ParserSource for T {}
 
-
 macro_rules! get_state {
     ($state:expr) => {
         Box::new($state) as Box<dyn ParseState>
@@ -233,12 +232,16 @@ pub fn find_close<'a>(slice: &'a Slice<'a>, start: usize) -> Option<Slice<'_>> {
         end += 1;
     }
     let test = end < slice.len();
-    end += 1;
+    //end += 1;
     // find end of period
     test.then(|| Slice {
         str: &slice.str[end..],
         pos: slice.pos + end,
     })
+}
+
+pub fn is_close(slice: &Slice) -> bool {
+    slice.len() > 0 && is_valid_close_char(slice.str[0])
 }
 
 // (expr_index, string_index, state)

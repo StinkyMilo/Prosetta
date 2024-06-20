@@ -1,15 +1,16 @@
 use super::*;
 /// state for equals
 #[derive(Debug)]
-pub struct EqState {}
-impl ParseState for EqState {
+pub struct AssignState {}
+impl ParseState for AssignState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
         // set expr
-        *env.expr = Expr::Set {
+        *env.expr = Expr::Assign {
             name_start: word.pos + env.global_index,
             name: word.str.to_owned(),
             value_index: env.child_index,
             locs: env.locs.take().unwrap_or_default(),
+            end: usize::MAX,
         };
         // setup child state
         MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
@@ -17,7 +18,7 @@ impl ParseState for EqState {
 
     fn step_match(
         &mut self,
-        _env: &mut Enviroment,
+        env: &mut Enviroment,
         did_child_match: bool,
         word: &Slice,
         rest: &Slice,
@@ -28,7 +29,12 @@ impl ParseState for EqState {
             match close {
                 // will never be a period to find even on future words
                 None => MatchResult::Failed,
-                Some(slice) => MatchResult::Matched(slice.pos),
+                Some(slice) => {
+                    if let Expr::Assign { end, .. } = env.expr {
+                        *end = slice.pos;
+                    }
+                    MatchResult::Matched(slice.pos+1)
+                }
             }
         } else {
             // child expr failed
@@ -38,7 +44,7 @@ impl ParseState for EqState {
     }
 
     fn get_name(&self) -> &'static str {
-        "Equals"
+        "Assign"
     }
 
     fn do_replace(&self) -> bool {
@@ -46,7 +52,7 @@ impl ParseState for EqState {
     }
 }
 
-impl EqState {
+impl AssignState {
     pub fn new() -> Self {
         Self {}
     }

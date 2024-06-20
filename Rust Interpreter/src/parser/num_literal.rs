@@ -14,16 +14,17 @@ impl ParseState for LiteralNumState {
 
         // check
         if let Some(value) = self.value {
-            *env.expr = Expr::LitNum {
+            *env.expr = Expr::MultiLitNum {
                 locs: Vec::new(),
                 str_start: word.pos + env.global_index,
                 str_length: word.len(),
                 value,
+                end:usize::MAX,
             };
             MatchResult::Matched(rest.pos)
         } else {
             // future words could be number names
-            MatchResult::Continue
+            MatchResult::Failed
         }
     }
 

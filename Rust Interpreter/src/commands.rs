@@ -30,11 +30,12 @@ pub enum Expr {
         locs: Vec<usize>,
         indexes: [usize; 4],
     },
-    Set {
+    Assign {
         locs: Vec<usize>,
         name_start: usize,
         name: Vec<u8>,
         value_index: usize,
+        end: usize,
     },
     Rect {
         locs: Vec<usize>,
@@ -53,17 +54,19 @@ pub enum Expr {
         locs: Vec<usize>,
         str_start: usize,
         str: Vec<u8>,
+        end: usize,
     },
     Operator {
         func_type: OperatorType,
         locs: Vec<usize>,
         indexes: Vec<usize>,
     },
-    LitNum {
+    MultiLitNum {
         locs: Vec<usize>,
         str_start: usize,
         str_length: usize,
         value: i64,
+        end: usize,
     },
 }
 

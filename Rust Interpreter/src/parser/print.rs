@@ -5,7 +5,7 @@ use super::*;
 pub struct PrintState {}
 
 impl ParseState for PrintState {
-    fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
+    fn step(&mut self, _env: &mut Enviroment, _word: &Slice, _rest: &Slice) -> MatchResult {
         todo!()
     }
 

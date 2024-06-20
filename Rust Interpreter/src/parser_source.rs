@@ -1,7 +1,16 @@
 use std::{
     fmt::Debug,
     io::{self, BufRead, StdinLock},
+    iter::{self, Flatten},
 };
+
+pub type ParserSourceIter<'a> = Flatten<std::vec::IntoIter<Box<dyn Iterator<Item = &'a u8> + 'a>>>;
+
+macro_rules! make_iter {
+    ($expr:expr) => {
+        Box::new($expr) as Box<dyn iter::Iterator<Item = &u8>>
+    };
+}
 
 #[derive(Debug)]
 enum Source<'a> {
@@ -65,7 +74,7 @@ impl<'a> ParserSource<'a> {
                         .as_mut()
                         .is_some_and(|s| s.read_until(b'\n', &mut new_line).is_ok());
                     if ret {
-                        *start += new_line.len();
+                        *start = buf.len();
                         buf.append(&mut new_line);
                     }
                     ret
@@ -90,18 +99,20 @@ impl<'a> ParserSource<'a> {
             }
         }
     }
-    pub fn reset(&mut self) {
-        for s in &mut self.sources {
-            if let Source::Stdin { source, .. } = s {
-                *source = None;
+    pub fn get_iter<'b>(&'b self) -> ParserSourceIter {
+        let mut ret = Vec::new();
+        let mut first = true;
+        for s in &self.sources {
+            if !first {
+                ret.push(make_iter!(iter::once(&b'\n')));
             }
+            first = false;
+            ret.push(match s {
+                Source::Stdin { buf, .. } => make_iter!(buf.iter()),
+                Source::File => todo!(),
+                Source::String { str, .. } => make_iter!(str.iter()),
+            });
         }
-    }
-    pub fn get_n(&mut self) {
-        for s in &mut self.sources {
-            if let Source::Stdin { source, .. } = s {
-                *source = None;
-            }
-        }
+        ret.into_iter().flatten()
     }
 }

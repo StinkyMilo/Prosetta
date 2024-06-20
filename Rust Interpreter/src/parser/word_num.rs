@@ -5,19 +5,25 @@ use super::*;
 pub struct WordNumState {}
 impl ParseState for WordNumState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
-        let close = find_close(rest, 0);
-        if let Some(close) = close {
-            *env.expr = Expr::WordNum {
-                str_start: word.pos + env.global_index,
-                str: word.str.to_owned().to_ascii_lowercase(),
-                locs: env.locs.take().unwrap_or_default(),
-            };
+        // wait for non . word
+        if is_close(word) {
+            MatchResult::Continue
+        } else {
+            let close = find_close(rest, 0);
+            if let Some(close) = close {
+                *env.expr = Expr::WordNum {
+                    locs: env.locs.take().unwrap_or_default(),
+                    str_start: word.pos + env.global_index,
+                    str: word.str.to_owned().to_ascii_lowercase(),
+                    end: close.pos + env.global_index,
+                };
 
-            return MatchResult::Matched(close.pos);
+                MatchResult::Matched(close.pos + 1)
+            } else {
+                // did not find close
+                MatchResult::Failed
+            }
         }
-
-        // will not work on next word
-        MatchResult::Failed
     }
 
     fn step_match(

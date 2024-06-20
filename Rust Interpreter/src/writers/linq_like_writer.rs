@@ -1,14 +1,21 @@
 use crate::commands::*;
 
-fn join_locs(locs: &Vec<usize>) -> String {
+fn join_locs(locs: &Vec<usize>, end: Option<usize>) -> String {
     if locs.is_empty() {
         "".to_string()
     } else {
         let mut iter = locs.into_iter();
         let first = iter.next().unwrap();
-        iter.fold("@".to_string() + &first.to_string(), |a, b| {
+        let mut ret = iter.fold("@".to_string() + &first.to_string(), |a, b| {
             a + &"," + &b.to_string()
-        })
+        });
+        if let Some(index) = end {
+            if index != usize::MAX {
+                ret += "$";
+                ret += &index.to_string();
+            }
+        }
+        ret
     }
 }
 
@@ -35,26 +42,39 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
     match &exprs[index] {
         Expr::NoneStat => "(todo stat)".to_string(),
         Expr::NoneExpr => "(todo expr)".to_string(),
-        Expr::Set {
+        Expr::Assign {
             locs,
             name_start,
             name,
             value_index,
+            end,
         } => format!(
             "(set{} \"{}\"@{} {})",
-            join_locs(locs),
+            join_locs(locs, Some(*end)),
             String::from_utf8_lossy(&name),
             name_start,
             write_expr(exprs, *value_index)
         ),
         Expr::Line { locs, indexes } => {
-            format!("(line{} {})", join_locs(locs), write_exprs(exprs, indexes),)
+            format!(
+                "(line{} {})",
+                join_locs(locs, None),
+                write_exprs(exprs, indexes),
+            )
         }
         Expr::Arc { locs, indexes } => {
-            format!("(arc{} {})", join_locs(locs), write_exprs(exprs, indexes),)
+            format!(
+                "(arc{} {})",
+                join_locs(locs, None),
+                write_exprs(exprs, indexes),
+            )
         }
         Expr::Rect { locs, indexes } => {
-            format!("(rect{} {})", join_locs(locs), write_exprs(exprs, indexes),)
+            format!(
+                "(rect{} {})",
+                join_locs(locs, None),
+                write_exprs(exprs, indexes),
+            )
         }
         Expr::Var { name_start, name } => format!(
             "(var \"{}\"@{})",
@@ -65,9 +85,10 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             locs,
             str_start,
             str,
+            end,
         } => format!(
             "(wordnum{} \"{}\"@{})",
-            join_locs(locs),
+            join_locs(locs, Some(*end)),
             String::from_utf8_lossy(str),
             str_start
         ),
@@ -89,24 +110,29 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             format!(
                 "({}{} {})",
                 name,
-                join_locs(locs),
+                join_locs(locs, None),
                 write_exprs(exprs, indexes)
             )
         }
-        Expr::LitNum {
+        Expr::MultiLitNum {
             locs,
             str_start,
             str_length,
             value,
+            end,
         } => format!(
             "(litnum{} {}@{}${})",
-            join_locs(locs),
+            join_locs(locs, Some(*end)),
             value,
             str_start,
             str_length
         ),
         Expr::Print { locs, data } => {
-            format!("(print{} {})", join_locs(locs), write_prints(exprs, data))
+            format!(
+                "(print{} {})",
+                join_locs(locs, None),
+                write_prints(exprs, data)
+            )
         }
     }
 }

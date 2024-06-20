@@ -10,6 +10,7 @@ const NOT_ALIAS: &'static [u8] = b"not";
 
 const STAT_ALIASES: [&'static [u8]; 5] = [b"arc", b"lin", b"was", b"rec", b"pri"];
 
+// match alias to expr
 fn setup_expr(alias: &'static [u8], index: usize) -> MatchResult {
     MatchResult::ContinueWith(
         index,
@@ -22,7 +23,7 @@ fn setup_expr(alias: &'static [u8], index: usize) -> MatchResult {
             b"exp" => get_state!(operator::OperatorState::new_exp()),
             b"log" => get_state!(operator::OperatorState::new_log()),
 
-            b"lit" => get_state!(num_lit::LitNumState::new()),
+            b"lit" => get_state!(multi_lit_num::MultiLitNumState::new()),
             b"int" => get_state!(word_num::WordNumState::new()),
             b"not" => get_state!(not::NotState::new()),
             _ => panic!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
@@ -30,13 +31,14 @@ fn setup_expr(alias: &'static [u8], index: usize) -> MatchResult {
     )
 }
 
+// match alias to stat
 fn setup_stat(alias: &'static [u8], index: usize) -> MatchResult {
     MatchResult::ContinueWith(
         index,
         match alias {
             b"arc" => get_state!(circle::CircleState::new()),
             b"lin" => get_state!(line::LineState::new()),
-            b"was" => get_state!(set::EqState::new()),
+            b"was" => get_state!(set::AssignState::new()),
             b"rec" => get_state!(rect::RectState::new()),
             b"pri" => get_state!(print::PrintState::new()),
             _ => panic!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),

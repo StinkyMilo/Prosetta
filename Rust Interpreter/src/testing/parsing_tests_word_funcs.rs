@@ -114,30 +114,30 @@ mod tests {
     fn test_find_end_close_after() {
         assert_eq!(
             find_close(&new_slice(" a . b ", 0), 0),
-            Some(new_slice(" b ", 4))
+            Some(new_slice(". b ", 3))
         );
         assert_eq!(
             find_close(&new_slice(" a . b ", 0), 0),
-            Some(new_slice(" b ", 4))
+            Some(new_slice(". b ", 3))
         );
         assert_eq!(
             find_close(&new_slice(" a .b c", 0), 0),
-            Some(new_slice("b c", 4))
+            Some(new_slice(".b c", 3))
         );
         assert_eq!(
             find_close(&new_slice(" a b.c d", 0), 0),
-            Some(new_slice("c d", 5))
+            Some(new_slice(".c d", 4))
         );
     }
 
     #[test]
     fn test_find_end_close_fails() {
         assert_eq!(find_close(&new_slice("", 0), 0), None);
-        assert_eq!(find_close(&new_slice(".", 0), 0), Some(new_slice("", 1)));
-        assert_eq!(find_close(&new_slice(".a", 0), 0), Some(new_slice("a", 1)));
+        assert_eq!(find_close(&new_slice(".", 0), 0), Some(new_slice(".", 0)));
+        assert_eq!(find_close(&new_slice(".a", 0), 0), Some(new_slice(".a", 0)));
         assert_eq!(
-            find_close(&new_slice(".aa", 0), 0),
-            Some(new_slice("aa", 1))
+            find_close(&new_slice(" .aa", 0), 0),
+            Some(new_slice(".aa", 1))
         );
         assert_eq!(find_close(&new_slice("a b c d", 0), 0), None);
     }

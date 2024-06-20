@@ -1,4 +1,7 @@
-#[allow(dead_code)]
+#![allow(dead_code)]
+#![allow(unused_macros)]
+#![allow(unused_imports)]
+
 #[cfg(test)]
 pub mod test_lib {
 
@@ -83,7 +86,6 @@ macro_rules! add_vars {
 }
 pub(crate) use add_vars;
 
-#[cfg(test)]
 macro_rules! assert_step {
     ($parser:ident,$step_result:ident,$state:expr,$word:expr) => {
         $crate::testing::test_lib::assert_step_inner(
@@ -96,5 +98,5 @@ macro_rules! assert_step {
         );
     };
 }
-#[cfg(test)]
+
 pub(crate) use assert_step;

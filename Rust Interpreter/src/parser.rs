@@ -20,7 +20,7 @@ mod line;
 mod print;
 mod rect;
 
-mod num_lit;
+mod multi_lit_num;
 mod num_literal;
 
 #[path = "testing/parsing_tests_simple.rs"]
@@ -255,7 +255,7 @@ impl<'a> Parser<'a> {
             let start_index = *self.data.stat_starts.last().unwrap();
             self.parsing_line = false;
             // add to varibles
-            if let Expr::Set { name, .. } = &self.data.exprs[start_index] {
+            if let Expr::Assign { name, .. } = &self.data.exprs[start_index] {
                 self.data.vars.insert(name.to_owned());
             }
             ParserResult::MatchedLine
