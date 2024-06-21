@@ -4,11 +4,30 @@ use super::*;
 
 pub struct MultiLitNumState {
     has_data: bool,
+    first: bool,
 }
 
 impl ParseState for MultiLitNumState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, _rest: &Slice) -> MatchResult {
-        // find close
+        if self.first {
+            let locs = env.locs.take().unwrap_or_default();
+            *env.expr = Expr::MultiLitNum {
+                locs,
+                end: usize::MAX,
+                num_indexes: Vec::new(),
+            };
+        }
+        MatchResult::ContinueWith(word.pos, Box::new(num_literal::LiteralNumState::new()))
+    }
+
+    fn step_match(
+        &mut self,
+        env: &mut Enviroment,
+        child_index: Option<usize>,
+        word: &Slice,
+        _rest: &Slice,
+    ) -> MatchResult {
+        self.first = false;
         if is_close(word) {
             if self.has_data {
                 if let Expr::MultiLitNum { end, .. } = env.expr {
@@ -16,48 +35,17 @@ impl ParseState for MultiLitNumState {
                 }
                 MatchResult::Matched(word.pos + 1)
             } else {
-                MatchResult::Failed
+                MatchResult::Continue
             }
-        }
-        // else check if number
-        else {
-            if let Some(new_digit) = num_literal::get_number_word(word.str) {
-                self.has_data = true;
-
-                //set up or update command
-                if let Expr::MultiLitNum {
-                    str_start,
-                    str_length,
-                    value,
-                    ..
-                } = env.expr
-                {
-                    *value = *value * 10 + new_digit;
-                    *str_length = word.end() - *str_start + env.global_index;
-                } else {
-                    let locs = env.locs.take().unwrap_or_default();
-                    *env.expr = Expr::MultiLitNum {
-                        locs,
-                        str_start: word.pos + env.global_index,
-                        str_length: word.len(),
-                        value: new_digit,
-                        end: usize::MAX,
-                    };
-                }
-            };
+        } else if let Some(index) = child_index {
+            self.has_data = true;
+            if let Expr::MultiLitNum { num_indexes, .. } = env.expr {
+                num_indexes.push(index);
+            }
+            MatchResult::ContinueWith(word.pos, Box::new(num_literal::LiteralNumState::new()))
+        } else {
             MatchResult::Continue
         }
-    }
-
-    fn step_match(
-        &mut self,
-        _env: &mut Enviroment,
-        _did_child_match: bool,
-        _word: &Slice,
-        _rest: &Slice,
-    ) -> MatchResult {
-        // has no child to match - fn should never be called
-        unimplemented!()
     }
 
     fn get_name(&self) -> &'static str {
@@ -71,6 +59,9 @@ impl ParseState for MultiLitNumState {
 
 impl MultiLitNumState {
     pub fn new() -> Self {
-        MultiLitNumState { has_data: false }
+        MultiLitNumState {
+            has_data: false,
+            first: true,
+        }
     }
 }

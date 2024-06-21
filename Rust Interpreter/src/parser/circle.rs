@@ -6,43 +6,45 @@ pub struct CircleState {
 }
 impl ParseState for CircleState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, _rest: &Slice) -> MatchResult {
-        let locs = env.locs.take().unwrap_or_default();
+        // let locs = env.locs.take().unwrap_or_default();
 
-        *env.expr = Expr::Arc {
-            locs,
-            indexes: [env.child_index, usize::MAX, usize::MAX, usize::MAX],
-        };
+        // *env.expr = Expr::Arc {
+        //     locs,
+        //     indexes: [env.child_index, usize::MAX, usize::MAX, usize::MAX],
+        // };
 
-        // setup child state
-        MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont()))
+        // // setup child state
+        // MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont()))
+        todo!()
     }
 
     fn step_match(
         &mut self,
         env: &mut Enviroment,
-        did_child_match: bool,
+        child_index:Option<usize>,
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult {
-        if did_child_match {
-            if self.children == 2 {
-                // matched second child - find h
-                let close = find_close(&word, 0).or_else(|| find_close(&rest, 0));
-                match close {
-                    // will never be a h to find even on future words
-                    None => MatchResult::Failed,
-                    Some(slice) => MatchResult::Matched(slice.pos),
-                }
-            } else {
-                // matched first child - setup second child
-                self.children += 1;
-                self.add_child(env.expr, self.children, env.child_index);
-                MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont()))
-            }
-        } else {
-            // if either child match fails - I will never match
-            MatchResult::Failed
-        }
+        // if did_child_match {
+        //     if self.children == 2 {
+        //         // matched second child - find h
+        //         let close = find_close(&word, 0).or_else(|| find_close(&rest, 0));
+        //         match close {
+        //             // will never be a h to find even on future words
+        //             None => MatchResult::Failed,
+        //             Some(slice) => MatchResult::Matched(slice.pos),
+        //         }
+        //     } else {
+        //         // matched first child - setup second child
+        //         self.children += 1;
+        //         self.add_child(env.expr, self.children, env.child_index);
+        //         MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont()))
+        //     }
+        // } else {
+        //     // if either child match fails - I will never match
+             //MatchResult::Failed
+        // }
+        todo!()
     }
 
     fn get_name(&self) -> &'static str {

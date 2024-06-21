@@ -32,7 +32,7 @@ mod parsing_tests_milo;
 #[path = "testing/parsing_tests_other.rs"]
 mod parsing_tests_other;
 
-use std::{fmt::Debug, hint::black_box};
+use std::{fmt::Debug, hint::black_box, mem};
 
 use crate::{commands::*, linq_like_writer};
 
@@ -57,7 +57,6 @@ pub struct Parser<'a> {
 
     pos: usize,
     last_result: LastMatchResult,
-    last_locs: Option<Vec<usize>>,
     aliases: AliasData,
 }
 
@@ -76,7 +75,6 @@ impl<'a> Parser<'a> {
             pos: 0,
             parsing_line: false,
             last_result: LastMatchResult::None,
-            last_locs: None,
             aliases: AliasData::new(flags),
         }
     }
@@ -150,17 +148,17 @@ impl<'a> Parser<'a> {
         let frame = &mut self.stack[stack_index];
         let mut expr = &mut Expr::NoneExpr;
 
-        let next_child = self.data.exprs.vec.len();
+        //let next_child = self.data.exprs.vec.len();
 
         if frame.0 < self.data.exprs.vec.len() {
             expr = &mut self.data.exprs.vec[frame.0];
         }
+
         // setup env
         let mut env = Enviroment {
             expr,
             vars: &self.data.vars,
-            locs: self.last_locs.take(),
-            child_index: next_child,
+            locs: None,
             global_index: self.pos,
             aliases: &self.aliases,
         };
@@ -169,17 +167,27 @@ impl<'a> Parser<'a> {
 
         let (word, rest) = Self::get_slice(self.data.source.get_line(), frame.1);
 
+        let last_result = mem::replace(&mut self.last_result, LastMatchResult::None);
+
         // run step function
-        let mut result = match self.last_result {
+        let mut result = match last_result {
             LastMatchResult::None | LastMatchResult::Continue => {
                 frame.2.step(&mut env, &word, &rest)
             }
-            LastMatchResult::Matched => frame.2.step_match(&mut env, true, &word, &rest),
-            LastMatchResult::Failed => frame.2.step_match(&mut env, false, &word, &rest),
+            LastMatchResult::New(locs) => {
+                env.locs = locs;
+                frame.2.step(&mut env, &word, &rest)
+            }
+            LastMatchResult::Matched(child_index) => {
+                frame
+                    .2
+                    .step_match(&mut env, Some(child_index), &word, &rest)
+            }
+            LastMatchResult::Failed => frame.2.step_match(&mut env, None, &word, &rest),
         };
 
         // run aftermath
-        self.last_locs = env.locs.take();
+        let new_locs = env.locs.take();
 
         // reached end of line - upgrade result to failed
         if word.len() == 0 && matches!(result, MatchResult::Continue) {
@@ -190,7 +198,9 @@ impl<'a> Parser<'a> {
             // I matched - return to last expr on stack with success
             MatchResult::Matched(index) => self.matched_func(index),
             // continue parsing child
-            MatchResult::ContinueWith(index, state) => self.continue_with_func(index, state),
+            MatchResult::ContinueWith(index, state) => {
+                self.continue_with_func(index, state, new_locs)
+            }
             // continue with me
             MatchResult::Continue => self.continue_func(rest.pos),
             // I failed, go back on stack with fail
@@ -230,7 +240,12 @@ impl<'a> Parser<'a> {
         ParserResult::Continue
     }
 
-    fn continue_with_func(&mut self, index: usize, state: Box<dyn ParseState>) -> ParserResult {
+    fn continue_with_func(
+        &mut self,
+        index: usize,
+        state: Box<dyn ParseState>,
+        locs: Option<Vec<usize>>,
+    ) -> ParserResult {
         let mut expr_index = self.data.exprs.vec.len();
 
         // replace none exprs
@@ -241,13 +256,14 @@ impl<'a> Parser<'a> {
         self.data.exprs.vec.push(Expr::NoneExpr);
         self.stack.push((expr_index, index, state));
 
-        self.last_result = LastMatchResult::None;
+        self.last_result = LastMatchResult::New(locs);
 
         ParserResult::ContinueWith
     }
 
     fn matched_func(&mut self, index: usize) -> ParserResult {
         let state = self.stack.pop().unwrap();
+        let expr_index = state.0;
         self.last_state = Some(state);
 
         // matched final stat
@@ -261,7 +277,7 @@ impl<'a> Parser<'a> {
             ParserResult::MatchedLine
         } else {
             // setup result for next step
-            self.last_result = LastMatchResult::Matched;
+            self.last_result = LastMatchResult::Matched(expr_index);
             self.stack.last_mut().unwrap().1 = index;
             ParserResult::Matched
         }
@@ -293,7 +309,6 @@ impl<'a> Parser<'a> {
                 self.data.stat_starts.push(index);
 
                 self.parsing_line = true;
-                self.last_locs = None;
                 self.last_result = LastMatchResult::None;
             }
             found_data

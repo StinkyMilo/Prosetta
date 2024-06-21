@@ -57,7 +57,6 @@ pub mod test_lib {
         Enviroment {
             vars,
             expr,
-            child_index,
             locs,
             global_index: 0,
             aliases,

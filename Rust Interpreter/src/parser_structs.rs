@@ -1,7 +1,6 @@
 use std::{
     collections::HashSet,
     fmt::{self, Debug},
-    io::BufRead,
 };
 
 use super::{alias_data::AliasData, Expr};
@@ -12,6 +11,9 @@ mod parsing_tests_word_funcs;
 pub type VarSet = HashSet<Vec<u8>>;
 pub type StepFunction =
     fn(env: &mut Enviroment, result: LastMatchResult, word: &Slice, rest: &Slice) -> MatchResult;
+
+// (expr_index, string_index, state)
+pub type State = (usize, usize, Box<dyn ParseState>);
 
 // pub trait ParserSource: BufRead + Debug {}
 // impl<T: BufRead + Debug> ParserSource for T {}
@@ -45,7 +47,7 @@ pub trait ParseState: Debug {
     fn step_match(
         &mut self,
         env: &mut Enviroment,
-        did_child_match: bool,
+        child: Option<usize>,
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult;
@@ -63,10 +65,11 @@ pub enum MatchResult {
     Failed,
 }
 
-#[derive(PartialEq, Debug, Clone, Copy)]
+#[derive(PartialEq, Debug)]
 pub enum LastMatchResult {
     None,
-    Matched,
+    New(Option<Vec<usize>>),
+    Matched(usize),
     Failed,
     Continue,
 }
@@ -98,7 +101,6 @@ pub struct Enviroment<'a> {
     pub vars: &'a VarSet,
     pub expr: &'a mut Expr,
     pub locs: Option<Vec<usize>>,
-    pub child_index: usize,
     pub global_index: usize,
     pub aliases: &'a AliasData,
 }
@@ -244,5 +246,4 @@ pub fn is_close(slice: &Slice) -> bool {
     slice.len() > 0 && is_valid_close_char(slice.str[0])
 }
 
-// (expr_index, string_index, state)
-pub type State = (usize, usize, Box<dyn ParseState>);
+

@@ -8,7 +8,7 @@ impl ParseState for AssignState {
         *env.expr = Expr::Assign {
             name_start: word.pos + env.global_index,
             name: word.str.to_owned(),
-            value_index: env.child_index,
+            value_index: usize::MAX,
             locs: env.locs.take().unwrap_or_default(),
             end: usize::MAX,
         };
@@ -19,21 +19,25 @@ impl ParseState for AssignState {
     fn step_match(
         &mut self,
         env: &mut Enviroment,
-        did_child_match: bool,
+        child_index: Option<usize>,
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult {
-        if did_child_match {
+        if let Some(index) = child_index {
             // find ending close
             let close = find_close(&word, 0).or_else(|| find_close(&rest, 0));
             match close {
                 // will never be a period to find even on future words
                 None => MatchResult::Failed,
                 Some(slice) => {
-                    if let Expr::Assign { end, .. } = env.expr {
+                    if let Expr::Assign {
+                        value_index, end, ..
+                    } = env.expr
+                    {
+                        *value_index = index;
                         *end = slice.pos;
                     }
-                    MatchResult::Matched(slice.pos+1)
+                    MatchResult::Matched(slice.pos + 1)
                 }
             }
         } else {

@@ -49,7 +49,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             value_index,
             end,
         } => format!(
-            "(set{} \"{}\"@{} {})",
+            "(assign{} \"{}\"@{} {})",
             join_locs(locs, Some(*end)),
             String::from_utf8_lossy(&name),
             name_start,
@@ -114,18 +114,19 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                 write_exprs(exprs, indexes)
             )
         }
-        Expr::MultiLitNum {
-            locs,
+        Expr::LitNum {
             str_start,
             str_length,
             value,
+        } => format!("(litnum {}@{}${})", value, str_start, str_length),
+        Expr::MultiLitNum {
+            locs,
+            num_indexes,
             end,
         } => format!(
-            "(litnum{} {}@{}${})",
+            "(mutlilitnum{} {})",
             join_locs(locs, Some(*end)),
-            value,
-            str_start,
-            str_length
+            write_exprs(exprs, num_indexes)
         ),
         Expr::Print { locs, data } => {
             format!(

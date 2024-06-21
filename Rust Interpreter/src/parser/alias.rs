@@ -34,11 +34,11 @@ impl ParseState for NoneState {
     fn step_match(
         &mut self,
         env: &mut Enviroment,
-        did_child_match: bool,
+        child_index:Option<usize>,
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult {
-        if did_child_match {
+        if child_index.is_some() {
             // child matched successfully
             MatchResult::Matched(word.pos)
         } else {

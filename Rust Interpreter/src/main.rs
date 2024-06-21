@@ -8,7 +8,7 @@ use crate::parser::{Parser, ParserFlags, ParserResult};
 #[path = "testing/testing.rs"]
 mod testing;
 
-mod playground;
+//mod playground;
 
 mod commands;
 mod parser;

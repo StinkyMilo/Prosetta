@@ -14,10 +14,10 @@ mod tests_simple {
         );
         assert_eq!(
             linq_like_writer::write_first(&parser.data.exprs),
-            "(set@2,3,4$19 \"seventy\"@6 (litnum 7@14$5))"
+            "(assign@2,3,4$19 \"seventy\"@6 (litnum 7@14$5))"
         );
     }
-    
+
     #[test]
     fn test_wizards() {
         let text = b"The wizards were literally nine at most..".to_vec();
@@ -28,7 +28,7 @@ mod tests_simple {
         );
         assert_eq!(
             linq_like_writer::write_first(&parser.data.exprs),
-            "(set@4,7,10$40 \"were\"@12 (litnum@17,18,19$39 9@27$4))"
+            "(assign@4,7,10$40 \"were\"@12 (mutlilitnum@17,18,19$39 (litnum 9@27$4)))"
         );
     }
 

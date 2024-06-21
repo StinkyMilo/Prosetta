@@ -23,7 +23,7 @@ impl ParseState for VarState {
     fn step_match(
         &mut self,
         _env: &mut Enviroment,
-        _did_child_match: bool,
+        _child_index:Option<usize>,
         _word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {

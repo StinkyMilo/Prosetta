@@ -11,9 +11,9 @@ const LOC_COLOR: [(TermColor, bool); 3] = [
     (TermColor::Blue, true),
 ];
 
-const STRING_COLOR: (TermColor, bool) = (TermColor::Blue, false);
+const STRING_COLOR: (TermColor, bool) = (TermColor::Yellow, false);
 
-const VAR_COLOR: (TermColor, bool) = (TermColor::Green, false);
+const VAR_COLOR: (TermColor, bool) = (TermColor::Cyan, true);
 const NUM_COLOR: (TermColor, bool) = (TermColor::Green, true);
 
 pub struct SyntaxLinter<T: Renderer> {
@@ -155,7 +155,7 @@ impl<T: Renderer> SyntaxLinter<T> {
                 locs,
                 str_start,
                 str,
-                end
+                end,
             } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_up_to(source, *str_start);
@@ -166,16 +166,21 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
             }
-            Expr::MultiLitNum {
-                locs,
+            Expr::LitNum {
                 str_start,
                 str_length,
-                end,
                 ..
             } => {
-                self.write_locs(source, locs, stack_index);
                 self.write_up_to(source, *str_start);
                 self.write_as(source, *str_length, NUM_COLOR);
+            }
+            Expr::MultiLitNum {
+                locs,
+                end,
+                num_indexes,
+            } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, num_indexes, stack_index + 1);
                 self.write_end(source, *end, stack_index);
             }
             Expr::Print { locs, .. } => {

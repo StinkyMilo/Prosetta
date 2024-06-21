@@ -9,44 +9,46 @@ pub struct OperatorState {
 
 impl ParseState for OperatorState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, _rest: &Slice) -> MatchResult {
-        if !self.cont {
-            let locs = env.locs.take().unwrap_or_default();
-            *env.expr = Expr::Operator {
-                func_type: self.fn_type,
-                locs,
-                indexes: Vec::new(),
-            };
-            self.last_child_index = env.child_index;
-        }
-        // setup child state
-        MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr()))
+        // if !self.cont {
+        //     let locs = env.locs.take().unwrap_or_default();
+        //     *env.expr = Expr::Operator {
+        //         func_type: self.fn_type,
+        //         locs,
+        //         indexes: Vec::new(),
+        //     };
+        //     self.last_child_index = env.child_index;
+        // }
+        // // setup child state
+        // MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr()))
+        todo!()
     }
 
     fn step_match(
         &mut self,
         env: &mut Enviroment,
-        did_child_match: bool,
+        child_index:Option<usize>,
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult {
         // if child matched - find next child
-        if did_child_match {
-            self.add_child(env.expr, self.last_child_index);
-            self.last_child_index = env.child_index;
-            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr()))
-        // if word contains h - end
-        } else if find_close(word, 0).is_some() {
-            // if has 2 or more children - match otherwise fail
-            if self.get_child_count(env.expr) >= 2 {
-                MatchResult::Matched(rest.pos)
-            } else {
-                MatchResult::Failed
-            }
-        // if no h - continue
-        } else {
-            self.cont = true;
-            MatchResult::Continue
-        }
+        // if did_child_match {
+        //     self.add_child(env.expr, self.last_child_index);
+        //     self.last_child_index = env.child_index;
+        //     MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr()))
+        // // if word contains h - end
+        // } else if find_close(word, 0).is_some() {
+        //     // if has 2 or more children - match otherwise fail
+        //     if self.get_child_count(env.expr) >= 2 {
+        //         MatchResult::Matched(rest.pos)
+        //     } else {
+        //         MatchResult::Failed
+        //     }
+        // // if no h - continue
+        // } else {
+        //     self.cont = true;
+        //     MatchResult::Continue
+        // }
+        todo!()
     }
 
 

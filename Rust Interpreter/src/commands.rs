@@ -61,11 +61,14 @@ pub enum Expr {
         locs: Vec<usize>,
         indexes: Vec<usize>,
     },
-    MultiLitNum {
-        locs: Vec<usize>,
+    LitNum {
         str_start: usize,
         str_length: usize,
         value: i64,
+    },
+    MultiLitNum {
+        locs: Vec<usize>,
+        num_indexes: Vec<usize>,
         end: usize,
     },
 }
