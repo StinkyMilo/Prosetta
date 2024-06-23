@@ -11,7 +11,7 @@ const LOC_COLOR: [(TermColor, bool); 3] = [
     (TermColor::Blue, true),
 ];
 
-const STRING_COLOR: (TermColor, bool) = (TermColor::Yellow, false);
+const STRING_COLOR: (TermColor, bool) = (TermColor::Black, true);
 
 const VAR_COLOR: (TermColor, bool) = (TermColor::Cyan, true);
 const NUM_COLOR: (TermColor, bool) = (TermColor::Green, true);
@@ -185,6 +185,19 @@ impl<T: Renderer> SyntaxLinter<T> {
             }
             Expr::Print { locs, .. } => {
                 self.write_locs(source, locs, stack_index);
+            }
+            Expr::Skip {
+                locs,
+                index,
+                start,
+                end,
+            } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_up_to(source, *start - 1);
+                self.write_up_to_as(source, *end, STRING_COLOR);
+                self.write_end(source, *end, stack_index);
+                // same stack_index for same color
+                self.write_expr(source, exprs, *index, stack_index)
             }
             Expr::NoneExpr | Expr::NoneStat => {}
         };

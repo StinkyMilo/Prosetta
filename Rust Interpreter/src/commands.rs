@@ -71,6 +71,12 @@ pub enum Expr {
         num_indexes: Vec<usize>,
         end: usize,
     },
+    Skip {
+        locs: Vec<usize>,
+        index: usize,
+        start: usize,
+        end: usize,
+    },
 }
 
 impl Expr {

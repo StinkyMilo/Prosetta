@@ -135,6 +135,20 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                 write_prints(exprs, data)
             )
         }
+        Expr::Skip {
+            locs,
+            index,
+            start,
+            end,
+        } => {
+            format!(
+                "(skip{} @{}${} {})",
+                join_locs(locs, None),
+                *start,
+                *end,
+                write_expr(exprs, *index),
+            )
+        }
     }
 }
 

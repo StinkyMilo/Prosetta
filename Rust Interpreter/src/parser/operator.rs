@@ -26,7 +26,7 @@ impl ParseState for OperatorState {
     fn step_match(
         &mut self,
         env: &mut Enviroment,
-        child_index:Option<usize>,
+        child_index: Option<usize>,
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult {
@@ -50,7 +50,6 @@ impl ParseState for OperatorState {
         // }
         todo!()
     }
-
 
     fn get_name(&self) -> &'static str {
         match self.fn_type {

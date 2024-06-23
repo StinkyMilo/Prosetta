@@ -28,6 +28,15 @@ impl ParseState for MultiLitNumState {
         _rest: &Slice,
     ) -> MatchResult {
         self.first = false;
+
+        // add child if matched
+        if let Some(index) = child_index {
+            self.has_data = true;
+            if let Expr::MultiLitNum { num_indexes, .. } = env.expr {
+                num_indexes.push(index);
+            }
+        }
+
         if is_close(word) {
             if self.has_data {
                 if let Expr::MultiLitNum { end, .. } = env.expr {
@@ -37,11 +46,7 @@ impl ParseState for MultiLitNumState {
             } else {
                 MatchResult::Continue
             }
-        } else if let Some(index) = child_index {
-            self.has_data = true;
-            if let Expr::MultiLitNum { num_indexes, .. } = env.expr {
-                num_indexes.push(index);
-            }
+        } else if child_index.is_some() {
             MatchResult::ContinueWith(word.pos, Box::new(num_literal::LiteralNumState::new()))
         } else {
             MatchResult::Continue

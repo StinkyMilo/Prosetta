@@ -42,7 +42,7 @@ fn main() {
     args.sort();
 
     let flags = ParserFlags {
-        not: args.binary_search(&"not".to_string()).is_ok(),
+        not: true, //args.binary_search(&"not".to_string()).is_ok(),
     };
 
     // println!(

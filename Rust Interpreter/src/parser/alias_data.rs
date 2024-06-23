@@ -38,7 +38,7 @@ fn setup_stat(alias: &'static [u8], index: usize) -> MatchResult {
         match alias {
             b"arc" => get_state!(circle::CircleState::new()),
             b"lin" => get_state!(line::LineState::new()),
-            b"was" => get_state!(set::AssignState::new()),
+            b"was" => get_state!(assign::AssignState::new()),
             b"rec" => get_state!(rect::RectState::new()),
             b"pri" => get_state!(print::PrintState::new()),
             _ => panic!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),

@@ -40,5 +40,37 @@ mod tests_simple {
             test_lib::assert_result(&mut parser),
             ParserResult::MatchedLine
         );
+        assert_eq!(
+            linq_like_writer::write_first(&parser.data.exprs),
+            "(assign@2,3,4$30 \"nice\"@6 (mutlilitnum@12,13,14$24 (litnum 6@16$3) (litnum 9@20$4)))"
+        );
+    }
+
+    #[test]
+    fn test_liechtenstein() {
+        let text = b"The wars in Liechtenstein ravaged the country..".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
+        assert_eq!(
+            test_lib::assert_result(&mut parser),
+            ParserResult::MatchedLine
+        );
+        assert_eq!(
+            linq_like_writer::write_first(&parser.data.exprs),
+            "(assign@4,5,7$46 \"in\"@9 (wordnum@13,19,21$45 \"ravaged\"@26))"
+        );
+    }
+
+    #[test]
+    fn test_nottingham() {
+        let text = b"I was in Nottingham and it literally snowed the entire time I was there! All eight days!  ".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        assert_eq!(
+            test_lib::assert_result(&mut parser),
+            ParserResult::MatchedLine
+        );
+        assert_eq!(
+            linq_like_writer::write_first(&parser.data.exprs),
+            "(assign@2,3,4$87 \"in\"@6 (skip@9,10,11 @20$71 (litnum 8@77$5)))"
+        );
     }
 }

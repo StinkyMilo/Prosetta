@@ -11,7 +11,7 @@ mod alias;
 pub(crate) mod alias_data;
 mod not;
 mod operator;
-mod set;
+mod assign;
 mod var;
 mod word_num;
 

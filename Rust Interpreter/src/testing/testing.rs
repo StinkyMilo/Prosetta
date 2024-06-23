@@ -50,7 +50,6 @@ pub mod test_lib {
     pub fn new_env<'a>(
         vars: &'a HashSet<Vec<u8>>,
         expr: &'a mut Expr,
-        child_index: usize,
         locs: Option<Vec<usize>>,
         aliases: &'a AliasData,
     ) -> Enviroment<'a> {
