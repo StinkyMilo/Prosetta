@@ -13,8 +13,10 @@ pub enum OperatorType {
 
 #[derive(PartialEq, Debug)]
 pub enum Prints {
+    // child_index
     Var(usize),
-    Word(String, usize),
+    // value, string_index
+    Word(Vec<u8>, usize),
 }
 
 #[derive(PartialEq, Debug)]

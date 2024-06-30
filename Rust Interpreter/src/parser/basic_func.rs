@@ -60,16 +60,16 @@ impl<T: BasicState + Debug> ParseState for T {
                         get_state!(alias::NoneState::new_expr_cont()),
                     )
                 } else {
-                    // exprcont failed on the entire rest of it - will never match
+                    // exprcont failed on the entire rest of string - I will never match
                     MatchResult::Failed
                 }
             }
             CloseType::Able => {
                 // I can close so I close
                 if is_close(word) {
-                    self.end(env.expr, word.pos);
+                    self.end(env.expr, word.pos + env.global_index);
                     MatchResult::Matched(word.pos + 1)
-                    // succeeded so continue again with noncont expr
+                    // succeeded - continue again with noncont expr
                 } else if child.is_some() {
                     MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr()))
                     // failed - pass word

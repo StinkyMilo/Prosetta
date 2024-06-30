@@ -11,9 +11,9 @@ mod basic_func;
 
 mod alias;
 pub(crate) mod alias_data;
+mod assign;
 mod not;
 mod operator;
-mod assign;
 mod var;
 mod word_num;
 
@@ -120,6 +120,7 @@ impl<'a> Parser<'a> {
                 return ParserResult::Start;
             }
         }
+        //debug time
         let _debug = format!(
             "{:?}",
             Vec::from_iter(self.stack.iter().map(|x| (x.0, x.1)))
@@ -285,8 +286,10 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn get_slice(line: &[u8], start: usize) -> (Slice, Slice) {
+    fn get_slice(line: &[u8], mut start: usize) -> (Slice, Slice) {
         //let line = line.as_bytes();
+        start = start.min(line.len());
+
         let slice = Slice {
             str: &line[start..],
             pos: start,

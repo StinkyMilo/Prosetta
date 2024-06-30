@@ -85,6 +85,26 @@ impl<T: Renderer> SyntaxLinter<T> {
         self.renderer.add_with(&buf, color);
         self.index += num;
     }
+}
+
+impl<T: Renderer> SyntaxLinter<T> {
+    fn write_prints(
+        &mut self,
+        source: &mut ParserSourceIter,
+        exprs: &ExprArena,
+        data: &Vec<Prints>,
+    ) {
+        for print in data {
+            match print {
+                // stack index is not used in vars
+                Prints::Var(index) => self.write_expr(source, exprs, *index, 0),
+                Prints::Word(str, index) => {
+                    self.write_up_to(source, *index);
+                    self.write_as(source, str.len(), STRING_COLOR);
+                }
+            }
+        }
+    }
 
     fn write_locs(&mut self, source: &mut ParserSourceIter, locs: &Vec<usize>, stack_index: usize) {
         let color = LOC_COLOR[stack_index % 3];
@@ -135,17 +155,17 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_expr(source, exprs, *value_index, stack_index + 1);
                 self.write_end(source, *end, stack_index);
             }
-            Expr::Line { locs, indexes,end } => {
+            Expr::Line { locs, indexes, end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.write_end(source, *end, stack_index);
             }
-            Expr::Arc { locs, indexes,end } => {
+            Expr::Arc { locs, indexes, end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.write_end(source, *end, stack_index);
             }
-            Expr::Rect { locs, indexes,end } => {
+            Expr::Rect { locs, indexes, end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.write_end(source, *end, stack_index);
@@ -189,8 +209,10 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_exprs(source, exprs, num_indexes, stack_index + 1);
                 self.write_end(source, *end, stack_index);
             }
-            Expr::Print { locs, .. } => {
+            Expr::Print { locs, data, end } => {
                 self.write_locs(source, locs, stack_index);
+                self.write_prints(source, exprs, data);
+                self.write_end(source, *end, stack_index);
             }
             Expr::Skip {
                 locs,

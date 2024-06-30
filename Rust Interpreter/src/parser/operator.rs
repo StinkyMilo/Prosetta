@@ -18,7 +18,7 @@ impl ParseState for OperatorState {
             };
         }
         // setup child state
-        MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr()))
+        MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr()))
     }
 
     fn step_match(
@@ -45,7 +45,7 @@ impl ParseState for OperatorState {
                     // will never be a period to find even on future words
                     None => MatchResult::Failed,
                     Some(slice) => {
-                        *end = slice.pos;
+                        *end = slice.pos + env.global_index;
                         MatchResult::Matched(slice.pos + 1)
                     }
                 };
@@ -53,13 +53,13 @@ impl ParseState for OperatorState {
             } else if is_close(word) {
                 // return if has enough children?
                 if fn_type_in_range(self.fn_type, self.child_count) {
-                    *end = word.pos;
+                    *end = word.pos + env.global_index;
                     return MatchResult::Matched(word.pos + 1);
                 }
             }
             // move next
             if child_index.is_some() {
-                MatchResult::ContinueWith(word.pos, Box::new(num_literal::LiteralNumState::new()))
+                MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr()))
             } else {
                 MatchResult::Continue
             }

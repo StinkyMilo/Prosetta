@@ -141,8 +141,9 @@ impl<'a> Slice<'a> {
     }
 }
 
+const OTHER_CHARS: &[u8] = b"-+^/";
 fn is_valid_word_char(char: u8) -> bool {
-    char.is_ascii_alphanumeric() || char == b'-'
+    char.is_ascii_alphanumeric() || OTHER_CHARS.contains(&char)
 }
 
 const END_CHARS: &[u8] = b".?!,";
@@ -245,5 +246,3 @@ pub fn find_close<'a>(slice: &'a Slice<'a>, start: usize) -> Option<Slice<'_>> {
 pub fn is_close(slice: &Slice) -> bool {
     slice.len() > 0 && is_valid_close_char(slice.str[0])
 }
-
-

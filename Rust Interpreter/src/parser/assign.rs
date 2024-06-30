@@ -35,7 +35,7 @@ impl ParseState for AssignState {
                     } = env.expr
                     {
                         *value_index = index;
-                        *end = slice.pos;
+                        *end = slice.pos + env.global_index;
                     }
                     MatchResult::Matched(slice.pos + 1)
                 }

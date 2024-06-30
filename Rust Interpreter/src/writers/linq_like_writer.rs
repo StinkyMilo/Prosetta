@@ -157,7 +157,7 @@ fn write_prints(exprs: &ExprArena, data: &Vec<Prints>) -> String {
     for print in data {
         ret += &match print {
             Prints::Var(index) => write_expr(exprs, *index) + " ",
-            Prints::Word(str, index) => format!("\"{}\"@{} ", str, index),
+            Prints::Word(str, index) => format!("\"{}\"@{} ", std::str::from_utf8(str).unwrap(), index),
         }
     }
     ret.pop();
