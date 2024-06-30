@@ -1,4 +1,5 @@
 pub(crate) mod wind_renderer;
+pub(crate) mod html_renderer;
 
 #[allow(dead_code)]
 #[derive(PartialEq, Clone, Copy)]

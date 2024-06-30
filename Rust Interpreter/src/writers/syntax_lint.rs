@@ -135,17 +135,20 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_expr(source, exprs, *value_index, stack_index + 1);
                 self.write_end(source, *end, stack_index);
             }
-            Expr::Line { locs, indexes } => {
+            Expr::Line { locs, indexes,end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.write_end(source, *end, stack_index);
             }
-            Expr::Arc { locs, indexes } => {
+            Expr::Arc { locs, indexes,end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.write_end(source, *end, stack_index);
             }
-            Expr::Rect { locs, indexes } => {
+            Expr::Rect { locs, indexes,end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.write_end(source, *end, stack_index);
             }
             Expr::Var { name_start, name } => {
                 self.write_up_to(source, *name_start);
@@ -154,17 +157,20 @@ impl<T: Renderer> SyntaxLinter<T> {
             Expr::WordNum {
                 locs,
                 str_start,
-                str,
+                str_len,
                 end,
             } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_up_to(source, *str_start);
-                self.write_as(source, str.len(), STRING_COLOR);
+                self.write_as(source, *str_len, STRING_COLOR);
                 self.write_end(source, *end, stack_index);
             }
-            Expr::Operator { locs, indexes, .. } => {
+            Expr::Operator {
+                locs, indexes, end, ..
+            } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.write_end(source, *end, stack_index);
             }
             Expr::LitNum {
                 str_start,

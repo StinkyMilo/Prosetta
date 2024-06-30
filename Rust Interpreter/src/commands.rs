@@ -25,10 +25,12 @@ pub enum Expr {
     Arc {
         locs: Vec<usize>,
         indexes: [usize; 4],
+        end: usize,
     },
     Line {
         locs: Vec<usize>,
         indexes: [usize; 4],
+        end: usize,
     },
     Assign {
         locs: Vec<usize>,
@@ -40,10 +42,12 @@ pub enum Expr {
     Rect {
         locs: Vec<usize>,
         indexes: [usize; 4],
+        end: usize,
     },
     Print {
         locs: Vec<usize>,
         data: Vec<Prints>,
+        end: usize,
     },
     //expr
     Var {
@@ -53,13 +57,14 @@ pub enum Expr {
     WordNum {
         locs: Vec<usize>,
         str_start: usize,
-        str: Vec<u8>,
+        str_len: usize,
         end: usize,
     },
     Operator {
-        func_type: OperatorType,
         locs: Vec<usize>,
+        func_type: OperatorType,
         indexes: Vec<usize>,
+        end: usize,
     },
     LitNum {
         str_start: usize,

@@ -1,74 +1,55 @@
 use super::*;
+use basic_func::BasicState;
 
 #[derive(Debug)]
 pub struct LineState {
-    children: u8,
+    count: u8,
 }
-impl ParseState for LineState {
-    fn step(&mut self, env: &mut Enviroment, word: &Slice, _rest: &Slice) -> MatchResult {
-        // let locs = env.locs.take().unwrap_or_default();
-
-        // *env.expr = Expr::Line {
-        //     locs,
-        //     indexes: [env.child_index, usize::MAX, usize::MAX, usize::MAX],
-        // };
-
-        // // setup child state
-        // MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont()))
-        todo!()
-    }
-
-    fn step_match(
-        &mut self,
-        env: &mut Enviroment,
-        child_index:Option<usize>,
-        word: &Slice,
-        rest: &Slice,
-    ) -> MatchResult {
-        // if did_child_match {
-        //     if self.children == 3 {
-        //         // matched second child - find h
-        //         let close = find_close(&word, 0).or_else(|| find_close(&rest, 0));
-        //         match close {
-        //             // will never be a h to find even on future words
-        //             None => MatchResult::Failed,
-        //             Some(slice) => MatchResult::Matched(slice.pos),
-        //         }
-        //     } else {
-        //         // matched first child - setup second child
-        //         self.children += 1;
-        //         self.set_child_indexes(env.expr, self.children, env.child_index);
-        //         MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont()))
-        //     }
-        // } else {
-        //     // if either child match fails - I will never match
-        //     MatchResult::Failed
-        // }
-        todo!()
-    }
-
+impl BasicState for LineState {
     fn get_name(&self) -> &'static str {
         "Line"
     }
 
-    fn do_replace(&self) -> bool {
-        false
+    fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {
+        let ret = self.count == 0;
+        if ret {
+            *expr = Expr::Line {
+                locs,
+                indexes: [usize::MAX; 4],
+                end: usize::MAX,
+            }
+        }
+        ret
+    }
+
+    fn add_child(&mut self, expr: &mut Expr, index: usize) {
+        if let Expr::Line { indexes, .. } = expr {
+            indexes[self.count as usize] = index;
+            self.count += 1;
+        } else {
+            unreachable!()
+        }
+    }
+
+    fn can_close(&self) -> basic_func::CloseType {
+        match self.count {
+            0..=3 => basic_func::CloseType::Unable,
+            4 => basic_func::CloseType::Force,
+            _ => unreachable!(),
+        }
+    }
+
+    fn end(&mut self, expr: &mut Expr, index: usize) {
+        if let Expr::Line { end, .. } = expr {
+            *end = index;
+        } else {
+            unreachable!()
+        }
     }
 }
 
 impl LineState {
     pub fn new() -> Self {
-        LineState { children: 0 }
-    }
-}
-
-impl LineState {
-    fn set_child_indexes(&self, expr: &mut Expr, field_index: u8, child_index: usize) {
-        match expr {
-            Expr::Line { indexes, .. } => indexes[field_index as usize] = child_index,
-            _ => {
-                unimplemented!()
-            }
-        }
+        LineState { count: 0 }
     }
 }

@@ -5,5 +5,14 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+wasm = ["dep:wasm-bindgen","dep:wasm-pack","dep:getrandom","dep:wee_alloc"]
+image= ["dep:nannou"]
+
 [dependencies]
-nannou = "0.19.0"
+cfg-if = "1.0.0"
+nannou = {version="0.19.0", optional=true}
+wasm-bindgen = {version="0.2.92", optional=true}
+wasm-pack = {version="0.12.1", optional=true}
+getrandom = { version = "0.2", features = ["js"], optional=true} 
+wee_alloc = { version = "0.4.5", optional=true}

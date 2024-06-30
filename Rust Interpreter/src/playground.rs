@@ -65,3 +65,7 @@ use crate::{
 //         println!("{}", std::str::from_utf8(&lint.into_string()).unwrap());
 //     }
 // }
+
+pub fn size_test() {
+
+}

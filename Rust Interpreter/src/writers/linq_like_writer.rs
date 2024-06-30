@@ -55,24 +55,24 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             name_start,
             write_expr(exprs, *value_index)
         ),
-        Expr::Line { locs, indexes } => {
+        Expr::Line { locs, indexes, end } => {
             format!(
                 "(line{} {})",
-                join_locs(locs, None),
+                join_locs(locs, Some(*end)),
                 write_exprs(exprs, indexes),
             )
         }
-        Expr::Arc { locs, indexes } => {
+        Expr::Arc { locs, indexes, end } => {
             format!(
                 "(arc{} {})",
-                join_locs(locs, None),
+                join_locs(locs, Some(*end)),
                 write_exprs(exprs, indexes),
             )
         }
-        Expr::Rect { locs, indexes } => {
+        Expr::Rect { locs, indexes, end } => {
             format!(
                 "(rect{} {})",
-                join_locs(locs, None),
+                join_locs(locs, Some(*end)),
                 write_exprs(exprs, indexes),
             )
         }
@@ -84,19 +84,19 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         Expr::WordNum {
             locs,
             str_start,
-            str,
+            str_len,
             end,
         } => format!(
-            "(wordnum{} \"{}\"@{})",
+            "(wordnum{} @{}$${})",
             join_locs(locs, Some(*end)),
-            String::from_utf8_lossy(str),
-            str_start
+            *str_start,
+            *str_len,
         ),
         Expr::Operator {
             locs,
             func_type,
             indexes,
-            ..
+            end,
         } => {
             let name = match func_type {
                 OperatorType::Add => "add",
@@ -110,7 +110,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             format!(
                 "({}{} {})",
                 name,
-                join_locs(locs, None),
+                join_locs(locs, Some(*end)),
                 write_exprs(exprs, indexes)
             )
         }
@@ -128,10 +128,10 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             join_locs(locs, Some(*end)),
             write_exprs(exprs, num_indexes)
         ),
-        Expr::Print { locs, data } => {
+        Expr::Print { locs, data, end } => {
             format!(
                 "(print{} {})",
-                join_locs(locs, None),
+                join_locs(locs, Some(*end)),
                 write_prints(exprs, data)
             )
         }

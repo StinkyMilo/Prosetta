@@ -7,6 +7,8 @@ pub(crate) use parser_source::*;
 pub(crate) mod parser_structs;
 pub(crate) use parser_structs::*;
 
+mod basic_func;
+
 mod alias;
 pub(crate) mod alias_data;
 mod not;
@@ -34,7 +36,7 @@ mod parsing_tests_other;
 
 use std::{fmt::Debug, hint::black_box, mem};
 
-use crate::{commands::*, linq_like_writer};
+use crate::{commands::*, writers::linq_like_writer};
 
 use alias_data::AliasData;
 

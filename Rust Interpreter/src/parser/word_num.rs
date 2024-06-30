@@ -14,7 +14,7 @@ impl ParseState for WordNumState {
                 *env.expr = Expr::WordNum {
                     locs: env.locs.take().unwrap_or_default(),
                     str_start: word.pos + env.global_index,
-                    str: word.str.to_owned().to_ascii_lowercase(),
+                    str_len: word.len(),
                     end: close.pos + env.global_index,
                 };
 
@@ -34,7 +34,7 @@ impl ParseState for WordNumState {
         _rest: &Slice,
     ) -> MatchResult {
         // has child to match - fn should never be called
-        unimplemented!()
+        unreachable!()
     }
 
     fn get_name(&self) -> &'static str {

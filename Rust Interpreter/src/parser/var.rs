@@ -28,7 +28,7 @@ impl ParseState for VarState {
         _rest: &Slice,
     ) -> MatchResult {
         // has no child to match - fn should never be called
-        unimplemented!()
+        unreachable!()
     }
 
     fn get_name(&self) -> &'static str {
