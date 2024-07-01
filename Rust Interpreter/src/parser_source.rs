@@ -22,8 +22,7 @@ enum Source<'a> {
     File,
     String {
         str: Vec<u8>,
-        start: usize,
-        end: usize,
+        first: bool,
     },
 }
 
@@ -46,11 +45,7 @@ impl<'a> ParserSource<'a> {
     }
     pub fn from_string(str: Vec<u8>) -> Self {
         Self {
-            sources: vec![Source::String {
-                str,
-                start: 0,
-                end: 0,
-            }],
+            sources: vec![Source::String { str, first: true }],
             index: 0,
         }
     }
@@ -61,35 +56,50 @@ impl<'a> ParserSource<'a> {
         match &self.sources[self.index] {
             Source::Stdin { start, buf, .. } => &buf[*start..],
             Source::File => todo!(),
-            Source::String { str, start, end } => &str[*start..*end],
+            Source::String { str, first } => {
+                // if getting before new line is set - return nothing
+                if *first {
+                    &[]
+                } else {
+                    &str
+                }
+            }
         }
     }
     pub fn new_line<'b>(&'b mut self) -> Option<&'b [u8]> {
-        let mut ret = false;
-        while !ret {
-            ret = match &mut self.sources[self.index] {
+        loop {
+            if self.index >= self.sources.len() {
+                return None;
+            }
+            let has_failed = match &mut self.sources[self.index] {
                 Source::Stdin { source, start, buf } => {
-                    let mut new_line = Vec::new();
-                    let ret = source
-                        .as_mut()
-                        .is_some_and(|s| s.read_until(b'\n', &mut new_line).is_ok());
-                    if ret {
-                        *start = buf.len();
-                        buf.append(&mut new_line);
-                    }
+                    //let mut new_input = Vec::new();
+                    let mut ret = false;
+                    // let
+                    // while ret {
+                    //     ret = source
+                    //         .as_mut()
+                    //         .is_some_and(|s| s.read_until(b'\n', &mut new_line).is_ok());
+                    //     if ret {
+                    //         *start = buf.len();
+                    //         buf.append(&mut new_line);
+                    //     }
+                    // }
                     ret
                 }
                 Source::File => todo!(),
-                Source::String { str, start, end } => {
-                    let loc = str.iter().skip(*end).position(|&r| r == b'\n');
-                    let index = loc.unwrap_or(str.len());
-                    *start = *end;
-                    *end = index;
-                    *start != *end
+                Source::String { str, first } => {
+                    let ret = *first;
+                    *first = false;
+                    !ret
                 }
             };
+            if has_failed {
+                self.index += 1;
+            } else {
+                return Some(self.get_line());
+            }
         }
-        Some(self.get_line())
     }
 
     pub fn drop_input(&mut self) {

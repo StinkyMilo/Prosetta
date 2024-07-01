@@ -15,9 +15,6 @@ pub type StepFunction =
 // (expr_index, string_index, state)
 pub type State = (usize, usize, Box<dyn ParseState>);
 
-// pub trait ParserSource: BufRead + Debug {}
-// impl<T: BufRead + Debug> ParserSource for T {}
-
 macro_rules! get_state {
     ($state:expr) => {
         Box::new($state) as Box<dyn ParseState>
@@ -146,7 +143,7 @@ fn is_valid_word_char(char: u8) -> bool {
     char.is_ascii_alphanumeric() || OTHER_CHARS.contains(&char)
 }
 
-const END_CHARS: &[u8] = b".?!,";
+const END_CHARS: &[u8] = b".?!,:";
 fn is_valid_close_char(char: u8) -> bool {
     END_CHARS.contains(&char)
 }

@@ -18,7 +18,6 @@ mod writers;
 use parser::ParserSource;
 use parser_runner::{run_parser, RunnerFlags};
 
-
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
 #[cfg(feature = "wasm")]
@@ -87,7 +86,11 @@ fn main() {
         linted: true,
     };
 
-    run_parser(parser_flags, vis_flags, ParserSource::from_stdin());
+    run_parser(
+        parser_flags,
+        vis_flags,
+        ParserSource::from_string(MILO_POEM.to_vec()),
+    );
 
     let _ = io::stdin().read(&mut [0u8]).unwrap();
 }
@@ -172,3 +175,43 @@ fn main() {
 //     "   java program:\n{}",
 //     processing_writer::write(&parser.exprs, &parser.stat_starts)
 // );
+
+static MILO_POEM: &[u8] = b"
+The wizards utter 'paint iambically.'
+The peasants hadn't choice but to obey.
+\
+The wizards' cruel entertainments chant
+and utter utter nonsense, void of weight.
+\
+The wizards' cursed victims utter trash;
+the mages stand offended that despite
+intent most fair, the peasants: they dissent!
+\
+The wizards thought it boon to speak in verse
+but overestimate the peasant's skill;
+'there is no point to it' the peasants thought.
+'What cruel poetry they thrust on us.'
+And so the peasants organized revolt.
+\
+They searched for mages speaking just in verse;
+they thought and thought and thought 'where could they be?'
+\
+But long had passed; magicians marched away
+from cruel bitter thought and cursed man.
+\
+And so in lack of overlords but yet
+still wrought by curse the agriculturists
+admitted thought that life is not so bad.
+Despite new vocal eccentricities,
+their burdens lifted free of mages cruel.
+They thought that they were cursed, but in fact
+\
+the wizards had abandonded cruel thought,
+and left the peasants free of emperor.
+\
+And so their revolution had achieved
+a world where peasants had to speak in verse
+but answered not to any cruel lord
+for they had long since gone, with nothing left
+but a society that slowly learned
+restriction fosters creativity.";

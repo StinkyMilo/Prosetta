@@ -118,7 +118,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             str_start,
             str_length,
             value,
-        } => format!("(litnum {}@{}${})", value, str_start, str_length),
+        } => format!("(litnum {}@{}$${})", value, str_start, str_length),
         Expr::MultiLitNum {
             locs,
             num_indexes,

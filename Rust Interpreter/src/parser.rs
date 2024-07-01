@@ -40,7 +40,6 @@ use crate::{commands::*, writers::linq_like_writer};
 
 use alias_data::AliasData;
 
-//type MatchResult<T> = Option<(usize, T)>;
 #[derive(Debug)]
 pub struct ParsedData<'a> {
     pub exprs: ExprArena,
@@ -272,11 +271,13 @@ impl<'a> Parser<'a> {
         // matched final stat
         if self.stack.is_empty() {
             let start_index = *self.data.stat_starts.last().unwrap();
-            self.parsing_line = false;
+            //self.parsing_line = false;
             // add to varibles
             if let Expr::Assign { name, .. } = &self.data.exprs[start_index] {
                 self.data.vars.insert(name.to_owned());
             }
+            // setup next
+            self.add_new_nonestat(index);
             ParserResult::MatchedLine
         } else {
             // setup result for next step
@@ -304,22 +305,25 @@ impl<'a> Parser<'a> {
         if let Some(data) = data {
             let found_data = trim_ascii_whitespace(data).len() > 0;
             if found_data {
-                // push match stat on first step of line
-                let index = self.data.exprs.vec.len();
-
-                self.data.exprs.vec.push(Expr::NoneStat);
-
-                self.stack
-                    .push((index, 0, Box::new(alias::NoneState::new_stat())));
-                self.data.stat_starts.push(index);
-
+                self.add_new_nonestat(0);
                 self.parsing_line = true;
-                self.last_result = LastMatchResult::None;
             }
             found_data
         } else {
             false
         }
+    }
+
+    fn add_new_nonestat(&mut self, new_index: usize) {
+        // push match stat on first step of line
+        let index = self.data.exprs.vec.len();
+
+        self.data.exprs.vec.push(Expr::NoneStat);
+
+        self.stack
+            .push((index, new_index, Box::new(alias::NoneState::new_stat())));
+        self.data.stat_starts.push(index);
+        self.last_result = LastMatchResult::None;
     }
 }
 
