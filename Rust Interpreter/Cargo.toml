@@ -6,8 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-wasm = ["dep:wasm-bindgen","dep:wasm-pack","dep:getrandom","dep:wee_alloc"]
-image= ["dep:nannou"]
+wasm = ["dep:wasm-bindgen", "dep:wasm-pack", "dep:getrandom", "dep:wee_alloc"]
+image = ["dep:nannou"]
 
 [dependencies]
 cfg-if = "1.0.0"

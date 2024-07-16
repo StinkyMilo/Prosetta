@@ -1,6 +1,6 @@
 use std::{
     fmt::Debug,
-    io::{self, BufRead, StdinLock},
+    io::{self, stdin, BufRead, StdinLock},
     iter::{self, Flatten},
 };
 
@@ -35,19 +35,37 @@ pub struct ParserSource<'a> {
 impl<'a> ParserSource<'a> {
     pub fn from_stdin() -> Self {
         Self {
-            sources: vec![Source::Stdin {
-                source: Some(io::stdin().lock()),
-                start: 0,
-                buf: Vec::new(),
-            }],
+            sources: Vec::new(),
             index: 0,
         }
+        .add_stdin()
     }
     pub fn from_string(str: Vec<u8>) -> Self {
         Self {
-            sources: vec![Source::String { str, first: true }],
+            sources: Vec::new(),
             index: 0,
         }
+        .add_string(str)
+    }
+}
+
+impl<'a> ParserSource<'a> {
+    pub fn add_stdin(mut self) -> Self {
+        self.sources.push(Source::Stdin {
+            source: None,
+            start: 0,
+            buf: Vec::new(),
+        });
+        self
+    }
+
+    pub fn add_string(mut self, mut str: Vec<u8>) -> Self {
+        // if last is not newline - add it
+        if does_str_need_newline(&str) {
+            str.push(b'\n');
+        }
+        self.sources.push(Source::String { str, first: true });
+        self
     }
 }
 
@@ -88,7 +106,7 @@ impl<'a> ParserSource<'a> {
                     ret
                 }
                 Source::File => todo!(),
-                Source::String { str, first } => {
+                Source::String { first, .. } => {
                     let ret = *first;
                     *first = false;
                     !ret
@@ -111,18 +129,23 @@ impl<'a> ParserSource<'a> {
     }
     pub fn get_iter<'b>(&'b self) -> ParserSourceIter {
         let mut ret = Vec::new();
-        let mut first = true;
+        let mut add_newline = false;
         for s in &self.sources {
-            if !first {
+            if add_newline {
                 ret.push(make_iter!(iter::once(&b'\n')));
             }
-            first = false;
-            ret.push(match s {
-                Source::Stdin { buf, .. } => make_iter!(buf.iter()),
+            let iter;
+            (iter, add_newline) = match s {
+                Source::Stdin { buf, .. } => (make_iter!(buf.iter()), false),
                 Source::File => todo!(),
-                Source::String { str, .. } => make_iter!(str.iter()),
-            });
+                Source::String { str, .. } => (make_iter!(str.iter()), does_str_need_newline(str)),
+            };
+            ret.push(iter);
         }
         ret.into_iter().flatten()
     }
+}
+
+fn does_str_need_newline(str: &Vec<u8>) -> bool {
+    !str.last().is_some_and(|f| *f == b'\n')
 }

@@ -89,7 +89,8 @@ fn main() {
     run_parser(
         parser_flags,
         vis_flags,
-        ParserSource::from_string(MILO_POEM.to_vec()),
+        ParserSource::from_string(MILO_POEM[0][1..].to_vec())
+            .add_string(MILO_POEM[1][1..].to_vec()),
     );
 
     let _ = io::stdin().read(&mut [0u8]).unwrap();
@@ -176,7 +177,8 @@ fn main() {
 //     processing_writer::write(&parser.exprs, &parser.stat_starts)
 // );
 
-static MILO_POEM: &[u8] = b"
+static MILO_POEM: [&[u8]; 2] = [
+    b"
 The wizards utter 'paint iambically.'
 The peasants hadn't choice but to obey.
 \
@@ -194,8 +196,8 @@ but overestimate the peasant's skill;
 And so the peasants organized revolt.
 \
 They searched for mages speaking just in verse;
-they thought and thought and thought 'where could they be?'
-\
+they thought and thought and thought 'where could they be?'",
+    b"
 But long had passed; magicians marched away
 from cruel bitter thought and cursed man.
 \
@@ -214,4 +216,5 @@ a world where peasants had to speak in verse
 but answered not to any cruel lord
 for they had long since gone, with nothing left
 but a society that slowly learned
-restriction fosters creativity.";
+restriction fosters creativity.",
+];

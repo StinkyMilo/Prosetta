@@ -11,8 +11,8 @@ impl ParseState for NotState {
             *env.expr = Expr::Skip {
                 locs: env.locs.take().unwrap_or_default(),
                 index: usize::MAX,
-                start: word.pos,
-                end: index.pos,
+                start: word.pos+ env.global_index,
+                end: index.pos + env.global_index,
             };
 
             MatchResult::ContinueWith(index.pos + 1, Box::new(alias::NoneState::new_expr_cont()))

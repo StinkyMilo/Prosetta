@@ -84,7 +84,7 @@ impl<T: BasicState + Debug> ParseState for T {
                     // will never be a period to find even on future words
                     None => MatchResult::Failed,
                     Some(slice) => {
-                        self.end(env.expr, slice.pos);
+                        self.end(env.expr, slice.pos + env.global_index);
                         MatchResult::Matched(slice.pos + 1)
                     }
                 }
