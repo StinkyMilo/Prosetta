@@ -2,13 +2,6 @@ use std::fmt::Debug;
 
 use super::*;
 
-// can or must the state be closed
-pub enum CloseType {
-    Unable,
-    Able,
-    Force,
-}
-
 // a super state that wants between n and m arguments and a close
 pub trait BasicState {
     fn get_name(&self) -> &'static str;

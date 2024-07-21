@@ -12,6 +12,15 @@ macro_rules! make_iter {
     };
 }
 
+// can or must the state be closed
+#[derive(Debug)]
+pub enum CloseType {
+    Unable,
+    Able,
+    Force,
+}
+
+
 #[derive(Debug)]
 enum Source<'a> {
     Stdin {

@@ -1,4 +1,5 @@
 use super::*;
+use crate::parser::CloseType;
 use basic_func::BasicState;
 
 #[derive(Debug)]
@@ -31,10 +32,10 @@ impl BasicState for LineState {
         }
     }
 
-    fn can_close(&self) -> basic_func::CloseType {
+    fn can_close(&self) -> CloseType {
         match self.count {
-            0..=3 => basic_func::CloseType::Unable,
-            4 => basic_func::CloseType::Force,
+            0..=3 => CloseType::Unable,
+            4 => CloseType::Force,
             _ => unreachable!(),
         }
     }
