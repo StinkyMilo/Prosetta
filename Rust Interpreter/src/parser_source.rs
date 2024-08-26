@@ -20,7 +20,6 @@ pub enum CloseType {
     Force,
 }
 
-
 #[derive(Debug)]
 enum Source<'a> {
     Stdin {
@@ -61,7 +60,7 @@ impl<'a> ParserSource<'a> {
 impl<'a> ParserSource<'a> {
     pub fn add_stdin(mut self) -> Self {
         self.sources.push(Source::Stdin {
-            source: None,
+            source: Some(stdin().lock()),
             start: 0,
             buf: Vec::new(),
         });
@@ -100,19 +99,30 @@ impl<'a> ParserSource<'a> {
             }
             let has_failed = match &mut self.sources[self.index] {
                 Source::Stdin { source, start, buf } => {
-                    //let mut new_input = Vec::new();
-                    let mut ret = false;
-                    // let
-                    // while ret {
-                    //     ret = source
-                    //         .as_mut()
-                    //         .is_some_and(|s| s.read_until(b'\n', &mut new_line).is_ok());
-                    //     if ret {
-                    //         *start = buf.len();
-                    //         buf.append(&mut new_line);
-                    //     }
-                    // }
-                    ret
+                    if let Some(stdin) = source {
+                        let mut new_input = Vec::new();
+                        let has_failed = stdin.read_until(b'\n', &mut new_input).is_err();
+
+                        // remove \r if it exists
+                        if new_input.last() == Some(&b'\r'){
+                            new_input.pop();
+                        }
+
+                        if has_failed || new_input.len() == 0 {
+                            true
+                        } else {
+                            if buf.len() == 0 {
+                                *buf = new_input;
+                            } else {
+                                //buf.push(b'\n');
+                                *start = buf.len();
+                                buf.append(&mut new_input);
+                            }
+                            false
+                        }
+                    } else {
+                        true
+                    }
                 }
                 Source::File => todo!(),
                 Source::String { first, .. } => {
@@ -145,7 +155,8 @@ impl<'a> ParserSource<'a> {
             }
             let iter;
             (iter, add_newline) = match s {
-                Source::Stdin { buf, .. } => (make_iter!(buf.iter()), false),
+                Source::Stdin { buf, .. } => 
+                (make_iter!(buf.iter()), false),
                 Source::File => todo!(),
                 Source::String { str, .. } => (make_iter!(str.iter()), does_str_need_newline(str)),
             };

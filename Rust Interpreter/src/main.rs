@@ -1,3 +1,5 @@
+#![cfg(not(feature = "wasm"))]
+
 use std::{
     io::{self, Read},
     mem,
@@ -17,49 +19,6 @@ mod writers;
 
 use parser::ParserSource;
 use parser_runner::{run_parser, RunnerFlags};
-
-// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
-// allocator.
-#[cfg(feature = "wasm")]
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
-
-// fn setup() {
-//     console_error_panic_hook::set_once();
-// }
-#[cfg(feature = "wasm")]
-use wasm_bindgen::prelude::*;
-
-#[cfg(feature = "wasm")]
-#[wasm_bindgen]
-pub fn wasm_run_parser(str: String) -> Vec<String> {
-    //setup();
-    let mut parser = Parser::new(
-        ParserSource::from_string(str.into_bytes()),
-        ParserFlags { not: true },
-    );
-
-    let mut ret = Vec::new();
-
-    loop {
-        match parser.step() {
-            ParserResult::NoInput => break,
-            ParserResult::Matched
-            | ParserResult::MatchedLine
-            | ParserResult::Failed
-            | ParserResult::FailedLine => {
-                let data = &parser.data;
-                let iter = data.source.get_iter();
-                let mut lint = SyntaxLinter::<HTMLRenderer>::new();
-                lint.write(&data.exprs, &data.stat_starts, iter);
-                ret.push(String::from_utf8(lint.into_string()).unwrap());
-            }
-            _ => {}
-        };
-    }
-
-    ret
-}
 
 fn main() {
     //playground::print_test();
@@ -89,6 +48,7 @@ fn main() {
     run_parser(
         parser_flags,
         vis_flags,
+        //ParserSource::from_stdin()
         ParserSource::from_string(MILO_POEM[0][1..].to_vec())
             .add_string(MILO_POEM[1][1..].to_vec()),
     );

@@ -1,74 +1,14 @@
+use basic_func::BasicState;
+
 use super::*;
 
 #[derive(Debug)]
 pub struct OperatorState {
     fn_type: OperatorType,
-    first: bool,
-    child_count: usize,
+    count: u8,
 }
 
-impl ParseState for OperatorState {
-    fn step(&mut self, env: &mut Enviroment, word: &Slice, _rest: &Slice) -> MatchResult {
-        if self.first {
-            *env.expr = Expr::Operator {
-                locs: env.locs.take().unwrap_or_default(),
-                func_type: self.fn_type,
-                indexes: Vec::new(),
-                end: usize::MAX,
-            };
-        }
-        // setup child state
-        MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr()))
-    }
-
-    fn step_match(
-        &mut self,
-        env: &mut Enviroment,
-        child_index: Option<usize>,
-        word: &Slice,
-        rest: &Slice,
-    ) -> MatchResult {
-        self.first = false;
-        if let Expr::Operator { indexes, end, .. } = env.expr {
-            // add child if matched
-            if let Some(index) = child_index {
-                self.child_count += 1;
-                indexes.push(index);
-            }
-
-            // can't have more children
-            if fn_type_in_range(self.fn_type, self.child_count)
-                && !fn_type_in_range(self.fn_type, self.child_count + 1)
-            {
-                let close = find_close(&word, 0).or_else(|| find_close(&rest, 0));
-                return match close {
-                    // will never be a period to find even on future words
-                    None => MatchResult::Failed,
-                    Some(slice) => {
-                        *end = slice.pos + env.global_index;
-                        MatchResult::Matched(slice.pos + 1)
-                    }
-                };
-            // on close
-            } else if is_close(word) {
-                // return if has enough children?
-                if fn_type_in_range(self.fn_type, self.child_count) {
-                    *end = word.pos + env.global_index;
-                    return MatchResult::Matched(word.pos + 1);
-                }
-            }
-            // move next
-            if child_index.is_some() {
-                MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr()))
-            } else {
-                MatchResult::Continue
-            }
-        // child is not operator - should not be possible
-        } else {
-            unreachable!()
-        }
-    }
-
+impl BasicState for OperatorState {
     fn get_name(&self) -> &'static str {
         match self.fn_type {
             OperatorType::Add => "Add",
@@ -80,18 +20,58 @@ impl ParseState for OperatorState {
             OperatorType::Log => "Log",
         }
     }
-    fn do_replace(&self) -> bool {
-        false
+
+    fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {
+        let ret = self.count == 0;
+        if ret {
+            *expr = Expr::Operator {
+                locs,
+                func_type: self.fn_type,
+                indexes: Vec::new(),
+                end: usize::MAX,
+            };
+        }
+        ret
+    }
+
+    fn add_child(&mut self, expr: &mut Expr, index: usize) {
+        if let Expr::Operator { indexes, .. } = expr {
+            indexes.push(index);
+            self.count += 1;
+        } else {
+            unreachable!()
+        }
+    }
+
+    // this is a mess
+    fn can_close(&self) -> CloseType {
+        match (self.fn_type, self.count) {
+            (OperatorType::Add, 2..) => CloseType::Able,
+            (OperatorType::Sub, 1) => CloseType::Able,
+            (OperatorType::Sub, 2) => CloseType::Force,
+            (OperatorType::Mult, 2..) => CloseType::Able,
+            (OperatorType::Div, 2) => CloseType::Force,
+            (OperatorType::Mod, 2) => CloseType::Force,
+            (OperatorType::Exp, 1) => CloseType::Able,
+            (OperatorType::Exp, 2) => CloseType::Force,
+            (OperatorType::Log, 1) => CloseType::Able,
+            (OperatorType::Log, 2) => CloseType::Force,
+            _ => CloseType::Unable,
+        }
+    }
+
+    fn end(&mut self, expr: &mut Expr, index: usize) {
+        if let Expr::Operator { end, .. } = expr {
+            *end = index;
+        } else {
+            unreachable!()
+        }
     }
 }
 
 impl OperatorState {
     fn new(fn_type: OperatorType) -> Self {
-        OperatorState {
-            fn_type,
-            first: true,
-            child_count: 0,
-        }
+        OperatorState { fn_type, count: 0 }
     }
 
     pub fn new_add() -> Self {
@@ -120,17 +100,5 @@ impl OperatorState {
 
     pub fn new_log() -> Self {
         Self::new(OperatorType::Log)
-    }
-}
-
-fn fn_type_in_range(fn_type: OperatorType, num: usize) -> bool {
-    match fn_type {
-        OperatorType::Add => num >= 2,
-        OperatorType::Sub => num == 1 || num == 2,
-        OperatorType::Mult => num >= 2,
-        OperatorType::Div => num == 2,
-        OperatorType::Mod => num == 2,
-        OperatorType::Exp => num == 2,
-        OperatorType::Log => num == 1 || num == 2,
     }
 }
