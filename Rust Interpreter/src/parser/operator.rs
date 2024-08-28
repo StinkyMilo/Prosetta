@@ -18,6 +18,8 @@ impl BasicState for OperatorState {
             OperatorType::Mod => "Mod",
             OperatorType::Exp => "Exp",
             OperatorType::Log => "Log",
+            OperatorType::LessThan => "LessThan",
+            OperatorType::GreaterThan => "GreaterThan"
         }
     }
 
@@ -56,6 +58,8 @@ impl BasicState for OperatorState {
             (OperatorType::Exp, 2) => CloseType::Force,
             (OperatorType::Log, 1) => CloseType::Able,
             (OperatorType::Log, 2) => CloseType::Force,
+            (OperatorType::LessThan, 2) => CloseType::Force,
+            (OperatorType::GreaterThan, 2) => CloseType::Force,
             _ => CloseType::Unable,
         }
     }
@@ -100,5 +104,13 @@ impl OperatorState {
 
     pub fn new_log() -> Self {
         Self::new(OperatorType::Log)
+    }
+
+    pub fn new_less_than() -> Self {
+        Self::new(OperatorType::LessThan)
+    }
+
+    pub fn new_greater_than() -> Self {
+        Self::new(OperatorType::GreaterThan)
     }
 }
