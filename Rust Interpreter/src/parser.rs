@@ -40,29 +40,39 @@ use crate::{commands::*, writers::linq_like_writer};
 
 use alias_data::AliasData;
 
+///The data that is currently parsed
 #[derive(Debug)]
 pub struct ParsedData<'a> {
+    ///the array of parsed exprs
     pub exprs: ExprArena,
+    ///the start indexes of statements
     pub stat_starts: Vec<usize>,
+    ///the set of current varibles
     pub vars: VarSet,
+    ///the parserSource that is used
     pub source: ParserSource<'a>,
 }
 
 #[derive(Debug)]
 pub struct Parser<'a> {
+    ///the currently parsed data
     pub data: ParsedData<'a>,
+    ///the stack of states
     stack: Vec<State>,
+    ///the last state that was dropped (if the last step Matched or Failed)
     last_state: Option<State>,
-
+    ///is the parser currently paring or line or did last step end (see ParserResult::is_end)
     parsing_line: bool,
-
+    ///the global position without respect to ParserSource buffers
     pos: usize,
+    ///The last match result
     last_result: LastMatchResult,
+    ///the static alias data
     aliases: AliasData,
 }
 
-type ParseFunc = fn() -> MatchResult;
 impl<'a> Parser<'a> {
+    ///make a new parser with a source and command flags
     pub fn new(source: ParserSource<'a>, flags: ParserFlags) -> Self {
         Parser {
             data: ParsedData {
@@ -79,20 +89,19 @@ impl<'a> Parser<'a> {
             aliases: AliasData::new(flags),
         }
     }
-    // pub fn change_source(&mut self, source: &'a mut dyn ParserSource) {
-    //     self.source = source;
-    // }
-
+    ///get the last state
     pub fn get_last_state<'b>(&'b self) -> Option<&'b State> {
         self.last_state.as_ref().or_else(|| self.stack.last())
     }
 
-    pub fn get_state(&self) -> &'static str {
+    ///get the name of the last state
+    pub fn get_last_state_name(&self) -> &'static str {
         self.get_last_state()
             .map_or(&"None", |state| state.2.get_name())
     }
 
-    pub fn get_word<'b>(&'b self) -> &'b [u8] {
+    ///get the slice that was last used
+    pub fn get_last_word<'b>(&'b self) -> &'b [u8] {
         // (if self.last_result == LastMatchResult::Failed {
         //     self.get_last_state()
         // } else {
@@ -102,13 +111,19 @@ impl<'a> Parser<'a> {
             Self::get_slice(self.data.source.get_line(), state.1).0.str
         })
     }
+
+    ///convert the parser into its data
+    ///also drops the stdin from the ParserSource
     pub fn into_data(mut self) -> ParsedData<'a> {
         self.data.source.drop_input();
         self.data
     }
 }
 
+///the parser - Woah!!
 impl<'a> Parser<'a> {
+    ///step the parser
+    ///
     pub fn step(&mut self) -> ParserResult {
         let is_first = !self.parsing_line;
         if is_first {
@@ -210,6 +225,7 @@ impl<'a> Parser<'a> {
         }
     }
 
+    ///this function is called if the step fails
     fn failed_func(&mut self) -> ParserResult {
         let state = self.stack.pop().unwrap();
 
@@ -231,6 +247,7 @@ impl<'a> Parser<'a> {
         }
     }
 
+    ///this function is called if the step coninues
     fn continue_func(&mut self, new_index: usize) -> ParserResult {
         let stack_index = self.stack.len() - 1;
         let frame = &mut self.stack[stack_index];
@@ -241,7 +258,7 @@ impl<'a> Parser<'a> {
 
         ParserResult::Continue
     }
-
+    ///this function is called if the step coninues with
     fn continue_with_func(
         &mut self,
         index: usize,
@@ -262,7 +279,7 @@ impl<'a> Parser<'a> {
 
         ParserResult::ContinueWith
     }
-
+    ///this function is called if the step matches
     fn matched_func(&mut self, index: usize) -> ParserResult {
         let state = self.stack.pop().unwrap();
         let expr_index = state.0;
@@ -286,7 +303,7 @@ impl<'a> Parser<'a> {
             ParserResult::Matched
         }
     }
-
+    ///get a (word,rest) that starts at start
     fn get_slice(line: &[u8], mut start: usize) -> (Slice, Slice) {
         //let line = line.as_bytes();
         start = start.min(line.len());
@@ -297,7 +314,7 @@ impl<'a> Parser<'a> {
         };
         get_next_slice(&slice, 0)
     }
-
+    ///setup the a new line for parsing
     fn setup_first(&mut self) -> bool {
         let line = self.data.source.get_line();
         self.pos += line.len();
@@ -313,7 +330,7 @@ impl<'a> Parser<'a> {
             false
         }
     }
-
+    ///setup a noneStat on the stack
     fn add_new_nonestat(&mut self, new_index: usize) {
         // push match stat on first step of line
         let index = self.data.exprs.vec.len();
@@ -327,7 +344,7 @@ impl<'a> Parser<'a> {
     }
 }
 
-// https://stackoverflow.com/questions/31101915/how-to-implement-trim-for-vecu8
+/// https://stackoverflow.com/questions/31101915/how-to-implement-trim-for-vecu8
 pub fn trim_ascii_whitespace(x: &[u8]) -> &[u8] {
     let from = match x.iter().position(|x| !x.is_ascii_whitespace()) {
         Some(i) => i,

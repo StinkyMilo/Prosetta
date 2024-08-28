@@ -1,8 +1,9 @@
 use std::{
     fmt::Debug,
-    io::{self, stdin, BufRead, StdinLock},
+    io::{stdin, BufRead, StdinLock},
     iter::{self, Flatten},
 };
+
 
 pub type ParserSourceIter<'a> = Flatten<std::vec::IntoIter<Box<dyn Iterator<Item = &'a u8> + 'a>>>;
 
@@ -10,14 +11,6 @@ macro_rules! make_iter {
     ($expr:expr) => {
         Box::new($expr) as Box<dyn iter::Iterator<Item = &u8>>
     };
-}
-
-// can or must the state be closed
-#[derive(Debug)]
-pub enum CloseType {
-    Unable,
-    Able,
-    Force,
 }
 
 #[derive(Debug)]
@@ -104,7 +97,7 @@ impl<'a> ParserSource<'a> {
                         let has_failed = stdin.read_until(b'\n', &mut new_input).is_err();
 
                         // remove \r if it exists
-                        if new_input.last() == Some(&b'\r'){
+                        if new_input.last() == Some(&b'\r') {
                             new_input.pop();
                         }
 
@@ -155,8 +148,7 @@ impl<'a> ParserSource<'a> {
             }
             let iter;
             (iter, add_newline) = match s {
-                Source::Stdin { buf, .. } => 
-                (make_iter!(buf.iter()), false),
+                Source::Stdin { buf, .. } => (make_iter!(buf.iter()), false),
                 Source::File => todo!(),
                 Source::String { str, .. } => (make_iter!(str.iter()), does_str_need_newline(str)),
             };

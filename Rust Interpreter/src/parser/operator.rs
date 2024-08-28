@@ -60,7 +60,7 @@ impl BasicState for OperatorState {
         }
     }
 
-    fn end(&mut self, expr: &mut Expr, index: usize) {
+    fn set_end(&mut self, expr: &mut Expr, index: usize) {
         if let Expr::Operator { end, .. } = expr {
             *end = index;
         } else {

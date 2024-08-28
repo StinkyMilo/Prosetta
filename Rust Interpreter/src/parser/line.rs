@@ -40,7 +40,7 @@ impl BasicState for LineState {
         }
     }
 
-    fn end(&mut self, expr: &mut Expr, index: usize) {
+    fn set_end(&mut self, expr: &mut Expr, index: usize) {
         if let Expr::Line { end, .. } = expr {
             *end = index;
         } else {

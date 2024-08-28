@@ -23,8 +23,8 @@ pub fn run_state(state: ParserResult, parser: &Parser, parser_flags: RunnerFlags
         println!(
             "assert_step!(parser, {:?}, \"{}\", \"{}\");",
             state,
-            parser.get_state(),
-            std::str::from_utf8(parser.get_word()).unwrap()
+            parser.get_last_state_name(),
+            std::str::from_utf8(parser.get_last_word()).unwrap()
         );
     }
 }

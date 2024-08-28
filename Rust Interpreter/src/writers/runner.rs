@@ -233,7 +233,6 @@ fn run_statement(
         }
         Expr::Print { locs, data, end } => {
             set_global_to_loc(&mut global_index, locs);
-            for 
             set_global_to_end(&mut global_index, *end);
             (data, global_index)
         },

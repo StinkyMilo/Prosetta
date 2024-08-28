@@ -2,21 +2,22 @@ use std::fmt::Debug;
 
 use super::*;
 
-// a super state that wants between n and m arguments and a close
+/// a super state that wants between n and m arguments and a close
 pub trait BasicState {
+    /// get the name
     fn get_name(&self) -> &'static str;
 
-    // set expr and return whether it is first
+    /// set expr and return whether it is first
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool;
 
-    // add children at index to self
+    /// add children at index to self
     fn add_child(&mut self, expr: &mut Expr, index: usize);
 
-    // can I be closed
+    /// can I be closed
     fn can_close(&self) -> CloseType;
 
-    // set end to index
-    fn end(&mut self, expr: &mut Expr, index: usize);
+    /// set end to index
+    fn set_end(&mut self, expr: &mut Expr, index: usize);
 }
 
 impl<T: BasicState + Debug> ParseState for T {
@@ -60,7 +61,7 @@ impl<T: BasicState + Debug> ParseState for T {
             CloseType::Able => {
                 // I can close so I close
                 if is_close(word) {
-                    self.end(env.expr, word.pos + env.global_index);
+                    self.set_end(env.expr, word.pos + env.global_index);
                     MatchResult::Matched(word.pos + 1)
                     // succeeded - continue again with noncont expr
                 } else if child.is_some() {
@@ -77,7 +78,7 @@ impl<T: BasicState + Debug> ParseState for T {
                     // will never be a period to find even on future words
                     None => MatchResult::Failed,
                     Some(slice) => {
-                        self.end(env.expr, slice.pos + env.global_index);
+                        self.set_end(env.expr, slice.pos + env.global_index);
                         MatchResult::Matched(slice.pos + 1)
                     }
                 }

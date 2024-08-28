@@ -10,7 +10,8 @@ const NOT_ALIAS: &'static [u8] = b"not";
 
 const STAT_ALIASES: [&'static [u8]; 5] = [b"arc", b"lin", b"was", b"rec", b"pri"];
 
-// match alias to expr
+///match alias to expr
+///the reason this is done this was is because this compiles to a hashtable
 fn setup_expr(alias: &'static [u8], index: usize) -> MatchResult {
     MatchResult::ContinueWith(
         index,
@@ -31,7 +32,7 @@ fn setup_expr(alias: &'static [u8], index: usize) -> MatchResult {
     )
 }
 
-// match alias to stat
+/// match alias to stat
 fn setup_stat(alias: &'static [u8], index: usize) -> MatchResult {
     MatchResult::ContinueWith(
         index,

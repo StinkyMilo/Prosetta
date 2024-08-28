@@ -43,7 +43,7 @@ impl BasicState for RectState {
         }
     }
 
-    fn end(&mut self, expr: &mut Expr, index: usize) {
+    fn set_end(&mut self, expr: &mut Expr, index: usize) {
         if let Expr::Rect { end, .. } = expr {
             *end = index;
         } else {
