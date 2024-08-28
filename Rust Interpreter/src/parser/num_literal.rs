@@ -1,36 +1,31 @@
 use super::*;
 #[derive(Debug)]
 
-pub struct LiteralNumState {
-    value: Option<i64>,
-}
+pub struct LiteralNumState {}
 
 impl ParseState for LiteralNumState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
-        // if not checked - try
-        if self.value.is_none() {
-            self.value = get_number(word.str)
-        }
+        // try
+        let value = get_number(word.str);
 
         // check
-        if let Some(value) = self.value {
+        if let Some(value) = value {
             *env.expr = Expr::LitNum {
-                locs: Vec::new(),
                 str_start: word.pos + env.global_index,
                 str_length: word.len(),
                 value,
             };
             MatchResult::Matched(rest.pos)
         } else {
-            // future words could be number names
-            MatchResult::Continue
+            // word is not a number
+            MatchResult::Failed
         }
     }
 
     fn step_match(
         &mut self,
         _env: &mut Enviroment,
-        _did_child_match: bool,
+        _child_index:Option<usize>,
         _word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
@@ -39,7 +34,7 @@ impl ParseState for LiteralNumState {
     }
 
     fn get_name(&self) -> &'static str {
-        "NumLiteral"
+        "NumLit"
     }
 
     fn do_replace(&self) -> bool {
@@ -49,11 +44,7 @@ impl ParseState for LiteralNumState {
 
 impl LiteralNumState {
     pub fn new() -> Self {
-        LiteralNumState { value: None }
-    }
-    pub fn check(&mut self, _env: &mut Enviroment, word: &Slice) -> bool {
-        self.value = get_number(word.str);
-        self.value.is_some()
+        Self {}
     }
 }
 

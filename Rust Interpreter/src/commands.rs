@@ -1,10 +1,22 @@
 use std::ops::Index;
 
 #[derive(PartialEq, Debug, Clone, Copy)]
-pub enum BiFunctionType {
+pub enum OperatorType {
     Add,
     Sub,
     Mult,
+    Div,
+    Mod,
+    Exp,
+    Log,
+}
+
+#[derive(PartialEq, Debug)]
+pub enum Prints {
+    // child_index
+    Var(usize),
+    // value, string_index
+    Word(Vec<u8>, usize),
 }
 
 #[derive(PartialEq, Debug)]
@@ -12,62 +24,69 @@ pub enum Expr {
     NoneStat,
     NoneExpr,
     //stats
-    Eq {
+    Arc {
+        locs: Vec<usize>,
+        indexes: [usize; 4],
+        end: usize,
+    },
+    Line {
+        locs: Vec<usize>,
+        indexes: [usize; 4],
+        end: usize,
+    },
+    Assign {
         locs: Vec<usize>,
         name_start: usize,
         name: Vec<u8>,
         value_index: usize,
+        end: usize,
     },
-    Line {
+    Rect {
         locs: Vec<usize>,
-        indexes:[usize;4],
+        indexes: [usize; 4],
+        end: usize,
     },
-    Circle {
+    Print {
         locs: Vec<usize>,
-        indexes:[usize;3],
+        data: Vec<Prints>,
+        end: usize,
     },
-
     //expr
     Var {
         name_start: usize,
         name: Vec<u8>,
     },
-    Num {
+    WordNum {
         locs: Vec<usize>,
         str_start: usize,
-        str: Vec<u8>,
+        str_len: usize,
+        end: usize,
     },
-    BiFunction {
-        func_type: BiFunctionType,
+    Operator {
         locs: Vec<usize>,
+        func_type: OperatorType,
         indexes: Vec<usize>,
+        end: usize,
     },
     LitNum {
-        locs: Vec<usize>,
         str_start: usize,
         str_length: usize,
         value: i64,
     },
+    MultiLitNum {
+        locs: Vec<usize>,
+        num_indexes: Vec<usize>,
+        end: usize,
+    },
+    Skip {
+        locs: Vec<usize>,
+        index: usize,
+        start: usize,
+        end: usize,
+    },
 }
 
 impl Expr {
-    // pub fn get_name(&self) -> &'static str {
-    //     match self {
-    //         Expr::NoneStat => "NoneStat",
-    //         Expr::NoneExpr => "NoneExpr",
-    //         Expr::Eq { .. } => "Equals",
-    //         Expr::Line { .. } => "Line",
-    //         Expr::Circle { .. } => "Circle",
-    //         Expr::Var { .. } => "Var",
-    //         Expr::Num { .. } => "Num",
-    //         Expr::BiFunction { func_type, .. } => match func_type {
-    //             BiFunctionType::Add => "Add",
-    //             BiFunctionType::Sub => "Sub",
-    //             BiFunctionType::Mult => "Mult",
-    //         },
-    //         Expr::LitNum { .. } => "LitNum",
-    //     }
-    // }
     pub fn is_none(&self) -> bool {
         match self {
             Expr::NoneStat => true,

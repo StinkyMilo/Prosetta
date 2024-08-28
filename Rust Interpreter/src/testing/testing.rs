@@ -1,12 +1,14 @@
-#[allow(dead_code)]
+#![allow(dead_code)]
+#![allow(unused_macros)]
+#![allow(unused_imports)]
 
 #[cfg(test)]
 pub mod test_lib {
 
     use crate::commands::Expr;
 
-    use crate::parser::*;
-
+    use crate::parser::{Parser, *};
+    use alias_data::AliasData;
     use std::collections::HashSet;
 
     pub fn assert_step_inner(
@@ -18,8 +20,8 @@ pub mod test_lib {
         line: u32,
     ) {
         let result = parser.step();
-        let state = parser.get_state();
-        let word = std::str::from_utf8(parser.get_word()).unwrap();
+        let state = parser.get_last_state_name();
+        let word = std::str::from_utf8(parser.get_last_word()).unwrap();
         let message = &format!(
             "result was {:?}(\"{}\",\"{}\"). expected {:?}(\"{}\",\"{}\") at {}:{}",
             result, state, word, exp_result, exp_state, exp_word, file, line
@@ -48,15 +50,23 @@ pub mod test_lib {
     pub fn new_env<'a>(
         vars: &'a HashSet<Vec<u8>>,
         expr: &'a mut Expr,
-        child_index: usize,
         locs: Option<Vec<usize>>,
+        aliases: &'a AliasData,
     ) -> Enviroment<'a> {
         Enviroment {
             vars,
             expr,
-            child_index,
             locs,
             global_index: 0,
+            aliases,
+        }
+    }
+    pub fn assert_result(parser: &mut Parser) -> ParserResult {
+        loop {
+            let result = parser.step();
+            if result.is_end() {
+                return result;
+            }
         }
     }
 }
@@ -74,7 +84,6 @@ macro_rules! add_vars {
 }
 pub(crate) use add_vars;
 
-#[cfg(test)]
 macro_rules! assert_step {
     ($parser:ident,$step_result:ident,$state:expr,$word:expr) => {
         $crate::testing::test_lib::assert_step_inner(
@@ -87,5 +96,5 @@ macro_rules! assert_step {
         );
     };
 }
-#[cfg(test)]
+
 pub(crate) use assert_step;

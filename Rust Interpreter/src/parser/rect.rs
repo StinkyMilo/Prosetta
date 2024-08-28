@@ -3,18 +3,20 @@ use crate::parser::CloseType;
 use basic_func::BasicState;
 
 #[derive(Debug)]
-pub struct LineState {
+
+pub struct RectState {
     count: u8,
 }
-impl BasicState for LineState {
+
+impl BasicState for RectState {
     fn get_name(&self) -> &'static str {
-        "Line"
+        "Rect"
     }
 
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {
         let ret = self.count == 0;
         if ret {
-            *expr = Expr::Line {
+            *expr = Expr::Rect {
                 locs,
                 indexes: [usize::MAX; 4],
                 end: usize::MAX,
@@ -24,7 +26,7 @@ impl BasicState for LineState {
     }
 
     fn add_child(&mut self, expr: &mut Expr, index: usize) {
-        if let Expr::Line { indexes, .. } = expr {
+        if let Expr::Rect { indexes, .. } = expr {
             indexes[self.count as usize] = index;
             self.count += 1;
         } else {
@@ -34,14 +36,15 @@ impl BasicState for LineState {
 
     fn can_close(&self) -> CloseType {
         match self.count {
-            0..=3 => CloseType::Unable,
+            0..=2 => CloseType::Unable,
+            3 => CloseType::Able,
             4 => CloseType::Force,
             _ => unreachable!(),
         }
     }
 
     fn set_end(&mut self, expr: &mut Expr, index: usize) {
-        if let Expr::Line { end, .. } = expr {
+        if let Expr::Rect { end, .. } = expr {
             *end = index;
         } else {
             unreachable!()
@@ -49,8 +52,8 @@ impl BasicState for LineState {
     }
 }
 
-impl LineState {
+impl RectState {
     pub fn new() -> Self {
-        LineState { count: 0 }
+        RectState { count: 0 }
     }
 }
