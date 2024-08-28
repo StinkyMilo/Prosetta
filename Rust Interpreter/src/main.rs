@@ -49,12 +49,61 @@ fn main() {
         parser_flags,
         vis_flags,
         //ParserSource::from_stdin()
-        ParserSource::from_string(MILO_POEM[0][1..].to_vec())
-            .add_string(MILO_POEM[1][1..].to_vec()),
+        ParserSource::from_string(MILO_POEM_2[0].to_vec())
     );
 
     let _ = io::stdin().read(&mut [0u8]).unwrap();
 }
+
+static MILO_POEM: [&[u8]; 2] = [
+    b"
+The wizards utter 'paint iambically.'
+The peasants hadn't choice but to obey.
+\
+The wizards' cruel entertainments chant
+and utter utter nonsense, void of weight.
+\
+The wizards' cursed victims utter trash;
+the mages stand offended that despite
+intent most fair, the peasants: they dissent!
+\
+The wizards thought it boon to speak in verse
+but overestimate the peasant's skill;
+'there is no point to it' the peasants thought.
+'What cruel poetry they thrust on us.'
+And so the peasants organized revolt.
+\
+They searched for mages speaking just in verse;
+they thought and thought and thought 'where could they be?'",
+    b"
+But long had passed; magicians marched away
+from cruel bitter thought and cursed man.
+\
+And so in lack of overlords but yet
+still wrought by curse the agriculturists
+admitted thought that life is not so bad.
+Despite new vocal eccentricities,
+their burdens lifted free of mages cruel.
+They thought that they were cursed, but in fact
+\
+the wizards had abandonded cruel thought,
+and left the peasants free of emperor.
+\
+And so their revolution had achieved
+a world where peasants had to speak in verse
+but answered not to any cruel lord
+for they had long since gone, with nothing left
+but a society that slowly learned
+restriction fosters creativity.",
+];
+
+static MILO_POEM_2: [&[u8]; 1] = [
+    b"
+    was name les int marioooo. int luigi...
+    was name2 mor int marioooo. int luigi...
+    "
+];
+
 
 // while !matches!(
 //     result,
@@ -136,45 +185,3 @@ fn main() {
 //     "   java program:\n{}",
 //     processing_writer::write(&parser.exprs, &parser.stat_starts)
 // );
-
-static MILO_POEM: [&[u8]; 2] = [
-    b"
-The wizards utter 'paint iambically.'
-The peasants hadn't choice but to obey.
-\
-The wizards' cruel entertainments chant
-and utter utter nonsense, void of weight.
-\
-The wizards' cursed victims utter trash;
-the mages stand offended that despite
-intent most fair, the peasants: they dissent!
-\
-The wizards thought it boon to speak in verse
-but overestimate the peasant's skill;
-'there is no point to it' the peasants thought.
-'What cruel poetry they thrust on us.'
-And so the peasants organized revolt.
-\
-They searched for mages speaking just in verse;
-they thought and thought and thought 'where could they be?'",
-    b"
-But long had passed; magicians marched away
-from cruel bitter thought and cursed man.
-\
-And so in lack of overlords but yet
-still wrought by curse the agriculturists
-admitted thought that life is not so bad.
-Despite new vocal eccentricities,
-their burdens lifted free of mages cruel.
-They thought that they were cursed, but in fact
-\
-the wizards had abandonded cruel thought,
-and left the peasants free of emperor.
-\
-And so their revolution had achieved
-a world where peasants had to speak in verse
-but answered not to any cruel lord
-for they had long since gone, with nothing left
-but a society that slowly learned
-restriction fosters creativity.",
-];

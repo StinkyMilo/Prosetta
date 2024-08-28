@@ -106,6 +106,8 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                 OperatorType::Mod => "mod",
                 OperatorType::Exp => "exp",
                 OperatorType::Log => "log",
+                OperatorType::LessThan => "<",
+                OperatorType::GreaterThan => ">"
             };
             format!(
                 "({}{} {})",

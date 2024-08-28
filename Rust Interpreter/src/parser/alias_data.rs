@@ -2,8 +2,8 @@ use super::*;
 
 type BuildInSetUp = fn(alias: &'static [u8], index: usize) -> MatchResult;
 
-const BASE_EXPR_ALIASES: [&'static [u8]; 9] = [
-    b"int", b"tim", b"add", b"sub", b"lit", b"ide", b"mod", b"log", b"exp",
+const BASE_EXPR_ALIASES: [&'static [u8]; 11] = [
+    b"int", b"tim", b"add", b"sub", b"lit", b"ide", b"mod", b"log", b"exp", b"les", b"mor"
 ];
 
 const NOT_ALIAS: &'static [u8] = b"not";
@@ -21,8 +21,10 @@ fn setup_expr(alias: &'static [u8], index: usize) -> MatchResult {
             b"tim" => get_state!(operator::OperatorState::new_mult()),
             b"ide" => get_state!(operator::OperatorState::new_div()),
             b"mod" => get_state!(operator::OperatorState::new_mod()),
-            b"exp" => get_state!(operator::OperatorState::new_exp()),
             b"log" => get_state!(operator::OperatorState::new_log()),
+            b"exp" => get_state!(operator::OperatorState::new_exp()),
+            b"les" => get_state!(operator::OperatorState::new_less_than()),
+            b"mor" => get_state!(operator::OperatorState::new_greater_than()),
 
             b"lit" => get_state!(multi_lit_num::MultiLitNumState::new()),
             b"int" => get_state!(word_num::WordNumState::new()),

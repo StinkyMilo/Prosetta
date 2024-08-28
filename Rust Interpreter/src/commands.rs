@@ -9,6 +9,8 @@ pub enum OperatorType {
     Mod,
     Exp,
     Log,
+    LessThan,
+    GreaterThan
 }
 
 #[derive(PartialEq, Debug)]
