@@ -2,7 +2,7 @@ use super::*;
 
 #[derive(Debug)]
 
-pub struct NotState {}
+pub struct NotState;
 
 impl ParseState for NotState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
@@ -11,7 +11,7 @@ impl ParseState for NotState {
             *env.expr = Expr::Skip {
                 locs: env.locs.take().unwrap_or_default(),
                 index: usize::MAX,
-                start: word.pos+ env.global_index,
+                start: word.pos + env.global_index,
                 end: index.pos + env.global_index,
             };
 
@@ -29,12 +29,14 @@ impl ParseState for NotState {
         word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
+        // child matched - add index of child and match
         if let Some(new_index) = child_index {
             if let Expr::Skip { index, .. } = env.expr {
                 *index = new_index;
             };
 
             MatchResult::Matched(word.pos)
+        // child failed - I fail
         } else {
             MatchResult::Failed
         }
@@ -51,6 +53,6 @@ impl ParseState for NotState {
 
 impl NotState {
     pub fn new() -> Self {
-        NotState {}
+        Self
     }
 }

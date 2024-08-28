@@ -1,6 +1,7 @@
 use super::*;
 use alias_data::*;
 
+///the state of the matching state machine
 #[derive(Debug, PartialEq)]
 enum MatchState {
     Var,
@@ -9,14 +10,20 @@ enum MatchState {
 }
 
 /// used for both NoneStat and NoneExpr
-/// finds next buildin function
+/// finds next command
 #[derive(Debug)]
 pub struct NoneState {
-    data: &'static BuiltinData,
+    ///a reference to the static data of the aliases
+    data: &'static StaticAliasData,
+    ///the progress of each alias
     progress: Vec<u8>,
+    ///the already parsed locs (the locations of alias characters)
     locs: Vec<Option<Vec<usize>>>,
+    ///the offset into the word
     offset: usize,
+    ///the number of currently matched aliases
     matched: u16,
+    ///the next state of the state machine
     next_match_state: MatchState,
 }
 
@@ -34,7 +41,7 @@ impl ParseState for NoneState {
     fn step_match(
         &mut self,
         env: &mut Enviroment,
-        child_index:Option<usize>,
+        child_index: Option<usize>,
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult {
@@ -57,7 +64,7 @@ impl ParseState for NoneState {
 }
 
 impl NoneState {
-    fn new(data: &'static BuiltinData) -> Self {
+    fn new(data: &'static StaticAliasData) -> Self {
         Self {
             data,
             progress: Vec::new(),
@@ -67,6 +74,7 @@ impl NoneState {
             next_match_state: MatchState::FindAliases,
         }
     }
+    ///reset state back to defaults for a new word
     fn reset(&mut self, length: usize) {
         self.progress = vec![0u8; length];
         self.locs = vec![Some(Vec::new()); length];
@@ -91,8 +99,10 @@ impl NoneState {
 }
 
 impl NoneState {
-    /// matches based on MatchState
-
+    ///matches based on MatchState
+    ///Expr starts at Var, to check if it is a varible, then it checks if it is a number,
+    ///then it tries to find aliases in the word
+    ///Stat starts at the aliases directly
     fn run_match_state(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
         let (new_state, ret) = match self.next_match_state {
             // is word a varible
@@ -115,7 +125,7 @@ impl NoneState {
         ret
     }
 
-    /// matches buildin functions based on self.data
+    ///matches buildin functions based on self.data
     fn match_alias(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
         let aliases = (self.data.aliases)(env.aliases);
 
@@ -138,7 +148,11 @@ impl NoneState {
             MatchResult::Failed
         }
     }
-
+    ///finds the bast match of the ones to have just matched
+    ///Done by:
+    ///1. Implicitly the first to match
+    ///2. least length between first and last letter
+    ///3. then on least total location value
     fn find_best_match(
         &mut self,
         env: &mut Enviroment,
@@ -158,7 +172,7 @@ impl NoneState {
                 let location_sum: usize = matching_locs.iter().sum();
 
                 // is best match
-                // match on least length between firt and last letter
+                // match on least length between first and last letter
                 // then on least total location value
                 if size < min_size || (size == min_size && location_sum < min_locations) {
                     min_index = j as u16;
@@ -180,6 +194,7 @@ impl NoneState {
         )
     }
 
+    ///match current letter at offset to all aliases
     fn match_letters(&mut self, aliases: &AliasNames, word: &Slice<'_>, offset: usize) {
         // does letter match any commands
         for i in 0..aliases.len() {
@@ -197,27 +212,3 @@ impl NoneState {
         }
     }
 }
-
-// fn step_stat(
-//     env: &mut Enviroment,
-//     result: MatchChildResult,
-//     word: &Slice,
-//     rest: &Slice,
-// ) -> MatchResult {
-//     match_built_in(&STAT_DATA, env, result, word, rest)
-// }
-// fn step_expr(
-//     env: &mut Enviroment,
-//     result: MatchChildResult,
-//     word: &Slice,
-//     rest: &Slice,
-// ) -> MatchResult {
-//     if result == MatchChildResult::None {
-//         let var_result = step_var(env, result, word, rest);
-//         if matches!(var_result, MatchResult::Matched(_)) {
-//             return var_result;
-//         }
-//     }
-
-//     match_built_in(&EXPR_DATA, env, result, word, rest)
-// }

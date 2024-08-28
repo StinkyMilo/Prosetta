@@ -54,6 +54,6 @@ impl BasicState for RectState {
 
 impl RectState {
     pub fn new() -> Self {
-        RectState { count: 0 }
+        Self { count: 0 }
     }
 }

@@ -51,6 +51,6 @@ impl BasicState for LineState {
 
 impl LineState {
     pub fn new() -> Self {
-        LineState { count: 0 }
+        Self { count: 0 }
     }
 }

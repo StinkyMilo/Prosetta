@@ -36,10 +36,10 @@ pub struct ParserFlags {
 
 /// A state (which goes onto the parser stack)
 pub trait ParseState: Debug {
-    /// call first time to setup the state
+    /// called first time to setup the state and after the state continues
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult;
 
-    /// call rest of times after match
+    /// called after match or fail
     fn step_match(
         &mut self,
         env: &mut Enviroment,
@@ -48,9 +48,11 @@ pub trait ParseState: Debug {
         rest: &Slice,
     ) -> MatchResult;
 
-    /// gets the name of the
+    /// gets the name of the state
     fn get_name(&self) -> &'static str;
 
+    ///apparently not called, but
+    ///weather the expr should be replaced by new expr
     fn do_replace(&self) -> bool;
 }
 

@@ -1,10 +1,10 @@
 use super::*;
 /// state for equals
 #[derive(Debug)]
-pub struct VarState {}
+pub struct VarState;
 impl ParseState for VarState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
-        //get lowercase
+        // get lowercase
         let lower = word.str.to_ascii_lowercase();
 
         // is varible in scope
@@ -23,7 +23,7 @@ impl ParseState for VarState {
     fn step_match(
         &mut self,
         _env: &mut Enviroment,
-        _child_index:Option<usize>,
+        _child_index: Option<usize>,
         _word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
@@ -41,10 +41,6 @@ impl ParseState for VarState {
 }
 impl VarState {
     pub fn new() -> Self {
-        VarState { }
+        Self
     }
-    // pub fn check(&mut self, env: &mut Enviroment, word: &Slice) -> bool {
-    //     self.is_checked = env.vars.contains(&word.str.to_ascii_lowercase());
-    //     self.is_checked
-    // }
 }

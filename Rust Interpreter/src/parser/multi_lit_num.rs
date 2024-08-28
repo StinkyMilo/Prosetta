@@ -37,17 +37,22 @@ impl ParseState for MultiLitNumState {
             }
         }
 
+        // if the word is a close, then close
         if is_close(word) {
+            // I have data - I succeed
             if self.has_data {
                 if let Expr::MultiLitNum { end, .. } = env.expr {
                     *end = word.pos;
                 }
                 MatchResult::Matched(word.pos + 1)
             } else {
+                // I do not have data - I cannot close
                 MatchResult::Continue
             }
+        // child matched - add new child
         } else if child_index.is_some() {
             MatchResult::ContinueWith(word.pos, Box::new(num_literal::LiteralNumState::new()))
+        // child failed - move over word
         } else {
             MatchResult::Continue
         }
@@ -64,7 +69,7 @@ impl ParseState for MultiLitNumState {
 
 impl MultiLitNumState {
     pub fn new() -> Self {
-        MultiLitNumState {
+        Self {
             has_data: false,
             first: true,
         }

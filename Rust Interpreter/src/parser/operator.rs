@@ -71,7 +71,7 @@ impl BasicState for OperatorState {
 
 impl OperatorState {
     fn new(fn_type: OperatorType) -> Self {
-        OperatorState { fn_type, count: 0 }
+        Self { fn_type, count: 0 }
     }
 
     pub fn new_add() -> Self {

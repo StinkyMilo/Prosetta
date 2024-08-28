@@ -1,7 +1,5 @@
 use super::*;
 
-type BuildInSetUp = fn(alias: &'static [u8], index: usize) -> MatchResult;
-
 const BASE_EXPR_ALIASES: [&'static [u8]; 9] = [
     b"int", b"tim", b"add", b"sub", b"lit", b"ide", b"mod", b"log", b"exp",
 ];
@@ -11,8 +9,7 @@ const NOT_ALIAS: &'static [u8] = b"not";
 const STAT_ALIASES: [&'static [u8]; 5] = [b"arc", b"lin", b"was", b"rec", b"pri"];
 
 ///match alias to expr
-///the reason this is done this was is because this compiles to a hashtable
-fn setup_expr(alias: &'static [u8], index: usize) -> MatchResult {
+fn get_expr_state(alias: &'static [u8], index: usize) -> MatchResult {
     MatchResult::ContinueWith(
         index,
         match alias {
@@ -33,7 +30,7 @@ fn setup_expr(alias: &'static [u8], index: usize) -> MatchResult {
 }
 
 /// match alias to stat
-fn setup_stat(alias: &'static [u8], index: usize) -> MatchResult {
+fn get_stat_state(alias: &'static [u8], index: usize) -> MatchResult {
     MatchResult::ContinueWith(
         index,
         match alias {
@@ -46,42 +43,53 @@ fn setup_stat(alias: &'static [u8], index: usize) -> MatchResult {
         },
     )
 }
-
+///A vector of alias strings
+pub type AliasNames = Vec<&'static [u8]>;
+///function to get alias strings from AliasData
+type AliasSelector = fn(&AliasData) -> &AliasNames;
+///fn to get the continueWith state with the corresponding string
+type AliasToState = fn(alias: &'static [u8], index: usize) -> MatchResult;
+///static alias
 #[derive(Debug)]
-pub struct BuiltinData {
+pub struct StaticAliasData {
+    ///function to get alias strings from AliasData
     pub aliases: AliasSelector,
-    pub func: BuildInSetUp,
+    ///function to get the matching continueWith state
+    pub func: AliasToState,
+    ///is this a expr alias data
     pub is_expr: bool,
+    ///should this continue on failure of a word
     pub default_continue: bool,
+    ///the name of the corresponding state
     pub state_name: &'static str,
 }
 
+///holds lists of all alias strings
 #[derive(Debug)]
 pub struct AliasData {
-    pub expr: Vec<&'static [u8]>,
-    pub stat: Vec<&'static [u8]>,
+    pub expr: AliasNames,
+    pub stat: AliasNames,
 }
-pub type AliasNames = Vec<&'static [u8]>;
-type AliasSelector = fn(&AliasData) -> &AliasNames;
 
+///static alias data
 impl AliasData {
-    pub const EXPR: BuiltinData = BuiltinData {
+    pub const EXPR: StaticAliasData = StaticAliasData {
         aliases: |data| &data.expr,
-        func: setup_expr,
+        func: get_expr_state,
         is_expr: true,
         default_continue: false,
         state_name: "NoneExpr",
     };
-    pub const EXPR_CONT: BuiltinData = BuiltinData {
+    pub const EXPR_CONT: StaticAliasData = StaticAliasData {
         aliases: |data| &data.expr,
-        func: setup_expr,
+        func: get_expr_state,
         is_expr: true,
         default_continue: true,
         state_name: "NoneExprCont",
     };
-    pub const STAT: BuiltinData = BuiltinData {
+    pub const STAT: StaticAliasData = StaticAliasData {
         aliases: |data| &data.stat,
-        func: setup_stat,
+        func: get_stat_state,
         is_expr: false,
         default_continue: true,
         state_name: "NoneStat",
@@ -98,7 +106,7 @@ impl AliasData {
 
         let stat_vec = Vec::from(STAT_ALIASES);
 
-        AliasData {
+        Self {
             expr: expr_vec,
             stat: stat_vec,
         }

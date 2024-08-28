@@ -17,7 +17,7 @@ impl ParseState for PrintState {
             if matched {
                 end = word.pos + env.global_index;
             }
-            
+
             *env.expr = Expr::Print {
                 locs: env.locs.take().unwrap_or_default(),
                 data: Vec::new(),
@@ -81,6 +81,6 @@ impl ParseState for PrintState {
 
 impl PrintState {
     pub fn new() -> Self {
-        PrintState { first: true }
+        Self { first: true }
     }
 }

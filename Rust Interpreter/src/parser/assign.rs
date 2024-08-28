@@ -1,7 +1,7 @@
 use super::*;
 /// state for equals
 #[derive(Debug)]
-pub struct AssignState {}
+pub struct AssignState;
 impl ParseState for AssignState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
         // set expr
@@ -58,6 +58,6 @@ impl ParseState for AssignState {
 
 impl AssignState {
     pub fn new() -> Self {
-        Self {}
+        Self
     }
 }

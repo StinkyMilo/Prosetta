@@ -2,7 +2,7 @@ use super::*;
 
 /// state for num
 #[derive(Debug)]
-pub struct WordNumState {}
+pub struct WordNumState;
 impl ParseState for WordNumState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
         // wait for non . word
@@ -47,27 +47,6 @@ impl ParseState for WordNumState {
 }
 impl WordNumState {
     pub fn new() -> Self {
-        WordNumState {}
+        Self
     }
 }
-
-// fn step_num(
-//     env: &mut Enviroment,
-//     _result: LastMatchResult,
-//     word: &Slice,
-//     rest: &Slice,
-// ) -> MatchResult {
-//     let close = find_h_close(rest, 0);
-//     if let Some(close) = close {
-//         let Expr::Num { str_start, str, .. } = env.expr else {
-//             unimplemented!()
-//         };
-
-//         *str_start = word.pos;
-//         *str = word.str.to_owned().to_ascii_lowercase();
-//         return MatchResult::Matched(close.pos);
-//     }
-
-//     // will not work on next word
-//     MatchResult::Failed
-// }

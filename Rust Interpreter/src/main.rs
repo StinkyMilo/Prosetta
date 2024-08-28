@@ -48,9 +48,9 @@ fn main() {
     run_parser(
         parser_flags,
         vis_flags,
-        //ParserSource::from_stdin()
-        ParserSource::from_string(MILO_POEM[0][1..].to_vec())
-            .add_string(MILO_POEM[1][1..].to_vec()),
+        ParserSource::from_stdin()
+        // ParserSource::from_string(MILO_POEM[0][1..].to_vec())
+        //     .add_string(MILO_POEM[1][1..].to_vec()),
     );
 
     let _ = io::stdin().read(&mut [0u8]).unwrap();

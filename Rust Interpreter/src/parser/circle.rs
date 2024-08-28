@@ -52,6 +52,6 @@ impl BasicState for CircleState {
 
 impl CircleState {
     pub fn new() -> Self {
-        CircleState { count: 0 }
+        Self { count: 0 }
     }
 }
