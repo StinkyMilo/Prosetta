@@ -37,7 +37,7 @@ impl ParseState for AssignState {
                         *value_index = index;
                         *end = slice.pos + env.global_index;
                     }
-                    MatchResult::Matched(slice.pos + 1)
+                    MatchResult::Matched(slice.pos, true)
                 }
             }
         } else {

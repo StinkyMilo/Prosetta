@@ -15,7 +15,7 @@ impl ParseState for LiteralNumState {
                 str_length: word.len(),
                 value,
             };
-            MatchResult::Matched(rest.pos)
+            MatchResult::Matched(rest.pos, false)
         } else {
             // word is not a number
             MatchResult::Failed
@@ -25,7 +25,7 @@ impl ParseState for LiteralNumState {
     fn step_match(
         &mut self,
         _env: &mut Enviroment,
-        _child_index:Option<usize>,
+        _child_index: Option<usize>,
         _word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {

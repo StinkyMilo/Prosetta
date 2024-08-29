@@ -44,7 +44,7 @@ impl ParseState for MultiLitNumState {
                 if let Expr::MultiLitNum { end, .. } = env.expr {
                     *end = word.pos;
                 }
-                MatchResult::Matched(word.pos + 1)
+                MatchResult::Matched(word.pos, true)
             } else {
                 // I do not have data - I cannot close
                 MatchResult::Continue

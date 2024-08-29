@@ -20,7 +20,7 @@ impl ParseState for WordNumState {
                     end: close.pos + env.global_index,
                 };
 
-                MatchResult::Matched(close.pos + 1)
+                MatchResult::Matched(close.pos, true)
             } else {
                 // did not find close - fail
                 MatchResult::Failed

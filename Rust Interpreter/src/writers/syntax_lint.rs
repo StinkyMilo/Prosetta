@@ -85,6 +85,9 @@ impl<T: Renderer> SyntaxLinter<T> {
         self.renderer.add_with(&buf, color);
         self.index += num;
     }
+    fn insert(&mut self, text: &[u8], color: (TermColor, bool)) {
+        self.renderer.add_with(&text, color);
+    }
 }
 
 impl<T: Renderer> SyntaxLinter<T> {
@@ -117,8 +120,12 @@ impl<T: Renderer> SyntaxLinter<T> {
     fn write_end(&mut self, source: &mut ParserSourceIter, end: usize, stack_index: usize) {
         let color = LOC_COLOR[stack_index % 3];
         if end != usize::MAX {
-            self.write_up_to(source, end);
-            self.write_as(source, 1, color);
+            if self.index > end {
+                self.insert(b"_", color);
+            } else {
+                self.write_up_to(source, end);
+                self.write_as(source, 1, color);
+            }
         }
     }
 

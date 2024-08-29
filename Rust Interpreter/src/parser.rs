@@ -65,10 +65,12 @@ pub struct Parser<'a> {
     parsing_line: bool,
     ///the global position without respect to ParserSource buffers
     pos: usize,
-    ///The last match result
+    ///the last match result
     last_result: LastMatchResult,
     ///the static alias data
     aliases: AliasData,
+    ///the number of times the current slice should repeat
+    repeat_count: u8,
 }
 
 impl<'a> Parser<'a> {
@@ -87,6 +89,7 @@ impl<'a> Parser<'a> {
             parsing_line: false,
             last_result: LastMatchResult::None,
             aliases: AliasData::new(flags),
+            repeat_count: 0,
         }
     }
     ///get the last state
@@ -181,8 +184,8 @@ impl<'a> Parser<'a> {
         };
 
         // setup slice
-
-        let (word, rest) = Self::get_slice(self.data.source.get_line(), frame.1);
+        let line = self.data.source.get_line();
+        let (word, rest) = Self::get_slice(line, frame.1);
 
         let last_result = mem::replace(&mut self.last_result, LastMatchResult::None);
 
@@ -213,7 +216,7 @@ impl<'a> Parser<'a> {
 
         match result {
             // I matched - return to last expr on stack with success
-            MatchResult::Matched(index) => self.matched_func(index),
+            MatchResult::Matched(index, bool) => self.matched_func(index, bool),
             // continue parsing child
             MatchResult::ContinueWith(index, state) => {
                 self.continue_with_func(index, state, new_locs)
@@ -232,6 +235,7 @@ impl<'a> Parser<'a> {
         let state_pos = state.0;
         self.data.exprs.vec.truncate(state_pos);
         //let _test = format!("{:?}", state);
+        self.repeat_count = 0;
 
         self.last_state = Some(state);
 
@@ -251,6 +255,8 @@ impl<'a> Parser<'a> {
     fn continue_func(&mut self, new_index: usize) -> ParserResult {
         let stack_index = self.stack.len() - 1;
         let frame = &mut self.stack[stack_index];
+
+        self.repeat_count = 0;
         // change match starting location to after word
         frame.1 = new_index;
 
@@ -266,7 +272,7 @@ impl<'a> Parser<'a> {
         locs: Option<Vec<usize>>,
     ) -> ParserResult {
         let mut expr_index = self.data.exprs.vec.len();
-
+        self.repeat_count = 0;
         // replace none exprs
         if self.data.exprs.vec.last().is_some_and(|e| e.is_none()) {
             self.data.exprs.vec.pop();
@@ -279,8 +285,9 @@ impl<'a> Parser<'a> {
 
         ParserResult::ContinueWith
     }
+
     ///this function is called if the step matches
-    fn matched_func(&mut self, index: usize) -> ParserResult {
+    fn matched_func(&mut self, mut index: usize, closed: bool) -> ParserResult {
         let state = self.stack.pop().unwrap();
         let expr_index = state.0;
         self.last_state = Some(state);
@@ -297,12 +304,39 @@ impl<'a> Parser<'a> {
             self.add_new_nonestat(index);
             ParserResult::MatchedLine
         } else {
+            if closed {
+                let line = self.data.source.get_line();
+                self.repeat_count += 1;
+                // get needed counts
+                let (needed_count, offset) = Self::get_repeat_count(index, line);
+                if self.repeat_count >= needed_count {
+                    index += offset as usize;
+                    self.repeat_count = 0;
+                }
+            }
             // setup result for next step
             self.last_result = LastMatchResult::Matched(expr_index);
             self.stack.last_mut().unwrap().1 = index;
             ParserResult::Matched
         }
     }
+    /// gets the number of times the characters at line[index] should be repeated and the offset after
+    /// returns (repeat_count,offset)
+    fn get_repeat_count(index: usize, line: &[u8]) -> (u8, u8) {
+        if line[index..index + 2] == b"..."[..] {
+            (255, 3)
+        } else {
+            (
+                match line[index] {
+                    b'.' | b',' | b':' => 1,
+                    b'?' | b'!' => 2,
+                    _ => 0,
+                },
+                1,
+            )
+        }
+    }
+
     ///get a (word,rest) that starts at start
     fn get_slice(line: &[u8], mut start: usize) -> (Slice, Slice) {
         //let line = line.as_bytes();

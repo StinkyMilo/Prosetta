@@ -47,7 +47,7 @@ impl ParseState for NoneState {
     ) -> MatchResult {
         if child_index.is_some() {
             // child matched successfully
-            MatchResult::Matched(word.pos)
+            MatchResult::Matched(word.pos, false)
         } else {
             // child did not match - continue searching
             self.run_match_state(env, word, rest)

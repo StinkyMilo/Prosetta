@@ -1,5 +1,5 @@
-pub(crate) mod wind_renderer;
 pub(crate) mod html_renderer;
+pub(crate) mod wind_renderer;
 
 #[allow(dead_code)]
 #[derive(PartialEq, Clone, Copy)]
@@ -14,6 +14,7 @@ pub enum TermColor {
     Yellow,
 }
 
+#[allow(dead_code)]
 pub trait Renderer: Default {
     fn set_color(&mut self, color: (TermColor, bool));
     fn add(&mut self, text: &[u8]);

@@ -13,7 +13,7 @@ impl ParseState for VarState {
                 name_start: word.pos + env.global_index,
                 name: lower,
             };
-            MatchResult::Matched(rest.pos)
+            MatchResult::Matched(rest.pos, false)
         } else {
             // future words could be varible names
             MatchResult::Failed

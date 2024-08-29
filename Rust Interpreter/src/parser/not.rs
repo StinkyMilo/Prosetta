@@ -35,7 +35,7 @@ impl ParseState for NotState {
                 *index = new_index;
             };
 
-            MatchResult::Matched(word.pos)
+            MatchResult::Matched(word.pos, false)
         // child failed - I fail
         } else {
             MatchResult::Failed

@@ -62,7 +62,7 @@ impl<T: BasicState + Debug> ParseState for T {
                 // I can close so I close
                 if is_close(word) {
                     self.set_end(env.expr, word.pos + env.global_index);
-                    MatchResult::Matched(word.pos + 1)
+                    MatchResult::Matched(word.pos, true)
                     // succeeded - continue again with noncont expr
                 } else if child.is_some() {
                     MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr()))
@@ -79,7 +79,7 @@ impl<T: BasicState + Debug> ParseState for T {
                     None => MatchResult::Failed,
                     Some(slice) => {
                         self.set_end(env.expr, slice.pos + env.global_index);
-                        MatchResult::Matched(slice.pos + 1)
+                        MatchResult::Matched(slice.pos, true)
                     }
                 }
             }

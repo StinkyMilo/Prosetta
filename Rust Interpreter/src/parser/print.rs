@@ -26,7 +26,7 @@ impl ParseState for PrintState {
         }
 
         if matched {
-            MatchResult::Matched(word.pos + 1)
+            MatchResult::Matched(word.pos, true)
         } else {
             MatchResult::ContinueWith(word.pos, get_state!(var::VarState::new()))
         }
@@ -46,7 +46,7 @@ impl ParseState for PrintState {
                 data.push(Prints::Var(index));
                 if is_close(word) {
                     *end = word.pos + env.global_index;
-                    MatchResult::Matched(word.pos + 1)
+                    MatchResult::Matched(word.pos,true)
                 } else {
                     MatchResult::ContinueWith(word.pos, get_state!(var::VarState::new()))
                 }
