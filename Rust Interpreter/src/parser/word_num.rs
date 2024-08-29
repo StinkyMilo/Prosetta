@@ -5,11 +5,13 @@ use super::*;
 pub struct WordNumState;
 impl ParseState for WordNumState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
-        // wait for non . word
+        // wait for non . word to start
         if is_close(word) {
             MatchResult::Continue
         } else {
+            // find close
             let close = find_close(rest, 0);
+            //close exists - match
             if let Some(close) = close {
                 *env.expr = Expr::WordNum {
                     locs: env.locs.take().unwrap_or_default(),
@@ -20,7 +22,7 @@ impl ParseState for WordNumState {
 
                 MatchResult::Matched(close.pos + 1)
             } else {
-                // did not find close
+                // did not find close - fail
                 MatchResult::Failed
             }
         }
@@ -33,7 +35,7 @@ impl ParseState for WordNumState {
         _word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
-        // has child to match - fn should never be called
+        // has no child to match - fn should never be called
         unreachable!()
     }
 

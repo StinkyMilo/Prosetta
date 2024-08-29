@@ -52,7 +52,7 @@ pub trait ParseState: Debug {
     fn get_name(&self) -> &'static str;
 
     ///apparently not called, but
-    ///weather the expr should be replaced by new expr
+    ///whether the expr should be replaced by new expr
     fn do_replace(&self) -> bool;
 }
 

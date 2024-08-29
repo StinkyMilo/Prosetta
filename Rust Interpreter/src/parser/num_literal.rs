@@ -5,10 +5,10 @@ pub struct LiteralNumState {}
 
 impl ParseState for LiteralNumState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
-        // try
+        // try parse number
         let value = get_number(word.str);
 
-        // check
+        // if value exists - match
         if let Some(value) = value {
             *env.expr = Expr::LitNum {
                 str_start: word.pos + env.global_index,
