@@ -10,7 +10,11 @@ pub enum OperatorType {
     Exp,
     Log,
     LessThan,
-    GreaterThan
+    GreaterThan,
+    And,
+    Or,
+    Equals,
+    Not
 }
 
 #[derive(PartialEq, Debug)]

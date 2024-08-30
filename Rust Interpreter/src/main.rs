@@ -48,8 +48,8 @@ fn main() {
     run_parser(
         parser_flags,
         vis_flags,
-        ParserSource::from_stdin()
-        //ParserSource::from_string(MILO_POEM_2[0].to_vec())
+        // ParserSource::from_stdin()
+        ParserSource::from_string(MILO_POEM_2[0].to_vec())
     );
 
     let _ = io::stdin().read(&mut [0u8]).unwrap();
@@ -101,8 +101,8 @@ restriction fosters creativity.",
 #[allow(dead_code)]
 static MILO_POEM_2: [&[u8]; 1] = [
     b"
-    was name les int marioooo. int luigi.!
-    was name2 mor int marioooo. int luigi.!
+    was name als int marioooo. int luigi.!
+    was name2 par int marioooo. int luigi.!
     "
 ];
 

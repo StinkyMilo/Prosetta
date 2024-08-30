@@ -99,15 +99,19 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             end,
         } => {
             let name = match func_type {
-                OperatorType::Add => "add",
-                OperatorType::Sub => "sub",
-                OperatorType::Mult => "mult",
-                OperatorType::Div => "div",
-                OperatorType::Mod => "mod",
+                OperatorType::Add => "+",
+                OperatorType::Sub => "-",
+                OperatorType::Mult => "*",
+                OperatorType::Div => "/",
+                OperatorType::Mod => "%",
                 OperatorType::Exp => "exp",
                 OperatorType::Log => "log",
                 OperatorType::LessThan => "<",
-                OperatorType::GreaterThan => ">"
+                OperatorType::GreaterThan => ">",
+                OperatorType::And => "&",
+                OperatorType::Or => "||",
+                OperatorType::Equals => "==",
+                OperatorType::Not => "!"
             };
             format!(
                 "({}{} {})",
