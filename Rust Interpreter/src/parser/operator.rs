@@ -19,7 +19,7 @@ impl BasicState for OperatorState {
             OperatorType::Exp => "Exp",
             OperatorType::Log => "Log",
             OperatorType::LessThan => "LessThan",
-            OperatorType::GreaterThan => "GreaterThan"
+            OperatorType::GreaterThan => "GreaterThan",
         }
     }
 
@@ -30,7 +30,7 @@ impl BasicState for OperatorState {
                 locs,
                 func_type: self.fn_type,
                 indexes: Vec::new(),
-                end: usize::MAX,
+                end: End::none(),
             };
         }
         ret
@@ -64,7 +64,7 @@ impl BasicState for OperatorState {
         }
     }
 
-    fn set_end(&mut self, expr: &mut Expr, index: usize) {
+    fn set_end(&mut self, expr: &mut Expr, index: End) {
         if let Expr::Operator { end, .. } = expr {
             *end = index;
         } else {

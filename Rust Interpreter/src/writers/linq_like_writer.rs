@@ -1,6 +1,19 @@
-use crate::commands::*;
+use crate::{commands::*, parser::End};
 
-fn join_locs(locs: &Vec<usize>, end: Option<usize>) -> String {
+fn write_end(end: End) -> String {
+    let mut ret = String::new();
+    if end.index != usize::MAX {
+        ret += "$";
+        ret += &end.index.to_string();
+        if end.count != 1 {
+            ret += "$$";
+            ret += &end.count.to_string();
+        }
+    }
+    ret
+}
+
+fn join_locs(locs: &Vec<usize>, end: Option<End>) -> String {
     if locs.is_empty() {
         "".to_string()
     } else {
@@ -9,11 +22,8 @@ fn join_locs(locs: &Vec<usize>, end: Option<usize>) -> String {
         let mut ret = iter.fold("@".to_string() + &first.to_string(), |a, b| {
             a + &"," + &b.to_string()
         });
-        if let Some(index) = end {
-            if index != usize::MAX {
-                ret += "$";
-                ret += &index.to_string();
-            }
+        if let Some(end) = end {
+            ret += &write_end(end);
         }
         ret
     }
@@ -107,7 +117,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                 OperatorType::Exp => "exp",
                 OperatorType::Log => "log",
                 OperatorType::LessThan => "<",
-                OperatorType::GreaterThan => ">"
+                OperatorType::GreaterThan => ">",
             };
             format!(
                 "({}{} {})",
@@ -147,7 +157,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                 "(skip{} @{}${} {})",
                 join_locs(locs, None),
                 *start,
-                *end,
+                write_end(*end),
                 write_expr(exprs, *index),
             )
         }
@@ -159,7 +169,9 @@ fn write_prints(exprs: &ExprArena, data: &Vec<Prints>) -> String {
     for print in data {
         ret += &match print {
             Prints::Var(index) => write_expr(exprs, *index) + " ",
-            Prints::Word(str, index) => format!("\"{}\"@{} ", std::str::from_utf8(str).unwrap(), index),
+            Prints::Word(str, index) => {
+                format!("\"{}\"@{} ", std::str::from_utf8(str).unwrap(), index)
+            }
         }
     }
     ret.pop();

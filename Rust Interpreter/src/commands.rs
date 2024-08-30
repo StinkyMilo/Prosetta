@@ -1,5 +1,7 @@
 use std::ops::Index;
 
+use crate::parser::End;
+
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum OperatorType {
     Add,
@@ -10,7 +12,7 @@ pub enum OperatorType {
     Exp,
     Log,
     LessThan,
-    GreaterThan
+    GreaterThan,
 }
 
 #[derive(PartialEq, Debug)]
@@ -29,29 +31,29 @@ pub enum Expr {
     Arc {
         locs: Vec<usize>,
         indexes: [usize; 4],
-        end: usize,
+        end: End,
     },
     Line {
         locs: Vec<usize>,
         indexes: [usize; 4],
-        end: usize,
+        end: End,
     },
     Assign {
         locs: Vec<usize>,
         name_start: usize,
         name: Vec<u8>,
         value_index: usize,
-        end: usize,
+        end: End,
     },
     Rect {
         locs: Vec<usize>,
         indexes: [usize; 4],
-        end: usize,
+        end: End,
     },
     Print {
         locs: Vec<usize>,
         data: Vec<Prints>,
-        end: usize,
+        end: End,
     },
     //expr
     Var {
@@ -62,13 +64,13 @@ pub enum Expr {
         locs: Vec<usize>,
         str_start: usize,
         str_len: usize,
-        end: usize,
+        end: End,
     },
     Operator {
         locs: Vec<usize>,
         func_type: OperatorType,
         indexes: Vec<usize>,
-        end: usize,
+        end: End,
     },
     LitNum {
         str_start: usize,
@@ -78,13 +80,13 @@ pub enum Expr {
     MultiLitNum {
         locs: Vec<usize>,
         num_indexes: Vec<usize>,
-        end: usize,
+        end: End,
     },
     Skip {
         locs: Vec<usize>,
         index: usize,
         start: usize,
-        end: usize,
+        end: End,
     },
 }
 

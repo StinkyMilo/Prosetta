@@ -12,15 +12,15 @@ impl ParseState for WordNumState {
             // find close
             let close = find_close(rest, 0);
             //close exists - match
-            if let Some(close) = close {
+            if let Some(index) = close {
                 *env.expr = Expr::WordNum {
                     locs: env.locs.take().unwrap_or_default(),
                     str_start: word.pos + env.global_index,
                     str_len: word.len(),
-                    end: close.pos + env.global_index,
+                    end: End::from_slice(&index, env.global_index),
                 };
 
-                MatchResult::Matched(close.pos, true)
+                MatchResult::Matched(index.pos, true)
             } else {
                 // did not find close - fail
                 MatchResult::Failed

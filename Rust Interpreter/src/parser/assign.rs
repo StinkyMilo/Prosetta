@@ -10,7 +10,7 @@ impl ParseState for AssignState {
             name: word.str.to_owned(),
             value_index: usize::MAX,
             locs: env.locs.take().unwrap_or_default(),
-            end: usize::MAX,
+            end: End::none(),
         };
         // setup child state
         MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
@@ -35,7 +35,7 @@ impl ParseState for AssignState {
                     } = env.expr
                     {
                         *value_index = index;
-                        *end = slice.pos + env.global_index;
+                        *end = End::from_slice(&slice, env.global_index);
                     }
                     MatchResult::Matched(slice.pos, true)
                 }

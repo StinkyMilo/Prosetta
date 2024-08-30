@@ -1,6 +1,7 @@
 use std::{
     collections::HashSet,
     fmt::{self, Debug},
+    usize,
 };
 
 use super::{alias_data::AliasData, Expr};
@@ -54,6 +55,28 @@ pub trait ParseState: Debug {
     ///apparently not called, but
     ///whether the expr should be replaced by new expr
     fn do_replace(&self) -> bool;
+}
+
+///a struct for closing character with an index and a length
+#[derive(PartialEq, Debug, Clone, Copy)]
+pub struct End {
+    pub index: usize,
+    pub count: u8,
+}
+
+impl End {
+    /// make new end from index and close length
+    pub fn new(index: usize, count: u8) -> Self {
+        Self { index, count }
+    }
+
+    pub fn from_slice(slice: &Slice, global_index: usize) -> Self {
+        End::new(slice.pos + global_index, slice.str.len() as u8)
+    }
+
+    pub fn none() -> Self {
+        End::new(usize::MAX, 0)
+    }
 }
 
 /// the result of a step or stepmatch function

@@ -17,7 +17,7 @@ pub trait BasicState {
     fn can_close(&self) -> CloseType;
 
     /// set end to index
-    fn set_end(&mut self, expr: &mut Expr, index: usize);
+    fn set_end(&mut self, expr: &mut Expr, index: End);
 }
 
 impl<T: BasicState + Debug> ParseState for T {
@@ -61,7 +61,7 @@ impl<T: BasicState + Debug> ParseState for T {
             CloseType::Able => {
                 // I can close so I close
                 if is_close(word) {
-                    self.set_end(env.expr, word.pos + env.global_index);
+                    self.set_end(env.expr, End::from_slice(&word, env.global_index));
                     MatchResult::Matched(word.pos, true)
                     // succeeded - continue again with noncont expr
                 } else if child.is_some() {
@@ -78,7 +78,7 @@ impl<T: BasicState + Debug> ParseState for T {
                     // will never be a period to find even on future words
                     None => MatchResult::Failed,
                     Some(slice) => {
-                        self.set_end(env.expr, slice.pos + env.global_index);
+                        self.set_end(env.expr, End::from_slice(&slice, env.global_index));
                         MatchResult::Matched(slice.pos, true)
                     }
                 }

@@ -7,15 +7,15 @@ pub struct NotState;
 impl ParseState for NotState {
     fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
         let close = find_close(&word, 0).or_else(|| find_close(&rest, 0));
-        if let Some(index) = close {
+        if let Some(slice) = close {
             *env.expr = Expr::Skip {
                 locs: env.locs.take().unwrap_or_default(),
                 index: usize::MAX,
                 start: word.pos + env.global_index,
-                end: index.pos + env.global_index,
+                end: End::from_slice(&slice, env.global_index),
             };
 
-            MatchResult::ContinueWith(index.pos + 1, Box::new(alias::NoneState::new_expr_cont()))
+            MatchResult::ContinueWith(slice.pos + 1, Box::new(alias::NoneState::new_expr_cont()))
         } else {
             // no . - will never match
             MatchResult::Failed

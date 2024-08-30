@@ -11,11 +11,11 @@ impl ParseState for PrintState {
         let matched = is_close(word);
 
         if self.first {
-            let mut end = usize::MAX;
+            let mut end = End::none();
 
             // "pri ." - useful for newline? - can change later
             if matched {
-                end = word.pos + env.global_index;
+                end = End::from_slice(&word, env.global_index)
             }
 
             *env.expr = Expr::Print {
@@ -45,8 +45,8 @@ impl ParseState for PrintState {
             if let Some(index) = child_index {
                 data.push(Prints::Var(index));
                 if is_close(word) {
-                    *end = word.pos + env.global_index;
-                    MatchResult::Matched(word.pos,true)
+                    *end = End::from_slice(&word, env.global_index);
+                    MatchResult::Matched(word.pos, true)
                 } else {
                     MatchResult::ContinueWith(word.pos, get_state!(var::VarState::new()))
                 }

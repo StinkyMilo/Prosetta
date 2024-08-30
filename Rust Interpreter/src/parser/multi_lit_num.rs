@@ -13,7 +13,7 @@ impl ParseState for MultiLitNumState {
             let locs = env.locs.take().unwrap_or_default();
             *env.expr = Expr::MultiLitNum {
                 locs,
-                end: usize::MAX,
+                end: End::none(),
                 num_indexes: Vec::new(),
             };
         }
@@ -42,7 +42,7 @@ impl ParseState for MultiLitNumState {
             // I have data - I succeed
             if self.has_data {
                 if let Expr::MultiLitNum { end, .. } = env.expr {
-                    *end = word.pos;
+                    *end = End::from_slice(&word, env.global_index);
                 }
                 MatchResult::Matched(word.pos, true)
             } else {
