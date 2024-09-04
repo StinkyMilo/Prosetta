@@ -3,7 +3,6 @@
 was i lit zero..
 was a lit one..
 was b lit one..
-was temp.
 whi les i lit hundred..
     sta
         pri a.
@@ -13,6 +12,29 @@ whi les i lit hundred..
         was i add i lit one...
     .
 .
+
+I wasted months seeking jobs with zero progress.
+    (was months (lit 0))
+Was there anything I could do? I felt like I had fallen into a hole with no escape...
+    (was there (int "a"))
+Was it worth even trying anymore? Could this application be the one that succeeded?
+    (was it (lit 1))
+I began wishing for some sort of release. Months dragged on and time continued. Minutes obediently marched forward, as minutes habitually do. Applying, hoping, waiting.
+    (whi (les months (tim (int "obediently") (int "habitually")))
+Until I met The Muffin Man, the man whose restaurant saved my life.
+    (sta
+He's a perfect professional; there isn't anything he can't do.
+    (pri there)
+His chocolate muffin was unmatched; it tasted like a thousand years of happiness.
+    (was unmatched it)
+Once he makes a muffin, he wraps it in a hand-made foil. There is a great joy to it all!
+    (was it (add there it))
+I worked as one of the waiters there in his unmatched muffin bakery.
+    (was there unmatched)
+These were the wackiest months of my life, too. I graduated a few months later into a role of deputy chef. In that role I had to whisper a poem to each muffin, tuck the batter in at night, and mix dozens of kinds of sugar in perfect ratios.
+    (was months (add months (int 1)))
+Though his methods were questionable, the results weren't. The Muffin Man and I made the best muffins in the world.
+    ))
 
 I was lonely as the subject pointed his hand. His finger vanished into the dark...
     (was "lonely" (sub (int "his") (int "the")))
