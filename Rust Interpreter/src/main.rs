@@ -48,8 +48,8 @@ fn main() {
     run_parser(
         parser_flags,
         vis_flags,
-        // ParserSource::from_stdin()
-        ParserSource::from_string(MILO_POEM_2[0].to_vec())
+        // ParserSource::from_string(MILO_POEM_2[0].to_vec())
+        ParserSource::from_stdin(),
     );
 
     let _ = io::stdin().read(&mut [0u8]).unwrap();
@@ -114,7 +114,6 @@ These were the wackiest months of my life, too. I graduated a few months later i
 Though his methods were questionable, the results weren't. The Muffin Man and I made the best muffins in the world.
     "
 ];
-
 
 // while !matches!(
 //     result,
