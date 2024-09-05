@@ -9,7 +9,7 @@ impl ParseState for VarState {
 
         // is varible in scope
         if env.vars.contains(&lower) {
-            *env.expr = Expr::Var {
+            env.exprs.vec[env.index] = Expr::Var {
                 name_start: word.pos + env.global_index,
                 name: lower,
             };

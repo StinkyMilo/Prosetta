@@ -178,11 +178,12 @@ impl<'a> Parser<'a> {
 
         // setup env
         let mut env = Environment {
-            expr,
+            exprs: &mut self.data.exprs,
+            index: frame.0,
             vars: &mut self.data.vars,
             locs: None,
             global_index: self.pos,
-            aliases: &self.aliases,
+            aliases: &self.aliases
         };
 
         // setup slice

@@ -8,7 +8,7 @@ impl ParseState for IfState {
 
     fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
         if !self.has_condition {
-            *env.expr = Expr::If {
+            env.exprs.vec[env.index] = Expr::If {
                 condition_start: word.pos + env.global_index,
                 locs: env.locs.take().unwrap_or_default(),
                 body_start: usize::MAX,
@@ -30,7 +30,7 @@ impl ParseState for IfState {
         word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
-        if let Expr::If {body_start, body_end, indexes, ..} = env.expr {
+        if let Expr::If {body_start, body_end, indexes, ..} = &mut env.exprs.vec[env.index] {
             //If we get a punctuation before an expression, we want to end. Otherwise, we want to continue with a new expression
             //Check the next close. Is it after the child expression? If so, don't even add the child and fail.
             if !(self.has_condition) {

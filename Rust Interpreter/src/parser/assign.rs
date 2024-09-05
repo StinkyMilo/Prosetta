@@ -5,7 +5,7 @@ pub struct AssignState;
 impl ParseState for AssignState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         // set expr
-        *env.expr = Expr::Assign {
+        env.exprs.vec[env.index] = Expr::Assign {
             name_start: word.pos + env.global_index,
             name: word.str.to_owned(),
             value_index: usize::MAX,
@@ -32,7 +32,7 @@ impl ParseState for AssignState {
                 Some(slice) => {
                     if let Expr::Assign {
                         name, value_index, end, ..
-                    } = env.expr
+                    } = &mut env.exprs.vec[env.index]
                     {
                         *value_index = index;
                         *end = slice.pos + env.global_index;
