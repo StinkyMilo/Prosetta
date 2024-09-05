@@ -171,6 +171,22 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                 write_exprs(exprs, indexes)
             )
         }
+        Expr::While { 
+            locs, 
+            indexes, 
+            body_start, 
+            body_end ,
+            ..
+        } => {
+            format!(
+                "(while{} @{}${} {})",
+                join_locs(locs, None),
+                body_start,
+                body_end,
+                //TODO separate condition from the rest
+                write_exprs(exprs, indexes)
+            )
+        }
     }
 }
 

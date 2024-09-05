@@ -244,6 +244,17 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.write_end(source, *body_end, stack_index);
             }
+            Expr::While {
+                locs, 
+                body_end ,
+                indexes,
+                ..
+            } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.write_end(source, *body_end, stack_index);
+            }
+            
             Expr::NoneExpr | Expr::NoneStat => {}
         };
     }

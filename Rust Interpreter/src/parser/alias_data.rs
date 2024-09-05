@@ -6,7 +6,7 @@ const BASE_EXPR_ALIASES: [&'static [u8]; 15] = [
 
 const NOT_ALIAS: &'static [u8] = b"not";
 
-const STAT_ALIASES: [&'static [u8]; 6] = [b"arc", b"lin", b"was", b"rec", b"pri", b"whe"];
+const STAT_ALIASES: [&'static [u8]; 7] = [b"arc", b"lin", b"was", b"rec", b"pri", b"whe", b"whi"];
 
 ///match alias to expr
 fn get_expr_state(alias: &'static [u8], index: usize) -> MatchResult {
@@ -46,6 +46,7 @@ fn get_stat_state(alias: &'static [u8], index: usize) -> MatchResult {
             b"rec" => get_state!(rect::RectState::new()),
             b"pri" => get_state!(print::PrintState::new()),
             b"whe" => get_state!(ifstatement::IfState::new()),
+            b"whi" => get_state!(whilestatement::WhileState::new()),
             _ => panic!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
         },
     )

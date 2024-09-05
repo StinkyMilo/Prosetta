@@ -1,14 +1,14 @@
 use super::*;
 /// state for equals
 #[derive(Debug)]
-pub struct IfState{
+pub struct WhileState{
     has_condition: bool
 }
-impl ParseState for IfState {
+impl ParseState for WhileState {
 
     fn step(&mut self, env: &mut Enviroment, word: &Slice, _rest: &Slice) -> MatchResult {
         if !self.has_condition {
-            *env.expr = Expr::If {
+            *env.expr = Expr::While {
                 condition_start: word.pos + env.global_index,
                 locs: env.locs.take().unwrap_or_default(),
                 body_start: usize::MAX,
@@ -30,7 +30,7 @@ impl ParseState for IfState {
         word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
-        if let Expr::If {body_start, body_end, indexes, ..} = env.expr {
+        if let Expr::While {body_start, body_end, indexes, ..} = env.expr {
             //If we get a punctuation before an expression, we want to end. Otherwise, we want to continue with a new expression
             //Check the next close. Is it after the child expression? If so, don't even add the child and fail.
             if !(self.has_condition) {
@@ -65,7 +65,7 @@ impl ParseState for IfState {
     }
 
     fn get_name(&self) -> &'static str {
-        "If"
+        "While"
     }
 
     fn do_replace(&self) -> bool {
@@ -73,7 +73,7 @@ impl ParseState for IfState {
     }
 }
 
-impl IfState {
+impl WhileState {
     pub fn new() -> Self {
         Self{
             has_condition: false

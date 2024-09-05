@@ -96,6 +96,13 @@ pub enum Expr {
         body_start: usize,
         indexes: Vec<usize>,
         body_end: usize
+    },
+    While {
+        locs: Vec<usize>,
+        condition_start: usize,
+        body_start: usize,
+        indexes: Vec<usize>,
+        body_end: usize
     }
 }
 
