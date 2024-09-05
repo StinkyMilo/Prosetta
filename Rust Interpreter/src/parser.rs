@@ -177,7 +177,7 @@ impl<'a> Parser<'a> {
         }
 
         // setup env
-        let mut env = Enviroment {
+        let mut env = Environment {
             expr,
             vars: &mut self.data.vars,
             locs: None,

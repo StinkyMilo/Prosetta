@@ -52,8 +52,8 @@ pub mod test_lib {
         expr: &'a mut Expr,
         locs: Option<Vec<usize>>,
         aliases: &'a AliasData,
-    ) -> Enviroment<'a> {
-        Enviroment {
+    ) -> Environment<'a> {
+        Environment {
             vars,
             expr,
             locs,

@@ -3,7 +3,7 @@ use super::*;
 #[derive(Debug)]
 pub struct AssignState;
 impl ParseState for AssignState {
-    fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
+    fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         // set expr
         *env.expr = Expr::Assign {
             name_start: word.pos + env.global_index,
@@ -18,7 +18,7 @@ impl ParseState for AssignState {
 
     fn step_match(
         &mut self,
-        env: &mut Enviroment,
+        env: &mut Environment,
         child_index: Option<usize>,
         word: &Slice,
         rest: &Slice,

@@ -6,7 +6,7 @@ pub struct WhileState{
 }
 impl ParseState for WhileState {
 
-    fn step(&mut self, env: &mut Enviroment, word: &Slice, _rest: &Slice) -> MatchResult {
+    fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
         if !self.has_condition {
             *env.expr = Expr::While {
                 condition_start: word.pos + env.global_index,
@@ -25,7 +25,7 @@ impl ParseState for WhileState {
 
     fn step_match(
         &mut self,
-        env: &mut Enviroment,
+        env: &mut Environment,
         child_index: Option<usize>,
         word: &Slice,
         _rest: &Slice,

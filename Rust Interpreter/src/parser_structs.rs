@@ -10,7 +10,7 @@ mod parsing_tests_word_funcs;
 
 pub type VarSet = HashSet<Vec<u8>>;
 // pub type StepFunction =
-//     fn(env: &mut Enviroment, result: LastMatchResult, word: &Slice, rest: &Slice) -> MatchResult;
+//     fn(env: &mut Environment, result: LastMatchResult, word: &Slice, rest: &Slice) -> MatchResult;
 
 // (expr_index, string_index, state)
 
@@ -37,12 +37,12 @@ pub struct ParserFlags {
 /// A state (which goes onto the parser stack)
 pub trait ParseState: Debug {
     /// called first time to setup the state and after the state continues
-    fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult;
+    fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult;
 
     /// called after match or fail
     fn step_match(
         &mut self,
-        env: &mut Enviroment,
+        env: &mut Environment,
         child: Option<usize>,
         word: &Slice,
         rest: &Slice,
@@ -123,7 +123,7 @@ impl ParserResult {
 }
 
 ///the parser enviorment
-pub struct Enviroment<'a> {
+pub struct Environment<'a> {
     ///The set of current varibles
     pub vars: &'a mut VarSet,
     ///The list of expressions

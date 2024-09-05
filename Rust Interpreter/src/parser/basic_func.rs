@@ -21,7 +21,7 @@ pub trait BasicState {
 }
 
 impl<T: BasicState + Debug> ParseState for T {
-    fn step(&mut self, env: &mut Enviroment, word: &Slice, _rest: &Slice) -> MatchResult {
+    fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
         let is_first = self.do_first(env.expr, env.locs.take().unwrap_or_default());
         if is_first {
             // cont - has required arguments
@@ -34,7 +34,7 @@ impl<T: BasicState + Debug> ParseState for T {
 
     fn step_match(
         &mut self,
-        env: &mut Enviroment,
+        env: &mut Environment,
         child: Option<usize>,
         word: &Slice,
         rest: &Slice,

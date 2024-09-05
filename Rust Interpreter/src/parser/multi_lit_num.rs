@@ -8,7 +8,7 @@ pub struct MultiLitNumState {
 }
 
 impl ParseState for MultiLitNumState {
-    fn step(&mut self, env: &mut Enviroment, word: &Slice, _rest: &Slice) -> MatchResult {
+    fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
         if self.first {
             let locs = env.locs.take().unwrap_or_default();
             *env.expr = Expr::MultiLitNum {
@@ -22,7 +22,7 @@ impl ParseState for MultiLitNumState {
 
     fn step_match(
         &mut self,
-        env: &mut Enviroment,
+        env: &mut Environment,
         child_index: Option<usize>,
         word: &Slice,
         _rest: &Slice,
