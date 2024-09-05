@@ -187,6 +187,20 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                 write_exprs(exprs, indexes)
             )
         }
+        Expr::Else {
+            locs,
+            indexes,
+            start,
+            end
+        } => {
+            format!(
+                "(else{} @{}${} {})",
+                join_locs(locs, None),
+                start,
+                end,
+                write_exprs(exprs,indexes)
+            )
+        }
     }
 }
 

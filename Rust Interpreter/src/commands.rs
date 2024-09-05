@@ -103,6 +103,12 @@ pub enum Expr {
         body_start: usize,
         indexes: Vec<usize>,
         body_end: usize
+    },
+    Else {
+        locs: Vec<usize>,
+        start: usize,
+        end: usize,
+        indexes: Vec<usize>
     }
 }
 

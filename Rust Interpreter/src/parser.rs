@@ -18,6 +18,7 @@ mod var;
 mod word_num;
 mod ifstatement;
 mod whilestatement;
+mod elsestatement;
 
 mod circle;
 mod line;
@@ -168,13 +169,6 @@ impl<'a> Parser<'a> {
         // get curr frame
         let stack_index = self.stack.len() - 1;
         let frame = &mut self.stack[stack_index];
-        let mut expr = &mut Expr::NoneExpr;
-
-        //let next_child = self.data.exprs.vec.len();
-
-        if frame.0 < self.data.exprs.vec.len() {
-            expr = &mut self.data.exprs.vec[frame.0];
-        }
 
         // setup env
         let mut env = Environment {

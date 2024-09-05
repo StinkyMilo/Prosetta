@@ -3,7 +3,7 @@ use std::{
     fmt::{self, Debug},
 };
 
-use super::{alias_data::AliasData, Expr, ExprArena};
+use super::{alias_data::AliasData, ExprArena};
 
 #[path = "testing/parsing_tests_word_funcs.rs"]
 mod parsing_tests_word_funcs;
