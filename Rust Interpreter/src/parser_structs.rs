@@ -125,7 +125,7 @@ impl ParserResult {
 ///the parser enviorment
 pub struct Enviroment<'a> {
     ///The set of current varibles
-    pub vars: &'a VarSet,
+    pub vars: &'a mut VarSet,
     ///The list of expressions
     pub expr: &'a mut Expr,
     ///The current locs (locations of the alias characters)

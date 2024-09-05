@@ -94,8 +94,8 @@ pub enum Expr {
         locs: Vec<usize>,
         condition_start: usize,
         body_start: usize,
-        body_end: usize,
-        has_condition: bool
+        indexes: Vec<usize>,
+        body_end: usize
     }
 }
 

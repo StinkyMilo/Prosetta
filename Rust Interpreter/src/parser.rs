@@ -178,7 +178,7 @@ impl<'a> Parser<'a> {
         // setup env
         let mut env = Enviroment {
             expr,
-            vars: &self.data.vars,
+            vars: &mut self.data.vars,
             locs: None,
             global_index: self.pos,
             aliases: &self.aliases,
@@ -295,12 +295,6 @@ impl<'a> Parser<'a> {
 
         // matched final stat
         if self.stack.is_empty() {
-            let start_index = *self.data.stat_starts.last().unwrap();
-            //self.parsing_line = false;
-            // add to varibles
-            if let Expr::Assign { name, .. } = &self.data.exprs[start_index] {
-                self.data.vars.insert(name.to_owned());
-            }
             // setup next
             self.add_new_nonestat(index);
             ParserResult::MatchedLine

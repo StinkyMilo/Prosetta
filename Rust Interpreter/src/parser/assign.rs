@@ -31,11 +31,12 @@ impl ParseState for AssignState {
                 None => MatchResult::Failed,
                 Some(slice) => {
                     if let Expr::Assign {
-                        value_index, end, ..
+                        name, value_index, end, ..
                     } = env.expr
                     {
                         *value_index = index;
                         *end = slice.pos + env.global_index;
+                        env.vars.insert(name.to_owned());
                     }
                     MatchResult::Matched(slice.pos, true)
                 }

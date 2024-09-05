@@ -155,6 +155,22 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                 write_expr(exprs, *index),
             )
         }
+        Expr::If { 
+            locs, 
+            indexes, 
+            body_start, 
+            body_end ,
+            ..
+        } => {
+            format!(
+                "(if{} @{}${} {})",
+                join_locs(locs, None),
+                body_start,
+                body_end,
+                //TODO separate condition from the rest
+                write_exprs(exprs, indexes)
+            )
+        }
     }
 }
 
