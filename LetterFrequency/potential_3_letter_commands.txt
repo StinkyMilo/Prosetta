@@ -22,7 +22,8 @@ Rep: List set operator "replace" (list, index, value) (#90) -- replaces index wi
 Del: List delete operator. (list, index?) (#317) -- defaults to removing first value, otherwise removes at index. Other values shift.
 
 ## Conditionals ##
-Whe: If (condition, statementIfTrue, statementIfFalse?) (#111)
+Whe: If (condition, body) (#111)
+Els: Else (body) (#291)
 Les: Less than (#211)
 Mor: Greater than (#52)
 Als: And operator (#169) -- Yes, I could make this "and", but "and" has a score of almost 2.5%, which I think is too high.
