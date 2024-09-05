@@ -16,7 +16,7 @@ mod not;
 mod operator;
 mod var;
 mod word_num;
-mod if;
+mod ifstatement;
 
 mod circle;
 mod line;

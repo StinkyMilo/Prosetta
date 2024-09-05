@@ -90,6 +90,13 @@ pub enum Expr {
         start: usize,
         end: usize,
     },
+    If {
+        locs: Vec<usize>,
+        condition_start: usize,
+        body_start: usize,
+        body_end: usize,
+        has_condition: bool
+    }
 }
 
 impl Expr {

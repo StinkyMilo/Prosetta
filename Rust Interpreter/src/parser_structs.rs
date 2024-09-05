@@ -59,7 +59,7 @@ pub trait ParseState: Debug {
 /// the result of a step or stepmatch function
 ///
 /// Matched is returned to go to the parent state with the index to now parse from and whether the state closed on it
-/// ContinueWith is returned to add a child onto the stack with an index and the state to coninue with
+/// ContinueWith is returned to add a child onto the stack with an index and the state to continue with
 /// Continue is returned to give the same state the next word
 /// Failed is returned to go to the parent state with a failure
 #[derive(Debug)]
