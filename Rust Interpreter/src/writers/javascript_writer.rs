@@ -204,9 +204,6 @@ fn write_exprs(exprs: &ExprArena, indexes: &[usize], delimeter: &str) -> String 
     if indexes.len() == 0 {
         return "".to_string();
     }
-    if indexes.len() == 1 {
-        return write_expr(exprs, indexes[0]);
-    }
     let mut ret = String::new();
     ret += write_expr(exprs, indexes[0]).as_str();
     for index in &indexes[1..] {
