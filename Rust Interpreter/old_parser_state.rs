@@ -17,7 +17,7 @@ type VarSet = HashSet<Vec<u8>>;
 //type ParseFn = fn(this: &Parser,&VarSet, &Slice<'_>, Vec<usize>) -> MatchResult;
 type BuildInSetUp = fn(num: u16, index: usize, child_index: usize, locs: Vec<usize>) -> MatchResult;
 type StepFunction =
-    fn(env: &mut Enviroment, result: MatchChildResult, word: &Slice, rest: &Slice) -> MatchResult;
+    fn(env: &mut Environment, result: MatchChildResult, word: &Slice, rest: &Slice) -> MatchResult;
 
 pub trait ParseSource: BufRead + Debug {}
 impl<T: BufRead + Debug> ParseSource for T {}
@@ -91,7 +91,7 @@ pub enum ParserResult {
     Failed(&'static str),
 }
 
-struct Enviroment<'a> {
+struct Environment<'a> {
     vars: &'a VarSet,
     expr: &'a mut Expr,
     state: &'a mut StateContext,
@@ -271,7 +271,7 @@ impl<'a> Parser<'a> {
         }
         let frame = &mut self.stack_state[stack_index];
         // setup env
-        let mut env = Enviroment {
+        let mut env = Environment {
             expr,
             state: frame,
             vars: &self.vars,
@@ -369,7 +369,7 @@ fn get_name_from_state(expr:&Expr,state:&StateContext)->&'static str{
 }
 
 // functions
-fn get_step_fn(env: &Enviroment) -> StepFunction {
+fn get_step_fn(env: &Environment) -> StepFunction {
     match &*env.state {
         StateContext::Matching(BuiltinMatchState { is_expr, .. }) => {
             if *is_expr {
@@ -394,7 +394,7 @@ fn get_step_fn(env: &Enviroment) -> StepFunction {
 }
 
 fn step_stat(
-    env: &mut Enviroment,
+    env: &mut Environment,
     result: MatchChildResult,
     word: &Slice,
     rest: &Slice,
@@ -402,7 +402,7 @@ fn step_stat(
     match_built_in(&STAT_DATA, env, result, word, rest)
 }
 fn step_expr(
-    env: &mut Enviroment,
+    env: &mut Environment,
     result: MatchChildResult,
     word: &Slice,
     rest: &Slice,
@@ -418,7 +418,7 @@ fn step_expr(
 }
 
 fn step_eq(
-    env: &mut Enviroment,
+    env: &mut Environment,
     result: MatchChildResult,
     word: &Slice,
     rest: &Slice,
@@ -462,7 +462,7 @@ fn step_eq(
 }
 
 fn step_var(
-    env: &mut Enviroment,
+    env: &mut Environment,
     _result: MatchChildResult,
     word: &Slice,
     rest: &Slice,
@@ -483,7 +483,7 @@ fn step_var(
 }
 
 fn step_num(
-    env: &mut Enviroment,
+    env: &mut Environment,
     _result: MatchChildResult,
     word: &Slice,
     rest: &Slice,
@@ -580,7 +580,7 @@ fn setup_stat(num: u16, index: usize, child_index: usize, locs: Vec<usize>) -> M
 
 fn match_built_in(
     data: &BuiltinData,
-    env: &mut Enviroment,
+    env: &mut Environment,
     result: MatchChildResult,
     word: &Slice,
     rest: &Slice,
@@ -698,7 +698,7 @@ fn match_built_in(
 }
 
 fn step_bi_fn(
-    env: &mut Enviroment,
+    env: &mut Environment,
     result: MatchChildResult,
     word: &Slice,
     rest: &Slice,
@@ -708,7 +708,7 @@ fn step_bi_fn(
 }
 
 fn step_add(
-    env: &mut Enviroment,
+    env: &mut Environment,
     result: MatchChildResult,
     word: &Slice,
     rest: &Slice,
@@ -716,7 +716,7 @@ fn step_add(
     step_bi_fn(env, result, word, rest)
 }
 fn step_mult(
-    env: &mut Enviroment,
+    env: &mut Environment,
     result: MatchChildResult,
     word: &Slice,
     rest: &Slice,

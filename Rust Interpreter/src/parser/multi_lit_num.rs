@@ -8,10 +8,10 @@ pub struct MultiLitNumState {
 }
 
 impl ParseState for MultiLitNumState {
-    fn step(&mut self, env: &mut Enviroment, word: &Slice, _rest: &Slice) -> MatchResult {
+    fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
         if self.first {
             let locs = env.locs.take().unwrap_or_default();
-            *env.expr = Expr::MultiLitNum {
+            env.exprs.vec[env.index] = Expr::MultiLitNum {
                 locs,
                 end: usize::MAX,
                 num_indexes: Vec::new(),
@@ -22,7 +22,7 @@ impl ParseState for MultiLitNumState {
 
     fn step_match(
         &mut self,
-        env: &mut Enviroment,
+        env: &mut Environment,
         child_index: Option<usize>,
         word: &Slice,
         _rest: &Slice,
@@ -32,7 +32,7 @@ impl ParseState for MultiLitNumState {
         // add child if matched
         if let Some(index) = child_index {
             self.has_data = true;
-            if let Expr::MultiLitNum { num_indexes, .. } = env.expr {
+            if let Expr::MultiLitNum { num_indexes, .. } = &mut env.exprs.vec[env.index] {
                 num_indexes.push(index);
             }
         }
@@ -41,7 +41,7 @@ impl ParseState for MultiLitNumState {
         if is_close(word) {
             // I have data - I succeed
             if self.has_data {
-                if let Expr::MultiLitNum { end, .. } = env.expr {
+                if let Expr::MultiLitNum { end, .. } = &mut env.exprs.vec[env.index] {
                     *end = word.pos;
                 }
                 MatchResult::Matched(word.pos, true)

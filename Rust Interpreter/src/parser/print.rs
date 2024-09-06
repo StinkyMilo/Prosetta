@@ -7,7 +7,7 @@ pub struct PrintState {
 }
 
 impl ParseState for PrintState {
-    fn step(&mut self, env: &mut Enviroment, word: &Slice, _rest: &Slice) -> MatchResult {
+    fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
         let matched = is_close(word);
 
         if self.first {
@@ -18,7 +18,7 @@ impl ParseState for PrintState {
                 end = word.pos + env.global_index;
             }
 
-            *env.expr = Expr::Print {
+            env.exprs.vec[env.index] = Expr::Print {
                 locs: env.locs.take().unwrap_or_default(),
                 data: Vec::new(),
                 end,
@@ -34,13 +34,13 @@ impl ParseState for PrintState {
 
     fn step_match(
         &mut self,
-        env: &mut Enviroment,
+        env: &mut Environment,
         child_index: Option<usize>,
         word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
         self.first = false;
-        if let Expr::Print { data, end, .. } = env.expr {
+        if let Expr::Print { data, end, .. } = &mut env.exprs.vec[env.index] {
             // prev word was var
             if let Some(index) = child_index {
                 data.push(Prints::Var(index));
