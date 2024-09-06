@@ -147,6 +147,40 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             format!("print_console({});", write_prints(exprs, data))
         }
         Expr::Skip { .. } => "".to_string(),
+        Expr::If {
+            locs: _,
+            indexes,
+            body_start: _,
+            body_end: _,
+            ..
+        } => {
+            format!(
+                "if ({}) {{\n{}\n}}",
+                write_expr(exprs, indexes[0]),
+                write_exprs(exprs, &indexes[1..], "\n")
+            )
+        }
+        Expr::While {
+            locs: _,
+            indexes,
+            body_start: _,
+            body_end: _,
+            ..
+        } => {
+            format!(
+                "while ({}) {{\n{}\n}}",
+                write_expr(exprs, indexes[0]),
+                write_exprs(exprs, &indexes[1..], "\n")
+            )
+        }
+        Expr::Else {
+            locs: _,
+            indexes,
+            start: _,
+            end: _,
+        } => {
+            format!("else {{\n{}\n}}", write_exprs(exprs, indexes, "\n"))
+        }
     }
 }
 
@@ -167,6 +201,9 @@ fn write_prints(exprs: &ExprArena, data: &Vec<Prints>) -> String {
 }
 
 fn write_exprs(exprs: &ExprArena, indexes: &[usize], delimeter: &str) -> String {
+    if indexes.len() == 0 {
+        return "".to_string();
+    }
     if indexes.len() == 1 {
         return write_expr(exprs, indexes[0]);
     }

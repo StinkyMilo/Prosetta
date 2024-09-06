@@ -1,6 +1,6 @@
-whe 0..
-els.
-whi 0..
+whe 0. pri "0 is truthy!".
+els pri "0 is falsey!".
+whi 0. pri "0 is truthy in a loop!".
 fre i li 1 2 3. pri i.
 arc 50 50 20.
 arc 50 50 20 40.
