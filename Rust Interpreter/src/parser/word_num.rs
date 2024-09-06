@@ -4,7 +4,7 @@ use super::*;
 #[derive(Debug)]
 pub struct WordNumState;
 impl ParseState for WordNumState {
-    fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
+    fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         // wait for non . word to start
         if is_close(word) {
             MatchResult::Continue
@@ -13,7 +13,7 @@ impl ParseState for WordNumState {
             let close = find_close(rest, 0);
             //close exists - match
             if let Some(close) = close {
-                *env.expr = Expr::WordNum {
+                env.exprs.vec[env.index] = Expr::WordNum {
                     locs: env.locs.take().unwrap_or_default(),
                     str_start: word.pos + env.global_index,
                     str_len: word.len(),
@@ -30,7 +30,7 @@ impl ParseState for WordNumState {
 
     fn step_match(
         &mut self,
-        _env: &mut Enviroment,
+        _env: &mut Environment,
         _child_index: Option<usize>,
         _word: &Slice,
         _rest: &Slice,

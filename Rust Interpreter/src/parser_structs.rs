@@ -3,14 +3,14 @@ use std::{
     fmt::{self, Debug},
 };
 
-use super::{alias_data::AliasData, Expr};
+use super::{alias_data::AliasData, ExprArena};
 
 #[path = "testing/parsing_tests_word_funcs.rs"]
 mod parsing_tests_word_funcs;
 
 pub type VarSet = HashSet<Vec<u8>>;
 // pub type StepFunction =
-//     fn(env: &mut Enviroment, result: LastMatchResult, word: &Slice, rest: &Slice) -> MatchResult;
+//     fn(env: &mut Environment, result: LastMatchResult, word: &Slice, rest: &Slice) -> MatchResult;
 
 // (expr_index, string_index, state)
 
@@ -37,12 +37,12 @@ pub struct ParserFlags {
 /// A state (which goes onto the parser stack)
 pub trait ParseState: Debug {
     /// called first time to setup the state and after the state continues
-    fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult;
+    fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult;
 
     /// called after match or fail
     fn step_match(
         &mut self,
-        env: &mut Enviroment,
+        env: &mut Environment,
         child: Option<usize>,
         word: &Slice,
         rest: &Slice,
@@ -59,7 +59,7 @@ pub trait ParseState: Debug {
 /// the result of a step or stepmatch function
 ///
 /// Matched is returned to go to the parent state with the index to now parse from and whether the state closed on it
-/// ContinueWith is returned to add a child onto the stack with an index and the state to coninue with
+/// ContinueWith is returned to add a child onto the stack with an index and the state to continue with
 /// Continue is returned to give the same state the next word
 /// Failed is returned to go to the parent state with a failure
 #[derive(Debug)]
@@ -123,11 +123,12 @@ impl ParserResult {
 }
 
 ///the parser enviorment
-pub struct Enviroment<'a> {
+pub struct Environment<'a> {
     ///The set of current varibles
-    pub vars: &'a VarSet,
+    pub vars: &'a mut VarSet,
     ///The list of expressions
-    pub expr: &'a mut Expr,
+    pub exprs: &'a mut ExprArena,
+    pub index: usize,
     ///The current locs (locations of the alias characters)
     pub locs: Option<Vec<usize>>,
     /// the global index (with multiple input buffers)

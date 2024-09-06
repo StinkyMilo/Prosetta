@@ -28,7 +28,7 @@ pub struct NoneState {
 }
 
 impl ParseState for NoneState {
-    fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
+    fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         let aliases = (self.data.aliases)(env.aliases);
         debug_assert!(aliases.len() < u16::MAX as usize);
 
@@ -40,7 +40,7 @@ impl ParseState for NoneState {
 
     fn step_match(
         &mut self,
-        env: &mut Enviroment,
+        env: &mut Environment,
         child_index: Option<usize>,
         word: &Slice,
         rest: &Slice,
@@ -103,7 +103,7 @@ impl NoneState {
     ///Expr starts at Var, to check if it is a varible, then it checks if it is a number,
     ///then it tries to find aliases in the word
     ///Stat starts at the aliases directly
-    fn run_match_state(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
+    fn run_match_state(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         let (new_state, ret) = match self.next_match_state {
             // is word a varible
             MatchState::Var => (
@@ -126,7 +126,7 @@ impl NoneState {
     }
 
     ///matches buildin functions based on self.data
-    fn match_alias(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
+    fn match_alias(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         let aliases = (self.data.aliases)(env.aliases);
 
         // run until end of word
@@ -155,7 +155,7 @@ impl NoneState {
     ///3. then on least total location value
     fn find_best_match(
         &mut self,
-        env: &mut Enviroment,
+        env: &mut Environment,
         aliases: &AliasNames,
         offset: usize,
         rest: usize,
