@@ -73,13 +73,13 @@ impl<T: BasicState + Debug> ParseState for T {
             }
             CloseType::Force => {
                 // forced to close
-                let close = find_close(&word, 0).or_else(|| find_close(&rest, 0));
+                let close = find_close_slice(&word, 0).or_else(|| find_close_slice(&rest, 0));
                 match close {
                     // will never be a period to find even on future words
                     None => MatchResult::Failed,
                     Some(slice) => {
-                        self.set_end(env.expr, End::from_slice(&slice, env.global_index));
-                        MatchResult::Matched(slice.pos, true)
+                        self.set_end(env.expr, End::from_slice(&slice.0, env.global_index));
+                        MatchResult::Matched(slice.0.pos, true)
                     }
                 }
             }

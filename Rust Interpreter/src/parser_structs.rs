@@ -259,7 +259,13 @@ pub fn get_next_slice<'a>(slice: &Slice<'a>, mut start: usize) -> (Slice<'a>, Sl
 
     //is slice a closing character aka "."
     if end < slice.len() && is_valid_close_char(slice.str[end]) {
-        end += 1;
+        // is "..."
+        if end + 3 <= slice.len() && &slice.str[end..end + 3] == &b"..."[..] {
+            end += 3;
+        // not "..."
+        } else {
+            end += 1;
+        }
     } else {
         while end < slice.len() && is_valid_word_char(slice.str[end]) {
             end += 1;
@@ -294,6 +300,37 @@ pub fn find_word_end<'a>(slice: &'a Slice<'a>, start: usize) -> Slice<'a> {
     }
 }
 
+/// returns (close, rest) after finding close
+pub fn find_close_slice<'a>(slice: &'a Slice<'a>, mut start: usize) -> Option<(Slice, Slice)> {
+    // find end char
+    while start < slice.len() && !is_valid_close_char(slice.str[start]) {
+        start += 1;
+    }
+    if start < slice.len() {
+        // let test1 = start + 3 <= slice.len();
+        // let test2 = &slice.str[start..start + 3] == &b"..."[..];
+        let end = if start + 3 <= slice.len() && &slice.str[start..start + 3] == &b"..."[..] {
+            start + 3
+        } else {
+            start + 1
+        };
+
+        // find end of period
+        Some((
+            Slice {
+                str: &slice.str[start..end],
+                pos: slice.pos + start,
+            },
+            Slice {
+                str: &slice.str[end..],
+                pos: slice.pos + end,
+            },
+        ))
+    } else {
+        None
+    }
+}
+
 /// returns the rest after finding the next closing character
 pub fn find_close<'a>(slice: &'a Slice<'a>, start: usize) -> Option<Slice<'_>> {
     // find end char
@@ -302,7 +339,6 @@ pub fn find_close<'a>(slice: &'a Slice<'a>, start: usize) -> Option<Slice<'_>> {
         end += 1;
     }
     let test = end < slice.len();
-    //end += 1;
     // find end of period
     test.then(|| Slice {
         str: &slice.str[end..],

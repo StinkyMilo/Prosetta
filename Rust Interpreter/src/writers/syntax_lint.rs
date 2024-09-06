@@ -20,9 +20,12 @@ const VAR_COLOR: (TermColor, bool) = (TermColor::Cyan, true);
 const NUM_COLOR: (TermColor, bool) = (TermColor::Green, true);
 
 pub struct SyntaxLinter<T: Renderer> {
+    /// the renderer
     renderer: T,
+    /// the current writing index
     index: usize,
-    ends: Vec<(TermColor, bool)>,
+    /// the length of ending characters and vec of ending colors if they exist
+    ends: Option<(u8, Vec<(TermColor, bool)>)>,
 }
 
 #[allow(dead_code)]
@@ -31,7 +34,7 @@ impl<T: Renderer> SyntaxLinter<T> {
         Self {
             renderer: Default::default(),
             index: 0,
-            ends: Vec::new(),
+            ends: None,
         }
     }
     pub fn into_string(self) -> Vec<u8> {
@@ -49,6 +52,7 @@ impl<T: Renderer> SyntaxLinter<T> {
     ) {
         for statement in line_starts {
             self.write_expr(&mut source, exprs, *statement, 0);
+            self.write_end(&mut source);
         }
         self.write_rest(&mut source);
     }
@@ -90,8 +94,18 @@ impl<T: Renderer> SyntaxLinter<T> {
         self.renderer.add_with(&buf, color);
         self.index += num;
     }
-    fn insert(&mut self, text: &[u8], color: (TermColor, bool)) {
-        self.renderer.add_with(&text, color);
+    // fn insert(&mut self, text: &[u8], color: (TermColor, bool)) {
+    //     self.renderer.add_with(&text, color);
+    // }
+    fn write_end(&mut self, source: &mut ParserSourceIter) {
+        if let Some(end) = self.ends.take() {
+            // let num = index
+            //     .checked_sub(self.index)
+            //     .expect("index is before the end index");
+            let buf = get_n(source, end.0 as usize).expect("found end of buffer");
+            self.renderer.add_with_mult(&buf, end.1);
+            self.index += end.0 as usize;
+        }
     }
 }
 
@@ -125,21 +139,29 @@ impl<T: Renderer> SyntaxLinter<T> {
     fn add_end(&mut self, source: &mut ParserSourceIter, end: End, stack_index: usize) {
         let color = LOC_COLOR[stack_index % 3];
         if end.index != usize::MAX {
-            let close_index = self.index - end.count as usize;
-            //different close character
-            if !self.ends.is_empty() || close_index > end.index {
+            //let close_index = self.index - end.count as usize;
+
+            // if close_index == self.index {
+
+            // } else {
+            //     //different close character
+            // }
+
+            // if passed close
+            if self.ends.is_some() && end.index > self.index {
                 self.write_end(source);
-            } else {
+                self.write_up_to(source, end.index);
+            //close is before index
+            } else if end.index < self.index {
                 unreachable!("close index has already been passed");
             }
-            self.ends.push(color);
-        }
-    }
-
-    fn write_end(&mut self, source: &mut ParserSourceIter) {
-    
-                self.write_up_to(source, end);
-                self.write_as(source, 1, color);
+            // setup close
+            if let Some((_, vec)) = &mut self.ends {
+                vec.push(color);
+            } else {
+                self.write_up_to(source, end.index);
+                self.ends = Some((end.count, vec![color]));
+            }
         }
     }
 
@@ -162,6 +184,7 @@ impl<T: Renderer> SyntaxLinter<T> {
         index: usize,
         stack_index: usize,
     ) {
+        self.write_end(source);
         match &exprs[index] {
             Expr::Assign {
                 locs,
@@ -245,6 +268,7 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_up_to(source, *start - 1);
                 self.write_up_to_as(source, end.index, STRING_COLOR);
                 self.add_end(source, *end, stack_index);
+                self.write_end(source);
                 // same stack_index for same color
                 self.write_expr(source, exprs, *index, stack_index)
             }
@@ -252,3 +276,5 @@ impl<T: Renderer> SyntaxLinter<T> {
         };
     }
 }
+
+//The wizards were literally nine at most!

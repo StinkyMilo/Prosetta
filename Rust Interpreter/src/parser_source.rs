@@ -4,7 +4,6 @@ use std::{
     iter::{self, Flatten},
 };
 
-
 pub type ParserSourceIter<'a> = Flatten<std::vec::IntoIter<Box<dyn Iterator<Item = &'a u8> + 'a>>>;
 
 macro_rules! make_iter {
@@ -93,26 +92,7 @@ impl<'a> ParserSource<'a> {
             let has_failed = match &mut self.sources[self.index] {
                 Source::Stdin { source, start, buf } => {
                     if let Some(stdin) = source {
-                        let mut new_input = Vec::new();
-                        let has_failed = stdin.read_until(b'\n', &mut new_input).is_err();
-
-                        // remove \r if it exists
-                        if new_input.last() == Some(&b'\r') {
-                            new_input.pop();
-                        }
-
-                        if has_failed || new_input.len() == 0 {
-                            true
-                        } else {
-                            if buf.len() == 0 {
-                                *buf = new_input;
-                            } else {
-                                //buf.push(b'\n');
-                                *start = buf.len();
-                                buf.append(&mut new_input);
-                            }
-                            false
-                        }
+                        Self::get_from_stdin(stdin, start, buf)
                     } else {
                         true
                     }
@@ -158,6 +138,50 @@ impl<'a> ParserSource<'a> {
     }
 }
 
+impl<'a> ParserSource<'a> {
+    /// get input from stdin stoping on 0 len input
+    /// returns has_failed
+    fn get_from_stdin(stdin: &mut StdinLock<'a>, start: &mut usize, buf: &mut Vec<u8>) -> bool {
+        // only allow one input
+        if buf.len() != 0 {
+            return true;
+        }
+        let mut has_input = false;
+        *start = buf.len();
+        loop {
+            let mut new_input = Vec::new();
+            let has_failed = stdin.read_until(b'\n', &mut new_input).is_err();
+
+            // remove newlines if it exists
+            while !new_input.is_empty() {
+                let last = *new_input.last().unwrap();
+                if last == b'\n' || last == b'\r' {
+                    new_input.pop();
+                } else {
+                    break;
+                }
+            }
+
+            if has_failed || new_input.len() == 0 {
+                return !has_input;
+            }
+
+            has_input = true;
+            if buf.len() == 0 {
+                *buf = new_input;
+                buf.push(b'\n');
+            } else {
+                buf.append(&mut new_input);
+                buf.push(b'\n');
+            }
+        }
+    }
+}
+
 fn does_str_need_newline(str: &Vec<u8>) -> bool {
     !str.last().is_some_and(|f| *f == b'\n')
 }
+// "
+// The wizards state  was dire.
+// They saw zero in their looking glass.
+// "
