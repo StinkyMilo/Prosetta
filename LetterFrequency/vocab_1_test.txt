@@ -36,6 +36,18 @@ These were the wackiest months of my life, too. I graduated a few months later i
 Though his methods were questionable, the results weren't. The Muffin Man and I made the best muffins in the world.
     ))
 
+I wasted months seeking jobs with zero progress.
+Was there anything I could do? I felt like I had fallen into a hole with no escape...
+Was it worth even trying anymore? Could this application be the one that succeeded?
+I began wishing for some sort of release. Months dragged on and time continued. Minutes obediently marched forward, as minutes habitually do. Applying, hoping, waiting.
+Until I met The Muffin Man, the man whose restaurant saved my life.
+He's a perfect professional; there isn't anything he can't do.
+His chocolate muffin was unmatched; it tasted like a thousand years of happiness.
+Once he makes a muffin, he wraps it in a hand-made foil. There is a great joy to it all!
+I worked as one of the waiters there in his unmatched muffin bakery.
+These were the wackiest months of my life, too. I graduated a few months later into a role of deputy chef. In that role I had to whisper a poem to each muffin, tuck the batter in at night, and mix dozens of kinds of sugar in perfect ratios.
+Though his methods were questionable, the results weren't. The Muffin Man and I made the best muffins in the world.
+
 I was lonely as the subject pointed his hand. His finger vanished into the dark...
     (was "lonely" (sub (int "his") (int "the")))
 He was but a naive little one, that boy.
