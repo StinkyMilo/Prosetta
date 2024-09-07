@@ -5,7 +5,7 @@
 #[cfg(test)]
 pub mod test_lib {
 
-    use crate::commands::Expr;
+    use crate::commands::{Expr, ExprArena};
 
     use crate::parser::{Parser, *};
     use alias_data::AliasData;
@@ -48,14 +48,16 @@ pub mod test_lib {
     }
 
     pub fn new_env<'a>(
-        vars: &'a HashSet<Vec<u8>>,
-        expr: &'a mut Expr,
+        vars: &'a mut HashSet<Vec<u8>>,
+        exprs: &'a mut ExprArena,
         locs: Option<Vec<usize>>,
         aliases: &'a AliasData,
-    ) -> Enviroment<'a> {
-        Enviroment {
+        index: usize,
+    ) -> Environment<'a> {
+        Environment {
             vars,
-            expr,
+            exprs,
+            index,
             locs,
             global_index: 0,
             aliases,

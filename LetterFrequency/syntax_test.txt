@@ -1,0 +1,34 @@
+whe 0. pri "0 is truthy". pri "This is a second statement"!
+els pri "0 is falsey"!
+whi 0. pri "0 is truthy in a loop"!
+fre i li 1 2 3. pri i.
+arc 50 50 20.
+arc 50 50 20 40.
+lin 0 0 50 50.
+rec 50 50 20.
+rec 50 50 20 40.
+was tmp int abc!
+was tmp tim 2 5!
+was tmp tim 1 2 3 4 5!
+was tmp ide 2 5!
+was tmp add 2 5!
+was tmp add 1 2 3 4 5!
+was tmp sub 2 5!
+was tmp log 2 5!
+was tmp exp 2 5!
+was tmp mod 2 5!
+was tmp lit 1 0!
+was var 50.
+pri Hello World.
+was var lis 1 2 3 4 5.
+was tmp ind var 1!
+was tmp app var 5!
+was tmp rep var 5 6!
+was tmp fin var 3!
+was tmp les 3 4!
+was tmp mor 3 4!
+was tmp als 1 1!
+was tmp oth 1 0!
+was tmp par 1 1!
+was tmp inv 0!
+pri tmp.

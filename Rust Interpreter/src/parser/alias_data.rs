@@ -1,12 +1,12 @@
 use super::*;
 
-const BASE_EXPR_ALIASES: [&'static [u8]; 11] = [
-    b"int", b"tim", b"add", b"sub", b"lit", b"ide", b"mod", b"log", b"exp", b"les", b"mor"
+const BASE_EXPR_ALIASES: [&'static [u8]; 15] = [
+    b"int", b"tim", b"add", b"sub", b"lit", b"ide", b"mod", b"log", b"exp", b"les", b"mor", b"als", b"oth", b"par", b"inv"
 ];
 
 const NOT_ALIAS: &'static [u8] = b"not";
 
-const STAT_ALIASES: [&'static [u8]; 5] = [b"arc", b"lin", b"was", b"rec", b"pri"];
+const STAT_ALIASES: [&'static [u8]; 8] = [b"arc", b"lin", b"was", b"rec", b"pri", b"whe", b"whi", b"els"];
 
 ///match alias to expr
 fn get_expr_state(alias: &'static [u8], index: usize) -> MatchResult {
@@ -22,6 +22,10 @@ fn get_expr_state(alias: &'static [u8], index: usize) -> MatchResult {
             b"exp" => get_state!(operator::OperatorState::new_exp()),
             b"les" => get_state!(operator::OperatorState::new_less_than()),
             b"mor" => get_state!(operator::OperatorState::new_greater_than()),
+            b"als" => get_state!(operator::OperatorState::new_and()),
+            b"oth" => get_state!(operator::OperatorState::new_or()),
+            b"par" => get_state!(operator::OperatorState::new_equals()),
+            b"inv" => get_state!(operator::OperatorState::new_not()),
 
             b"lit" => get_state!(multi_lit_num::MultiLitNumState::new()),
             b"int" => get_state!(word_num::WordNumState::new()),
@@ -41,6 +45,9 @@ fn get_stat_state(alias: &'static [u8], index: usize) -> MatchResult {
             b"was" => get_state!(assign::AssignState::new()),
             b"rec" => get_state!(rect::RectState::new()),
             b"pri" => get_state!(print::PrintState::new()),
+            b"whe" => get_state!(ifstatement::IfState::new()),
+            b"whi" => get_state!(whilestatement::WhileState::new()),
+            b"els" => get_state!(elsestatement::ElseState::new()),
             _ => panic!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
         },
     )

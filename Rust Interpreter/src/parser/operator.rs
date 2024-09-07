@@ -20,6 +20,10 @@ impl BasicState for OperatorState {
             OperatorType::Log => "Log",
             OperatorType::LessThan => "LessThan",
             OperatorType::GreaterThan => "GreaterThan",
+            OperatorType::And => "And",
+            OperatorType::Or => "Or",
+            OperatorType::Equals => "Equals",
+            OperatorType::Not => "Not"
         }
     }
 
@@ -60,6 +64,10 @@ impl BasicState for OperatorState {
             (OperatorType::Log, 2) => CloseType::Force,
             (OperatorType::LessThan, 2) => CloseType::Force,
             (OperatorType::GreaterThan, 2) => CloseType::Force,
+            (OperatorType::And, 2..) => CloseType::Able,
+            (OperatorType::Or, 2..) => CloseType::Able,
+            (OperatorType::Equals, 2..) => CloseType::Able,
+            (OperatorType::Not, 1) => CloseType::Force,
             _ => CloseType::Unable,
         }
     }
@@ -112,5 +120,21 @@ impl OperatorState {
 
     pub fn new_greater_than() -> Self {
         Self::new(OperatorType::GreaterThan)
+    }
+
+    pub fn new_and() -> Self {
+        Self::new(OperatorType::And)
+    }
+
+    pub fn new_or() -> Self {
+        Self::new(OperatorType::Or)
+    }
+
+    pub fn new_equals() -> Self {
+        Self::new(OperatorType::Equals)
+    }
+
+    pub fn new_not() -> Self {
+        Self::new(OperatorType::Not)
     }
 }

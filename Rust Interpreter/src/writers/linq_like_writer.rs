@@ -109,15 +109,19 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             end,
         } => {
             let name = match func_type {
-                OperatorType::Add => "add",
-                OperatorType::Sub => "sub",
-                OperatorType::Mult => "mult",
-                OperatorType::Div => "div",
-                OperatorType::Mod => "mod",
+                OperatorType::Add => "+",
+                OperatorType::Sub => "-",
+                OperatorType::Mult => "*",
+                OperatorType::Div => "/",
+                OperatorType::Mod => "%",
                 OperatorType::Exp => "exp",
                 OperatorType::Log => "log",
                 OperatorType::LessThan => "<",
                 OperatorType::GreaterThan => ">",
+                OperatorType::And => "&",
+                OperatorType::Or => "||",
+                OperatorType::Equals => "==",
+                OperatorType::Not => "!"
             };
             format!(
                 "({}{} {})",
@@ -159,6 +163,52 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                 *start,
                 write_end(*end),
                 write_expr(exprs, *index),
+            )
+        }
+        Expr::If { 
+            locs, 
+            indexes, 
+            body_start, 
+            body_end ,
+            ..
+        } => {
+            format!(
+                "(if{} @{}${} {})",
+                join_locs(locs, None),
+                body_start,
+                body_end,
+                //TODO separate condition from the rest
+                write_exprs(exprs, indexes)
+            )
+        }
+        Expr::While { 
+            locs, 
+            indexes, 
+            body_start, 
+            body_end ,
+            ..
+        } => {
+            format!(
+                "(while{} @{}${} {})",
+                join_locs(locs, None),
+                body_start,
+                body_end,
+                //TODO separate condition from the rest
+                write_exprs(exprs, indexes)
+            )
+        }
+        Expr::Else {
+            locs,
+            indexes,
+            start,
+            end
+        } => {
+            format!(
+                "(else{} @{}${} {})",
+                join_locs(locs, None),
+                start,
+                end,
+                write_exprs(exprs,indexes)
             )
         }
     }

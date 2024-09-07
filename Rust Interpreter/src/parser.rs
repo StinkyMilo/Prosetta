@@ -16,6 +16,9 @@ mod not;
 mod operator;
 mod var;
 mod word_num;
+mod ifstatement;
+mod whilestatement;
+mod elsestatement;
 
 mod circle;
 mod line;
@@ -166,21 +169,15 @@ impl<'a> Parser<'a> {
         // get curr frame
         let stack_index = self.stack.len() - 1;
         let frame = &mut self.stack[stack_index];
-        let mut expr = &mut Expr::NoneExpr;
-
-        //let next_child = self.data.exprs.vec.len();
-
-        if frame.0 < self.data.exprs.vec.len() {
-            expr = &mut self.data.exprs.vec[frame.0];
-        }
 
         // setup env
-        let mut env = Enviroment {
-            expr,
-            vars: &self.data.vars,
+        let mut env = Environment {
+            exprs: &mut self.data.exprs,
+            index: frame.0,
+            vars: &mut self.data.vars,
             locs: None,
             global_index: self.pos,
-            aliases: &self.aliases,
+            aliases: &self.aliases
         };
 
         // setup slice
@@ -294,12 +291,6 @@ impl<'a> Parser<'a> {
 
         // matched final stat
         if self.stack.is_empty() {
-            let start_index = *self.data.stat_starts.last().unwrap();
-            //self.parsing_line = false;
-            // add to varibles
-            if let Expr::Assign { name, .. } = &self.data.exprs[start_index] {
-                self.data.vars.insert(name.to_owned());
-            }
             // setup next
             self.add_new_nonestat(index);
             ParserResult::MatchedLine

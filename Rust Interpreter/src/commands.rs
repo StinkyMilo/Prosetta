@@ -13,6 +13,10 @@ pub enum OperatorType {
     Log,
     LessThan,
     GreaterThan,
+    And,
+    Or,
+    Equals,
+    Not
 }
 
 #[derive(PartialEq, Debug)]
@@ -88,6 +92,45 @@ pub enum Expr {
         start: usize,
         end: End,
     },
+    If {
+        locs: Vec<usize>,
+        condition_start: usize,
+        body_start: usize,
+        indexes: Vec<usize>,
+        end: End,
+    },
+    While {
+        locs: Vec<usize>,
+        condition_start: usize,
+        body_start: usize,
+        indexes: Vec<usize>,
+        end: End,
+    },
+    Else {
+        locs: Vec<usize>,
+        start: usize,
+        end: End,
+    },
+    If {
+        locs: Vec<usize>,
+        condition_start: usize,
+        body_start: usize,
+        indexes: Vec<usize>,
+        end: End,
+    },
+    While {
+        locs: Vec<usize>,
+        condition_start: usize,
+        body_start: usize,
+        indexes: Vec<usize>,
+        end: End,
+    },
+    Else {
+        locs: Vec<usize>,
+        start: usize,
+        end: usize,
+        end: End,
+    }
 }
 
 impl Expr {
