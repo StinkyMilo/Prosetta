@@ -180,6 +180,44 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             end: _,
         } => {
             format!("else {{\n{}\n}}", write_exprs(exprs, indexes, "\n"))
+        },
+        Expr::LitCol { 
+            value ,
+            ..
+        } => {
+            format!("\"{}\"",String::from_utf8_lossy(&value))
+        },
+        Expr::Stroke { 
+            indexes,
+            ..
+        } => {
+            if indexes[1] == usize::MAX {
+                format!(
+                    "set_stroke({});",
+                    write_expr(exprs, indexes[0])
+                )
+            } else {
+                format!("set_stroke({});", write_exprs(exprs, indexes, ", "))
+            }
+        },
+        Expr::Fill { 
+            indexes,
+            ..
+        } => {
+            if indexes[1] == usize::MAX {
+                format!(
+                    "set_fill({});",
+                    write_expr(exprs, indexes[0])
+                )
+            } else {
+                format!("set_fill({});", write_exprs(exprs, indexes, ", "))
+            }
+        },
+        Expr::Color { 
+            indexes, 
+            ..
+        } => {
+            format!("get_color({});", write_exprs(exprs, indexes, ", "))
         }
     }
 }

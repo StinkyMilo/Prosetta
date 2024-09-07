@@ -264,6 +264,41 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.write_end(source, *end, stack_index);
             }
+            Expr::LitCol { 
+                str_start,
+                str_length,
+                ..
+            } => {
+                self.write_up_to(source, *str_start);
+                self.write_as(source, *str_length, STRING_COLOR);
+            }
+            Expr::Stroke { 
+                locs, 
+                indexes, 
+                end 
+            } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.write_end(source, *end, stack_index);
+            }
+            Expr::Fill {
+                locs,
+                indexes,
+                end
+            } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.write_end(source, *end, stack_index);
+            },
+            Expr::Color { 
+                locs, 
+                indexes, 
+                end 
+            } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.write_end(source, *end, stack_index);
+            }
             
             Expr::NoneExpr | Expr::NoneStat => {}
         };

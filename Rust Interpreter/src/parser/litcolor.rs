@@ -111,7 +111,7 @@ impl LiteralColorState {
     }
 }
 
-pub fn get_color_word(word_so_far: &[u8], word: &[u8]) -> LitColorFoundResult {
+fn get_color_word(word_so_far: &[u8], word: &[u8]) -> LitColorFoundResult {
     let cleaned_word = &*word.to_ascii_lowercase();
     match &*word_so_far {
         b"" => match cleaned_word {

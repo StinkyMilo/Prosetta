@@ -200,6 +200,48 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                 end,
                 write_exprs(exprs,indexes)
             )
+        },
+        Expr::LitCol { 
+            str_start,
+            str_length,
+            value 
+        } => {
+            format!(
+                "(litnum {}@{}$${})", String::from_utf8_lossy(value), str_start, str_length
+            )
+        }
+        Expr::Color { 
+            locs, 
+            indexes,
+            end 
+        } => {
+            format!(
+                "(color{} {})",
+                join_locs(locs, Some(*end)),
+                write_exprs(exprs, indexes),
+            )
+        },
+        Expr::Stroke { 
+            locs, 
+            indexes,
+            end 
+        } => {
+            format!(
+                "(stroke{} {})",
+                join_locs(locs, Some(*end)),
+                write_exprs(exprs, indexes),
+            )
+        },
+        Expr::Fill { 
+            locs, 
+            indexes,
+            end 
+        } => {
+            format!(
+                "(fill{} {})",
+                join_locs(locs, Some(*end)),
+                write_exprs(exprs, indexes),
+            )
         }
     }
 }
