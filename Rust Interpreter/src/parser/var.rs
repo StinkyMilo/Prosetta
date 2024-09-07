@@ -8,7 +8,7 @@ impl ParseState for VarState {
         let lower = word.str.to_ascii_lowercase();
 
         // is varible in scope
-        if env.vars.contains(&lower) {
+        if env.vars.contains(lower.clone()) {
             *env.expr = Expr::Var {
                 name_start: word.pos + env.global_index,
                 name: lower,

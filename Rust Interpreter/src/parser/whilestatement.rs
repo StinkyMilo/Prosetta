@@ -71,7 +71,7 @@ impl ParseState for WhileState {
                 }
             }
         } else {
-            MatchResult::Failed
+            unreachable!()
         }
     }
 

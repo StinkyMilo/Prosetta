@@ -62,6 +62,7 @@ pub enum Expr {
     If {
         locs: Vec<usize>,
         indexes: Vec<usize>,
+        else_index: usize,
         end: End,
     },
     While {

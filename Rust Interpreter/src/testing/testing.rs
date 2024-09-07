@@ -47,22 +47,22 @@ pub mod test_lib {
         }
     }
 
-    pub fn new_env<'a>(
-        vars: &'a mut HashSet<Vec<u8>>,
-        expr: &'a mut Expr,
-        locs: Option<Vec<usize>>,
-        aliases: &'a AliasData,
-        last_stat:Option<&'a mut Expr>
-    ) -> Environment<'a> {
-        Environment {
-            vars,
-            expr,
-            last_stat,
-            locs,
-            global_index: 0,
-            aliases,
-        }
-    }
+    // pub fn new_env<'a>(
+    //     vars: &'a mut VarSet,
+    //     expr: &'a mut Expr,
+    //     locs: Option<Vec<usize>>,
+    //     aliases: &'a AliasData,
+    //     last_stat:Option<&'a mut Expr>
+    // ) -> Environment<'a> {
+    //     Environment {
+    //         vars,
+    //         expr,
+    //         last_stat,
+    //         locs,
+    //         global_index: 0,
+    //         aliases,
+    //     }
+    // }
     pub fn assert_result(parser: &mut Parser) -> ParserResult {
         loop {
             let result = parser.step();

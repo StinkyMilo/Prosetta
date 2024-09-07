@@ -34,6 +34,8 @@ impl ParseState for MultiLitNumState {
             self.has_data = true;
             if let Expr::MultiLitNum { num_indexes, .. } = env.expr {
                 num_indexes.push(index);
+            } else {
+                unreachable!()
             }
         }
 
@@ -43,6 +45,8 @@ impl ParseState for MultiLitNumState {
             if self.has_data {
                 if let Expr::MultiLitNum { end, .. } = env.expr {
                     *end = End::from_slice(&word, env.global_index);
+                } else {
+                    unreachable!()
                 }
                 MatchResult::Matched(word.pos, true)
             } else {

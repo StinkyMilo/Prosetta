@@ -8,11 +8,12 @@ impl ParseState for ElseState {
     fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
         if self.first {
             *env.expr = Expr::Else {
-                //start: word.pos + env.global_index,
                 locs: env.locs.take().unwrap_or_default(),
                 indexes: Vec::new(),
                 end: End::none(),
             };
+            // go up layer
+            env.vars.add_layer();
         }
         // non cont stat for seeing closes
         MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
@@ -26,24 +27,29 @@ impl ParseState for ElseState {
         _rest: &Slice,
     ) -> MatchResult {
         self.first = false;
+        if let Some(Expr::If { else_index, .. }) = env.last_stat {
+            if let Expr::Else { end, indexes, .. } = env.expr {
+                if let Some(index) = child_index {
+                    indexes.push(index);
+                }
 
-        if let Expr::Else { end, indexes, .. } = env.expr {
-            //If we get a punctuation before an expression, we want to end. Otherwise, we want to continue with a new expression
-            //Check the next close. Is it after the child expression? If so, don't even add the child and fail.
-            let mut statement_found = false;
-            if let Some(index) = child_index {
-                indexes.push(index);
-                statement_found = true;
-            }
-
-            if is_close(word) {
-                *end = End::from_slice(word, env.global_index);
-                MatchResult::Matched(word.pos, true)
-            } else if statement_found {
-                MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat_cont()))
+                // close if have close
+                if is_close(word) {
+                    *end = End::from_slice(&word, env.global_index);
+                    *else_index = env.expr_index;
+                    env.vars.remove_layer();
+                    MatchResult::Matched(word.pos, true)
+                    // succeeded - continue again with noncont stat
+                } else if child_index.is_some() {
+                    MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat()))
+                    // failed - pass word
+                } else {
+                    MatchResult::Continue
+                }
             } else {
-                MatchResult::Continue
+                unreachable!()
             }
+            // "if" was not previous state
         } else {
             MatchResult::Failed
         }

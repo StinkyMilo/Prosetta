@@ -8,8 +8,35 @@ use super::{alias_data::AliasData, Expr};
 
 #[path = "testing/parsing_tests_word_funcs.rs"]
 mod parsing_tests_word_funcs;
+// quickscope
 
-pub type VarSet = HashSet<Vec<u8>>;
+pub struct VarSet {
+    set: ScopeSet<Vec<u8>>,
+}
+impl VarSet {
+    pub fn new() -> Self {
+        Self {
+            set: ScopeSet::new(),
+        }
+    }
+    pub fn insert(&mut self, name: Vec<u8>) {
+        self.set.define(name);
+    }
+    pub fn add_layer(&mut self) {
+        self.set.push_layer();
+    }
+    pub fn remove_layer(&mut self) {
+        self.set.pop_layer();
+    }
+    pub fn contains(&self, name: Vec<u8>) -> bool {
+        self.set.contains(&name)
+    }
+}
+impl Debug for VarSet {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("VarSet").finish()
+    }
+}
 // pub type StepFunction =
 //     fn(env: &mut Environment, result: LastMatchResult, word: &Slice, rest: &Slice) -> MatchResult;
 
@@ -28,6 +55,7 @@ macro_rules! get_state {
     };
 }
 pub(crate) use get_state;
+use quickscope::ScopeSet;
 
 /// add or remove commands based on flags
 #[derive(Default, Debug)]
@@ -151,6 +179,8 @@ pub struct Environment<'a> {
     pub vars: &'a mut VarSet,
     ///The list of expressions
     pub expr: &'a mut Expr,
+    ///the index of this expr
+    pub expr_index: usize,
     ///The last stat if exists
     pub last_stat: Option<&'a mut Expr>,
     ///The current locs (locations of the alias characters)

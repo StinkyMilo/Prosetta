@@ -35,11 +35,11 @@ impl<T: BasicState + Debug> ParseState for T {
     fn step_match(
         &mut self,
         env: &mut Environment,
-        child: Option<usize>,
+        child_index: Option<usize>,
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult {
-        if let Some(index) = child {
+        if let Some(index) = child_index {
             self.add_child(env.expr, index);
         }
 
@@ -47,7 +47,7 @@ impl<T: BasicState + Debug> ParseState for T {
 
         match can_close {
             CloseType::Unable => {
-                if child.is_some() {
+                if child_index.is_some() {
                     // continue again
                     MatchResult::ContinueWith(
                         word.pos,
@@ -64,7 +64,7 @@ impl<T: BasicState + Debug> ParseState for T {
                     self.set_end(env.expr, End::from_slice(&word, env.global_index));
                     MatchResult::Matched(word.pos, true)
                     // succeeded - continue again with noncont expr
-                } else if child.is_some() {
+                } else if child_index.is_some() {
                     MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr()))
                     // failed - pass word
                 } else {

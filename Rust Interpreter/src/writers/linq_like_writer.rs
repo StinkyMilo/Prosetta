@@ -1,3 +1,5 @@
+use std::usize;
+
 use crate::{commands::*, parser::End};
 
 fn write_end(end: End) -> String {
@@ -166,36 +168,28 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             )
         }
         Expr::If {
-            locs,
-            indexes,
-            end,
-            ..
+            locs, indexes, end, ..
         } => {
+            let split = indexes.split_at_checked(1).unwrap_or_default();
             format!(
                 "(if{} {} then {})",
                 join_locs(locs, Some(*end)),
-                write_expr(exprs, *indexes.first().unwrap()),
-                write_exprs(exprs, &indexes[1..]),
+                write_expr(exprs, *split.0.first().unwrap_or(&usize::MAX)),
+                write_exprs(exprs, split.1),
             )
         }
         Expr::While {
-            locs,
-            indexes,
-            end,
-            ..
+            locs, indexes, end, ..
         } => {
+            let split = indexes.split_at_checked(1).unwrap_or_default();
             format!(
                 "(while{} {} then {})",
                 join_locs(locs, Some(*end)),
-                write_expr(exprs, *indexes.first().unwrap()),
-                write_exprs(exprs, &indexes[1..]),
+                write_expr(exprs, *split.0.first().unwrap_or(&usize::MAX)),
+                write_exprs(exprs, split.1),
             )
         }
-        Expr::Else {
-            locs,
-            indexes,
-            end,
-        } => {
+        Expr::Else { locs, indexes, end } => {
             format!(
                 "(else{} {})",
                 join_locs(locs, Some(*end)),

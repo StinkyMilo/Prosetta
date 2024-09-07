@@ -33,7 +33,9 @@ impl ParseState for NotState {
         if let Some(new_index) = child_index {
             if let Expr::Skip { index, .. } = env.expr {
                 *index = new_index;
-            };
+            } else {
+                unreachable!()
+            }
 
             MatchResult::Matched(word.pos, false)
         // child failed - I fail

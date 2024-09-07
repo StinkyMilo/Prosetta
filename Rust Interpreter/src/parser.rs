@@ -196,6 +196,7 @@ impl<'a> Parser<'a> {
         let mut env = Environment {
             expr,
             last_stat,
+            expr_index:frame.0,
             vars: &mut self.data.vars,
             locs: None,
             global_index: self.pos,

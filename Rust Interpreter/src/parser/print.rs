@@ -26,6 +26,12 @@ impl ParseState for PrintState {
         }
 
         if matched {
+            // set end
+            if let Expr::Print { end, .. } = env.expr {
+                *end = End::from_slice(&word, env.global_index);
+            } else {
+                unreachable!()
+            }
             MatchResult::Matched(word.pos, true)
         } else {
             MatchResult::ContinueWith(word.pos, get_state!(var::VarState::new()))

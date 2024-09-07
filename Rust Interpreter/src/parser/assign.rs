@@ -31,7 +31,10 @@ impl ParseState for AssignState {
                 None => MatchResult::Failed,
                 Some(slice) => {
                     if let Expr::Assign {
-                        name, value_index, end, ..
+                        name,
+                        value_index,
+                        end,
+                        ..
                     } = env.expr
                     {
                         *value_index = index;
