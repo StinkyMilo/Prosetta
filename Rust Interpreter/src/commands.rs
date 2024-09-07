@@ -16,7 +16,7 @@ pub enum OperatorType {
     And,
     Or,
     Equals,
-    Not
+    Not,
 }
 
 #[derive(PartialEq, Debug)]
@@ -59,6 +59,21 @@ pub enum Expr {
         data: Vec<Prints>,
         end: End,
     },
+    If {
+        locs: Vec<usize>,
+        indexes: Vec<usize>,
+        end: End,
+    },
+    While {
+        locs: Vec<usize>,
+        indexes: Vec<usize>,
+        end: End,
+    },
+    Else {
+        locs: Vec<usize>,
+        indexes: Vec<usize>,
+        end: End,
+    },
     //expr
     Var {
         name_start: usize,
@@ -92,45 +107,6 @@ pub enum Expr {
         start: usize,
         end: End,
     },
-    If {
-        locs: Vec<usize>,
-        condition_start: usize,
-        body_start: usize,
-        indexes: Vec<usize>,
-        end: End,
-    },
-    While {
-        locs: Vec<usize>,
-        condition_start: usize,
-        body_start: usize,
-        indexes: Vec<usize>,
-        end: End,
-    },
-    Else {
-        locs: Vec<usize>,
-        start: usize,
-        end: End,
-    },
-    If {
-        locs: Vec<usize>,
-        condition_start: usize,
-        body_start: usize,
-        indexes: Vec<usize>,
-        end: End,
-    },
-    While {
-        locs: Vec<usize>,
-        condition_start: usize,
-        body_start: usize,
-        indexes: Vec<usize>,
-        end: End,
-    },
-    Else {
-        locs: Vec<usize>,
-        start: usize,
-        end: usize,
-        end: End,
-    }
 }
 
 impl Expr {
