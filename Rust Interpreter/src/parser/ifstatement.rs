@@ -9,10 +9,10 @@ impl ParseState for IfState {
         if !self.has_condition {
             *env.expr = Expr::If {
                 locs: env.locs.take().unwrap_or_default(),
-                condition_start: word.pos + env.global_index,
-                body_start: usize::MAX,
+                // condition_start: word.pos + env.global_index,
+                // body_start: usize::MAX,
                 indexes: Vec::new(),
-                body_end: usize::MAX,
+                end: End::none(),
             };
             // setup child state
             MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont()))
@@ -36,8 +36,8 @@ impl ParseState for IfState {
             }
         }
         if let Expr::If {
-            body_start,
-            body_end,
+            // body_start,
+            // body_end,
             indexes,
             ..
         } = env.expr
@@ -48,8 +48,11 @@ impl ParseState for IfState {
                 if let Some(index) = child_index {
                     indexes.push(index);
                     self.has_condition = true;
-                    *body_start = index;
-                    MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat_cont()))
+                    //*body_start = index;
+                    MatchResult::ContinueWith(
+                        word.pos,
+                        get_state!(alias::NoneState::new_stat_cont()),
+                    )
                 } else {
                     //No child
                     MatchResult::Failed
@@ -62,7 +65,7 @@ impl ParseState for IfState {
                 }
 
                 if is_close(word) {
-                    *body_end = word.pos + env.global_index;
+                    //*body_end = word.pos + env.global_index;
                     MatchResult::Matched(word.pos, true)
                 } else if statement_found {
                     if has_else {
@@ -72,7 +75,7 @@ impl ParseState for IfState {
                             // will never be a period to find even on future words
                             None => MatchResult::Failed,
                             Some(slice) => {
-                                *body_end = slice.pos + env.global_index;
+                                //*body_end = slice.pos + env.global_index;
                                 MatchResult::Matched(slice.pos, true)
                             }
                         }

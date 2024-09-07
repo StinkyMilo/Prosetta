@@ -5,7 +5,7 @@ use super::*;
 pub struct NotState;
 
 impl ParseState for NotState {
-    fn step(&mut self, env: &mut Enviroment, word: &Slice, rest: &Slice) -> MatchResult {
+    fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         let close = find_close_slice(&word, 0).or_else(|| find_close_slice(&rest, 0));
         if let Some(slice) = close {
             *env.expr = Expr::Skip {

@@ -17,10 +17,10 @@ impl ParseState for WordNumState {
                     locs: env.locs.take().unwrap_or_default(),
                     str_start: word.pos + env.global_index,
                     str_len: word.len(),
-                    end: End::from_slice(&index.0, env.global_index),
+                    end: End::from_slice(&close.0, env.global_index),
                 };
 
-                MatchResult::Matched(index.0.pos, true)
+                MatchResult::Matched(close.0.pos, true)
             } else {
                 // did not find close - fail
                 MatchResult::Failed

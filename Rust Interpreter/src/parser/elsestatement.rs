@@ -8,10 +8,10 @@ impl ParseState for ElseState {
     fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
         if self.first {
             *env.expr = Expr::Else {
-                start: word.pos + env.global_index,
+                //start: word.pos + env.global_index,
                 locs: env.locs.take().unwrap_or_default(),
                 indexes: Vec::new(),
-                end: usize::MAX,
+                end: End::none(),
             };
         }
         // non cont stat for seeing closes
@@ -37,7 +37,7 @@ impl ParseState for ElseState {
             }
 
             if is_close(word) {
-                *end = word.pos + env.global_index;
+                *end = End::from_slice(word, env.global_index);
                 MatchResult::Matched(word.pos, true)
             } else if statement_found {
                 MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat_cont()))

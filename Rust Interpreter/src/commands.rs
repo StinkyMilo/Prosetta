@@ -52,7 +52,7 @@ pub enum Expr {
         name_start: usize,
         name: Vec<u8>,
         value_index: usize,
-        end: usize,
+        end: End,
     },
     Print {
         locs: Vec<usize>,
@@ -73,26 +73,6 @@ pub enum Expr {
         locs: Vec<usize>,
         indexes: Vec<usize>,
         end: End,
-    },
-    If {
-        locs: Vec<usize>,
-        condition_start: usize,
-        body_start: usize,
-        indexes: Vec<usize>,
-        body_end: usize,
-    },
-    While {
-        locs: Vec<usize>,
-        condition_start: usize,
-        body_start: usize,
-        indexes: Vec<usize>,
-        body_end: usize,
-    },
-    Else {
-        locs: Vec<usize>,
-        start: usize,
-        end: usize,
-        indexes: Vec<usize>,
     },
     //expr
     Var {
