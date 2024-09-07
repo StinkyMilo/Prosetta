@@ -10,7 +10,7 @@ impl ParseState for LiteralNumState {
 
         // if value exists - match
         if let Some(value) = value {
-            env.exprs.vec[env.index] = Expr::LitNum {
+            *env.expr = Expr::LitNum {
                 str_start: word.pos + env.global_index,
                 str_length: word.len(),
                 value,

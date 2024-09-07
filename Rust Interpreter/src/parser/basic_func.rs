@@ -22,7 +22,7 @@ pub trait BasicState {
 
 impl<T: BasicState + Debug> ParseState for T {
     fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
-        let is_first = self.do_first(&mut env.exprs.vec[env.index], env.locs.take().unwrap_or_default());
+        let is_first = self.do_first(env.expr, env.locs.take().unwrap_or_default());
         if is_first {
             // cont - has required arguments
             MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr_cont()))
@@ -40,7 +40,7 @@ impl<T: BasicState + Debug> ParseState for T {
         rest: &Slice,
     ) -> MatchResult {
         if let Some(index) = child {
-            self.add_child(&mut env.exprs.vec[env.index], index);
+            self.add_child(env.expr, index);
         }
 
         let can_close = self.can_close();
@@ -61,7 +61,7 @@ impl<T: BasicState + Debug> ParseState for T {
             CloseType::Able => {
                 // I can close so I close
                 if is_close(word) {
-                    self.set_end(&mut env.exprs.vec[env.index], word.pos + env.global_index);
+                    self.set_end(env.expr, word.pos + env.global_index);
                     MatchResult::Matched(word.pos, true)
                     // succeeded - continue again with noncont expr
                 } else if child.is_some() {
@@ -78,7 +78,7 @@ impl<T: BasicState + Debug> ParseState for T {
                     // will never be a period to find even on future words
                     None => MatchResult::Failed,
                     Some(slice) => {
-                        self.set_end(&mut env.exprs.vec[env.index], slice.pos + env.global_index);
+                        self.set_end(env.expr, slice.pos + env.global_index);
                         MatchResult::Matched(slice.pos, true)
                     }
                 }

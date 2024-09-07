@@ -3,7 +3,7 @@ use std::{
     fmt::{self, Debug},
 };
 
-use super::{alias_data::AliasData, ExprArena};
+use super::{alias_data::AliasData, Expr, ExprArena};
 
 #[path = "testing/parsing_tests_word_funcs.rs"]
 mod parsing_tests_word_funcs;
@@ -127,8 +127,9 @@ pub struct Environment<'a> {
     ///The set of current varibles
     pub vars: &'a mut VarSet,
     ///The list of expressions
-    pub exprs: &'a mut ExprArena,
-    pub index: usize,
+    pub expr: &'a mut Expr,
+    ///The last stat if exists
+    pub last_stat: Option<&'a mut Expr>,
     ///The current locs (locations of the alias characters)
     pub locs: Option<Vec<usize>>,
     /// the global index (with multiple input buffers)

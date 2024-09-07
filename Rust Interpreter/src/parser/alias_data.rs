@@ -1,12 +1,15 @@
 use super::*;
 
 const BASE_EXPR_ALIASES: [&'static [u8]; 15] = [
-    b"int", b"tim", b"add", b"sub", b"lit", b"ide", b"mod", b"log", b"exp", b"les", b"mor", b"als", b"oth", b"par", b"inv"
+    b"int", b"tim", b"add", b"sub", b"lit", b"ide", b"mod", b"log", b"exp", b"les", b"mor", b"als",
+    b"oth", b"par", b"inv",
 ];
 
 const NOT_ALIAS: &'static [u8] = b"not";
 
-const STAT_ALIASES: [&'static [u8]; 8] = [b"arc", b"lin", b"was", b"rec", b"pri", b"whe", b"whi", b"els"];
+const STAT_ALIASES: [&'static [u8]; 8] = [
+    b"arc", b"lin", b"was", b"rec", b"pri", b"whe", b"whi", b"els",
+];
 
 ///match alias to expr
 fn get_expr_state(alias: &'static [u8], index: usize) -> MatchResult {
@@ -96,12 +99,20 @@ impl AliasData {
         default_continue: true,
         state_name: "NoneExprCont",
     };
+
     pub const STAT: StaticAliasData = StaticAliasData {
         aliases: |data| &data.stat,
         func: get_stat_state,
         is_expr: false,
         default_continue: true,
         state_name: "NoneStat",
+    };
+    pub const STAT_CONT: StaticAliasData = StaticAliasData {
+        aliases: |data| &data.stat,
+        func: get_stat_state,
+        is_expr: false,
+        default_continue: false,
+        state_name: "NoneStatCont",
     };
 }
 

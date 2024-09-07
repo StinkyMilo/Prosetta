@@ -14,7 +14,7 @@ pub enum OperatorType {
     And,
     Or,
     Equals,
-    Not
+    Not,
 }
 
 #[derive(PartialEq, Debug)]
@@ -40,6 +40,11 @@ pub enum Expr {
         indexes: [usize; 4],
         end: usize,
     },
+    Rect {
+        locs: Vec<usize>,
+        indexes: [usize; 4],
+        end: usize,
+    },
     Assign {
         locs: Vec<usize>,
         name_start: usize,
@@ -47,15 +52,30 @@ pub enum Expr {
         value_index: usize,
         end: usize,
     },
-    Rect {
-        locs: Vec<usize>,
-        indexes: [usize; 4],
-        end: usize,
-    },
     Print {
         locs: Vec<usize>,
         data: Vec<Prints>,
         end: usize,
+    },
+    If {
+        locs: Vec<usize>,
+        condition_start: usize,
+        body_start: usize,
+        indexes: Vec<usize>,
+        body_end: usize,
+    },
+    While {
+        locs: Vec<usize>,
+        condition_start: usize,
+        body_start: usize,
+        indexes: Vec<usize>,
+        body_end: usize,
+    },
+    Else {
+        locs: Vec<usize>,
+        start: usize,
+        end: usize,
+        indexes: Vec<usize>,
     },
     //expr
     Var {
@@ -90,26 +110,6 @@ pub enum Expr {
         start: usize,
         end: usize,
     },
-    If {
-        locs: Vec<usize>,
-        condition_start: usize,
-        body_start: usize,
-        indexes: Vec<usize>,
-        body_end: usize
-    },
-    While {
-        locs: Vec<usize>,
-        condition_start: usize,
-        body_start: usize,
-        indexes: Vec<usize>,
-        body_end: usize
-    },
-    Else {
-        locs: Vec<usize>,
-        start: usize,
-        end: usize,
-        indexes: Vec<usize>
-    }
 }
 
 impl Expr {
@@ -117,6 +117,14 @@ impl Expr {
         match self {
             Expr::NoneStat => true,
             Expr::NoneExpr => true,
+            _ => false,
+        }
+    }
+    pub fn is_stat(&self) -> bool {
+        match self {
+            Expr::Arc { .. } | Expr::Line { .. } | Expr::Rect { .. } => true,
+            Expr::Assign { .. } | Expr::Print { .. } => true,
+            Expr::If { .. } | Expr::Else { .. } | Expr::While { .. } => true,
             _ => false,
         }
     }

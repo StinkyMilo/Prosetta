@@ -13,7 +13,7 @@ impl ParseState for WordNumState {
             let close = find_close(rest, 0);
             //close exists - match
             if let Some(close) = close {
-                env.exprs.vec[env.index] = Expr::WordNum {
+                *env.expr = Expr::WordNum {
                     locs: env.locs.take().unwrap_or_default(),
                     str_start: word.pos + env.global_index,
                     str_len: word.len(),
