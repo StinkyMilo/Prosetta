@@ -6,6 +6,7 @@ use alias_data::*;
 enum MatchState {
     Var,
     Num,
+    Color,
     FindAliases,
 }
 
@@ -116,6 +117,13 @@ impl NoneState {
                 MatchResult::ContinueWith(
                     word.pos,
                     get_state!(num_literal::LiteralNumState::new()),
+                ),
+            ),
+            MatchState::Color => (
+                MatchState::FindAliases,
+                MatchResult::ContinueWith(
+                    word.pos,
+                    get_state!(litcolor::LiteralColorState::new())
                 ),
             ),
             // else check aliases
