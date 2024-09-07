@@ -19,6 +19,9 @@ mod word_num;
 mod ifstatement;
 mod whilestatement;
 mod elsestatement;
+mod stroke;
+mod fill;
+mod color;
 
 mod circle;
 mod line;
