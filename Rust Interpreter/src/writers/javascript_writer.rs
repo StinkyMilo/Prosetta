@@ -217,7 +217,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             indexes, 
             ..
         } => {
-            format!("get_color({});", write_exprs(exprs, indexes, ", "))
+            format!("get_color({})", write_exprs(exprs, indexes, ", "))
         }
     }
 }
