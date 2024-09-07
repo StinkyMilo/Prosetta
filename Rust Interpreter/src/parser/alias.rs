@@ -113,12 +113,13 @@ impl NoneState {
             ),
             // is word a literal number
             MatchState::Num => (
-                MatchState::FindAliases,
+                MatchState::Color,
                 MatchResult::ContinueWith(
                     word.pos,
                     get_state!(num_literal::LiteralNumState::new()),
                 ),
             ),
+            // is word a color
             MatchState::Color => (
                 MatchState::FindAliases,
                 MatchResult::ContinueWith(

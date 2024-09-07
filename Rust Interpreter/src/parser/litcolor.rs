@@ -15,41 +15,33 @@ enum LitColorFoundResult{
 impl ParseState for LiteralColorState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         let value = get_color_word(&self.wsf,word.str);
-        match value {
-            LitColorFoundResult::Found => {
-                env.exprs.vec[env.index] = Expr::LitCol {
-                    str_start: word.pos + env.global_index,
-                    str_length: word.len(),
-                    value: word.str.to_owned()
-                };
-                MatchResult::Matched(rest.pos, false)
-            },
-            LitColorFoundResult::CouldFind => {
-                env.exprs.vec[env.index] = Expr::LitCol {
-                    str_start: word.pos + env.global_index,
-                    str_length: usize::MAX,
-                    value: Vec::new()
-                };
-                self.wsf.append(&mut word.str.to_owned().to_ascii_lowercase());
-                MatchResult::Continue
-            },
-            LitColorFoundResult::Failed => {
-                MatchResult::Failed
-            },
-            LitColorFoundResult::FoundOnLast => {
-                unreachable!();
+        if self.wsf == b"" {
+            match value {
+                LitColorFoundResult::Found => {
+                    env.exprs.vec[env.index] = Expr::LitCol {
+                        str_start: word.pos + env.global_index,
+                        str_length: word.len(),
+                        value: word.str.to_owned()
+                    };
+                    MatchResult::Matched(rest.pos, false)
+                },
+                LitColorFoundResult::CouldFind => {
+                    env.exprs.vec[env.index] = Expr::LitCol {
+                        str_start: word.pos + env.global_index,
+                        str_length: usize::MAX,
+                        value: Vec::new()
+                    };
+                    self.wsf.append(&mut word.str.to_owned().to_ascii_lowercase());
+                    MatchResult::Continue
+                },
+                LitColorFoundResult::Failed => {
+                    MatchResult::Failed
+                },
+                LitColorFoundResult::FoundOnLast => {
+                    unreachable!();
+                }
             }
-        }
-    }
-
-    fn step_match(
-            &mut self,
-            env: &mut Environment,
-            _child: Option<usize>,
-            word: &Slice,
-            rest: &Slice,
-        ) -> MatchResult {
-            let value = get_color_word(&self.wsf,word.str);
+        }else {
             match value {
                 //Finishes a color name
                 LitColorFoundResult::Found => {
@@ -92,6 +84,17 @@ impl ParseState for LiteralColorState {
                     MatchResult::Failed
                 }
             }
+        }
+    }
+
+    fn step_match(
+            &mut self,
+            _env: &mut Environment,
+            _child: Option<usize>,
+            _word: &Slice,
+            _rest: &Slice,
+        ) -> MatchResult {
+            unreachable!()
     }
 
     fn get_name(&self) -> &'static str {
@@ -149,7 +152,7 @@ fn get_color_word(word_so_far: &[u8], word: &[u8]) -> LitColorFoundResult {
             | b"lawn" | b"lemon" | b"light" | b"lime" | b"medium" | b"midnight" | b"mint"
             | b"misty" | b"navajo" | b"old" | b"olive" | b"orange" | b"pale" | b"papaya"
             | b"peach" | b"powder" | b"rebecca" | b"rosy" | b"royal" | b"saddle" | b"sandy"
-            | b"sea" | b"sky" | b"slate" | b"spring" | b"steel" | b"white" | b"yellow"
+            | b"sea" | b"sky" | b"slate" | b"spring" | b"steel" | b"white" | b"yellow" | b"aqua"
                 => LitColorFoundResult::CouldFind,
             _ => LitColorFoundResult::Failed
         },
@@ -160,6 +163,10 @@ fn get_color_word(word_so_far: &[u8], word: &[u8]) -> LitColorFoundResult {
         b"antique" =>  match cleaned_word {
             b"white" => LitColorFoundResult::Found,
             _ => LitColorFoundResult::Failed
+        },
+        b"aqua" => match cleaned_word {
+            b"marine" => LitColorFoundResult::Found,
+            _ => LitColorFoundResult::FoundOnLast
         },
         b"blanched" =>  match cleaned_word {
             b"almond" => LitColorFoundResult::Found,
