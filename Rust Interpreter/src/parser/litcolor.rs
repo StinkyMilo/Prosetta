@@ -328,7 +328,77 @@ pub fn get_color_word(word_so_far: &[u8], word: &[u8]) -> LitColorFoundResult {
         b"rebecca" => match cleaned_word {
             b"purple" => LitColorFoundResult::Found,
             _ => LitColorFoundResult::Failed
+        },
+        b"darkgolden" => match cleaned_word {
+            b"rod" => LitColorFoundResult::Found,
+            _ => LitColorFoundResult::Failed
+        },
+        b"darkolive" => match cleaned_word {
+            b"green" => LitColorFoundResult::Found,
+            _ => LitColorFoundResult::Failed
+        },
+        b"darksea" => match cleaned_word {
+            b"green" => LitColorFoundResult::Found,
+            _ => LitColorFoundResult::Failed
+        },
+        b"darkslate" => match cleaned_word {
+            b"blue" | b"gray" | b"grey" 
+                => LitColorFoundResult::Found,
+            _ => LitColorFoundResult::Failed
         }
+        b"deepsky" => match cleaned_word {
+            b"blue" => LitColorFoundResult::Found,
+            _ => LitColorFoundResult::Failed
+        },
+        b"lightgolden" => match cleaned_word {
+            b"rodyellow" => LitColorFoundResult::Found,
+            b"rod" => LitColorFoundResult::CouldFind,
+            _ => LitColorFoundResult::Failed
+        },
+        b"lightgoldenrod" => match cleaned_word {
+            b"yellow" => LitColorFoundResult::Found,
+            _ => LitColorFoundResult::Failed
+        },
+        b"lightsea" => match cleaned_word {
+            b"green" => LitColorFoundResult::Found,
+            _ => LitColorFoundResult::Failed
+        },
+        b"lightsky" => match cleaned_word {
+            b"blue" => LitColorFoundResult::Found,
+            _ => LitColorFoundResult::Failed
+        },
+        b"lightslate" => match cleaned_word {
+            b"gray" | b"grey" => LitColorFoundResult::Found,
+            _ => LitColorFoundResult::Failed
+        },
+        b"lightsteel" => match cleaned_word {
+            b"blue" => LitColorFoundResult::Found,
+            _ => LitColorFoundResult::Failed
+        },
+        b"mediumsea" => match cleaned_word {
+            b"green" => LitColorFoundResult::Found,
+            _ => LitColorFoundResult::Failed
+        },
+        b"mediumslate" => match cleaned_word {
+            b"blue" => LitColorFoundResult::Found,
+            _ => LitColorFoundResult::Failed
+        },
+        b"mediumspring" => match cleaned_word {
+            b"green" => LitColorFoundResult::Found,
+            _ => LitColorFoundResult::Failed
+        },
+        b"mediumviolet" => match cleaned_word {
+            b"red" => LitColorFoundResult::Found,
+            _ => LitColorFoundResult::Failed
+        },
+        b"palegolden" => match cleaned_word {
+            b"rod" => LitColorFoundResult::Found,
+            _ => LitColorFoundResult::Failed
+        },
+        b"paleviolet" => match cleaned_word {
+            b"red" => LitColorFoundResult::Found,
+            _ => LitColorFoundResult::Failed
+        },
         _ => LitColorFoundResult::Failed
     }
 }
