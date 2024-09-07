@@ -104,14 +104,14 @@ impl AliasData {
         aliases: |data| &data.stat,
         func: get_stat_state,
         is_expr: false,
-        default_continue: true,
+        default_continue: false,
         state_name: "NoneStat",
     };
     pub const STAT_CONT: StaticAliasData = StaticAliasData {
         aliases: |data| &data.stat,
         func: get_stat_state,
         is_expr: false,
-        default_continue: false,
+        default_continue: true,
         state_name: "NoneStatCont",
     };
 }

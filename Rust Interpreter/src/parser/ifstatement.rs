@@ -31,7 +31,7 @@ impl ParseState for IfState {
     ) -> MatchResult {
         let mut has_else = false;
         if self.has_condition {
-            if let Some(index) = child_index {
+            if let Some(_index) = child_index {
                 has_else = matches!(env.expr, Expr::Else { .. });
             }
         }

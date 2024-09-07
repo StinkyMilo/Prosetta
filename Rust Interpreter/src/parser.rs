@@ -144,29 +144,29 @@ impl<'a> Parser<'a> {
             }
         }
         //debug time
-        // let _debug = format!(
-        //     "{:?}",
-        //     Vec::from_iter(self.stack.iter().map(|x| (x.0, x.1)))
-        // );
-        // let _debug2 = format!(
-        //     "{:?}",
-        //     Vec::from_iter(self.stack.iter().map(|x| x.2.get_name()))
-        // );
-        // let _expr = format!("{:?}", self.data.exprs.vec);
-        // let _expr2 = linq_like_writer::write(&self.data.exprs, &self.data.stat_starts);
-        // let _expr_short = format!(
-        //     "{:?}",
-        //     self.data.exprs.vec.iter().map(|e| {
-        //         let mut str = format!("{:?}", e);
-        //         str.truncate(str.find(" ").unwrap_or(str.len()));
-        //         str
-        //     })
-        // );
-        // let _last = format!("{:?}", self.last_result);
-        // black_box(&_debug);
-        // black_box(&_debug2);
-        // black_box(&_expr);
-        // black_box(&_expr2);
+        let _debug = format!(
+            "{:?}",
+            Vec::from_iter(self.stack.iter().map(|x| (x.0, x.1)))
+        );
+        let _debug2 = format!(
+            "{:?}",
+            Vec::from_iter(self.stack.iter().map(|x| x.2.get_name()))
+        );
+        let _expr = format!("{:?}", self.data.exprs.vec);
+        let _expr2 = linq_like_writer::write(&self.data.exprs, &self.data.stat_starts);
+        let _expr_short = format!(
+            "{:?}",
+            Vec::from_iter(self.data.exprs.vec.iter().map(|e| {
+                let mut str = format!("{:?}", e);
+                str.truncate(str.find(" ").unwrap_or(str.len()));
+                str
+            }))
+        );
+        let _last = format!("{:?}", self.last_result);
+        black_box(&_debug);
+        black_box(&_debug2);
+        black_box(&_expr);
+        black_box(&_expr2);
 
         self.last_state = None;
         // get curr frame
@@ -176,8 +176,14 @@ impl<'a> Parser<'a> {
         // should always be in bounds
         // spilt at mut for borrow safety
         let split = self.data.exprs.vec.split_at_mut(frame.0);
-        let expr = &mut split.1[0];
 
+        // default_expr is used on failing back to a none state,
+        // the corrisponding expr no longer exists
+        let default_expr = &mut Expr::NoneExpr;
+        let expr = split.1.first_mut().unwrap_or(default_expr);
+
+        let _self_expr = format!("{:?}", expr);
+        //black_box(&_debug);
         let mut last_stat = None;
 
         // if last expr was a stat
@@ -378,8 +384,11 @@ impl<'a> Parser<'a> {
 
         self.data.exprs.vec.push(Expr::NoneStat);
 
-        self.stack
-            .push((index, new_index, Box::new(alias::NoneState::new_stat_cont())));
+        self.stack.push((
+            index,
+            new_index,
+            Box::new(alias::NoneState::new_stat_cont()),
+        ));
         self.data.stat_starts.push(index);
         self.last_result = LastMatchResult::None;
     }

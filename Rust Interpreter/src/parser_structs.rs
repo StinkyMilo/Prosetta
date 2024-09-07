@@ -4,7 +4,7 @@ use std::{
     usize,
 };
 
-use super::{alias_data::AliasData, Expr, ExprArena};
+use super::{alias_data::AliasData, Expr};
 
 #[path = "testing/parsing_tests_word_funcs.rs"]
 mod parsing_tests_word_funcs;
