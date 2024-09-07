@@ -49,15 +49,15 @@ pub mod test_lib {
 
     pub fn new_env<'a>(
         vars: &'a mut HashSet<Vec<u8>>,
-        exprs: &'a mut ExprArena,
+        expr: &'a mut Expr,
         locs: Option<Vec<usize>>,
         aliases: &'a AliasData,
-        index: usize,
+        last_stat:Option<&'a mut Expr>
     ) -> Environment<'a> {
         Environment {
             vars,
-            exprs,
-            index,
+            expr,
+            last_stat,
             locs,
             global_index: 0,
             aliases,

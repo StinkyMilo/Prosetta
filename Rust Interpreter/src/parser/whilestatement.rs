@@ -8,7 +8,7 @@ impl ParseState for WhileState {
 
     fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
         if !self.has_condition {
-            env.exprs.vec[env.index] = Expr::While {
+            *env.expr = Expr::While {
                 condition_start: word.pos + env.global_index,
                 locs: env.locs.take().unwrap_or_default(),
                 body_start: usize::MAX,
@@ -19,7 +19,7 @@ impl ParseState for WhileState {
             MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont()))
         }else{
             println!("Continuing with new statement");
-            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
+            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat_cont()))
         }
     }
 
@@ -30,7 +30,7 @@ impl ParseState for WhileState {
         word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
-        if let Expr::While {body_start, body_end, indexes, ..} = &mut env.exprs.vec[env.index] {
+        if let Expr::While {body_start, body_end, indexes, ..} = env.expr {
             //If we get a punctuation before an expression, we want to end. Otherwise, we want to continue with a new expression
             //Check the next close. Is it after the child expression? If so, don't even add the child and fail.
             if !(self.has_condition) {
@@ -38,7 +38,7 @@ impl ParseState for WhileState {
                     indexes.push(index);
                     self.has_condition=true;
                     *body_start=index;
-                    MatchResult::ContinueWith(word.pos,get_state!(alias::NoneState::new_stat()))
+                    MatchResult::ContinueWith(word.pos,get_state!(alias::NoneState::new_stat_cont()))
                 }else{
                     //No child
                     MatchResult::Failed
@@ -54,7 +54,7 @@ impl ParseState for WhileState {
                     *body_end = word.pos + env.global_index;
                     MatchResult::Matched(word.pos, true)
                 }else if statement_found {
-                    MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat()))
+                    MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat_cont()))
                 }else{
                     MatchResult::Continue
                 }

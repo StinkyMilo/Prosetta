@@ -22,7 +22,7 @@ pub trait BasicState {
 
 impl<T: BasicState + Debug> ParseState for T {
     fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
-        let is_first = self.do_first(&mut env.exprs.vec[env.index], env.locs.take().unwrap_or_default());
+        let is_first = self.do_first(env.expr, env.locs.take().unwrap_or_default());
         if is_first {
             // cont - has required arguments
             MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr_cont()))
@@ -40,7 +40,7 @@ impl<T: BasicState + Debug> ParseState for T {
         rest: &Slice,
     ) -> MatchResult {
         if let Some(index) = child {
-            self.add_child(&mut env.exprs.vec[env.index], index);
+            self.add_child(env.expr, index);
         }
 
         let can_close = self.can_close();

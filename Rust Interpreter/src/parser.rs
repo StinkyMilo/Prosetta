@@ -12,13 +12,13 @@ mod basic_func;
 mod alias;
 pub(crate) mod alias_data;
 mod assign;
+mod elsestatement;
+mod ifstatement;
 mod not;
 mod operator;
 mod var;
-mod word_num;
-mod ifstatement;
 mod whilestatement;
-mod elsestatement;
+mod word_num;
 
 mod circle;
 mod line;
@@ -74,6 +74,8 @@ pub struct Parser<'a> {
     aliases: AliasData,
     ///the number of times the current slice should repeat
     repeat_count: u8,
+    /// was the last matched state a stat
+    was_last_match_stat: bool,
 }
 
 impl<'a> Parser<'a> {
@@ -93,6 +95,7 @@ impl<'a> Parser<'a> {
             last_result: LastMatchResult::None,
             aliases: AliasData::new(flags),
             repeat_count: 0,
+            was_last_match_stat: false,
         }
     }
     ///get the last state
@@ -141,43 +144,56 @@ impl<'a> Parser<'a> {
             }
         }
         //debug time
-        let _debug = format!(
-            "{:?}",
-            Vec::from_iter(self.stack.iter().map(|x| (x.0, x.1)))
-        );
-        let _debug2 = format!(
-            "{:?}",
-            Vec::from_iter(self.stack.iter().map(|x| x.2.get_name()))
-        );
-        let _expr = format!("{:?}", self.data.exprs.vec);
-        let _expr2 = linq_like_writer::write(&self.data.exprs, &self.data.stat_starts);
-        let _expr_short = format!(
-            "{:?}",
-            self.data.exprs.vec.iter().map(|e| {
-                let mut str = format!("{:?}", e);
-                str.truncate(str.find(" ").unwrap_or(str.len()));
-                str
-            })
-        );
-        let _last = format!("{:?}", self.last_result);
-        black_box(&_debug);
-        black_box(&_debug2);
-        black_box(&_expr);
-        black_box(&_expr2);
+        // let _debug = format!(
+        //     "{:?}",
+        //     Vec::from_iter(self.stack.iter().map(|x| (x.0, x.1)))
+        // );
+        // let _debug2 = format!(
+        //     "{:?}",
+        //     Vec::from_iter(self.stack.iter().map(|x| x.2.get_name()))
+        // );
+        // let _expr = format!("{:?}", self.data.exprs.vec);
+        // let _expr2 = linq_like_writer::write(&self.data.exprs, &self.data.stat_starts);
+        // let _expr_short = format!(
+        //     "{:?}",
+        //     self.data.exprs.vec.iter().map(|e| {
+        //         let mut str = format!("{:?}", e);
+        //         str.truncate(str.find(" ").unwrap_or(str.len()));
+        //         str
+        //     })
+        // );
+        // let _last = format!("{:?}", self.last_result);
+        // black_box(&_debug);
+        // black_box(&_debug2);
+        // black_box(&_expr);
+        // black_box(&_expr2);
 
         self.last_state = None;
         // get curr frame
         let stack_index = self.stack.len() - 1;
         let frame = &mut self.stack[stack_index];
 
+        // should always be in bounds
+        // spilt at mut for borrow safety
+        let split = self.data.exprs.vec.split_at_mut(frame.0);
+        let expr = &mut split.1[0];
+
+        let mut last_stat = None;
+
+        // if last expr was a stat
+        if self.was_last_match_stat {
+            let last_stat_index = *self.data.stat_starts.last().unwrap();
+            last_stat = Some(&mut split.0[last_stat_index]);
+        }
+
         // setup env
         let mut env = Environment {
-            exprs: &mut self.data.exprs,
-            index: frame.0,
+            expr,
+            last_stat,
             vars: &mut self.data.vars,
             locs: None,
             global_index: self.pos,
-            aliases: &self.aliases
+            aliases: &self.aliases,
         };
 
         // setup slice
@@ -363,7 +379,7 @@ impl<'a> Parser<'a> {
         self.data.exprs.vec.push(Expr::NoneStat);
 
         self.stack
-            .push((index, new_index, Box::new(alias::NoneState::new_stat())));
+            .push((index, new_index, Box::new(alias::NoneState::new_stat_cont())));
         self.data.stat_starts.push(index);
         self.last_result = LastMatchResult::None;
     }

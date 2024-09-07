@@ -31,7 +31,7 @@ impl ParseState for NotState {
     ) -> MatchResult {
         // child matched - add index of child and match
         if let Some(new_index) = child_index {
-            if let Expr::Skip { index, .. } = &mut env.exprs.vec[env.index] {
+            if let Expr::Skip { index, .. } = env.expr {
                 *index = new_index;
             };
 

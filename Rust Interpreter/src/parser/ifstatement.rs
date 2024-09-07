@@ -1,25 +1,24 @@
 use super::*;
 /// state for equals
 #[derive(Debug)]
-pub struct IfState{
-    has_condition: bool
+pub struct IfState {
+    has_condition: bool,
 }
 impl ParseState for IfState {
-
     fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
         if !self.has_condition {
-            env.exprs.vec[env.index] = Expr::If {
-                condition_start: word.pos + env.global_index,
+            *env.expr = Expr::If {
                 locs: env.locs.take().unwrap_or_default(),
+                condition_start: word.pos + env.global_index,
                 body_start: usize::MAX,
-                indexes:Vec::new(),
-                body_end: usize::MAX
+                indexes: Vec::new(),
+                body_end: usize::MAX,
             };
             // setup child state
             MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont()))
-        }else{
-            println!("Continuing with new statement");
-            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
+        } else {
+            //println!("Continuing with new statement");
+            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat_cont()))
         }
     }
 
@@ -31,35 +30,41 @@ impl ParseState for IfState {
         rest: &Slice,
     ) -> MatchResult {
         let mut has_else = false;
-        if self.has_condition{
+        if self.has_condition {
             if let Some(index) = child_index {
-                has_else = matches!(env.exprs.vec[index],Expr::Else{..});
+                has_else = matches!(env.expr, Expr::Else { .. });
             }
         }
-        if let Expr::If {body_start, body_end, indexes, ..} = &mut env.exprs.vec[env.index] {
+        if let Expr::If {
+            body_start,
+            body_end,
+            indexes,
+            ..
+        } = env.expr
+        {
             //If we get a punctuation before an expression, we want to end. Otherwise, we want to continue with a new expression
             //Check the next close. Is it after the child expression? If so, don't even add the child and fail.
             if !(self.has_condition) {
                 if let Some(index) = child_index {
                     indexes.push(index);
-                    self.has_condition=true;
-                    *body_start=index;
-                    MatchResult::ContinueWith(word.pos,get_state!(alias::NoneState::new_stat()))
-                }else{
+                    self.has_condition = true;
+                    *body_start = index;
+                    MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat_cont()))
+                } else {
                     //No child
                     MatchResult::Failed
                 }
-            }else{
+            } else {
                 let mut statement_found = false;
                 if let Some(index) = child_index {
                     indexes.push(index);
-                    statement_found=true;
+                    statement_found = true;
                 }
-                
-                if is_close(word){
+
+                if is_close(word) {
                     *body_end = word.pos + env.global_index;
                     MatchResult::Matched(word.pos, true)
-                }else if statement_found {
+                } else if statement_found {
                     if has_else {
                         //Else must be the last statement
                         let close = find_close(&word, 0).or_else(|| find_close(&rest, 0));
@@ -71,14 +76,17 @@ impl ParseState for IfState {
                                 MatchResult::Matched(slice.pos, true)
                             }
                         }
-                    }else{
-                        MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat()))
+                    } else {
+                        MatchResult::ContinueWith(
+                            word.pos,
+                            get_state!(alias::NoneState::new_stat_cont()),
+                        )
                     }
-                }else{
+                } else {
                     MatchResult::Continue
                 }
-            } 
-        }else{
+            }
+        } else {
             MatchResult::Failed
         }
     }
@@ -94,8 +102,8 @@ impl ParseState for IfState {
 
 impl IfState {
     pub fn new() -> Self {
-        Self{
-            has_condition: false
+        Self {
+            has_condition: false,
         }
     }
 }

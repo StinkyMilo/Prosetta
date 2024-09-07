@@ -18,7 +18,7 @@ impl ParseState for PrintState {
                 end = End::from_slice(&word, env.global_index)
             }
 
-            env.exprs.vec[env.index] = Expr::Print {
+            *env.expr = Expr::Print {
                 locs: env.locs.take().unwrap_or_default(),
                 data: Vec::new(),
                 end,
@@ -40,7 +40,7 @@ impl ParseState for PrintState {
         _rest: &Slice,
     ) -> MatchResult {
         self.first = false;
-        if let Expr::Print { data, end, .. } = &mut env.exprs.vec[env.index] {
+        if let Expr::Print { data, end, .. } = env.expr {
             // prev word was var
             if let Some(index) = child_index {
                 data.push(Prints::Var(index));

@@ -42,17 +42,17 @@ pub enum Expr {
         indexes: [usize; 4],
         end: End,
     },
+    Rect {
+        locs: Vec<usize>,
+        indexes: [usize; 4],
+        end: End,
+    },
     Assign {
         locs: Vec<usize>,
         name_start: usize,
         name: Vec<u8>,
         value_index: usize,
-        end: End,
-    },
-    Rect {
-        locs: Vec<usize>,
-        indexes: [usize; 4],
-        end: End,
+        end: usize,
     },
     Print {
         locs: Vec<usize>,
@@ -73,6 +73,26 @@ pub enum Expr {
         locs: Vec<usize>,
         indexes: Vec<usize>,
         end: End,
+    },
+    If {
+        locs: Vec<usize>,
+        condition_start: usize,
+        body_start: usize,
+        indexes: Vec<usize>,
+        body_end: usize,
+    },
+    While {
+        locs: Vec<usize>,
+        condition_start: usize,
+        body_start: usize,
+        indexes: Vec<usize>,
+        body_end: usize,
+    },
+    Else {
+        locs: Vec<usize>,
+        start: usize,
+        end: usize,
+        indexes: Vec<usize>,
     },
     //expr
     Var {
@@ -114,6 +134,14 @@ impl Expr {
         match self {
             Expr::NoneStat => true,
             Expr::NoneExpr => true,
+            _ => false,
+        }
+    }
+    pub fn is_stat(&self) -> bool {
+        match self {
+            Expr::Arc { .. } | Expr::Line { .. } | Expr::Rect { .. } => true,
+            Expr::Assign { .. } | Expr::Print { .. } => true,
+            Expr::If { .. } | Expr::Else { .. } | Expr::While { .. } => true,
             _ => false,
         }
     }
