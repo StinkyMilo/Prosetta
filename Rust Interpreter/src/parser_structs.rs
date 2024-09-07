@@ -211,6 +211,13 @@ fn is_valid_close_char(char: u8) -> bool {
     END_CHARS.contains(&char)
 }
 
+///the chars that are returned single but are not closes
+const NON_CLOSE_CHARS: &[u8] = b"\"\'";
+///shoudl the char be made into a 1 len slice
+fn is_non_close_but_still_single(char: u8) -> bool {
+    NON_CLOSE_CHARS.contains(&char)
+}
+
 /// does slice consist of a closing character
 pub fn is_close(slice: &Slice) -> bool {
     slice.len() > 0 && is_valid_close_char(slice.str[0])
@@ -250,6 +257,7 @@ pub fn get_next_slice<'a>(slice: &Slice<'a>, mut start: usize) -> (Slice<'a>, Sl
     while start < slice.len()
         && !is_valid_word_char(slice.str[start])
         && !is_valid_close_char(slice.str[start])
+        && !is_non_close_but_still_single(slice.str[start])
     {
         start += 1;
     }
@@ -258,7 +266,9 @@ pub fn get_next_slice<'a>(slice: &Slice<'a>, mut start: usize) -> (Slice<'a>, Sl
     let mut end = start;
 
     //is slice a closing character aka "."
-    if end < slice.len() && is_valid_close_char(slice.str[end]) {
+    if end < slice.len()
+        && (is_valid_close_char(slice.str[end]) || is_non_close_but_still_single(slice.str[start]))
+    {
         // is "..."
         if end + 3 <= slice.len() && &slice.str[end..end + 3] == &b"..."[..] {
             end += 3;
