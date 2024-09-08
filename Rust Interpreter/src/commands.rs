@@ -111,17 +111,17 @@ pub enum Expr {
     Color {
         locs: Vec<usize>,
         indexes: [usize; 3],
-        end: usize,
+        end: End
     },
     Fill {
         locs: Vec<usize>,
         indexes: [usize; 3],
-        end: usize
+        end: End
     },
     Stroke {
         locs: Vec<usize>,
         indexes: [usize; 3],
-        end: usize
+        end: End
     },
     LitCol {
         str_start: usize,

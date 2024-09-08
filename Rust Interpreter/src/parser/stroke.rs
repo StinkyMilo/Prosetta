@@ -19,7 +19,7 @@ impl BasicState for StrokeState {
             *expr = Expr::Stroke {
                 locs,
                 indexes: [usize::MAX; 3],
-                end: usize::MAX,
+                end: End::none()
             }
         }
         ret
@@ -44,7 +44,7 @@ impl BasicState for StrokeState {
         }
     }
 
-    fn set_end(&mut self, expr: &mut Expr, index: usize) {
+    fn set_end(&mut self, expr: &mut Expr, index: End) {
         if let Expr::Stroke { end, .. } = expr {
             *end = index;
         } else {

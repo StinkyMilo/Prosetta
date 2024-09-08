@@ -203,7 +203,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
             value 
         } => {
             format!(
-                "(litnum {}@{}$${})", String::from_utf8_lossy(value), str_start, str_length
+                "(litcol {}@{}$${})", String::from_utf8_lossy(value), str_start, str_length
             )
         }
         Expr::Color { 

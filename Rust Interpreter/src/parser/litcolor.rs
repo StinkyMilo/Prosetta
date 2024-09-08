@@ -18,7 +18,7 @@ impl ParseState for LiteralColorState {
         if self.wsf == b"" {
             match value {
                 LitColorFoundResult::Found => {
-                    env.exprs.vec[env.index] = Expr::LitCol {
+                    *env.expr = Expr::LitCol {
                         str_start: word.pos + env.global_index,
                         str_length: word.len(),
                         value: word.str.to_owned()
@@ -26,7 +26,7 @@ impl ParseState for LiteralColorState {
                     MatchResult::Matched(rest.pos, false)
                 },
                 LitColorFoundResult::CouldFind => {
-                    env.exprs.vec[env.index] = Expr::LitCol {
+                    *env.expr = Expr::LitCol {
                         str_start: word.pos + env.global_index,
                         str_length: usize::MAX,
                         value: Vec::new()
@@ -46,7 +46,7 @@ impl ParseState for LiteralColorState {
                 //Finishes a color name
                 LitColorFoundResult::Found => {
                     if let Expr::LitCol { str_start, str_length, value } 
-                    = &mut env.exprs.vec[env.index] {
+                    = env.expr {
                         if let Some(len) = (word.pos + word.len() + env.global_index).checked_sub(*str_start) {
                             *str_length = len;
                             self.wsf.append(&mut word.str.to_owned().to_ascii_lowercase());
@@ -62,7 +62,7 @@ impl ParseState for LiteralColorState {
                 //Last word could have had more color words after it but didn't.
                 LitColorFoundResult::FoundOnLast => {
                     if let Expr::LitCol { str_start, str_length, value } 
-                    = &mut env.exprs.vec[env.index] {
+                    = env.expr {
                         if let Some(len) = (word.pos + env.global_index).checked_sub(*str_start) {
                             *str_length = len;
                             *value = self.wsf.to_owned();
