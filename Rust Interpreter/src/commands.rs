@@ -108,25 +108,25 @@ pub enum Expr {
         start: usize,
         end: End,
     },
-    If {
+    Color {
         locs: Vec<usize>,
-        condition_start: usize,
-        body_start: usize,
-        indexes: Vec<usize>,
-        body_end: usize
-    },
-    While {
-        locs: Vec<usize>,
-        condition_start: usize,
-        body_start: usize,
-        indexes: Vec<usize>,
-        body_end: usize
-    },
-    Else {
-        locs: Vec<usize>,
-        start: usize,
+        indexes: [usize; 3],
         end: usize,
-        indexes: Vec<usize>
+    },
+    Fill {
+        locs: Vec<usize>,
+        indexes: [usize; 3],
+        end: usize
+    },
+    Stroke {
+        locs: Vec<usize>,
+        indexes: [usize; 3],
+        end: usize
+    },
+    LitCol {
+        str_start: usize,
+        str_length: usize,
+        value: Vec<u8>
     }
 }
 
