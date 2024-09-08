@@ -10,17 +10,17 @@ impl ParseState for WordNumState {
             MatchResult::Continue
         } else {
             // find close
-            let close = find_close(rest, 0);
+            let close = find_close_slice(rest, 0);
             //close exists - match
             if let Some(close) = close {
-                env.exprs.vec[env.index] = Expr::WordNum {
+                *env.expr = Expr::WordNum {
                     locs: env.locs.take().unwrap_or_default(),
                     str_start: word.pos + env.global_index,
                     str_len: word.len(),
-                    end: close.pos + env.global_index,
+                    end: End::from_slice(&close.0, env.global_index),
                 };
 
-                MatchResult::Matched(close.pos, true)
+                MatchResult::Matched(close.0.pos, true)
             } else {
                 // did not find close - fail
                 MatchResult::Failed

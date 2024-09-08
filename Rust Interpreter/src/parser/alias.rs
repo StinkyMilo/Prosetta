@@ -91,6 +91,9 @@ impl NoneState {
     pub fn new_stat() -> Self {
         Self::new(&AliasData::STAT)
     }
+    pub fn new_stat_cont() -> Self {
+        Self::new(&AliasData::STAT_CONT)
+    }
     pub fn new_expr() -> Self {
         Self::new(&AliasData::EXPR)
     }

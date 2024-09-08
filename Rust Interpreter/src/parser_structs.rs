@@ -1,14 +1,42 @@
 use std::{
     collections::HashSet,
     fmt::{self, Debug},
+    usize,
 };
 
-use super::{alias_data::AliasData, ExprArena};
+use super::{alias_data::AliasData, Expr};
 
 #[path = "testing/parsing_tests_word_funcs.rs"]
 mod parsing_tests_word_funcs;
+// quickscope
 
-pub type VarSet = HashSet<Vec<u8>>;
+pub struct VarSet {
+    set: ScopeSet<Vec<u8>>,
+}
+impl VarSet {
+    pub fn new() -> Self {
+        Self {
+            set: ScopeSet::new(),
+        }
+    }
+    pub fn insert(&mut self, name: Vec<u8>) {
+        self.set.define(name);
+    }
+    pub fn add_layer(&mut self) {
+        self.set.push_layer();
+    }
+    pub fn remove_layer(&mut self) {
+        self.set.pop_layer();
+    }
+    pub fn contains(&self, name: Vec<u8>) -> bool {
+        self.set.contains(&name)
+    }
+}
+impl Debug for VarSet {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("VarSet").finish()
+    }
+}
 // pub type StepFunction =
 //     fn(env: &mut Environment, result: LastMatchResult, word: &Slice, rest: &Slice) -> MatchResult;
 
@@ -27,6 +55,7 @@ macro_rules! get_state {
     };
 }
 pub(crate) use get_state;
+use quickscope::ScopeSet;
 
 /// add or remove commands based on flags
 #[derive(Default, Debug)]
@@ -54,6 +83,28 @@ pub trait ParseState: Debug {
     ///apparently not called, but
     ///whether the expr should be replaced by new expr
     fn do_replace(&self) -> bool;
+}
+
+///a struct for closing character with an index and a length
+#[derive(PartialEq, Debug, Clone, Copy)]
+pub struct End {
+    pub index: usize,
+    pub count: u8,
+}
+
+impl End {
+    /// make new end from index and close length
+    pub fn new(index: usize, count: u8) -> Self {
+        Self { index, count }
+    }
+
+    pub fn from_slice(slice: &Slice, global_index: usize) -> Self {
+        End::new(slice.pos + global_index, slice.str.len() as u8)
+    }
+
+    pub fn none() -> Self {
+        End::new(usize::MAX, 0)
+    }
 }
 
 /// the result of a step or stepmatch function
@@ -127,8 +178,15 @@ pub struct Environment<'a> {
     ///The set of current varibles
     pub vars: &'a mut VarSet,
     ///The list of expressions
-    pub exprs: &'a mut ExprArena,
-    pub index: usize,
+    pub expr: &'a mut Expr,
+    ///the index of this expr
+    pub expr_index: usize,
+    ///the exprs before this 
+    pub parents: &'a mut [Expr],
+    ///the exprs after this
+    pub children: &'a mut [Expr],
+    ///The last matched expr if exists
+    pub last_matched_index: Option<usize>,
     ///The current locs (locations of the alias characters)
     pub locs: Option<Vec<usize>>,
     /// the global index (with multiple input buffers)
@@ -189,6 +247,13 @@ fn is_valid_close_char(char: u8) -> bool {
     END_CHARS.contains(&char)
 }
 
+///the chars that are returned single but are not closes
+const NON_CLOSE_CHARS: &[u8] = b"\"\'";
+///shoudl the char be made into a 1 len slice
+fn is_non_close_but_still_single(char: u8) -> bool {
+    NON_CLOSE_CHARS.contains(&char)
+}
+
 /// does slice consist of a closing character
 pub fn is_close(slice: &Slice) -> bool {
     slice.len() > 0 && is_valid_close_char(slice.str[0])
@@ -228,6 +293,7 @@ pub fn get_next_slice<'a>(slice: &Slice<'a>, mut start: usize) -> (Slice<'a>, Sl
     while start < slice.len()
         && !is_valid_word_char(slice.str[start])
         && !is_valid_close_char(slice.str[start])
+        && !is_non_close_but_still_single(slice.str[start])
     {
         start += 1;
     }
@@ -236,8 +302,16 @@ pub fn get_next_slice<'a>(slice: &Slice<'a>, mut start: usize) -> (Slice<'a>, Sl
     let mut end = start;
 
     //is slice a closing character aka "."
-    if end < slice.len() && is_valid_close_char(slice.str[end]) {
-        end += 1;
+    if end < slice.len()
+        && (is_valid_close_char(slice.str[end]) || is_non_close_but_still_single(slice.str[start]))
+    {
+        // is "..."
+        if end + 3 <= slice.len() && &slice.str[end..end + 3] == &b"..."[..] {
+            end += 3;
+        // not "..."
+        } else {
+            end += 1;
+        }
     } else {
         while end < slice.len() && is_valid_word_char(slice.str[end]) {
             end += 1;
@@ -272,6 +346,37 @@ pub fn find_word_end<'a>(slice: &'a Slice<'a>, start: usize) -> Slice<'a> {
     }
 }
 
+/// returns (close, rest) after finding close
+pub fn find_close_slice<'a>(slice: &'a Slice<'a>, mut start: usize) -> Option<(Slice, Slice)> {
+    // find end char
+    while start < slice.len() && !is_valid_close_char(slice.str[start]) {
+        start += 1;
+    }
+    if start < slice.len() {
+        // let test1 = start + 3 <= slice.len();
+        // let test2 = &slice.str[start..start + 3] == &b"..."[..];
+        let end = if start + 3 <= slice.len() && &slice.str[start..start + 3] == &b"..."[..] {
+            start + 3
+        } else {
+            start + 1
+        };
+
+        // find end of period
+        Some((
+            Slice {
+                str: &slice.str[start..end],
+                pos: slice.pos + start,
+            },
+            Slice {
+                str: &slice.str[end..],
+                pos: slice.pos + end,
+            },
+        ))
+    } else {
+        None
+    }
+}
+
 /// returns the rest after finding the next closing character
 pub fn find_close<'a>(slice: &'a Slice<'a>, start: usize) -> Option<Slice<'_>> {
     // find end char
@@ -280,7 +385,6 @@ pub fn find_close<'a>(slice: &'a Slice<'a>, start: usize) -> Option<Slice<'_>> {
         end += 1;
     }
     let test = end < slice.len();
-    //end += 1;
     // find end of period
     test.then(|| Slice {
         str: &slice.str[end..],

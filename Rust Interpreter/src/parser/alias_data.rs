@@ -31,7 +31,7 @@ fn get_expr_state(alias: &'static [u8], index: usize) -> MatchResult {
             b"int" => get_state!(word_num::WordNumState::new()),
             b"not" => get_state!(not::NotState::new()),
             b"col" => get_state!(color::ColorState::new()),
-            _ => panic!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
+            _ => unreachable!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
         },
     )
 }
@@ -51,7 +51,7 @@ fn get_stat_state(alias: &'static [u8], index: usize) -> MatchResult {
             b"els" => get_state!(elsestatement::ElseState::new()),
             b"sto" => get_state!(stroke::StrokeState::new()),
             b"fil" => get_state!(fill::FillState::new()),
-            _ => panic!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
+            _ => unreachable!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
         },
     )
 }
@@ -99,12 +99,20 @@ impl AliasData {
         default_continue: true,
         state_name: "NoneExprCont",
     };
+
     pub const STAT: StaticAliasData = StaticAliasData {
         aliases: |data| &data.stat,
         func: get_stat_state,
         is_expr: false,
-        default_continue: true,
+        default_continue: false,
         state_name: "NoneStat",
+    };
+    pub const STAT_CONT: StaticAliasData = StaticAliasData {
+        aliases: |data| &data.stat,
+        func: get_stat_state,
+        is_expr: false,
+        default_continue: true,
+        state_name: "NoneStatCont",
     };
 }
 

@@ -1592,8 +1592,19 @@ version = "0.1.0"
 dependencies = [
  "cfg-if 1.0.0",
  "nannou",
+ "quickscope",
  "wasm-bindgen",
  "wee_alloc",
+]
+
+[[package]]
+name = "quickscope"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d47bcfc3e13850589cf9338a02b6dfb5aebb3748a0f93a392e8df91d6193b6b"
+dependencies = [
+ "indexmap 1.9.3",
+ "smallvec",
 ]
 
 [[package]]

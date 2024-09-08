@@ -11,14 +11,14 @@ impl ParseState for PrintState {
         let matched = is_close(word);
 
         if self.first {
-            let mut end = usize::MAX;
+            let mut end = End::none();
 
             // "pri ." - useful for newline? - can change later
             if matched {
-                end = word.pos + env.global_index;
+                end = End::from_slice(&word, env.global_index)
             }
 
-            env.exprs.vec[env.index] = Expr::Print {
+            *env.expr = Expr::Print {
                 locs: env.locs.take().unwrap_or_default(),
                 data: Vec::new(),
                 end,
@@ -26,6 +26,12 @@ impl ParseState for PrintState {
         }
 
         if matched {
+            // set end
+            if let Expr::Print { end, .. } = env.expr {
+                *end = End::from_slice(&word, env.global_index);
+            } else {
+                unreachable!()
+            }
             MatchResult::Matched(word.pos, true)
         } else {
             MatchResult::ContinueWith(word.pos, get_state!(var::VarState::new()))
@@ -40,13 +46,13 @@ impl ParseState for PrintState {
         _rest: &Slice,
     ) -> MatchResult {
         self.first = false;
-        if let Expr::Print { data, end, .. } = &mut env.exprs.vec[env.index] {
+        if let Expr::Print { data, end, .. } = env.expr {
             // prev word was var
             if let Some(index) = child_index {
                 data.push(Prints::Var(index));
                 if is_close(word) {
-                    *end = word.pos + env.global_index;
-                    MatchResult::Matched(word.pos,true)
+                    *end = End::from_slice(&word, env.global_index);
+                    MatchResult::Matched(word.pos, true)
                 } else {
                     MatchResult::ContinueWith(word.pos, get_state!(var::VarState::new()))
                 }

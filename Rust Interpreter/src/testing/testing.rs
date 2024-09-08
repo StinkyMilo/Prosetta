@@ -47,26 +47,34 @@ pub mod test_lib {
         }
     }
 
-    pub fn new_env<'a>(
-        vars: &'a mut HashSet<Vec<u8>>,
-        exprs: &'a mut ExprArena,
-        locs: Option<Vec<usize>>,
-        aliases: &'a AliasData,
-        index: usize,
-    ) -> Environment<'a> {
-        Environment {
-            vars,
-            exprs,
-            index,
-            locs,
-            global_index: 0,
-            aliases,
-        }
-    }
+    // pub fn new_env<'a>(
+    //     vars: &'a mut VarSet,
+    //     expr: &'a mut Expr,
+    //     locs: Option<Vec<usize>>,
+    //     aliases: &'a AliasData,
+    //     last_stat:Option<&'a mut Expr>
+    // ) -> Environment<'a> {
+    //     Environment {
+    //         vars,
+    //         expr,
+    //         last_stat,
+    //         locs,
+    //         global_index: 0,
+    //         aliases,
+    //     }
+    // }
     pub fn assert_result(parser: &mut Parser) -> ParserResult {
         loop {
             let result = parser.step();
             if result.is_end() {
+                return result;
+            }
+        }
+    }
+    pub fn run_to_completion(parser: &mut Parser) -> ParserResult {
+        loop {
+            let result = parser.step();
+            if matches!(result, ParserResult::NoInput) {
                 return result;
             }
         }

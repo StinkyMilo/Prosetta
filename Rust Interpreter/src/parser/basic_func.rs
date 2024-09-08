@@ -17,12 +17,12 @@ pub trait BasicState {
     fn can_close(&self) -> CloseType;
 
     /// set end to index
-    fn set_end(&mut self, expr: &mut Expr, index: usize);
+    fn set_end(&mut self, expr: &mut Expr, index: End);
 }
 
 impl<T: BasicState + Debug> ParseState for T {
     fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
-        let is_first = self.do_first(&mut env.exprs.vec[env.index], env.locs.take().unwrap_or_default());
+        let is_first = self.do_first(env.expr, env.locs.take().unwrap_or_default());
         if is_first {
             // cont - has required arguments
             MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr_cont()))
@@ -35,19 +35,19 @@ impl<T: BasicState + Debug> ParseState for T {
     fn step_match(
         &mut self,
         env: &mut Environment,
-        child: Option<usize>,
+        child_index: Option<usize>,
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult {
-        if let Some(index) = child {
-            self.add_child(&mut env.exprs.vec[env.index], index);
+        if let Some(index) = child_index {
+            self.add_child(env.expr, index);
         }
 
         let can_close = self.can_close();
 
         match can_close {
             CloseType::Unable => {
-                if child.is_some() {
+                if child_index.is_some() {
                     // continue again
                     MatchResult::ContinueWith(
                         word.pos,
@@ -61,10 +61,10 @@ impl<T: BasicState + Debug> ParseState for T {
             CloseType::Able => {
                 // I can close so I close
                 if is_close(word) {
-                    self.set_end(&mut env.exprs.vec[env.index], word.pos + env.global_index);
+                    self.set_end(env.expr, End::from_slice(&word, env.global_index));
                     MatchResult::Matched(word.pos, true)
                     // succeeded - continue again with noncont expr
-                } else if child.is_some() {
+                } else if child_index.is_some() {
                     MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr()))
                     // failed - pass word
                 } else {
@@ -73,13 +73,13 @@ impl<T: BasicState + Debug> ParseState for T {
             }
             CloseType::Force => {
                 // forced to close
-                let close = find_close(&word, 0).or_else(|| find_close(&rest, 0));
+                let close = find_close_slice(&word, 0).or_else(|| find_close_slice(&rest, 0));
                 match close {
                     // will never be a period to find even on future words
                     None => MatchResult::Failed,
                     Some(slice) => {
-                        self.set_end(&mut env.exprs.vec[env.index], slice.pos + env.global_index);
-                        MatchResult::Matched(slice.pos, true)
+                        self.set_end(env.expr, End::from_slice(&slice.0, env.global_index));
+                        MatchResult::Matched(slice.0.pos, true)
                     }
                 }
             }

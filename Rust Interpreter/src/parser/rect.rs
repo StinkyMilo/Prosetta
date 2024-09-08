@@ -19,7 +19,7 @@ impl BasicState for RectState {
             *expr = Expr::Rect {
                 locs,
                 indexes: [usize::MAX; 4],
-                end: usize::MAX,
+                end: End::none(),
             }
         }
         ret
@@ -43,7 +43,7 @@ impl BasicState for RectState {
         }
     }
 
-    fn set_end(&mut self, expr: &mut Expr, index: usize) {
+    fn set_end(&mut self, expr: &mut Expr, index: End) {
         if let Expr::Rect { end, .. } = expr {
             *end = index;
         } else {

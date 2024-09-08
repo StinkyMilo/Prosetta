@@ -5,12 +5,12 @@ pub struct AssignState;
 impl ParseState for AssignState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         // set expr
-        env.exprs.vec[env.index] = Expr::Assign {
+        *env.expr = Expr::Assign {
             name_start: word.pos + env.global_index,
             name: word.str.to_owned(),
             value_index: usize::MAX,
             locs: env.locs.take().unwrap_or_default(),
-            end: usize::MAX,
+            end: End::none(),
         };
         // setup child state
         MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
@@ -25,20 +25,25 @@ impl ParseState for AssignState {
     ) -> MatchResult {
         if let Some(index) = child_index {
             // find ending close
-            let close = find_close(&word, 0).or_else(|| find_close(&rest, 0));
+            let close = find_close_slice(&word, 0).or_else(|| find_close_slice(&rest, 0));
             match close {
                 // will never be a period to find even on future words
                 None => MatchResult::Failed,
                 Some(slice) => {
                     if let Expr::Assign {
-                        name, value_index, end, ..
-                    } = &mut env.exprs.vec[env.index]
+                        name,
+                        value_index,
+                        end,
+                        ..
+                    } = env.expr
                     {
                         *value_index = index;
-                        *end = slice.pos + env.global_index;
+                        *end = End::from_slice(&slice.0, env.global_index);
                         env.vars.insert(name.to_owned());
+                    } else {
+                        unreachable!();
                     }
-                    MatchResult::Matched(slice.pos, true)
+                    MatchResult::Matched(slice.0.pos, true)
                 }
             }
         } else {

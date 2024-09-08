@@ -147,38 +147,21 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             format!("print_console({});", write_prints(exprs, data))
         }
         Expr::Skip { .. } => "".to_string(),
-        Expr::If {
-            locs: _,
-            indexes,
-            body_start: _,
-            body_end: _,
-            ..
-        } => {
+        Expr::If { indexes, .. } => {
             format!(
                 "if ({}) {{\n{}\n}}",
                 write_expr(exprs, indexes[0]),
                 write_exprs(exprs, &indexes[1..], "\n")
             )
         }
-        Expr::While {
-            locs: _,
-            indexes,
-            body_start: _,
-            body_end: _,
-            ..
-        } => {
+        Expr::While { indexes, .. } => {
             format!(
                 "while ({}) {{\n{}\n}}",
                 write_expr(exprs, indexes[0]),
                 write_exprs(exprs, &indexes[1..], "\n")
             )
         }
-        Expr::Else {
-            locs: _,
-            indexes,
-            start: _,
-            end: _,
-        } => {
+        Expr::Else { indexes, .. } => {
             format!("else {{\n{}\n}}", write_exprs(exprs, indexes, "\n"))
         },
         Expr::LitCol { 
