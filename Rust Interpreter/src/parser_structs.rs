@@ -181,10 +181,12 @@ pub struct Environment<'a> {
     pub expr: &'a mut Expr,
     ///the index of this expr
     pub expr_index: usize,
-    ///the states children
+    ///the exprs before this 
+    pub parents: &'a mut [Expr],
+    ///the exprs after this
     pub children: &'a mut [Expr],
     ///The last matched expr if exists
-    pub last_matched_expr: Option<&'a mut Expr>,
+    pub last_matched_index: Option<usize>,
     ///The current locs (locations of the alias characters)
     pub locs: Option<Vec<usize>>,
     /// the global index (with multiple input buffers)

@@ -175,37 +175,41 @@ impl<'a> Parser<'a> {
 
         // should always be in bounds
         // spilt at mut for borrow safety
-        let split1 = self.data.exprs.vec.split_at_mut(frame.0);
-        let _splits1 = format!("{:?}", split1);
-        let split2 = split1.1.split_at_mut_checked(1);
-        let _splits = format!("{:?} {:?}", _splits1, split2);
+        // get (parents, this[0] and children[1..])
+        let parents_this = self.data.exprs.vec.split_at_mut(frame.0);
+        let _splits1 = format!("{:?}", parents_this);
+        // get (this, children)
+        let this_children = parents_this.1.split_at_mut_checked(1);
+        let _splits = format!("{:?} {:?}", _splits1, this_children);
 
         // default_expr is used on failing back to a none state,
         // the corrisponding expr no longer exists
         let mut expr = &mut Expr::NoneExpr;
         let mut children: &mut [Expr] = &mut [];
-        if let Some(split) = split2 {
-            //should always be safe due to frame.0 + 1
+        let parents = parents_this.0;
+        if let Some(split) = this_children {
+            //should always be safe
             expr = split.0.first_mut().unwrap();
             children = split.1;
         }
 
         let _self_expr = format!("{:?}", expr);
         //black_box(&_debug);
-        let mut last_stat = None;
+        //let mut last_stat = None;
 
-        // // if last expr matched
-        if let Some(index) = self.last_match_index {
-            // let last_stat_index = self.data.exprs[last_stat];
-            last_stat = split1.0.get_mut(index);
-        }
+        // // // if last expr matched
+        // if let Some(index) = self.last_match_index {
+        //     // let last_stat_index = self.data.exprs[last_stat];
+        //     last_stat = split1.0.get_mut(index);
+        // }
 
         // setup env
         let mut env = Environment {
             expr,
-            last_matched_expr: last_stat,
-            expr_index: frame.0,
             children,
+            parents,
+            last_matched_index: self.last_match_index,
+            expr_index: frame.0,
             vars: &mut self.data.vars,
             locs: None,
             global_index: self.pos,

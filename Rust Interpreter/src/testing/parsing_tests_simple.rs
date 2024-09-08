@@ -119,15 +119,13 @@ mod tests_simple {
 
     #[test]
     fn test_if_else_pri() {
-        let text = b"whe one pri yes! else pri no..".to_vec();
+        let text = b"whe one pri yes! else pri no:(:(".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
+        test_lib::run_to_completion(&mut parser);
         assert_eq!(
-            test_lib::assert_result(&mut parser),
-            ParserResult::MatchedLine
-        );
-        assert_eq!(
-            linq_like_writer::write_first(&parser.data.exprs),
-            "(if@0,1,2$15 (litnum 1@4$$3) then (print@8,9,10$14 \"hi\"@12))"
+            linq_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(if@0,1,2$15 (litnum 1@4$$3) then:\n  (print@8,9,10$15 \"yes\"@12)\n)\n(else@17,18,19$30\
+            \n  (print@22,23,24$28 \"no\"@26)\n)"
         );
     }
 

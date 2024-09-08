@@ -38,6 +38,7 @@ pub fn write(exprs: &ExprArena, line_starts: &Vec<usize>) -> String {
         str += &write_expr(exprs, *statement, 0);
         str += "\n";
     }
+    str.pop();
     str
 }
 #[allow(dead_code)]

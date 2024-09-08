@@ -71,6 +71,14 @@ pub mod test_lib {
             }
         }
     }
+    pub fn run_to_completion(parser: &mut Parser) -> ParserResult {
+        loop {
+            let result = parser.step();
+            if matches!(result, ParserResult::NoInput) {
+                return result;
+            }
+        }
+    }
 }
 
 // use crate::testing::test_lib::*;
