@@ -33,7 +33,7 @@ fn get_expr_state(alias: &'static [u8], index: usize) -> MatchResult {
             b"lit" => get_state!(multi_lit_num::MultiLitNumState::new()),
             b"int" => get_state!(word_num::WordNumState::new()),
             b"not" => get_state!(not::NotState::new()),
-            _ => panic!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
+            _ => unreachable!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
         },
     )
 }
@@ -51,7 +51,7 @@ fn get_stat_state(alias: &'static [u8], index: usize) -> MatchResult {
             b"whe" => get_state!(ifstatement::IfState::new()),
             b"whi" => get_state!(whilestatement::WhileState::new()),
             b"els" => get_state!(elsestatement::ElseState::new()),
-            _ => panic!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
+            _ => unreachable!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
         },
     )
 }

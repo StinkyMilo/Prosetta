@@ -118,14 +118,14 @@ impl Expr {
             _ => false,
         }
     }
-    pub fn is_stat(&self) -> bool {
-        match self {
-            Expr::Arc { .. } | Expr::Line { .. } | Expr::Rect { .. } => true,
-            Expr::Assign { .. } | Expr::Print { .. } => true,
-            Expr::If { .. } | Expr::Else { .. } | Expr::While { .. } => true,
-            _ => false,
-        }
-    }
+    // pub fn is_stat(&self) -> bool {
+    //     match self {
+    //         Expr::Arc { .. } | Expr::Line { .. } | Expr::Rect { .. } => true,
+    //         Expr::Assign { .. } | Expr::Print { .. } => true,
+    //         Expr::If { .. } | Expr::Else { .. } | Expr::While { .. } => true,
+    //         _ => false,
+    //     }
+    // }
 }
 
 #[derive(Debug)]

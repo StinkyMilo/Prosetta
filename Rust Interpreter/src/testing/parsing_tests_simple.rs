@@ -118,8 +118,8 @@ mod tests_simple {
     }
 
     #[test]
-    fn test_if_pri() {
-        let text = b"whe one pri hi.".to_vec();
+    fn test_if_else_pri() {
+        let text = b"whe one pri yes! else pri no..".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
         assert_eq!(
             test_lib::assert_result(&mut parser),
@@ -127,7 +127,7 @@ mod tests_simple {
         );
         assert_eq!(
             linq_like_writer::write_first(&parser.data.exprs),
-            "(if@0,1,2$14$$3 (litnum 1@4$$3) then (print@8,9,10$14$$3 \"hi\"@12))"
+            "(if@0,1,2$15 (litnum 1@4$$3) then (print@8,9,10$14 \"hi\"@12))"
         );
     }
 

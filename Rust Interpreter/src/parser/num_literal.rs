@@ -30,7 +30,7 @@ impl ParseState for LiteralNumState {
         _rest: &Slice,
     ) -> MatchResult {
         // has no child to match - fn should never be called
-        unimplemented!()
+        unreachable!()
     }
 
     fn get_name(&self) -> &'static str {

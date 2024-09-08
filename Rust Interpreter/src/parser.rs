@@ -75,7 +75,7 @@ pub struct Parser<'a> {
     ///the number of times the current slice should repeat
     repeat_count: u8,
     /// was the last matched state a stat
-    was_last_match_stat: bool,
+    last_match_index: Option<usize>,
 }
 
 impl<'a> Parser<'a> {
@@ -95,7 +95,7 @@ impl<'a> Parser<'a> {
             last_result: LastMatchResult::None,
             aliases: AliasData::new(flags),
             repeat_count: 0,
-            was_last_match_stat: false,
+            last_match_index: None,
         }
     }
     ///get the last state
@@ -175,28 +175,37 @@ impl<'a> Parser<'a> {
 
         // should always be in bounds
         // spilt at mut for borrow safety
-        let split = self.data.exprs.vec.split_at_mut(frame.0);
+        let split1 = self.data.exprs.vec.split_at_mut(frame.0);
+        let _splits1 = format!("{:?}", split1);
+        let split2 = split1.1.split_at_mut_checked(1);
+        let _splits = format!("{:?} {:?}", _splits1, split2);
 
         // default_expr is used on failing back to a none state,
         // the corrisponding expr no longer exists
-        let default_expr = &mut Expr::NoneExpr;
-        let expr = split.1.first_mut().unwrap_or(default_expr);
+        let mut expr = &mut Expr::NoneExpr;
+        let mut children: &mut [Expr] = &mut [];
+        if let Some(split) = split2 {
+            //should always be safe due to frame.0 + 1
+            expr = split.0.first_mut().unwrap();
+            children = split.1;
+        }
 
         let _self_expr = format!("{:?}", expr);
         //black_box(&_debug);
         let mut last_stat = None;
 
-        // if last expr was a stat
-        if self.was_last_match_stat {
-            let last_stat_index = *self.data.stat_starts.last().unwrap();
-            last_stat = Some(&mut split.0[last_stat_index]);
+        // // if last expr matched
+        if let Some(index) = self.last_match_index {
+            // let last_stat_index = self.data.exprs[last_stat];
+            last_stat = split1.0.get_mut(index);
         }
 
         // setup env
         let mut env = Environment {
             expr,
-            last_stat,
-            expr_index:frame.0,
+            last_matched_expr: last_stat,
+            expr_index: frame.0,
+            children,
             vars: &mut self.data.vars,
             locs: None,
             global_index: self.pos,
@@ -310,6 +319,9 @@ impl<'a> Parser<'a> {
     fn matched_func(&mut self, mut index: usize, closed: bool) -> ParserResult {
         let state = self.stack.pop().unwrap();
         let expr_index = state.0;
+        //if !state.2.do_replace(){
+        self.last_match_index = Some(state.0);
+        //}
         self.last_state = Some(state);
 
         // matched final stat
