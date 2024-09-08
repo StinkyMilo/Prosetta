@@ -20,6 +20,7 @@ pub trait Renderer: Default {
     fn add(&mut self, text: &[u8]);
     fn push(&mut self, text: u8);
     fn add_with(&mut self, text: &[u8], color: (TermColor, bool));
+    fn add_with_mult(&mut self, text: &[u8], color: Vec<(TermColor, bool)>);
     fn push_with(&mut self, text: u8, color: (TermColor, bool));
     fn into_string(self) -> Vec<u8>;
 }

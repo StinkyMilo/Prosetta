@@ -17,7 +17,7 @@ impl BasicState for CircleState {
             *expr = Expr::Arc {
                 locs,
                 indexes: [usize::MAX; 4],
-                end: usize::MAX,
+                end: End::none(),
             }
         }
         ret
@@ -41,7 +41,7 @@ impl BasicState for CircleState {
         }
     }
 
-    fn set_end(&mut self, expr: &mut Expr, index: usize) {
+    fn set_end(&mut self, expr: &mut Expr, index: End) {
         if let Expr::Arc { end, .. } = expr {
             *end = index;
         } else {

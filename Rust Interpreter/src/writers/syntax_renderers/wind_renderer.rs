@@ -37,6 +37,15 @@ impl Renderer for WindowsRenderer {
         self.add(text);
     }
 
+    fn add_with_mult(&mut self, text: &[u8], colors: Vec<(TermColor, bool)>) {
+        for color in &colors[..colors.len() - 1] {
+            self.set_color(*color);
+            self.push(b'_');
+        }
+        self.set_color(*colors.last().unwrap());
+        self.add(text);
+    }
+
     fn push_with(&mut self, char: u8, color: (TermColor, bool)) {
         self.set_color(color);
         self.push(char);

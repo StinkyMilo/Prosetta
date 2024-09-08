@@ -10,7 +10,7 @@ impl ParseState for LiteralNumState {
 
         // if value exists - match
         if let Some(value) = value {
-            env.exprs.vec[env.index] = Expr::LitNum {
+            *env.expr = Expr::LitNum {
                 str_start: word.pos + env.global_index,
                 str_length: word.len(),
                 value,
@@ -30,7 +30,7 @@ impl ParseState for LiteralNumState {
         _rest: &Slice,
     ) -> MatchResult {
         // has no child to match - fn should never be called
-        unimplemented!()
+        unreachable!()
     }
 
     fn get_name(&self) -> &'static str {

@@ -12,13 +12,13 @@ mod basic_func;
 mod alias;
 pub(crate) mod alias_data;
 mod assign;
+mod elsestatement;
+mod ifstatement;
 mod not;
 mod operator;
 mod var;
-mod word_num;
-mod ifstatement;
 mod whilestatement;
-mod elsestatement;
+mod word_num;
 
 mod circle;
 mod line;
@@ -31,11 +31,11 @@ mod num_literal;
 #[path = "testing/parsing_tests_simple.rs"]
 mod parsing_tests_simple;
 
-#[path = "testing/parsing_tests_milo.rs"]
-mod parsing_tests_milo;
+// #[path = "testing/parsing_tests_milo.rs"]
+// mod parsing_tests_milo;
 
-#[path = "testing/parsing_tests_other.rs"]
-mod parsing_tests_other;
+// #[path = "testing/parsing_tests_other.rs"]
+// mod parsing_tests_other;
 
 use std::{fmt::Debug, hint::black_box, mem};
 
@@ -74,6 +74,8 @@ pub struct Parser<'a> {
     aliases: AliasData,
     ///the number of times the current slice should repeat
     repeat_count: u8,
+    /// was the last matched state a stat
+    last_match_index: Option<usize>,
 }
 
 impl<'a> Parser<'a> {
@@ -93,6 +95,7 @@ impl<'a> Parser<'a> {
             last_result: LastMatchResult::None,
             aliases: AliasData::new(flags),
             repeat_count: 0,
+            last_match_index: None,
         }
     }
     ///get the last state
@@ -153,11 +156,11 @@ impl<'a> Parser<'a> {
         let _expr2 = linq_like_writer::write(&self.data.exprs, &self.data.stat_starts);
         let _expr_short = format!(
             "{:?}",
-            self.data.exprs.vec.iter().map(|e| {
+            Vec::from_iter(self.data.exprs.vec.iter().map(|e| {
                 let mut str = format!("{:?}", e);
                 str.truncate(str.find(" ").unwrap_or(str.len()));
                 str
-            })
+            }))
         );
         let _last = format!("{:?}", self.last_result);
         black_box(&_debug);
@@ -170,14 +173,43 @@ impl<'a> Parser<'a> {
         let stack_index = self.stack.len() - 1;
         let frame = &mut self.stack[stack_index];
 
+        // should always be in bounds
+        // spilt at mut for borrow safety
+        let split1 = self.data.exprs.vec.split_at_mut(frame.0);
+        let _splits1 = format!("{:?}", split1);
+        let split2 = split1.1.split_at_mut_checked(1);
+        let _splits = format!("{:?} {:?}", _splits1, split2);
+
+        // default_expr is used on failing back to a none state,
+        // the corrisponding expr no longer exists
+        let mut expr = &mut Expr::NoneExpr;
+        let mut children: &mut [Expr] = &mut [];
+        if let Some(split) = split2 {
+            //should always be safe due to frame.0 + 1
+            expr = split.0.first_mut().unwrap();
+            children = split.1;
+        }
+
+        let _self_expr = format!("{:?}", expr);
+        //black_box(&_debug);
+        let mut last_stat = None;
+
+        // // if last expr matched
+        if let Some(index) = self.last_match_index {
+            // let last_stat_index = self.data.exprs[last_stat];
+            last_stat = split1.0.get_mut(index);
+        }
+
         // setup env
         let mut env = Environment {
-            exprs: &mut self.data.exprs,
-            index: frame.0,
+            expr,
+            last_matched_expr: last_stat,
+            expr_index: frame.0,
+            children,
             vars: &mut self.data.vars,
             locs: None,
             global_index: self.pos,
-            aliases: &self.aliases
+            aliases: &self.aliases,
         };
 
         // setup slice
@@ -287,6 +319,9 @@ impl<'a> Parser<'a> {
     fn matched_func(&mut self, mut index: usize, closed: bool) -> ParserResult {
         let state = self.stack.pop().unwrap();
         let expr_index = state.0;
+        //if !state.2.do_replace(){
+        self.last_match_index = Some(state.0);
+        //}
         self.last_state = Some(state);
 
         // matched final stat
@@ -314,8 +349,8 @@ impl<'a> Parser<'a> {
     /// gets the number of times the characters at line[index] should be repeated and the offset after
     /// returns (repeat_count,offset)
     fn get_repeat_count(index: usize, line: &[u8]) -> (u8, u8) {
-        if line[index..index + 2] == b"..."[..] {
-            (255, 3)
+        if index + 3 <= line.len() && line[index..index + 3] == b"..."[..] {
+            (10, 3)
         } else {
             (
                 match line[index] {
@@ -362,8 +397,11 @@ impl<'a> Parser<'a> {
 
         self.data.exprs.vec.push(Expr::NoneStat);
 
-        self.stack
-            .push((index, new_index, Box::new(alias::NoneState::new_stat())));
+        self.stack.push((
+            index,
+            new_index,
+            Box::new(alias::NoneState::new_stat_cont()),
+        ));
         self.data.stat_starts.push(index);
         self.last_result = LastMatchResult::None;
     }

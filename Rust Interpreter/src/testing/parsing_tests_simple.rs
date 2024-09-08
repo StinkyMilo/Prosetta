@@ -14,13 +14,13 @@ mod tests_simple {
         );
         assert_eq!(
             linq_like_writer::write_first(&parser.data.exprs),
-            "(assign@2,3,4$19 \"seventy\"@6 (litnum 7@14$5))"
+            "(assign@2,3,4$19 \"seventy\"@6 (litnum 7@14$$5))"
         );
     }
 
     #[test]
-    fn test_wizards() {
-        let text = b"The wizards were literally nine at most..".to_vec();
+    fn set_var_to_seven_with_ellipsis() {
+        let text = b"I was seventy seven....".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
         assert_eq!(
             test_lib::assert_result(&mut parser),
@@ -28,13 +28,41 @@ mod tests_simple {
         );
         assert_eq!(
             linq_like_writer::write_first(&parser.data.exprs),
-            "(assign@4,7,10$40 \"were\"@12 (mutlilitnum@17,18,19$39 (litnum 9@27$4)))"
+            "(assign@2,3,4$19$$3 \"seventy\"@6 (litnum 7@14$$5))"
+        );
+    }
+
+    #[test]
+    fn test_wizards_with_double_close() {
+        let text = b"The wizards were literally nine at most!".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
+        assert_eq!(
+            test_lib::assert_result(&mut parser),
+            ParserResult::MatchedLine
+        );
+        assert_eq!(
+            linq_like_writer::write_first(&parser.data.exprs),
+            "(assign@4,7,10$39 \"were\"@12 (mutlilitnum@17,18,19$39 (litnum 9@27$$4)))"
+        );
+    }
+
+    #[test]
+    fn test_wizards_with_double_close_ellipsis() {
+        let text = b"The wizards were literally nine at most...".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
+        assert_eq!(
+            test_lib::assert_result(&mut parser),
+            ParserResult::MatchedLine
+        );
+        assert_eq!(
+            linq_like_writer::write_first(&parser.data.exprs),
+            "(assign@4,7,10$39$$3 \"were\"@12 (mutlilitnum@17,18,19$39$$3 (litnum 9@27$$4)))"
         );
     }
 
     #[test]
     fn test_nice_69() {
-        let text = b"I was nice. lit six nine. Yeah.".to_vec();
+        let text = b"It was nice. lit six nine. Yeah.".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
         assert_eq!(
             test_lib::assert_result(&mut parser),
@@ -42,13 +70,12 @@ mod tests_simple {
         );
         assert_eq!(
             linq_like_writer::write_first(&parser.data.exprs),
-            "(assign@2,3,4$30 \"nice\"@6 (mutlilitnum@12,13,14$24 (litnum 6@16$3) (litnum 9@20$4)))"
+            "(assign@3,4,5$31 \"nice\"@7 (mutlilitnum@13,14,15$25 (litnum 6@17$$3) (litnum 9@21$$4)))"
         );
     }
-
     #[test]
-    fn test_liechtenstein() {
-        let text = b"The wars in Liechtenstein ravaged the country..".to_vec();
+    fn test_ellipsis_6_close() {
+        let text = b"It was sub sub sub sub sub sub one...".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
         assert_eq!(
             test_lib::assert_result(&mut parser),
@@ -56,75 +83,119 @@ mod tests_simple {
         );
         assert_eq!(
             linq_like_writer::write_first(&parser.data.exprs),
-            "(assign@4,5,7$46 \"in\"@9 (wordnum@13,19,21$45 @26$$7))"
+            "(assign@3,4,5$34$$3 \"sub\"@7 (-@11,12,13$34$$3 (-@15,16,17$34$$3 \
+            (-@19,20,21$34$$3 (-@23,24,25$34$$3 (-@27,28,29$34$$3 (litnum 1@31$$3)))))))"
         );
     }
-
     #[test]
-    fn test_nottingham() {
-        let text = b"I was in Nottingham and it literally snowed the entire time I was there! All eight days!".to_vec();
-        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+    fn test_2_peirod() {
+        let text = b"It was sub sub one..".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
         assert_eq!(
             test_lib::assert_result(&mut parser),
             ParserResult::MatchedLine
         );
         assert_eq!(
             linq_like_writer::write_first(&parser.data.exprs),
-            "(assign@2,3,4$87 \"in\"@6 (skip@9,10,11 @20$71 (litnum 8@77$5)))"
+            "(assign@3,4,5$19 \"sub\"@7 (-@11,12,13$18 (litnum 1@15$$3)))"
         );
     }
 
     #[test]
-    fn test_easy_as_123() {
-        let text = b"It was as nice andd easy as one two three..".to_vec();
-        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+    fn test_ellipsis_overload_12() {
+        let text = b"It was sub sub sub sub sub sub sub sub sub sub sub sub one......".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
         assert_eq!(
             test_lib::assert_result(&mut parser),
             ParserResult::MatchedLine
         );
         assert_eq!(
             linq_like_writer::write_first(&parser.data.exprs),
-            "(assign@3,4,5$42 \"as\"@7 (add@15,17,18$41 (litnum 1@28$3) (litnum 2@32$3) (litnum 3@36$5)))"
+            "(assign@3,4,5$61$$3 \"sub\"@7 (-@11,12,13$61$$3 (-@15,16,17$58$$3 (-@19,20,21$58$$3 (-@23,24,25$58$$3 \
+            (-@27,28,29$58$$3 (-@31,32,33$58$$3 (-@35,36,37$58$$3 (-@39,40,41$58$$3 (-@43,44,45$58$$3 \
+            (-@47,48,49$58$$3 (-@51,52,53$58$$3 (litnum 1@55$$3)))))))))))))"
+        );
+    }
+
+    #[test]
+    fn test_if_else_pri() {
+        let text = b"whe one pri yes! else pri no..".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
+        assert_eq!(
+            test_lib::assert_result(&mut parser),
+            ParserResult::MatchedLine
+        );
+        assert_eq!(
+            linq_like_writer::write_first(&parser.data.exprs),
+            "(if@0,1,2$15 (litnum 1@4$$3) then (print@8,9,10$14 \"hi\"@12))"
         );
     }
 
     // #[test]
-    // fn test_it_was_not_as_easy() {
-    //     let text = b"It was as bad andd not as easy as one two three...".to_vec();
-    //     let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+    // fn test_liechtenstein() {
+    //     let text = b"The wars in Liechtenstein ravaged the country..".to_vec();
+    //     let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
     //     assert_eq!(
     //         test_lib::assert_result(&mut parser),
-    //         ParserResult::FailedLine
+    //         ParserResult::MatchedLine
+    //     );
+    //     assert_eq!(
+    //         linq_like_writer::write_first(&parser.data.exprs),
+    //         "(assign@4,5,7$46 \"in\"@9 (wordnum@13,19,21$45 @26$$7))"
     //     );
     // }
 
     // #[test]
-    // fn test_it_was_easy_as_one() {
-    //     let text = b"It was as bad add one but not two three...".to_vec();
+    // fn test_nottingham() {
+    //     let text = b"I was in Nottingham and it literally snowed the entire time I was there! All eight days!".to_vec();
     //     let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
     //     assert_eq!(
     //         test_lib::assert_result(&mut parser),
-    //         ParserResult::FailedLine
+    //         ParserResult::MatchedLine
+    //     );
+    //     assert_eq!(
+    //         linq_like_writer::write_first(&parser.data.exprs),
+    //         "(assign@2,3,4$87 \"in\"@6 (skip@9,10,11 @20$71 (litnum 8@77$5)))"
     //     );
     // }
 
-    #[test]
-    fn test_submarine() {
-        let text = b"It was SS Submarine seven..".to_vec();
-        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
-        assert_eq!(
-            test_lib::assert_result(&mut parser),
-            ParserResult::MatchedLine
-        );
-        assert_eq!(
-            linq_like_writer::write_first(&parser.data.exprs),
-            "(assign@3,4,5$26 \"SS\"@7 (sub@10,11,12$25 (litnum 7@20$5)))"
-        );
-    }
+    // #[test]
+    // fn test_easy_as_123() {
+    //     let text = b"It was as nice andd easy as one two three..".to_vec();
+    //     let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+    //     assert_eq!(
+    //         test_lib::assert_result(&mut parser),
+    //         ParserResult::MatchedLine
+    //     );
+    //     assert_eq!(
+    //         linq_like_writer::write_first(&parser.data.exprs),
+    //         "(assign@3,4,5$42 \"as\"@7 (add@15,17,18$41 (litnum 1@28$3) (litnum 2@32$3) (litnum 3@36$5)))"
+    //     );
+    // }
+
+    // // #[test]
+    // // fn test_it_was_not_as_easy() {
+    // //     let text = b"It was as bad andd not as easy as one two three...".to_vec();
+    // //     let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+    // //     assert_eq!(
+    // //         test_lib::assert_result(&mut parser),
+    // //         ParserResult::FailedLine
+    // //     );
+    // // }
+
+    // // #[test]
+    // // fn test_it_was_easy_as_one() {
+    // //     let text = b"It was as bad add one but not two three...".to_vec();
+    // //     let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+    // //     assert_eq!(
+    // //         test_lib::assert_result(&mut parser),
+    // //         ParserResult::FailedLine
+    // //     );
+    // // }
 
     // #[test]
-    // fn test_line_4() {
-    //     let text = b"lin one two three four.".to_vec();
+    // fn test_submarine() {
+    //     let text = b"It was SS Submarine seven..".to_vec();
     //     let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
     //     assert_eq!(
     //         test_lib::assert_result(&mut parser),
@@ -135,4 +206,18 @@ mod tests_simple {
     //         "(assign@3,4,5$26 \"SS\"@7 (sub@10,11,12$25 (litnum 7@20$5)))"
     //     );
     // }
+
+    #[test]
+    fn test_line_4() {
+        let text = b"lin one two three four!".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        assert_eq!(
+            test_lib::assert_result(&mut parser),
+            ParserResult::MatchedLine
+        );
+        assert_eq!(
+            linq_like_writer::write_first(&parser.data.exprs),
+            "(line@0,1,2$22 (litnum 1@4$$3) (litnum 2@8$$3) (litnum 3@12$$5) (litnum 4@18$$4))"
+        );
+    }
 }

@@ -1,24 +1,24 @@
+use std::usize;
+
 use super::*;
 /// state for equals
 #[derive(Debug)]
-pub struct IfState{
-    has_condition: bool
+pub struct IfState {
+    has_condition: bool,
 }
 impl ParseState for IfState {
-
     fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
         if !self.has_condition {
-            env.exprs.vec[env.index] = Expr::If {
-                condition_start: word.pos + env.global_index,
+            *env.expr = Expr::If {
                 locs: env.locs.take().unwrap_or_default(),
-                body_start: usize::MAX,
-                indexes:Vec::new(),
-                body_end: usize::MAX
+                else_index: usize::MAX,
+                indexes: Vec::new(),
+                end: End::none(),
             };
             // setup child state
             MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont()))
-        }else{
-            println!("Continuing with new statement");
+        } else {
+            //println!("Continuing with new statement");
             MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
         }
     }
@@ -28,58 +28,41 @@ impl ParseState for IfState {
         env: &mut Environment,
         child_index: Option<usize>,
         word: &Slice,
-        rest: &Slice,
+        _rest: &Slice,
     ) -> MatchResult {
-        let mut has_else = false;
-        if self.has_condition{
-            if let Some(index) = child_index {
-                has_else = matches!(env.exprs.vec[index],Expr::Else{..});
-            }
-        }
-        if let Expr::If {body_start, body_end, indexes, ..} = &mut env.exprs.vec[env.index] {
-            //If we get a punctuation before an expression, we want to end. Otherwise, we want to continue with a new expression
-            //Check the next close. Is it after the child expression? If so, don't even add the child and fail.
-            if !(self.has_condition) {
+        if let Expr::If { indexes, end, .. } = env.expr {
+            // let mut has_else = false;
+            if !self.has_condition {
+                //add child and find stats
                 if let Some(index) = child_index {
-                    indexes.push(index);
                     self.has_condition=true;
-                    *body_start=index;
-                    MatchResult::ContinueWith(word.pos,get_state!(alias::NoneState::new_stat()))
-                }else{
-                    //No child
+                    indexes.push(index);
+                    MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
+                } else {
+                    // if child match fail, I can never succeed
                     MatchResult::Failed
                 }
-            }else{
-                let mut statement_found = false;
+            } else {
+                //and stat child
                 if let Some(index) = child_index {
                     indexes.push(index);
-                    statement_found=true;
                 }
-                
-                if is_close(word){
-                    *body_end = word.pos + env.global_index;
+
+                // close if have close
+                if is_close(word) {
+                    *end = End::from_slice(&word, env.global_index);
+                    env.vars.remove_layer();
                     MatchResult::Matched(word.pos, true)
-                }else if statement_found {
-                    if has_else {
-                        //Else must be the last statement
-                        let close = find_close(&word, 0).or_else(|| find_close(&rest, 0));
-                        match close {
-                            // will never be a period to find even on future words
-                            None => MatchResult::Failed,
-                            Some(slice) => {
-                                *body_end = slice.pos + env.global_index;
-                                MatchResult::Matched(slice.pos, true)
-                            }
-                        }
-                    }else{
-                        MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat()))
-                    }
-                }else{
+                    // succeeded - continue again with noncont stat
+                } else if child_index.is_some() {
+                    MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat()))
+                    // failed - pass word
+                } else {
                     MatchResult::Continue
                 }
-            } 
-        }else{
-            MatchResult::Failed
+            }
+        } else {
+            unreachable!()
         }
     }
 
@@ -94,8 +77,8 @@ impl ParseState for IfState {
 
 impl IfState {
     pub fn new() -> Self {
-        Self{
-            has_condition: false
+        Self {
+            has_condition: false,
         }
     }
 }
