@@ -76,18 +76,55 @@ pub fn get_number_literal(mut word: &[u8]) -> Option<i64> {
 }
 
 pub fn get_number_word(word: &[u8]) -> Option<i64> {
-    Some(match &*word.to_ascii_lowercase() {
-        b"zero" => 0,
-        b"one" => 1,
-        b"two" => 2,
-        b"three" => 3,
-        b"four" => 4,
-        b"five" => 5,
-        b"six" => 6,
-        b"seven" => 7,
-        b"eight" => 8,
-        b"nine" => 9,
-        b"ten" => 10,
-        _ => return None,
-    })
+    let first_binding = word.to_ascii_lowercase();
+    let temp_binding = String::from_utf8_lossy(&*&first_binding);
+    let split_match: Vec<String> = temp_binding.split("-").map(str::to_string).collect();
+    let mut sum = 0;
+    let mut last_value = 0;
+    let rev_values = Vec::new();
+    //TODO: Enforce that each number must be less than the last, and you can't do like eleven-one
+    for item in split_match{
+        
+        let next_value = match item {
+            "zero" => 0,
+            "one" => 1,
+            "two" => 2,
+            "three" => 3,
+            "four" => 4,
+            "five" => 5,
+            "six" => 6,
+            "seven" => 7,
+            "eight" => 8,
+            "nine" => 9,
+            "ten" => 10,
+            "eleven" => 11,
+            "twelve" => 12,
+            "thirteen" => 13,
+            "fourteen" => 14,
+            "fifteen" => 15,
+            "sixteen" => 16,
+            "seventeen" => 17,
+            "eighteen" => 18,
+            "nineteen" => 19,
+            "twenty" => 20,
+            "thirty" => 30,
+            "forty" => 40,
+            "fifty" => 50,
+            "sixty" => 60,
+            "seventy" => 70,
+            "eighty" => 80,
+            "ninety" => 90,
+            "hundred" => 100,
+            "thousand" => 1000,
+            "million" => 1000000,
+            "billion" => 1000000000,
+            _ => return None,
+        };
+        
+    }
+    Some(sum)
+}
+
+fn get_number_word_from_list(values: Vec<u16>){
+
 }
