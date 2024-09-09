@@ -123,9 +123,7 @@ pub fn get_number_word(word: &[u8]) -> Option<i64> {
             _ => return None,
         };
         rev_values.push(next_value);
-        let rvlen = rev_values.len();
     }
-    let rvlen = rev_values.len();
     get_number_word_from_list(&rev_values, 0, rev_values.len())
     
 }
