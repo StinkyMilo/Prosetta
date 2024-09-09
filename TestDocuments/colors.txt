@@ -1,0 +1,286 @@
+aliceblue
+alice blue
+antiquewhite
+antique white
+aqua
+aquamarine
+aqua marine
+azure
+beige
+bisque
+black
+blanchedalmond
+blanched almond
+blue
+blue violet
+blueviolet
+brown
+burlywood
+burly wood
+cadetblue
+cadet blue
+chartreuse
+chocolate
+coral
+cornflowerblue
+corn flower blue
+cornflower blue
+corn flowerblue
+cornsilk
+corn silk
+crimson
+cyan
+darkblue
+dark blue
+dark cyan
+darkcyan
+darkgoldenrod
+dark goldenrod
+dark golden rod
+darkgolden rod
+darkgray
+dark gray
+darkgreen
+dark green
+darkgrey
+dark grey
+darkkhaki
+dark khaki
+darkmagenta
+dark magenta
+darkolivegreen
+dark olive green
+darkolive green
+dark olivegreen
+darkorange
+dark orange
+darkorchid
+dark orchid
+darkred
+dark red
+darksalmon
+dark salmon
+dark sea green
+darksea green
+dark seagreen
+darkseagreen
+dark slate blue
+darkslate blue
+dark slateblue
+darkslateblue
+dark slate gray
+darkslate gray
+dark slategray
+darkslategray
+dark slate grey
+darkslate grey
+dark slategrey
+darkslategrey
+darkturquoise
+dark turquoise
+darkviolet
+dark violet
+deep pink
+deeppink
+deepskyblue
+deep skyblue
+deepsky blue
+deep sky blue
+dimgray
+dim gray
+dimgrey
+dim grey
+dodger blue
+dodgerblue
+firebrick
+fire brick
+floral white
+floralwhite
+forest green
+forestgreen
+fuchsia
+gainsboro
+ghostwhite
+ghost white
+gold
+golden rod
+goldenrod
+gray
+green
+greenyellow
+green yellow
+grey
+honeydew
+hotpink
+hot pink
+indianred
+indian red
+indigo
+ivory
+khaki
+lavender
+lavender blush
+lawngreen
+lawn green
+lemonchiffon
+lemon chiffon
+lightblue
+light blue
+light coral
+lightcoral
+light cyan
+lightcyan
+lightgoldenrodyellow
+light golden rod yellow
+light goldenrod yellow
+lightgolden rodyellow
+lightgolden rod yellow
+lightgoldenrod yellow
+light goldenrodyellow
+light golden rodyellow
+lightgray
+light gray
+lightgreen
+light green
+light grey
+lightgrey
+lightsalmon
+light salmon
+lightseagreen
+light seagreen
+lightsea green
+light sea green
+lightskyblue
+light sky blue
+lightsky blue
+light skyblue
+light slate gray
+lightslate gray
+light slategray
+lightslategray
+light slate grey
+lightslate grey
+light slategrey
+lightslategrey
+light steel blue
+lightsteelblue
+lightsteel blue
+light steelblue
+lightyellow
+light yellow
+lime
+limegreen
+lime green
+linen
+magenta
+maroon
+medium aquamarine
+medium aqua marine
+mediumaqua marine
+medium blue
+mediumblue
+medium orchid
+mediumorchid
+medium purple
+mediumpurple
+medium sea green
+mediumseagreen
+mediumsea green
+medium seagreen
+mediumslate blue
+medium slateblue
+medium slate blue
+mediumslateblue
+mediumspringgreen
+medium springgreen
+mediumspring green
+medium spring green
+medium turquoise
+mediumturquoise
+medium violet red
+mediumviolet red
+medium violetred
+mediumvioletred
+midnightblue
+midnight blue
+mintcream
+mint cream
+mistyrose
+misty rose
+moccasin
+navajo white
+navajowhite
+navy
+oldlace
+old lace
+olive
+olive drab
+olivedrab
+orange
+orange red
+orangered
+orchid
+palegoldenrod
+pale goldenrod
+palegolden rod
+pale golden rod
+palegreen
+pale green
+paleturquoise
+pale turquoise
+pale violet red
+palevioletred
+pale violetred
+paleviolet red
+papayawhip
+papaya whip
+peachpuff
+peach puff
+peru
+pink
+plum
+powder blue
+powderblue
+purple
+rebecca purple
+rebeccapurple
+red
+rosybrown
+rosy brown
+royalblue
+royal blue
+saddlebrown
+saddle brown
+salmon
+sandybrown
+sandy brown
+sea green
+seashell
+sea shell
+sienna
+silver
+skyblue
+sky blue
+slateblue
+slate blue
+slategray
+slate gray
+slategrey
+slate grey
+snow
+springgreen
+spring green
+steel blue
+steelblue
+tan
+teal
+thistle
+tomato
+transparent
+turquoise
+violet
+wheat
+white
+whitesmoke
+yellow
+yellowgreen

@@ -108,6 +108,26 @@ pub enum Expr {
         start: usize,
         end: End,
     },
+    Color {
+        locs: Vec<usize>,
+        indexes: [usize; 3],
+        end: End
+    },
+    Fill {
+        locs: Vec<usize>,
+        indexes: [usize; 3],
+        end: End
+    },
+    Stroke {
+        locs: Vec<usize>,
+        indexes: [usize; 3],
+        end: End
+    },
+    LitCol {
+        str_start: usize,
+        str_length: usize,
+        value: Vec<u8>
+    }
 }
 
 impl Expr {

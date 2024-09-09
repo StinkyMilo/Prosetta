@@ -1,15 +1,12 @@
 use super::*;
 
-const BASE_EXPR_ALIASES: [&'static [u8]; 15] = [
-    b"int", b"tim", b"add", b"sub", b"lit", b"ide", b"mod", b"log", b"exp", b"les", b"mor", b"als",
-    b"oth", b"par", b"inv",
+const BASE_EXPR_ALIASES: [&'static [u8]; 16] = [
+    b"int", b"tim", b"add", b"sub", b"lit", b"ide", b"mod", b"log", b"exp", b"les", b"mor", b"als", b"oth", b"par", b"inv", b"col"
 ];
 
 const NOT_ALIAS: &'static [u8] = b"not";
 
-const STAT_ALIASES: [&'static [u8]; 8] = [
-    b"arc", b"lin", b"was", b"rec", b"pri", b"whe", b"whi", b"els",
-];
+const STAT_ALIASES: [&'static [u8]; 10] = [b"arc", b"lin", b"was", b"rec", b"pri", b"whe", b"whi", b"els", b"sto", b"fil"];
 
 ///match alias to expr
 fn get_expr_state(alias: &'static [u8], index: usize) -> MatchResult {
@@ -33,6 +30,7 @@ fn get_expr_state(alias: &'static [u8], index: usize) -> MatchResult {
             b"lit" => get_state!(multi_lit_num::MultiLitNumState::new()),
             b"int" => get_state!(word_num::WordNumState::new()),
             b"not" => get_state!(not::NotState::new()),
+            b"col" => get_state!(color::ColorState::new()),
             _ => unreachable!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
         },
     )
@@ -51,6 +49,8 @@ fn get_stat_state(alias: &'static [u8], index: usize) -> MatchResult {
             b"whe" => get_state!(ifstatement::IfState::new()),
             b"whi" => get_state!(whilestatement::WhileState::new()),
             b"els" => get_state!(elsestatement::ElseState::new()),
+            b"sto" => get_state!(stroke::StrokeState::new()),
+            b"fil" => get_state!(fill::FillState::new()),
             _ => unreachable!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
         },
     )

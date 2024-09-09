@@ -18,7 +18,10 @@ mod not;
 mod operator;
 mod var;
 mod whilestatement;
-mod word_num;
+mod stroke;
+mod fill;
+mod color;
+mod litcolor;
 
 mod circle;
 mod line;
@@ -27,6 +30,7 @@ mod rect;
 
 mod multi_lit_num;
 mod num_literal;
+mod word_num;
 
 #[path = "testing/parsing_tests_simple.rs"]
 mod parsing_tests_simple;
