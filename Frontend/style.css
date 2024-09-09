@@ -1,0 +1,27 @@
+#outputcanvas {
+  background: white;
+  margin-left: 10px;
+}
+
+#sourcecode {
+  width: 450px;
+  margin-right: 10px;
+  resize: none;
+}
+
+#codespace {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+#console {
+  margin-top: 10px;
+  overflow: scroll;
+  height: 100px;
+  font-family: "Cascadia Code";
+  background: black;
+}
+
+body {
+  margin: 20px;
+}
