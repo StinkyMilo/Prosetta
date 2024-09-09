@@ -5,7 +5,7 @@
 use crate::{
     parser::{ParsedData, Parser, ParserFlags, ParserResult, ParserSource},
     writers::{
-        javascript_writer, linq_like_writer, syntax_lint::SyntaxLinter,
+        javascript_writer, lisp_like_writer, syntax_lint::SyntaxLinter,
         syntax_renderers::wind_renderer::WindowsRenderer,
     },
 };
@@ -40,7 +40,7 @@ pub fn run_after(data: ParsedData, parser_flags: RunnerFlags) {
     if parser_flags.whole_program {
         println!(
             "   whole program:\n{}",
-            linq_like_writer::write(&data.exprs, &data.stat_starts)
+            lisp_like_writer::write(&data.exprs, &data.stat_starts)
         );
         println!(
             "   JavaScript output:\n{}",

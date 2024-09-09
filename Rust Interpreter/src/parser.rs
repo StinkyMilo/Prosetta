@@ -43,7 +43,7 @@ mod parsing_tests_simple;
 
 use std::{fmt::Debug, hint::black_box, mem};
 
-use crate::{commands::*, writers::linq_like_writer};
+use crate::{commands::*, writers::lisp_like_writer};
 
 use alias_data::AliasData;
 
@@ -157,7 +157,7 @@ impl<'a> Parser<'a> {
             Vec::from_iter(self.stack.iter().map(|x| x.2.get_name()))
         );
         let _expr = format!("{:?}", self.data.exprs.vec);
-        let _expr2 = linq_like_writer::write(&self.data.exprs, &self.data.stat_starts);
+        let _expr2 = lisp_like_writer::write(&self.data.exprs, &self.data.stat_starts);
         let _expr_short = format!(
             "{:?}",
             Vec::from_iter(self.data.exprs.vec.iter().map(|e| {
