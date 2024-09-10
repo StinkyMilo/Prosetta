@@ -72,7 +72,7 @@ impl ParseState for MultiLitNumState {
                 } else if let Some(num_value) = get_number_word(word.str){
                     values.push(VarOrInt::Int(num_value%10));
                 } else {
-                    values.push(VarOrInt::Int(word.len() as i64));
+                    values.push(VarOrInt::Int((word.len() as i64)%10));
                 }
                 MatchResult::Continue
             }
@@ -104,7 +104,8 @@ impl MultiLitNumState {
     pub fn new() -> Self {
         Self {
             first: true,
-            any_vars: false
+            any_vars: false,
+            // any_vars: true,
         }
     }
 }
