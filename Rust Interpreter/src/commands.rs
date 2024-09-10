@@ -100,8 +100,10 @@ pub enum Expr {
     },
     //TODO: Could make a compiler optimization to pre-evaluate this if there are no variables
     MultiLitNum {
+        str_start: usize,
         locs: Vec<usize>,
         values: Vec<VarOrInt>,
+        single_value: Option<i64>,
         end: End,
     },
     Skip {
