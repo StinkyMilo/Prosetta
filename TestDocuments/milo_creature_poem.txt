@@ -20,6 +20,20 @@ fil dark grey
 was mayor 100
 was Gus (tim 2 mayor)
 
+re-used numbers
+    100 - mayor
+    200 - Gus
+    120 - cruel
+    160 - tried
+    170 - were
+    240 - done
+    10 - only
+    190 - domestic
+    20 - for
+    6 - rallied
+    220 - war
+    225 - falling
+
 ABCB or ABAB
 
 My town's top official is a dark grey cat.
@@ -28,11 +42,77 @@ He was mayor for one-hundred days.
     (was mayor 100)
 His name was Gus, and his campaign triumphed
     (was Gus (tim
-over two mayor candidates, both named Hayes.
+over two other mayor al candidates, whom the town had tired of.
     2 mayor))
 
-Following the superb victory of Gus 's initial ubiquitous, silly campaign,
-    (sub Gus (int 10))
-his limited vaccination faced notice.
-    (lit 1 5 6)
-155 160 120
+'He was only ten years old!' the papers shouted.
+    (was only 10)
+But the cat was cruel, and the criticism only fueled him.
+    (was cruel (tim only
+His administration assassinated the dissenters...
+    (int 12)))
+
+Then Gus and the Wildcats tried to light a little revolution.
+    (was tried (lit 1 6 0))
+His wars were headed to the capital,
+    (was were (add
+but though he tried, his forces only made it to the next town over...
+    tried only))
+
+By then, Gus was done with his military of tiny colleagues.
+    (was done (lit 2 4 0)) 
+He turned his attention towards domestic subjects.
+    (was domestic (sub 
+Gus required only the finest salmon for his meals. No tuna would do.
+    gus only))
+
+He set wages for the job of housecat to twenty dollars per hour.
+    (was for 20)
+He and the wildcats rallied against closed doors everywhere.
+    (was rallied (int closed))
+
+'He wants war' the papers shouted. Dissent grew substantial. 'Cat is done for!'
+    (was war (sub done for))
+Seeing his popularity was falling, he gave an endearing address. With five meows, worries of war ended!
+    (was falling (add five war))
+
+Hail the true American cat, Gus! Gus the mayor to end all mayor s!
+    (arc Gus Gus mayor mayor)
+
+His following began to subside as he tried to integrate catty policies.
+    (lin domestic (sub tried (int catty)
+But it soon came back, as he tried to be cruel again!
+    )tried cruel)
+
+The dog population tried to kill the cruel ruler,
+    (lin tried cruel 
+but though they tried they were unsuccessful.
+    tried were)
+
+One million people had handed Gus and only him the key to rule the town.
+    (lin (add gus only) 
+The subsequent chaos the cat tried to create that winter razed the town entirely!
+    (sub tried (int razed))
+The cat had done every cruel thing that the public had feared.
+    done cruel)
+
+But Gus kept learning! And though he had done cruel things, 
+    (lin done cruel 
+the things he had done were all well-intentioned.
+    done were)
+
+Strangely, his financial policies succeeded, according to economist John White. 
+    (fil white).
+After Gus's term ended in march, the next candidate had him tried for his crimes,
+    (arc (add tried for) 
+including domestic terrorism and one charge for being so dang cute!
+    domestic (tim one for))
+
+
+arc war domestic for.
+fil green.
+arc add were only. domestic rallied.
+arc war add were for. rallied.
+lin Gus Gus Gus war.
+lin Gus war. add Gus fifteen. falling.
+lin Gus war sub gus fifteen. falling.
