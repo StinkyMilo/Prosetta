@@ -127,6 +127,20 @@ mod tests_simple {
     }
 
     #[test]
+    fn lit_zero() {
+        let text = b"The wizards were literally...".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
+        assert_eq!(
+            test_lib::assert_result(&mut parser),
+            ParserResult::MatchedLine
+        );
+        assert_eq!(
+            linq_like_writer::write_first(&parser.data.exprs),
+            "(assign@4,7,10$26$$3 \"were\"@12 (litnum@17,18,19$26$$3 0))"
+        );
+    }
+
+    #[test]
     fn test_nice_69() {
         let text = b"It was nice. lit six nine. Yeah.".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());

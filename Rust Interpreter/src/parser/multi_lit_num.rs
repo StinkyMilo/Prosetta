@@ -28,13 +28,24 @@ impl ParseState for MultiLitNumState {
         if self.first {
             let locs = env.locs.take().unwrap_or_default();
             self.first=false;
-            *env.expr = Expr::MultiLitNum {
-                str_start: word.pos + env.global_index,
-                locs,
-                end: End::none(),
-                single_value: None,
-                values: Vec::new(),
-            };
+            if is_close(word){
+                *env.expr = Expr::MultiLitNum {
+                    str_start: word.pos + env.global_index,
+                    locs,
+                    end: End::from_slice(&word, env.global_index),
+                    single_value: Some(0),
+                    values: Vec::new(),
+                };
+                return MatchResult::Matched(word.pos, true);
+            }else{
+                *env.expr = Expr::MultiLitNum {
+                    str_start: word.pos + env.global_index,
+                    locs,
+                    end: End::none(),
+                    single_value: None,
+                    values: Vec::new(),
+                };
+            }
         }
         if let Expr::MultiLitNum { values, end, single_value, .. } = env.expr {
             if is_close(word){
