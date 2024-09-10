@@ -124,6 +124,9 @@ pub fn get_number_word(word: &[u8]) -> Option<i64> {
         };
         rev_values.push(next_value);
     }
+    if rev_values.len() == 0{
+        return None;
+    }
     get_number_word_from_list(&rev_values, 0, rev_values.len())
     
 }

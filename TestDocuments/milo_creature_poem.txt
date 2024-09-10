@@ -108,11 +108,151 @@ After Gus's term ended in march, the next candidate had him tried for his crimes
 including domestic terrorism and one charge for being so dang cute!
     domestic (tim one for))
 
+Articles came out about the war this domestic shorthair had caused for my small town,
+    (arc war domestic for)
+as well as his failure versus the green party next term.
+    (fil green)
 
-arc war domestic for.
-fil green.
-arc add were only. domestic rallied.
-arc war add were for. rallied.
-lin Gus Gus Gus war.
-lin Gus war. add Gus fifteen. falling.
-lin Gus war sub gus fifteen. falling.
+March marked a new addition to politics. Cats were n't only eligible candidates, 
+    (arc (add were only) 
+but now a domestic shorthair had almost rallied us into complete chaos!
+    domestic rallied)
+
+In accordance with the new 'no war s started by cats' act, 
+    (arc war 
+additional restrictions were put in place for mental assessment of any animal office holder,
+    (add were for) 
+so that we would never be rallied to action by a cute beast again.
+    rallied)
+
+In the next election, Gus the Cat ran versus Gus the Dog and Gus the Slug,
+    (lin Gus Gus Gus 
+all of whom had fought in the recent war.
+    war)
+
+The relation of Gus to war became clear.
+    (lin Gus war 
+We had handed Gus, a murderous beast who killed fifteen mice a day, 
+    (add Gus fifteen) 
+complete control over our town. No wonder crime stopped falling!
+    falling)
+
+Following Gus 's war, Subway made a Gus sandwich for fifteen dollars,
+    (lin Gus war (sub gus fifteen) 
+which didn't help its falling popularity.
+    falling)
+
+The end!
+
+
+
+
+
+
+
+
+
+
+My town's top official is a dark grey cat.
+He was mayor for one-hundred days.
+His name was Gus, and his campaign triumphed
+over two other mayor al candidates, whom the town had tired of.
+'He was only ten years old!' the papers shouted.
+But the cat was cruel, and the criticism only fueled him.
+His administration assassinated the dissenters...
+Then Gus and the Wildcats tried to light a little revolution.
+His wars were headed to the capital,
+but though he tried, his forces only made it to the next town over...
+By then, Gus was done with his military of tiny colleagues.
+He turned his attention towards domestic subjects.
+Gus required only the finest salmon for his meals. No tuna would do.
+He set wages for the job of housecat to twenty dollars per hour.
+He and the wildcats rallied against closed doors everywhere.
+'He wants war' the papers shouted. Dissent grew substantial. 'Cat is done for!'
+Seeing his popularity was falling, he gave an endearing address. With five meows, worries of war ended!
+Hail the true American cat, Gus! Gus the mayor to end all mayor s!
+His following began to subside as he tried to integrate catty policies.
+But it soon came back, as he tried to be cruel again!
+The dog population tried to kill the cruel ruler,
+but though they tried they were unsuccessful.
+One million people had handed Gus and only him the key to rule the town.
+The subsequent chaos the cat tried to create that winter razed the town entirely!
+The cat had done every cruel thing that the public had feared.
+But Gus kept learning! And though he had done cruel things, 
+the things he had done were all well-intentioned.
+Strangely, his financial policies succeeded, according to economist John White. 
+After Gus's term ended in march, the next candidate had him tried for his crimes,
+including domestic terrorism and one charge for being so dang cute!
+Articles came out about the war this domestic shorthair had caused for my small town,
+as well as his failure versus the green party next term.
+March marked a new addition to politics. Cats were n't only eligible candidates, 
+but now a domestic shorthair had almost rallied us into complete chaos!
+In accordance with the new 'no war s started by cats' act, 
+additional restrictions were put in place for mental assessment of any animal office holder,
+so that we would never be rallied to action by a cute beast again.
+In the next election, Gus the Cat ran versus Gus the Dog and Gus the Slug,
+all of whom had fought in the recent war.
+The relation of Gus to war became clear.
+We had handed Gus, a murderous beast who killed fifteen mice a day, 
+complete control over our town. No wonder crime stopped falling!
+Following Gus 's war, Subway made a Gus sandwich for fifteen dollars,
+which didn't help its falling popularity.
+The end!
+
+^ this version causes an infinite loop in the parser!
+
+[Section 1: Works!]
+My town's top official is a dark grey cat.
+He was mayor for one-hundred days.
+His name was Gus, and his campaign triumphed
+over two mayor al candidates, whom the town had tired of.
+'He was only ten years old!' the papers shouted.
+
+[Sections 1+2]
+My town's top official is a dark grey cat.
+He was mayor for one-hundred days.
+His name was Gus, and his campaign triumphed
+over two past mayor s, whom the town had tired of...
+'He was only ten years old!' the papers shouted.
+But the cat was cruel, and the criticism only fueled him.
+His administration assassinated the dissenters...
+Then Gus and the Wildcats tried to light a little revolution.
+His wars were headed to the capital,
+but though he tried, his forces only made it to the next town over...
+
+
+By then, Gus was done with his military of tiny colleagues.
+He turned his attention towards domestic subjects.
+Gus required only the finest salmon for his meals. No tuna would do.
+He set wages for the job of housecat to twenty dollars per hour.
+He and the wildcats rallied against closed doors everywhere.
+'He wants war' the papers shouted. Dissent grew substantial. 'Cat is done for!'
+Seeing his popularity was falling, he gave an endearing address. With five meows, worries of war ended!
+Hail the true American cat, Gus! Gus the mayor to end all mayor s!
+His following began to subside as he tried to integrate catty policies.
+But it soon came back, as he tried to be cruel again!
+The dog population tried to kill the cruel ruler,
+but though they tried they were unsuccessful.
+One million people had handed Gus and only him the key to rule the town.
+The subsequent chaos the cat tried to create that winter razed the town entirely!
+The cat had done every cruel thing that the public had feared.
+But Gus kept learning! And though he had done cruel things, 
+the things he had done were all well-intentioned.
+Strangely, his financial policies succeeded, according to economist John White. 
+After Gus's term ended in march, the next candidate had him tried for his crimes,
+including domestic terrorism and one charge for being so dang cute!
+Articles came out about the war this domestic shorthair had caused for my small town,
+as well as his failure versus the green party next term.
+March marked a new addition to politics. Cats were n't only eligible candidates, 
+but now a domestic shorthair had rallied us into complete chaos!
+In accordance with the new 'no war s started by cats' act, 
+additional restrictions were put in place for mental assessment of any animal office holder,
+so that we would never be rallied to action by a cute beast again.
+In the next election, Gus the Cat ran versus Gus the Dog and Gus the Slug,
+all of whom had fought in the recent war.
+The relation of Gus to war became clear.
+We had handed Gus, a murderous beast who killed fifteen mice a day, 
+complete power over our town. No wonder crime stopped falling!
+Following Gus 's war, Subway made a Gus sandwich for fifteen dollars,
+that didn't help its falling popularity.
+The end!
