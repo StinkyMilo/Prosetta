@@ -1,0 +1,35 @@
+set_fill("darkslategrey");
+draw_ellipse(200,200,100,100);
+ctx.lineWidth=4;
+set_stroke("black"); //This should be true by default
+draw_line(190,155,160,120);
+draw_line(160,120,160,170);
+draw_line(210,155,240,120);
+draw_line(240,120,240,170);
+set_fill("white");
+draw_ellipse(180,190,20,20);
+draw_ellipse(220,190,20,20);
+set_fill("green");
+draw_ellipse(180,190,6,6);
+draw_ellipse(220,190,6,6);
+draw_line(200,200,200,220);
+draw_line(200,220,215,225);
+draw_line(200,220,185,225);
+
+fil dark grey
+was mayor 100
+was Gus (tim 2 mayor)
+
+ABCB or ABAB
+
+My town's top official is a dark grey cat.
+    (fil darkgrey)
+He was mayor for one-hundred days.
+    (was mayor 100)
+His name was Gus, and his campaign triumphed
+    (was Gus (tim
+over two mayor candidates, both named Hayes.
+    2 mayor))
+
+Following the superb victory of Gus 's initial ubiquitous campaign,
+155 160 120
