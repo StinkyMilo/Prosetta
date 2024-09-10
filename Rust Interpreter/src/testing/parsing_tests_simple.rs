@@ -108,7 +108,7 @@ mod tests_simple {
         );
         assert_eq!(
             linq_like_writer::write_first(&parser.data.exprs),
-            "(assign@4,7,10$39 \"were\"@12 (mutlilitnum@17,18,19$39 (litnum 924@27$$4)))"
+            "(assign@4,7,10$39 \"were\"@12 (litnum@17,18,19$39 924))"
         );
     }
 
@@ -122,7 +122,7 @@ mod tests_simple {
         );
         assert_eq!(
             linq_like_writer::write_first(&parser.data.exprs),
-            "(assign@4,7,10$39$$3 \"were\"@12 (mutlilitnum@17,18,19$39$$3 (litnum 9@27$$4)))"
+            "(assign@4,7,10$39$$3 \"were\"@12 (litnum@17,18,19$39$$3 924))"
         );
     }
 
@@ -136,7 +136,7 @@ mod tests_simple {
         );
         assert_eq!(
             linq_like_writer::write_first(&parser.data.exprs),
-            "(assign@3,4,5$31 \"nice\"@7 (mutlilitnum@13,14,15$25 (litnum 6@17$$3) (litnum 9@21$$4)))"
+            "(assign@3,4,5$31 \"nice\"@7 (litnum@13,14,15$25 69))"
         );
     }
     #[test]
