@@ -2,11 +2,11 @@
 mod tests_simple {
     use crate::parser::*;
     use crate::testing::*;
-    //use crate::linq_like_writer::*;
+    //use crate::lisp_like_writer::*;
     //use std::hint;
     #[test]
     fn set_var_to_seven() {
-        let text = b"I was seventy seven.".to_vec();
+        let text = b"I was going to be seventy.".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
         assert_eq!(
             test_lib::assert_result(&mut parser),
@@ -14,13 +14,13 @@ mod tests_simple {
         );
         assert_eq!(
             lisp_like_writer::write_first(&parser.data.exprs),
-            "(assign@2,3,4$19 \"seventy\"@6 (litnum 7@14$$5))"
+            "(assign@2,3,4$25 \"going\"@6 (litnum 70@18$$7))"
         );
     }
 
     #[test]
     fn set_var_to_seven_with_ellipsis() {
-        let text = b"I was seventy seven....".to_vec();
+        let text = b"I was always seventy-seven....".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
         assert_eq!(
             test_lib::assert_result(&mut parser),
@@ -28,7 +28,73 @@ mod tests_simple {
         );
         assert_eq!(
             lisp_like_writer::write_first(&parser.data.exprs),
-            "(assign@2,3,4$19$$3 \"seventy\"@6 (litnum 7@14$$5))"
+            "(assign@2,3,4$26$$3 \"always\"@6 (litnum 77@13$$13))"
+        );
+    }
+
+    #[test]
+    fn make_complicated_litnum() {
+        let text = b"I was always one-hundred-and-twenty-three-thousand-three-hundred-and-two....".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
+        assert_eq!(
+            test_lib::assert_result(&mut parser),
+            ParserResult::MatchedLine
+        );
+        assert_eq!(
+            lisp_like_writer::write_first(&parser.data.exprs),
+            "(assign@2,3,4$72$$3 \"always\"@6 (litnum 123302@13$$59))"
+        );
+    }
+
+    #[test]
+    fn make_twenty_one_litnum() {
+        let text = b"I was always twenty-one....".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
+        assert_eq!(
+            test_lib::assert_result(&mut parser),
+            ParserResult::MatchedLine
+        );
+        assert_eq!(
+            lisp_like_writer::write_first(&parser.data.exprs),
+            "(assign@2,3,4$23$$3 \"always\"@6 (litnum 21@13$$10))"
+        );
+    }
+
+    #[test]
+    fn make_zero() {
+        let text = b"I was always zero....".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
+        assert_eq!(
+            test_lib::assert_result(&mut parser),
+            ParserResult::MatchedLine
+        );
+        assert_eq!(
+            lisp_like_writer::write_first(&parser.data.exprs),
+            "(assign@2,3,4$17$$3 \"always\"@6 (litnum 0@13$$4))"
+        );
+    }
+
+    #[test]
+    fn make_gettysburg() {
+        let text = b"I was always four-score-and-seven....".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
+        assert_eq!(
+            test_lib::assert_result(&mut parser),
+            ParserResult::MatchedLine
+        );
+        assert_eq!(
+            lisp_like_writer::write_first(&parser.data.exprs),
+            "(assign@2,3,4$33$$3 \"always\"@6 (litnum 87@13$$20))"
+        );
+    }
+
+    #[test]
+    fn do_not_make_gas_station() {
+        let text = b"I was always seven-eleven....".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
+        assert_eq!(
+            test_lib::assert_result(&mut parser),
+            ParserResult::FailedLine
         );
     }
 
@@ -42,7 +108,7 @@ mod tests_simple {
         );
         assert_eq!(
             lisp_like_writer::write_first(&parser.data.exprs),
-            "(assign@4,7,10$39 \"were\"@12 (mutlilitnum@17,18,19$39 (litnum 9@27$$4)))"
+            "(assign@4,7,10$39 \"were\"@12 (litnum@17,18,19$39 924))"
         );
     }
 
@@ -56,7 +122,21 @@ mod tests_simple {
         );
         assert_eq!(
             lisp_like_writer::write_first(&parser.data.exprs),
-            "(assign@4,7,10$39$$3 \"were\"@12 (mutlilitnum@17,18,19$39$$3 (litnum 9@27$$4)))"
+            "(assign@4,7,10$39$$3 \"were\"@12 (litnum@17,18,19$39$$3 924))"
+        );
+    }
+
+    #[test]
+    fn lit_zero() {
+        let text = b"The wizards were literally...".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
+        assert_eq!(
+            test_lib::assert_result(&mut parser),
+            ParserResult::MatchedLine
+        );
+        assert_eq!(
+            lisp_like_writer::write_first(&parser.data.exprs),
+            "(assign@4,7,10$26$$3 \"were\"@12 (litnum@17,18,19$26$$3 0))"
         );
     }
 
@@ -70,7 +150,7 @@ mod tests_simple {
         );
         assert_eq!(
             lisp_like_writer::write_first(&parser.data.exprs),
-            "(assign@3,4,5$31 \"nice\"@7 (mutlilitnum@13,14,15$25 (litnum 6@17$$3) (litnum 9@21$$4)))"
+            "(assign@3,4,5$31 \"nice\"@7 (litnum@13,14,15$25 69))"
         );
     }
     #[test]
@@ -179,7 +259,7 @@ mod tests_simple {
     //         ParserResult::MatchedLine
     //     );
     //     assert_eq!(
-    //         linq_like_writer::write_first(&parser.data.exprs),
+    //         lisp_like_writer::write_first(&parser.data.exprs),
     //         "(assign@4,5,7$46 \"in\"@9 (wordnum@13,19,21$45 @26$$7))"
     //     );
     // }
@@ -193,7 +273,7 @@ mod tests_simple {
     //         ParserResult::MatchedLine
     //     );
     //     assert_eq!(
-    //         linq_like_writer::write_first(&parser.data.exprs),
+    //         lisp_like_writer::write_first(&parser.data.exprs),
     //         "(assign@2,3,4$87 \"in\"@6 (skip@9,10,11 @20$71 (litnum 8@77$5)))"
     //     );
     // }
@@ -207,7 +287,7 @@ mod tests_simple {
     //         ParserResult::MatchedLine
     //     );
     //     assert_eq!(
-    //         linq_like_writer::write_first(&parser.data.exprs),
+    //         lisp_like_writer::write_first(&parser.data.exprs),
     //         "(assign@3,4,5$42 \"as\"@7 (add@15,17,18$41 (litnum 1@28$3) (litnum 2@32$3) (litnum 3@36$5)))"
     //     );
     // }
@@ -241,7 +321,7 @@ mod tests_simple {
     //         ParserResult::MatchedLine
     //     );
     //     assert_eq!(
-    //         linq_like_writer::write_first(&parser.data.exprs),
+    //         lisp_like_writer::write_first(&parser.data.exprs),
     //         "(assign@3,4,5$26 \"SS\"@7 (sub@10,11,12$25 (litnum 7@20$5)))"
     //     );
     // }

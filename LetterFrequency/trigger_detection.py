@@ -38,7 +38,7 @@ def get_single_trigger(word: str, commands: list[str]) -> None | str:
 
 
 # from `cat words_for_aliases.txt| jq keys`
-cmds = [
+aliases = [
     "int",
     "lit",
     "add",
@@ -61,7 +61,8 @@ cmds = [
     "par",
     "inv",
     "whi",
-    "frefun",
+    "fre",
+    "fun",
     "pri",
     "was",
     "sta",
@@ -69,6 +70,10 @@ cmds = [
     "rec",
     "lin",
     "arc",
+    "col",
+    "els",
+    "sto",
+    "fil",
 ]
 
 if __name__ == "__main__":
@@ -86,7 +91,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
     if args.check_word:
-        print("\n".join(get_triggers(args.check_word, cmds)))
+        print("\n".join(get_triggers(args.check_word, aliases)))
     elif args.get_keyword:
         import json
 
@@ -97,5 +102,4 @@ if __name__ == "__main__":
         else:
             print(f'"{args.get_keyword}" is not a valid keyword.')
     else:
-        print("\n".join(cmds))
-
+        print("\n".join(aliases))

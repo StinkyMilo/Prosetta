@@ -140,13 +140,35 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
         } => format!("(litnum {}@{}$${})", value, str_start, str_length),
         Expr::MultiLitNum {
             locs,
-            num_indexes,
+            single_value,
+            values,
             end,
-        } => format!(
-            "(mutlilitnum{} {})",
-            join_locs(locs, Some(*end)),
-            write_exprs(exprs, num_indexes)
-        ),
+            ..
+        } => {
+            if let Some(intval) = single_value {
+                format!(
+                    "(litnum{} {})",
+                    join_locs(locs, Some(*end)),
+                    intval
+                )
+            }else{
+                let mut output_vals = "".to_string();
+                let mut is_first = true;
+                for val in values {
+                    if is_first {
+                        output_vals += &format!("{}",val);
+                        is_first = false;
+                    }else{
+                        output_vals += &format!(" {}",val);
+                    }
+                }
+                format!(
+                    "(multilitnum{} {})",
+                    join_locs(locs, Some(*end)),
+                    output_vals
+                )
+            }
+        },
         Expr::Print { locs, data, end } => {
             format!(
                 "(print{}{})",

@@ -1,65 +1,94 @@
+use num_literal::get_number_word;
+use std::fmt;
 use super::*;
 
-#[derive(Debug)]
+#[derive(Debug,PartialEq)]
+pub enum VarOrInt{
+    Var(Vec<u8>),
+    Int(i64)
+}
 
+impl fmt::Display for VarOrInt{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            VarOrInt::Var(name) => write!(f,"{}", String::from_utf8_lossy(name)),
+            VarOrInt::Int(int_val) => write!(f, "{}", int_val)
+        }
+    }
+}
+
+#[derive(Debug)]
 pub struct MultiLitNumState {
-    has_data: bool,
     first: bool,
+    any_vars: bool,
 }
 
 impl ParseState for MultiLitNumState {
     fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
         if self.first {
             let locs = env.locs.take().unwrap_or_default();
-            *env.expr = Expr::MultiLitNum {
-                locs,
-                end: End::none(),
-                num_indexes: Vec::new(),
-            };
+            self.first=false;
+            if is_close(word){
+                *env.expr = Expr::MultiLitNum {
+                    str_start: word.pos + env.global_index,
+                    locs,
+                    end: End::from_slice(&word, env.global_index),
+                    single_value: Some(0),
+                    values: Vec::new(),
+                };
+                return MatchResult::Matched(word.pos, true);
+            }else{
+                *env.expr = Expr::MultiLitNum {
+                    str_start: word.pos + env.global_index,
+                    locs,
+                    end: End::none(),
+                    single_value: None,
+                    values: Vec::new(),
+                };
+            }
         }
-        MatchResult::ContinueWith(word.pos, Box::new(num_literal::LiteralNumState::new()))
+        if let Expr::MultiLitNum { values, end, single_value, .. } = env.expr {
+            if is_close(word){
+                *end = End::from_slice(&word, env.global_index);
+                if !self.any_vars{
+                    let mut final_val = 0;
+                    let mut final_val_multiplier = 1;
+                    for i in values.into_iter().rev() {
+                        if let VarOrInt::Int(i_val) = i {
+                            final_val += final_val_multiplier * *i_val;
+                            final_val_multiplier*=10;
+                        }else {
+                            unreachable!()
+                        }
+                    }
+                    *single_value = Some(final_val);
+                }
+                MatchResult::Matched(word.pos, true)
+            }else{
+                let lower = word.str.to_ascii_lowercase();
+                if env.vars.contains(lower.clone()) {
+                    self.any_vars=true;
+                    values.push(VarOrInt::Var(lower));
+                } else if let Some(num_value) = get_number_word(word.str){
+                    values.push(VarOrInt::Int(num_value%10));
+                } else {
+                    values.push(VarOrInt::Int((word.len() as i64)%10));
+                }
+                MatchResult::Continue
+            }
+        }else{
+            unreachable!()
+        }
     }
 
     fn step_match(
         &mut self,
-        env: &mut Environment,
-        child_index: Option<usize>,
-        word: &Slice,
+        _env: &mut Environment,
+        _child_index: Option<usize>,
+        _word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
-        self.first = false;
-
-        // add child if matched
-        if let Some(index) = child_index {
-            self.has_data = true;
-            if let Expr::MultiLitNum { num_indexes, .. } = env.expr {
-                num_indexes.push(index);
-            } else {
-                unreachable!()
-            }
-        }
-
-        // if the word is a close, then close
-        if is_close(word) {
-            // I have data - I succeed
-            if self.has_data {
-                if let Expr::MultiLitNum { end, .. } = env.expr {
-                    *end = End::from_slice(&word, env.global_index);
-                } else {
-                    unreachable!()
-                }
-                MatchResult::Matched(word.pos, true)
-            } else {
-                // I do not have data - I cannot close
-                MatchResult::Continue
-            }
-        // child matched - add new child
-        } else if child_index.is_some() {
-            MatchResult::ContinueWith(word.pos, Box::new(num_literal::LiteralNumState::new()))
-        // child failed - move over word
-        } else {
-            MatchResult::Continue
-        }
+        unreachable!()
     }
 
     fn get_name(&self) -> &'static str {
@@ -74,8 +103,9 @@ impl ParseState for MultiLitNumState {
 impl MultiLitNumState {
     pub fn new() -> Self {
         Self {
-            has_data: false,
             first: true,
+            any_vars: false,
+            // any_vars: true,
         }
     }
 }

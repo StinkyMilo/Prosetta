@@ -246,13 +246,9 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_up_to(source, *str_start);
                 self.write_as(source, *str_length, NUM_COLOR);
             }
-            Expr::MultiLitNum {
-                locs,
-                end,
-                num_indexes,
-            } => {
+            Expr::MultiLitNum { locs, end, str_start, .. } => {
                 self.write_locs(source, locs, stack_index);
-                self.write_exprs(source, exprs, num_indexes, stack_index + 1);
+                self.write_as(source, end.index-str_start+1, NUM_COLOR);
                 self.add_end(source, *end, stack_index);
             }
             Expr::Print { locs, data, end } => {
