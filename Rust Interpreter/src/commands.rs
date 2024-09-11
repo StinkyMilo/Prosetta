@@ -1,6 +1,7 @@
 use std::ops::Index;
 
 use crate::parser::End;
+use crate::parser::multi_lit_num::VarOrInt;
 
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum OperatorType {
@@ -99,9 +100,12 @@ pub enum Expr {
         str_length: usize,
         value: i64,
     },
+    //TODO: Could make a compiler optimization to pre-evaluate this if there are no variables
     MultiLitNum {
+        str_start: usize,
         locs: Vec<usize>,
-        num_indexes: Vec<usize>,
+        values: Vec<VarOrInt>,
+        single_value: Option<i64>,
         end: End,
     },
     Skip {

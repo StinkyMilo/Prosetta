@@ -29,7 +29,7 @@ mod line;
 mod print;
 mod rect;
 
-mod multi_lit_num;
+pub(crate) mod multi_lit_num;
 mod num_literal;
 mod word_num;
 

@@ -134,11 +134,23 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             str_length: _,
             value,
         } => value.to_string(),
-        Expr::MultiLitNum {
-            locs: _,
-            num_indexes,
-            end: _,
-        } => format!("{}", write_exprs(exprs, num_indexes, "")),
+        Expr::MultiLitNum { values, single_value, .. } => {
+            if let Some(intval) = single_value {
+                format!("{}",intval)
+            }else{
+                let mut output_vals = "".to_string();
+                let mut is_first = true;
+                for val in values {
+                    if is_first {
+                        output_vals += &format!("{}",val);
+                        is_first = false;
+                    }else{
+                        output_vals += &format!(", {}",val);
+                    }
+                }
+                format!("get_concat_value({})",output_vals)
+            }
+        },
         Expr::Print {
             locs: _,
             data,
