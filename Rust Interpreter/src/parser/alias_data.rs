@@ -47,7 +47,7 @@ fn get_stat_state(alias: &'static [u8], index: usize) -> MatchResult {
             b"rec" => get_state!(rect::RectState::new()),
             b"pri" => get_state!(print::PrintState::new()),
             b"whe" => get_state!(if_stat::IfState::new()),
-            b"whi" => get_state!(whilestatement::WhileState::new()),
+            b"whi" => get_state!(while_stat::WhileState::new()),
             b"els" => get_state!(else_stat::ElseState::new()),
             b"sto" => get_state!(stroke::StrokeState::new()),
             b"fil" => get_state!(fill::FillState::new()),

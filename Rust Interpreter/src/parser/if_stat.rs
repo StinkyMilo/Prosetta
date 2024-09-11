@@ -15,10 +15,10 @@ impl ParseState for IfState {
                 indexes: Vec::new(),
                 end: End::none(),
             };
+            env.vars.add_layer();
             // setup child state
             MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont()))
         } else {
-            //println!("Continuing with new statement");
             MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
         }
     }
@@ -31,7 +31,6 @@ impl ParseState for IfState {
         _rest: &Slice,
     ) -> MatchResult {
         if let Expr::If { indexes, end, .. } = env.expr {
-            // let mut has_else = false;
             if !self.has_condition {
                 //add child and find stats
                 if let Some(index) = child_index {

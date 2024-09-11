@@ -22,7 +22,7 @@ mod operator;
 mod string_lit;
 mod stroke;
 mod var;
-mod whilestatement;
+mod while_stat;
 
 mod circle;
 mod line;
