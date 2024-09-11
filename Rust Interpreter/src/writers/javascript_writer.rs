@@ -74,7 +74,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         Expr::Var {
             name_start: _,
             name,
-        } => String::from_utf8_lossy(&name).to_string(),
+        } => String::from_utf8_lossy(&name).to_string() + "mario",
         Expr::WordNum {
             locs: _,
             str_start: _,
@@ -134,23 +134,27 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             str_length: _,
             value,
         } => value.to_string(),
-        Expr::MultiLitNum { values, single_value, .. } => {
+        Expr::MultiLitNum {
+            values,
+            single_value,
+            ..
+        } => {
             if let Some(intval) = single_value {
-                format!("{}",intval)
-            }else{
+                format!("{}", intval)
+            } else {
                 let mut output_vals = "".to_string();
                 let mut is_first = true;
                 for val in values {
                     if is_first {
-                        output_vals += &format!("{}",val);
+                        output_vals += &format!("{}", val);
                         is_first = false;
-                    }else{
-                        output_vals += &format!(", {}",val);
+                    } else {
+                        output_vals += &format!(", {}", val);
                     }
                 }
-                format!("get_concat_value({})",output_vals)
+                format!("get_concat_value({})", output_vals)
             }
-        },
+        }
         Expr::Print {
             locs: _,
             data,
