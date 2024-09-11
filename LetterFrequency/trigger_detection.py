@@ -73,7 +73,7 @@ aliases = [
     "col",
     "els",
     "sto",
-    "fil"
+    "fil",
 ]
 
 if __name__ == "__main__":
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.check_word:
         print("\n".join(get_triggers(args.check_word, aliases)))
-    if args.get_keyword:
+    elif args.get_keyword:
         import json
 
         with open("./words_for_aliases.txt", "r") as file:
@@ -101,3 +101,5 @@ if __name__ == "__main__":
             print("\n".join(keywords[args.get_keyword]))
         else:
             print(f'"{args.get_keyword}" is not a valid keyword.')
+    else:
+        print("\n".join(aliases))
