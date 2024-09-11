@@ -12,16 +12,17 @@ mod basic_func;
 mod alias;
 pub(crate) mod alias_data;
 mod assign;
-mod elsestatement;
-mod ifstatement;
+mod color;
+mod else_stat;
+mod fill;
+mod if_stat;
+mod litcolor;
 mod not;
 mod operator;
+mod string_lit;
+mod stroke;
 mod var;
 mod whilestatement;
-mod stroke;
-mod fill;
-mod color;
-mod litcolor;
 
 mod circle;
 mod line;
@@ -342,7 +343,7 @@ impl<'a> Parser<'a> {
                 let line = self.data.source.get_line();
                 self.repeat_count += 1;
                 // get needed counts
-                let (needed_count, offset) = Self::get_repeat_count(index, line);
+                let (needed_count, offset) = get_close_data(&line[index..]);
                 if self.repeat_count >= needed_count {
                     index += offset as usize;
                     self.repeat_count = 0;
@@ -354,23 +355,6 @@ impl<'a> Parser<'a> {
             ParserResult::Matched
         }
     }
-    /// gets the number of times the characters at line[index] should be repeated and the offset after
-    /// returns (repeat_count,offset)
-    fn get_repeat_count(index: usize, line: &[u8]) -> (u8, u8) {
-        if index + 3 <= line.len() && line[index..index + 3] == b"..."[..] {
-            (10, 3)
-        } else {
-            (
-                match line[index] {
-                    b'.' | b',' | b':' => 1,
-                    b'?' | b'!' => 2,
-                    _ => 0,
-                },
-                1,
-            )
-        }
-    }
-
     ///get a (word,rest) that starts at start
     fn get_slice(line: &[u8], mut start: usize) -> (Slice, Slice) {
         //let line = line.as_bytes();

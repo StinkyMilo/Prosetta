@@ -149,7 +149,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
         ),
         Expr::Print { locs, data, end } => {
             format!(
-                "(print{} {})",
+                "(print{}{})",
                 join_locs(locs, Some(*end)),
                 write_prints(exprs, data)
             )
@@ -196,47 +196,45 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 join_locs(locs, Some(*end)),
                 write_stats(exprs, indexes, indent + 1)
             )
-        },
-        Expr::LitCol { 
+        }
+        Expr::LitCol {
             str_start,
             str_length,
-            value 
+            value,
         } => {
             format!(
-                "(litcol {}@{}$${})", String::from_utf8_lossy(value), str_start, str_length
+                "(litcol {}@{}$${})",
+                String::from_utf8_lossy(value),
+                str_start,
+                str_length
             )
         }
-        Expr::Color { 
-            locs, 
-            indexes,
-            end 
-        } => {
+        Expr::Color { locs, indexes, end } => {
             format!(
                 "(color{} {})",
                 join_locs(locs, Some(*end)),
                 write_exprs(exprs, indexes),
             )
-        },
-        Expr::Stroke { 
-            locs, 
-            indexes,
-            end 
-        } => {
+        }
+        Expr::Stroke { locs, indexes, end } => {
             format!(
                 "(stroke{} {})",
                 join_locs(locs, Some(*end)),
                 write_exprs(exprs, indexes),
             )
-        },
-        Expr::Fill { 
-            locs, 
-            indexes,
-            end 
-        } => {
+        }
+        Expr::Fill { locs, indexes, end } => {
             format!(
                 "(fill{} {})",
                 join_locs(locs, Some(*end)),
                 write_exprs(exprs, indexes),
+            )
+        }
+        Expr::LitString { str_start, str } => {
+            format!(
+                "(string${} \"{}\")",
+                *str_start,
+                String::from_utf8_lossy(str)
             )
         }
     }
@@ -246,13 +244,14 @@ fn write_prints(exprs: &ExprArena, data: &Vec<Prints>) -> String {
     let mut ret = String::new();
     for print in data {
         ret += &match print {
-            Prints::Var(index) => write_expr(exprs, *index, 0) + " ",
+            Prints::Var(index) | Prints::String(index) => {
+                format!(" {}", write_expr(exprs, *index, 0))
+            }
             Prints::Word(str, index) => {
-                format!("\"{}\"@{} ", std::str::from_utf8(str).unwrap(), index)
+                format!(" \"{}\"@{}", std::str::from_utf8(str).unwrap(), index)
             }
         }
     }
-    ret.pop();
     ret
 }
 

@@ -138,6 +138,37 @@ mod tests_simple {
             "(if@0,1,2$19 (litnum 1@4$$3) then:\n  (print@8,9,10$15 \"yes\"@12)\n)\n(print@21,22,23$30 \"maybe\"@25)\n(print@37,38,39$43 \"no\"@41)"
         );
     }
+    #[test]
+    fn test_in_word_hyphen() {
+        let text = b"I was about to learn in-depth mathematics -- It was crazy!".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(assign@2,3,4$42$$2 \"about\"@6 (wordnum@21,22,27$42$$2 @30$$11))"
+        );
+    }
+    #[test]
+    fn test_print_no_vars() {
+        let text = b"pri hi. pri hello world. pri \"hello world\".".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(print@0,1,2$6 \"hi\"@4)\n(print@8,9,10$23)\n(print@25,26,27$42 (string$29 \"hello world\"))"
+        );
+    }
+    #[test]
+    fn test_print_vars() {
+        let text = b"was test 4. pri one test two test. pri test. pri four.".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(assign@0,1,2$10 \"test\"@4 (litnum 4@9$$1))\n(print@12,13,14$33 (var \"test\"@20) (var \"test\"@29))\n\
+            (print@35,36,37$43 (var \"test\"@39))\n(print@45,46,47$53 \"four\"@49)"
+        );
+    }
 
     // #[test]
     // fn test_liechtenstein() {
