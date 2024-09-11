@@ -1,23 +1,23 @@
-He downloads Katana ZERO, which is a really fun game.
-While his katana slices slightly through fruit,
-my katana was a katana to contend with an adopted sense of one with the world
-when your katana models after three subpar bananas, zero allows my katana to modulate five particles with zero consequences
-I pride fizzbuzz.
-when my katana models after three subpar bananas, there is zero prideful fizz.
-when your katana improves with five parts zero Coke, you get no prideful buzz.
-I wanted a prize katana...
-
+I found I was happy with zero cares in the world. Here I am, simply having a great life.
+The whimsicality just never lessened, I'm happy, 100%.
+Everyone was happy and I had skedaddled with a happy one person combo meal. I ate it quite happily.
+I did a wheelie on my epic and also awesome sparkling modded happy bicycle with 3 different colors on it. I've zero regrets. I went and parked it on amberwoord street. People were happy to look at it for 5 minutes then wandered away. Soon there were 0 people left. Oh well.
+Everyone's so sportingly Fizzbuzz!
+Occasionally I like to cast spells that implores wheat to grow sparingly. This makes the moderators happy three times over. I've never seen anything quite like it, like a submarine fight one on one. Quite the sight to behold.
+Honestly I'm rambling a lot now bubbling like Sprite fizz. Really just all over the place.
+I don't think this piece is getting any better else I'd continue this whole paragraph with great aplomb moondancing as happy as can be like me 5 years ago. Oh well there's essentially zero reason to keep going with this.
+Even if I do get prideful buzz. It simply can't go on for much longer.
+May as well end on some good elements that prize happy... happiness
 
 ==KEYWORDS ONLY==
 
-was VAR zero
-whi VAR les lit zzzzz zzzzz
-VAR was VAR add int a
-whe VAR mod three par zero als VAR mod five par zero
-pri fizzbuzz.
-whe VAR mod three par zero
-pri fizz.
-whe VAR mod five par zero
-pri buzz.
-pri VAR...
-
+was myvar zero.
+whi les myvar 100.
+was myvar add myvar one..
+whe als par mod myvar 3. 0. par mod myvar 5. 0..
+pri fizzbuzz..
+els whe par mod myvar 3. 0.
+pri fizz..
+els whe par mod myvar 5. 0.
+pri buzz..
+els pri myvar...

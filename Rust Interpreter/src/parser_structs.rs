@@ -107,16 +107,15 @@ impl End {
 }
 
 /// the result of a step or stepmatch function
-///
-/// Matched is returned to go to the parent state with the index to now parse from and whether the state closed on it
-/// ContinueWith is returned to add a child onto the stack with an index and the state to continue with
-/// Continue is returned to give the same state the next word
-/// Failed is returned to go to the parent state with a failure
 #[derive(Debug)]
 pub enum MatchResult {
+    /// returned to go to the parent state with the index to now parse from and whether the state closed on it
     Matched(usize, bool),
+    /// returned to add a child onto the stack with an index and the state to continue with
     ContinueWith(usize, Box<dyn ParseState>),
+    /// returned to give the same state the next word
     Continue,
+    /// returned to go to the parent state with a failure
     Failed,
 }
 
@@ -180,7 +179,7 @@ pub struct Environment<'a> {
     pub expr: &'a mut Expr,
     ///the index of this expr
     pub expr_index: usize,
-    ///the exprs before this 
+    ///the exprs before this
     pub parents: &'a mut [Expr],
     ///the exprs after this
     pub children: &'a mut [Expr],
@@ -284,6 +283,25 @@ pub fn get_next_word<'a>(slice: &Slice<'a>, mut start: usize) -> (Slice<'a>, Sli
         },
     )
 }
+/// gets the number of times the characters at line[index] should be repeated and the offset after
+/// returns (repeat_count,offset)
+pub fn get_close_data(line: &[u8]) -> (u8, u8) {
+    if line.len() >= 3 && line[..3] == b"..."[..] {
+        (10, 3)
+    } else if line.len() >= 3 && line[..3] == b"---"[..] {
+        (3, 3)
+    } else if line.len() >= 2 && line[..2] == b"--"[..] {
+        (2, 2)
+    } else if line.len() >= 1 {
+        match line[0] {
+            b'.' | b',' | b':' => (1, 1),
+            b'?' | b'!' => (2, 1),
+            _ => (0, 0),
+        }
+    } else {
+        (0, 0)
+    }
+}
 
 ///gets the next slice. a slice consists of either a word or a closing character
 pub fn get_next_slice<'a>(slice: &Slice<'a>, mut start: usize) -> (Slice<'a>, Slice<'a>) {
@@ -301,16 +319,21 @@ pub fn get_next_slice<'a>(slice: &Slice<'a>, mut start: usize) -> (Slice<'a>, Sl
     let mut end = start;
 
     //is slice a closing character aka "."
-    if end < slice.len()
-        && (is_valid_close_char(slice.str[end]) || is_non_close_but_still_single(slice.str[start]))
-    {
-        // is "..."
-        if end + 3 <= slice.len() && &slice.str[end..end + 3] == &b"..."[..] {
-            end += 3;
-        // not "..."
-        } else {
-            end += 1;
-        }
+    // if end < slice.len()
+    //     && (is_valid_close_char(slice.str[end]) || is_non_close_but_still_single(slice.str[start]))
+    // {
+    //     // is "..."
+    //     if end + 3 <= slice.len() && &slice.str[end..end + 3] == &b"..."[..] {
+    //         end += 3;
+    //     // not "..."
+    //     } else {
+    //         end += 1;
+    //     }
+    let close_data = get_close_data(&slice.str[start..]);
+    if close_data.1 != 0 {
+        end += close_data.1 as usize;
+    } else if end < slice.len() && is_non_close_but_still_single(slice.str[start]) {
+        end += 1;
     } else {
         while end < slice.len() && is_valid_word_char(slice.str[end]) {
             end += 1;
@@ -348,19 +371,18 @@ pub fn find_word_end<'a>(slice: &'a Slice<'a>, start: usize) -> Slice<'a> {
 /// returns (close, rest) after finding close
 pub fn find_close_slice<'a>(slice: &'a Slice<'a>, mut start: usize) -> Option<(Slice, Slice)> {
     // find end char
-    while start < slice.len() && !is_valid_close_char(slice.str[start]) {
-        start += 1;
+    let mut close_len = 0;
+    while start < slice.len() {
+        close_len = get_close_data(&slice.str[start..]).1;
+        if close_len == 0 {
+            start += 1;
+        } else {
+            break;
+        }
     }
     if start < slice.len() {
-        // let test1 = start + 3 <= slice.len();
-        // let test2 = &slice.str[start..start + 3] == &b"..."[..];
-        let end = if start + 3 <= slice.len() && &slice.str[start..start + 3] == &b"..."[..] {
-            start + 3
-        } else {
-            start + 1
-        };
-
         // find end of period
+        let end = start + close_len as usize;
         Some((
             Slice {
                 str: &slice.str[start..end],
