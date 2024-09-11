@@ -30,7 +30,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             value_index,
             end: _,
         } => format!(
-            "{} = {};",
+            "{}mario = {};",
             String::from_utf8_lossy(&name),
             write_expr(exprs, *value_index)
         ),
