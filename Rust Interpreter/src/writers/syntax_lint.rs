@@ -119,7 +119,9 @@ impl<T: Renderer> SyntaxLinter<T> {
         for print in data {
             match print {
                 // stack index is not used in vars
-                Prints::Var(index) => self.write_expr(source, exprs, *index, 0),
+                Prints::Var(index) | Prints::String(index) => {
+                    self.write_expr(source, exprs, *index, 0)
+                }
                 Prints::Word(str, index) => {
                     self.write_up_to(source, *index);
                     self.write_as(source, str.len(), STRING_COLOR);
@@ -290,7 +292,7 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::LitCol { 
+            Expr::LitCol {
                 str_start,
                 str_length,
                 ..
@@ -298,40 +300,33 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_up_to(source, *str_start);
                 self.write_as(source, *str_length, STRING_COLOR);
             }
-            Expr::Stroke { 
-                locs, 
-                indexes, 
-                end 
-            } => {
+            Expr::Stroke { locs, indexes, end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Fill {
-                locs,
-                indexes,
-                end
-            } => {
-                self.write_locs(source, locs, stack_index);
-                self.write_exprs(source, exprs, indexes, stack_index + 1);
-                self.add_end(source, *end, stack_index);
-            },
-            Expr::Color { 
-                locs, 
-                indexes, 
-                end 
-            } => {
+            Expr::Fill { locs, indexes, end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            
+            Expr::Color { locs, indexes, end } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.add_end(source, *end, stack_index);
+            }
+
             Expr::Else {
                 locs, indexes, end, ..
             } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
+            }
+            Expr::LitString { str_start, str } => {
+                self.write_up_to(source, *str_start);
+                //one for each quote
+                self.write_as(source, str.len() + 2, STRING_COLOR);
             }
 
             Expr::NoneExpr | Expr::NoneStat => {}

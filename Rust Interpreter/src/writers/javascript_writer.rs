@@ -175,44 +175,29 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         }
         Expr::Else { indexes, .. } => {
             format!("else {{\n{}\n}}", write_exprs(exprs, indexes, "\n"))
-        },
-        Expr::LitCol { 
-            value ,
-            ..
-        } => {
-            format!("\"{}\"",String::from_utf8_lossy(&value))
-        },
-        Expr::Stroke { 
-            indexes,
-            ..
-        } => {
+        }
+        Expr::LitCol { value, .. } => {
+            format!("\"{}\"", String::from_utf8_lossy(&value))
+        }
+        Expr::Stroke { indexes, .. } => {
             if indexes[1] == usize::MAX {
-                format!(
-                    "set_stroke({});",
-                    write_expr(exprs, indexes[0])
-                )
+                format!("set_stroke({});", write_expr(exprs, indexes[0]))
             } else {
                 format!("set_stroke({});", write_exprs(exprs, indexes, ", "))
             }
-        },
-        Expr::Fill { 
-            indexes,
-            ..
-        } => {
+        }
+        Expr::Fill { indexes, .. } => {
             if indexes[1] == usize::MAX {
-                format!(
-                    "set_fill({});",
-                    write_expr(exprs, indexes[0])
-                )
+                format!("set_fill({});", write_expr(exprs, indexes[0]))
             } else {
                 format!("set_fill({});", write_exprs(exprs, indexes, ", "))
             }
-        },
-        Expr::Color { 
-            indexes, 
-            ..
-        } => {
+        }
+        Expr::Color { indexes, .. } => {
             format!("get_color({})", write_exprs(exprs, indexes, ", "))
+        }
+        Expr::LitString { str, .. } => {
+            format!("\"{}\"", String::from_utf8_lossy(str))
         }
     }
 }
@@ -221,7 +206,7 @@ fn write_prints(exprs: &ExprArena, data: &Vec<Prints>) -> String {
     let mut ret = String::new();
     for print in data {
         ret += &match print {
-            Prints::Var(index) => write_expr(exprs, *index),
+            Prints::Var(index) | Prints::String(index) => write_expr(exprs, *index),
             Prints::Word(str, _index) => {
                 format!("\"{}\"", std::str::from_utf8(str).unwrap().to_string())
             }

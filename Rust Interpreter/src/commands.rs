@@ -22,9 +22,11 @@ pub enum OperatorType {
 
 #[derive(PartialEq, Debug)]
 pub enum Prints {
-    // child_index
+    /// child_index
     Var(usize),
-    // value, string_index
+    /// child_index
+    String(usize),
+    /// value, string_index
     Word(Vec<u8>, usize),
 }
 
@@ -115,23 +117,27 @@ pub enum Expr {
     Color {
         locs: Vec<usize>,
         indexes: [usize; 3],
-        end: End
+        end: End,
     },
     Fill {
         locs: Vec<usize>,
         indexes: [usize; 3],
-        end: End
+        end: End,
     },
     Stroke {
         locs: Vec<usize>,
         indexes: [usize; 3],
-        end: End
+        end: End,
     },
     LitCol {
         str_start: usize,
         str_length: usize,
-        value: Vec<u8>
-    }
+        value: Vec<u8>,
+    },
+    LitString {
+        str_start: usize,
+        str: Vec<u8>,
+    },
 }
 
 impl Expr {
