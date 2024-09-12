@@ -1,7 +1,7 @@
 use super::*;
 
-const BASE_EXPR_ALIASES: [&'static [u8]; 16] = [
-    b"int", b"tim", b"add", b"sub", b"lit", b"ide", b"mod", b"log", b"exp", b"les", b"mor", b"als", b"oth", b"par", b"inv", b"col"
+const BASE_EXPR_ALIASES: [&'static [u8]; 17] = [
+    b"int", b"tim", b"add", b"sub", b"lit", b"ide", b"mod", b"log", b"exp", b"les", b"mor", b"als", b"oth", b"par", b"inv", b"col", b"TODO"
 ];
 
 const NOT_ALIAS: &'static [u8] = b"not";
@@ -31,6 +31,7 @@ fn get_expr_state(alias: &'static [u8], index: usize) -> MatchResult {
             b"int" => get_state!(word_num::WordNumState::new()),
             b"not" => get_state!(not::NotState::new()),
             b"col" => get_state!(color::ColorState::new()),
+            b"TODO" => get_state!(move_to::MoveToState::new()),
             _ => unreachable!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
         },
     )

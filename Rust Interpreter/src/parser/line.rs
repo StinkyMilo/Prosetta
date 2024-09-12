@@ -34,7 +34,9 @@ impl BasicState for LineState {
 
     fn can_close(&self) -> CloseType {
         match self.count {
-            0..=3 => CloseType::Unable,
+            0..=1 => CloseType::Unable,
+            2 => CloseType::Able,
+            3 => CloseType::Unable,
             4 => CloseType::Force,
             _ => unreachable!(),
         }

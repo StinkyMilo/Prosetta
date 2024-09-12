@@ -23,6 +23,7 @@ mod string_lit;
 mod stroke;
 mod var;
 mod while_stat;
+mod move_to;
 
 mod circle;
 mod line;
