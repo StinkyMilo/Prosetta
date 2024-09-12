@@ -203,6 +203,9 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         Expr::LitString { str, .. } => {
             format!("\"{}\"", String::from_utf8_lossy(str))
         }
+        Expr::MoveTo { indexes, ..} => {
+            format!("move_to({});", write_exprs(exprs,indexes, ", "))
+        }
     }
 }
 

@@ -140,7 +140,7 @@ pub enum Expr {
     },
     MoveTo {
         locs: Vec<usize>,
-        indexes: [usize; 4],
+        indexes: [usize; 2],
         end: End,
     }
 }

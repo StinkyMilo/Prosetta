@@ -16,7 +16,7 @@ impl BasicState for MoveToState {
         if ret {
             *expr = Expr::MoveTo {
                 locs,
-                indexes: [usize::MAX; 4],
+                indexes: [usize::MAX; 2],
                 end: End::none(),
             }
         }
@@ -35,15 +35,13 @@ impl BasicState for MoveToState {
     fn can_close(&self) -> CloseType {
         match self.count {
             0..=1 => CloseType::Unable,
-            2 => CloseType::Able,
-            3 => CloseType::Unable,
-            4 => CloseType::Force,
+            2 => CloseType::Force,
             _ => unreachable!(),
         }
     }
 
     fn set_end(&mut self, expr: &mut Expr, index: End) {
-        if let Expr::Line { end, .. } = expr {
+        if let Expr::MoveTo { end, .. } = expr {
             *end = index;
         } else {
             unreachable!()
