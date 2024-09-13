@@ -57,8 +57,8 @@ impl ParseState for AssignState {
         "Assign"
     }
 
-    fn do_replace(&self) -> bool {
-        false
+    fn get_type(&self) -> StateType {
+        StateType::Stat
     }
 }
 

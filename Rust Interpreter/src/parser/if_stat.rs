@@ -5,6 +5,7 @@ use super::*;
 #[derive(Debug)]
 pub struct IfState {
     has_condition: bool,
+    has_stat: bool,
 }
 impl ParseState for IfState {
     fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
@@ -34,7 +35,7 @@ impl ParseState for IfState {
             if !self.has_condition {
                 //add child and find stats
                 if let Some(index) = child_index {
-                    self.has_condition=true;
+                    self.has_condition = true;
                     indexes.push(index);
                     MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
                 } else {
@@ -44,11 +45,12 @@ impl ParseState for IfState {
             } else {
                 //and stat child
                 if let Some(index) = child_index {
+                    self.has_stat = true;
                     indexes.push(index);
                 }
 
                 // close if have close
-                if is_close(word) {
+                if self.has_stat && is_close(word) {
                     *end = End::from_slice(&word, env.global_index);
                     env.vars.remove_layer();
                     MatchResult::Matched(word.pos, true)
@@ -69,8 +71,8 @@ impl ParseState for IfState {
         "If"
     }
 
-    fn do_replace(&self) -> bool {
-        false
+    fn get_type(&self) -> StateType {
+        StateType::Stat
     }
 }
 
@@ -78,6 +80,7 @@ impl IfState {
     pub fn new() -> Self {
         Self {
             has_condition: false,
+            has_stat: false,
         }
     }
 }

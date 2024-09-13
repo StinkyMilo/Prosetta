@@ -62,6 +62,14 @@ pub struct ParserFlags {
     pub not: bool,
 }
 
+pub enum StateType {
+    /// for NoneExpr and NoneStat
+    /// is replaceble
+    None,
+    Expr,
+    Stat,
+}
+
 /// A state (which goes onto the parser stack)
 pub trait ParseState: Debug {
     /// called first time to setup the state and after the state continues
@@ -79,9 +87,7 @@ pub trait ParseState: Debug {
     /// gets the name of the state
     fn get_name(&self) -> &'static str;
 
-    ///apparently not called, but
-    ///whether the expr should be replaced by new expr
-    fn do_replace(&self) -> bool;
+    fn get_type(&self) -> StateType;
 }
 
 ///a struct for closing character with an index and a length

@@ -1,4 +1,5 @@
 use super::{Renderer, TermColor};
+use bstr::ByteSlice;
 
 pub struct HTMLRenderer {
     str: Vec<u8>,
@@ -23,8 +24,9 @@ impl Renderer for HTMLRenderer {
     }
 
     fn add(&mut self, text: &[u8]) {
+        let vec = text.replace(b"\n", b"<br>");
         self.check_color();
-        self.str.extend_from_slice(text);
+        self.str.extend_from_slice(&vec);
     }
 
     fn push(&mut self, char: u8) {
