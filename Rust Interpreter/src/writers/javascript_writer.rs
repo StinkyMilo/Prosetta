@@ -46,30 +46,14 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             indexes,
             end: _,
         } => {
-            if indexes[3] == usize::MAX {
-                format!(
-                    "draw_ellipse({}, {});",
-                    write_exprs(exprs, indexes, ", "),
-                    write_expr(exprs, indexes[2])
-                )
-            } else {
-                format!("draw_ellipse({});", write_exprs(exprs, indexes, ", "))
-            }
+            format!("draw_ellipse({});", write_exprs(exprs, indexes, ", "))
         }
         Expr::Rect {
             locs: _,
             indexes,
             end: _,
         } => {
-            if indexes[3] == usize::MAX {
-                format!(
-                    "draw_rect({}, {});",
-                    write_exprs(exprs, indexes, ", "),
-                    write_expr(exprs, indexes[2])
-                )
-            } else {
-                format!("draw_rect({});", write_exprs(exprs, indexes, ", "))
-            }
+            format!("draw_rect({});", write_exprs(exprs, indexes, ", "))
         }
         Expr::Var {
             name_start: _,
@@ -203,8 +187,8 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         Expr::LitString { str, .. } => {
             format!("\"{}\"", String::from_utf8_lossy(str))
         }
-        Expr::MoveTo { indexes, ..} => {
-            format!("move_to({});", write_exprs(exprs,indexes, ", "))
+        Expr::MoveTo { indexes, .. } => {
+            format!("move_to({});", write_exprs(exprs, indexes, ", "))
         }
         Expr::LineWidth { child_index, ..} => {
             format!("set_line_width({});",write_expr(exprs,*child_index))
