@@ -62,6 +62,7 @@ pub struct ParserFlags {
     pub not: bool,
 }
 
+#[derive(PartialEq, Eq, Debug)]
 pub enum StateType {
     /// for NoneExpr and NoneStat
     /// is replaceble
@@ -190,7 +191,7 @@ pub struct Environment<'a> {
     ///the exprs after this
     pub children: &'a mut [Expr],
     ///The last matched expr if exists
-    pub last_matched_index: Option<usize>,
+    pub last_stat_index: Option<usize>,
     ///The current locs (locations of the alias characters)
     pub locs: Option<Vec<usize>>,
     /// the global index (with multiple input buffers)

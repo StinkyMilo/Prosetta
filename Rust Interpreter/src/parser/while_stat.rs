@@ -16,8 +16,10 @@ impl ParseState for WhileState {
             env.vars.add_layer();
             // setup child state
             MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont()))
-        } else {
+        } else if self.has_stat {
             MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
+        } else {
+            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat_cont()))
         }
     }
 
@@ -34,7 +36,7 @@ impl ParseState for WhileState {
                 if let Some(index) = child_index {
                     self.has_condition = true;
                     indexes.push(index);
-                    MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
+                    MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat_cont()))
                 } else {
                     // if child match fail, I can never succeed
                     MatchResult::Failed

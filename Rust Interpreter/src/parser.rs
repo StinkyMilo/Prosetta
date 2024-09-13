@@ -80,8 +80,8 @@ pub struct Parser<'a> {
     aliases: AliasData,
     ///the number of times the current slice should repeat
     repeat_count: u8,
-    /// was the last matched state a stat
-    last_match_index: Option<usize>,
+    /// the index of the last matched state
+    last_stat_index: Option<usize>,
 }
 
 impl<'a> Parser<'a> {
@@ -101,7 +101,7 @@ impl<'a> Parser<'a> {
             last_result: LastMatchResult::None,
             aliases: AliasData::new(flags),
             repeat_count: 0,
-            last_match_index: None,
+            last_stat_index: None,
         }
     }
     ///get the last state
@@ -225,7 +225,7 @@ impl<'a> Parser<'a> {
             expr,
             children,
             parents,
-            last_matched_index: self.last_match_index,
+            last_stat_index: self.last_stat_index,
             expr_index: frame.0,
             vars: &mut self.data.vars,
             locs: None,
@@ -340,9 +340,9 @@ impl<'a> Parser<'a> {
     fn matched_func(&mut self, mut index: usize, closed: bool) -> ParserResult {
         let state = self.stack.pop().unwrap();
         let expr_index = state.0;
-        //if !state.2.do_replace(){
-        self.last_match_index = Some(state.0);
-        //}
+        if state.2.get_type() == StateType::Stat {
+            self.last_stat_index = Some(state.0);
+        }
         self.last_state = Some(state);
 
         // matched final stat

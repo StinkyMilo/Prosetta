@@ -5,12 +5,8 @@
 use crate::{
     parser::{ParsedData, Parser, ParserFlags, ParserResult, ParserSource},
     writers::{
-        javascript_writer, lisp_like_writer,
-        syntax_lint::SyntaxLinter,
-        syntax_renderers::{
-            html_renderer::{self, HTMLRenderer},
-            wind_renderer::WindowsRenderer,
-        },
+        javascript_writer, lisp_like_writer, syntax_lint::SyntaxLinter,
+        syntax_renderers::wind_renderer::WindowsRenderer,
     },
 };
 
@@ -24,7 +20,7 @@ pub struct RunnerFlags {
 
 pub fn run_state(state: ParserResult, parser: &Parser, parser_flags: RunnerFlags, step_count: u64) {
     if parser_flags.assert_steps {
-        if step_count % 100000 == 0 {
+        if step_count % 1 == 0 {
             println!(
                 "step:\nreturn:[{:?}]\nstack:[{}],word:[{}]",
                 state,
