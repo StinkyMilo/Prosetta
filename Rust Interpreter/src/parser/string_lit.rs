@@ -44,8 +44,8 @@ impl ParseState for LitStrState {
         "StringLit"
     }
 
-    fn get_type(&self) -> StateType {
-        StateType::Expr
+    fn do_replace(&self) -> bool {
+        false
     }
 }
 

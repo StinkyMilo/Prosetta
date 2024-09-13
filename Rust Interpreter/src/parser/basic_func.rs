@@ -90,7 +90,7 @@ impl<T: BasicState + Debug> ParseState for T {
         <Self as BasicState>::get_name(&self)
     }
 
-    fn get_type(&self) -> StateType {
-        StateType::Expr
+    fn do_replace(&self) -> bool {
+        todo!()
     }
 }

@@ -35,8 +35,8 @@ impl ParseState for VarState {
         "Var"
     }
 
-    fn get_type(&self) -> StateType {
-        StateType::Expr
+    fn do_replace(&self) -> bool {
+        false
     }
 }
 impl VarState {

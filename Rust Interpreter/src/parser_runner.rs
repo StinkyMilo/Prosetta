@@ -5,12 +5,8 @@
 use crate::{
     parser::{ParsedData, Parser, ParserFlags, ParserResult, ParserSource},
     writers::{
-        javascript_writer, lisp_like_writer,
-        syntax_lint::SyntaxLinter,
-        syntax_renderers::{
-            html_renderer::{self, HTMLRenderer},
-            wind_renderer::WindowsRenderer,
-        },
+        javascript_writer, lisp_like_writer, syntax_lint::SyntaxLinter,
+        syntax_renderers::wind_renderer::WindowsRenderer,
     },
 };
 
@@ -22,16 +18,14 @@ pub struct RunnerFlags {
     pub linted: bool,
 }
 
-pub fn run_state(state: ParserResult, parser: &Parser, parser_flags: RunnerFlags, step_count: u64) {
+pub fn run_state(state: ParserResult, parser: &Parser, parser_flags: RunnerFlags) {
     if parser_flags.assert_steps {
-        if step_count % 100000 == 0 {
-            println!(
-                "step:\nreturn:[{:?}]\nstack:[{}],word:[{}]",
-                state,
-                parser.get_parser_stack(),
-                std::str::from_utf8(parser.get_last_word()).unwrap()
-            );
-        }
+        println!(
+            "assert_step!(parser, {:?}, \"{}\", \"{}\");",
+            state,
+            parser.get_last_state_name(),
+            std::str::from_utf8(parser.get_last_word()).unwrap()
+        );
     }
 }
 
@@ -67,15 +61,13 @@ pub fn run_after(data: ParsedData, parser_flags: RunnerFlags) {
 pub fn run_parser(parser_flags: ParserFlags, vis_flags: RunnerFlags, source: ParserSource) {
     println!("Input text to be parsed:");
     let mut parser = Parser::new(source, parser_flags);
-    let mut step_count = 0;
+
     loop {
         match parser.step() {
             ParserResult::NoInput => break,
-            state => run_state(state, &parser, vis_flags, step_count),
+            state => run_state(state, &parser, vis_flags),
         }
-        step_count += 1;
     }
-    println!("step_count: {}", step_count);
 
     let data = parser.into_data();
 

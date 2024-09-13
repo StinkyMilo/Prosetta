@@ -72,8 +72,8 @@ impl ParseState for ElseState {
         "Else"
     }
 
-    fn get_type(&self) -> StateType {
-        StateType::Stat
+    fn do_replace(&self) -> bool {
+        false
     }
 }
 

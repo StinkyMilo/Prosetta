@@ -59,8 +59,8 @@ impl ParseState for NoneState {
         self.data.state_name
     }
 
-    fn get_type(&self) -> StateType {
-        StateType::None
+    fn do_replace(&self) -> bool {
+        true
     }
 }
 
@@ -107,12 +107,7 @@ impl NoneState {
     ///Expr starts at Var, to check if it is a varible, then it checks if it is a number,
     ///then it tries to find aliases in the word
     ///Stat starts at the aliases directly
-    fn run_match_state(
-        &mut self,
-        env: &mut Environment,
-        word: &Slice,
-        rest: &Slice,
-    ) -> MatchResult {
+    fn run_match_state(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         let (new_state, ret) = match self.next_match_state {
             // is word a varible
             MatchState::Var => (
@@ -130,7 +125,10 @@ impl NoneState {
             // is word a color
             MatchState::Color => (
                 MatchState::FindAliases,
-                MatchResult::ContinueWith(word.pos, get_state!(litcolor::LiteralColorState::new())),
+                MatchResult::ContinueWith(
+                    word.pos,
+                    get_state!(litcolor::LiteralColorState::new())
+                ),
             ),
             // else check aliases
             MatchState::FindAliases => (MatchState::FindAliases, self.match_alias(env, word, rest)),

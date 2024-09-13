@@ -43,8 +43,8 @@ impl ParseState for WordNumState {
         "Num"
     }
 
-    fn get_type(&self) -> StateType {
-        StateType::Expr
+    fn do_replace(&self) -> bool {
+        false
     }
 }
 impl WordNumState {

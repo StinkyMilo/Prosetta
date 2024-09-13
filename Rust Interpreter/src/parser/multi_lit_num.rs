@@ -95,8 +95,8 @@ impl ParseState for MultiLitNumState {
         "MultiLitNum"
     }
 
-    fn get_type(&self) -> StateType {
-        StateType::Expr
+    fn do_replace(&self) -> bool {
+        false
     }
 }
 

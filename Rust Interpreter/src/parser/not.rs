@@ -48,8 +48,8 @@ impl ParseState for NotState {
         "Not"
     }
 
-    fn get_type(&self) -> StateType {
-        StateType::Expr
+    fn do_replace(&self) -> bool {
+        false
     }
 }
 
