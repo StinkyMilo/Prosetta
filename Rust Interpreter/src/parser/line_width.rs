@@ -18,7 +18,7 @@ impl BasicState for LineWidthState {
         if ret {
             *expr = Expr::LineWidth {
                 locs,
-                child_index: None,
+                child_index: usize::MAX,
                 end: End::none()
             }
         }
@@ -27,7 +27,7 @@ impl BasicState for LineWidthState {
 
     fn add_child(&mut self, expr: &mut Expr, index: usize) {
         if let Expr::LineWidth { child_index, .. } = expr {
-            *child_index=Some(index);
+            *child_index=index;
             self.count += 1;
         } else {
             unreachable!()
@@ -36,7 +36,7 @@ impl BasicState for LineWidthState {
 
     fn can_close(&self) -> CloseType {
         match self.count {
-            0 => CloseType::Able,
+            0 => CloseType::Unable,
             1 => CloseType::Force,
             _ => unreachable!(),
         }

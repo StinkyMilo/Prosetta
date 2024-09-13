@@ -335,9 +335,7 @@ impl<T: Renderer> SyntaxLinter<T> {
             }
             Expr::LineWidth { locs, child_index, end } => {
                 self.write_locs(source, locs, stack_index);
-                if let Some(ind) = child_index{
-                    self.write_expr(source, exprs, *ind, stack_index + 1);
-                }
+                self.write_expr(source, exprs, *child_index, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
             Expr::NoneExpr | Expr::NoneStat => {}

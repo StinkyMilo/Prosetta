@@ -267,18 +267,11 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
             )
         },
         Expr::LineWidth { locs, child_index, end } => {
-            if let Some(ind) = child_index{
-                format!(
-                    "(linewidth{} {})",
-                    join_locs(locs, Some(*end)),
-                    write_expr(exprs,*ind, 0)
-                )       
-            }else{
-                format!(
-                    "(linewidth{})",
-                    join_locs(locs, Some(*end))
-                )
-            }
+            format!(
+                "(linewidth{} {})",
+                join_locs(locs, Some(*end)),
+                write_expr(exprs,*child_index, 0)
+            )      
         }
     }
 }

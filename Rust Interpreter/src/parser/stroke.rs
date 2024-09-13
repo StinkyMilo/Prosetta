@@ -36,7 +36,7 @@ impl BasicState for StrokeState {
 
     fn can_close(&self) -> CloseType {
         match self.count {
-            0 => CloseType::Able,
+            0 => CloseType::Unable,
             1 => CloseType::Able,
             2 => CloseType::Unable,
             3 => CloseType::Force,
