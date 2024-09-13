@@ -17,6 +17,7 @@ mod else_stat;
 mod fill;
 mod if_stat;
 mod litcolor;
+mod litcolor_data;
 mod not;
 mod operator;
 mod string_lit;
@@ -112,6 +113,17 @@ impl<'a> Parser<'a> {
     pub fn get_last_state_name(&self) -> &'static str {
         self.get_last_state()
             .map_or(&"None", |state| state.2.get_name())
+    }
+
+    ///get the current stack
+    pub fn get_parser_stack(&self) -> String {
+        let mut str = self.stack.iter().fold(String::new(), |mut str, state| {
+            str += &format!("{}:{}, ", state.2.get_name(), state.1);
+            str
+        });
+        str.pop();
+        str.pop();
+        str
     }
 
     ///get the slice that was last used
