@@ -142,6 +142,11 @@ pub enum Expr {
         locs: Vec<usize>,
         indexes: [usize; 2],
         end: End,
+    },
+    LineWidth {
+        locs: Vec<usize>,
+        child_index: Option<usize>,
+        end: End
     }
 }
 

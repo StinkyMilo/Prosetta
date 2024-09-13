@@ -333,7 +333,13 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-
+            Expr::LineWidth { locs, child_index, end } => {
+                self.write_locs(source, locs, stack_index);
+                if let Some(ind) = child_index{
+                    self.write_expr(source, exprs, *ind, stack_index + 1);
+                }
+                self.add_end(source, *end, stack_index);
+            }
             Expr::NoneExpr | Expr::NoneStat => {}
         };
     }

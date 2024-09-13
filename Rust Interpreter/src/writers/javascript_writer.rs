@@ -206,6 +206,13 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         Expr::MoveTo { indexes, ..} => {
             format!("move_to({});", write_exprs(exprs,indexes, ", "))
         }
+        Expr::LineWidth { child_index, ..} => {
+            if let Some(ind) = child_index {
+                format!("set_line_width({});",write_expr(exprs,*ind))
+            }else{
+                format!("set_line_width();")
+            }
+        }
     }
 }
 

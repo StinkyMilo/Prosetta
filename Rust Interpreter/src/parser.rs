@@ -33,6 +33,7 @@ mod rect;
 pub(crate) mod multi_lit_num;
 mod num_literal;
 mod word_num;
+mod line_width;
 
 #[path = "testing/parsing_tests_simple.rs"]
 mod parsing_tests_simple;
