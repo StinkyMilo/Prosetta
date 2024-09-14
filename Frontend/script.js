@@ -10,13 +10,15 @@ function init() {
   ctx = canvas.getContext('2d');
   cnsl = document.getElementById("console");
 
-  console.log(sourcecode, ctx, cnsl);
   print_console("Welcome to Prosetta!");
   clear_canvas();
   has_drawn_shape = false;
   move_to(0, 0);
+  ctx.moveTo(x, y);
   set_stroke("black");
   set_fill("transparent");
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
   ctx.lineWidth = 1;
 }
 
@@ -26,21 +28,21 @@ function print_console() {
     args.push(arguments[i]);
   }
   let line = args.join(" ")
-  console.log(line);
   cnsl.innerText += line + "\n";
 }
 
 function end_shape() {
+  if (!has_drawn_shape) {
+    return;
+  }
   ctx.fill();
   ctx.stroke();
-  has_drawn_shape = true;
 }
 
 function start_shape() {
-  if (has_drawn_shape) {
-    end_shape();
-  }
+  end_shape();
   ctx.beginPath();
+  ctx.moveTo(x, y);
 }
 
 function draw_line() {
@@ -48,7 +50,6 @@ function draw_line() {
     if (!last_was_line) {
       start_shape();
     }
-    ctx.moveTo(x, y);
     move_delta(arguments[0], arguments[1]);
     ctx.lineTo(x, y);
   }
@@ -60,6 +61,7 @@ function draw_line() {
     ctx.lineTo(x, y);
   }
   last_was_line = true;
+  has_drawn_shape = true;
 }
 
 function move_to(x1, y1) {
@@ -129,11 +131,19 @@ function draw_ellipse() {
 }
 
 function set_stroke(color) {
-  ctx.strokeStyle = color;
+  if (color == 0) {
+    ctx.strokeStyle = "transparent";
+  } else {
+    ctx.strokeStyle = color;
+  }
 }
 
 function set_fill(color) {
-  ctx.fillStyle = color;
+  if (color == 0) {
+    ctx.strokeStyle = "transparent";
+  } else {
+    ctx.fillStyle = color;
+  }
 }
 
 function set_line_width(width) {
