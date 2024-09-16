@@ -206,7 +206,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
         } => {
             let split = indexes.split_at_checked(1).unwrap_or_default();
             format!(
-                "(while{} {} then {})",
+                "(while{} {} then:\n{}\n)",
                 join_locs(locs, Some(*end)),
                 write_expr(exprs, *split.0.first().unwrap_or(&usize::MAX), 0),
                 write_stats(exprs, split.1, indent + 1),

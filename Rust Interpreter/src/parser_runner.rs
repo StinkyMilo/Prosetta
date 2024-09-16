@@ -2,6 +2,8 @@
 
 // }
 
+use std::time::SystemTime;
+
 use crate::{
     parser::{ParsedData, Parser, ParserFlags, ParserResult, ParserSource},
     writers::{
@@ -20,7 +22,7 @@ pub struct RunnerFlags {
 
 pub fn run_state(state: ParserResult, parser: &Parser, parser_flags: RunnerFlags, step_count: u64) {
     if parser_flags.assert_steps {
-        if step_count % 1 == 0 {
+        if step_count % 10000 == 0 {
             println!(
                 "step:\nreturn:[{:?}]\nstack:[{}],word:[{}]",
                 state,
@@ -64,6 +66,7 @@ pub fn run_parser(parser_flags: ParserFlags, vis_flags: RunnerFlags, source: Par
     println!("Input text to be parsed:");
     let mut parser = Parser::new(source, parser_flags);
     let mut step_count = 0;
+    let start = SystemTime::now();
     loop {
         match parser.step() {
             ParserResult::NoInput => break,
@@ -71,7 +74,13 @@ pub fn run_parser(parser_flags: ParserFlags, vis_flags: RunnerFlags, source: Par
         }
         step_count += 1;
     }
-    println!("step_count: {}", step_count);
+    let end = SystemTime::now();
+    let duration = end.duration_since(start).unwrap();
+    println!(
+        "took {} seconds with {} steps",
+        duration.as_secs(),
+        step_count
+    );
 
     let data = parser.into_data();
 

@@ -157,6 +157,8 @@ pub enum ParserResult {
     ContinueWith,
     Continue,
     Failed,
+    /// this fail was cached earlier
+    CachedFail,
 }
 
 ///is the state able to be closed

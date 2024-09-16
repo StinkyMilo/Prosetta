@@ -1,10 +1,13 @@
 #[cfg(test)]
 mod tests_simple {
+    use ntest::timeout;
+
     use crate::parser::*;
     use crate::testing::*;
     //use crate::lisp_like_writer::*;
     //use std::hint;
     #[test]
+    #[timeout(1000)]
     fn set_var_to_seven() {
         let text = b"I was going to be seventy.".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
@@ -19,6 +22,7 @@ mod tests_simple {
     }
 
     #[test]
+    #[timeout(1000)]
     fn set_var_to_seven_with_ellipsis() {
         let text = b"I was always seventy-seven....".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
@@ -33,8 +37,10 @@ mod tests_simple {
     }
 
     #[test]
+    #[timeout(1000)]
     fn make_complicated_litnum() {
-        let text = b"I was always one-hundred-and-twenty-three-thousand-three-hundred-and-two....".to_vec();
+        let text = b"I was always one-hundred-and-twenty-three-thousand-three-hundred-and-two...."
+            .to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
         assert_eq!(
             test_lib::assert_result(&mut parser),
@@ -47,6 +53,7 @@ mod tests_simple {
     }
 
     #[test]
+    #[timeout(1000)]
     fn make_twenty_one_litnum() {
         let text = b"I was always twenty-one....".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
@@ -61,6 +68,7 @@ mod tests_simple {
     }
 
     #[test]
+    #[timeout(1000)]
     fn make_zero() {
         let text = b"I was always zero....".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
@@ -75,6 +83,7 @@ mod tests_simple {
     }
 
     #[test]
+    #[timeout(1000)]
     fn make_gettysburg() {
         let text = b"I was always four-score-and-seven....".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
@@ -89,6 +98,7 @@ mod tests_simple {
     }
 
     #[test]
+    #[timeout(1000)]
     fn do_not_make_gas_station() {
         let text = b"I was always seven-eleven....".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
@@ -99,6 +109,7 @@ mod tests_simple {
     }
 
     #[test]
+    #[timeout(1000)]
     fn test_wizards_with_double_close() {
         let text = b"The wizards were literally nine at most!".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
@@ -113,6 +124,7 @@ mod tests_simple {
     }
 
     #[test]
+    #[timeout(1000)]
     fn test_wizards_with_double_close_ellipsis() {
         let text = b"The wizards were literally nine at most...".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
@@ -127,6 +139,7 @@ mod tests_simple {
     }
 
     #[test]
+    #[timeout(1000)]
     fn lit_zero() {
         let text = b"The wizards were literally...".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
@@ -141,6 +154,7 @@ mod tests_simple {
     }
 
     #[test]
+    #[timeout(1000)]
     fn test_nice_69() {
         let text = b"It was nice. lit six nine. Yeah.".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
@@ -154,6 +168,7 @@ mod tests_simple {
         );
     }
     #[test]
+    #[timeout(1000)]
     fn test_ellipsis_6_close() {
         let text = b"It was sub sub sub sub sub sub one...".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
@@ -168,6 +183,7 @@ mod tests_simple {
         );
     }
     #[test]
+    #[timeout(1000)]
     fn test_2_peirod() {
         let text = b"It was sub sub one..".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
@@ -182,6 +198,7 @@ mod tests_simple {
     }
 
     #[test]
+    #[timeout(1000)]
     fn test_ellipsis_overload_12() {
         let text = b"It was sub sub sub sub sub sub sub sub sub sub sub sub one......".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
@@ -198,6 +215,7 @@ mod tests_simple {
     }
 
     #[test]
+    #[timeout(1000)]
     fn test_if_else_pri() {
         let text = b"whe one pri yes! else pri no:(:(".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
@@ -209,6 +227,7 @@ mod tests_simple {
         );
     }
     #[test]
+    #[timeout(1000)]
     fn test_if_space_else_pri() {
         let text = b"whe one pri yes. Or, pri maybe. Else pri no:( sadge :(".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
@@ -219,6 +238,7 @@ mod tests_simple {
         );
     }
     #[test]
+    #[timeout(1000)]
     fn test_in_word_hyphen() {
         let text = b"I was about to learn in-depth mathematics -- It was crazy!".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
@@ -229,6 +249,7 @@ mod tests_simple {
         );
     }
     #[test]
+    #[timeout(1000)]
     fn test_print_no_vars() {
         let text = b"pri hi. pri hello world. pri \"hello world\".".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
@@ -239,6 +260,7 @@ mod tests_simple {
         );
     }
     #[test]
+    #[timeout(1000)]
     fn test_print_vars() {
         let text = b"was test 4. pri one test two test. pri test. pri four.".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
@@ -249,8 +271,21 @@ mod tests_simple {
             (print@35,36,37$43 (var \"test\"@39))\n(print@45,46,47$53 \"four\"@49)"
         );
     }
-
+    //TODO: fix so doesn;t fail
     // #[test]
+    // #[timeout(1000)]
+    fn test_else_past() {
+        let text = b"whels one whi one pri hi..".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(assign@0,1,2$10 \"test\"@4 (litnum 4@9$$1))\n(print@12,13,14$33 (var \"test\"@20) (var \"test\"@29))\n\
+            (print@35,36,37$43 (var \"test\"@39))\n(print@45,46,47$53 \"four\"@49)"
+        );
+    }
+
+    // #[test]#[timeout(1000)]
     // fn test_liechtenstein() {
     //     let text = b"The wars in Liechtenstein ravaged the country..".to_vec();
     //     let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
@@ -264,7 +299,7 @@ mod tests_simple {
     //     );
     // }
 
-    // #[test]
+    // #[test]#[timeout(1000)]
     // fn test_nottingham() {
     //     let text = b"I was in Nottingham and it literally snowed the entire time I was there! All eight days!".to_vec();
     //     let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
@@ -278,7 +313,7 @@ mod tests_simple {
     //     );
     // }
 
-    // #[test]
+    // #[test]#[timeout(1000)]
     // fn test_easy_as_123() {
     //     let text = b"It was as nice andd easy as one two three..".to_vec();
     //     let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
@@ -292,7 +327,7 @@ mod tests_simple {
     //     );
     // }
 
-    // // #[test]
+    // // #[test]#[timeout(1000)]
     // // fn test_it_was_not_as_easy() {
     // //     let text = b"It was as bad andd not as easy as one two three...".to_vec();
     // //     let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
@@ -302,7 +337,7 @@ mod tests_simple {
     // //     );
     // // }
 
-    // // #[test]
+    // // #[test]#[timeout(1000)]
     // // fn test_it_was_easy_as_one() {
     // //     let text = b"It was as bad add one but not two three...".to_vec();
     // //     let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
@@ -312,7 +347,7 @@ mod tests_simple {
     // //     );
     // // }
 
-    // #[test]
+    // #[test]#[timeout(1000)]
     // fn test_submarine() {
     //     let text = b"It was SS Submarine seven..".to_vec();
     //     let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
@@ -327,6 +362,7 @@ mod tests_simple {
     // }
 
     #[test]
+    #[timeout(1000)]
     fn test_line_4() {
         let text = b"lin one two three four!".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });

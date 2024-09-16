@@ -43,7 +43,13 @@ mod parsing_tests_simple;
 // #[path = "testing/parsing_tests_other.rs"]
 // mod parsing_tests_other;
 
-use std::{fmt::Debug, hint::black_box, mem};
+use std::{
+    any::{Any, TypeId},
+    collections::HashSet,
+    fmt::Debug,
+    hint::black_box,
+    mem,
+};
 
 use crate::{commands::*, writers::lisp_like_writer};
 
@@ -82,6 +88,8 @@ pub struct Parser<'a> {
     repeat_count: u8,
     /// the index of the last matched state
     last_stat_index: Option<usize>,
+    /// the hash map of failed exprs
+    cached_fails: HashSet<(usize, &'static str)>,
 }
 
 impl<'a> Parser<'a> {
@@ -102,6 +110,7 @@ impl<'a> Parser<'a> {
             aliases: AliasData::new(flags),
             repeat_count: 0,
             last_stat_index: None,
+            cached_fails: HashSet::new(),
         }
     }
     ///get the last state
@@ -190,6 +199,12 @@ impl<'a> Parser<'a> {
         let stack_index = self.stack.len() - 1;
         let frame = &mut self.stack[stack_index];
 
+        //if cached_fails has state failed at location
+        let id = (*frame.2).get_name();
+        if self.cached_fails.contains(&(frame.1, id)) {
+            self.failed_func();
+            return ParserResult::CachedFail;
+        }
         // should always be in bounds
         // spilt at mut for borrow safety
         // get (parents, this[0] and children[1..])
@@ -282,6 +297,12 @@ impl<'a> Parser<'a> {
     fn failed_func(&mut self) -> ParserResult {
         let state = self.stack.pop().unwrap();
 
+        if state.2.get_type() == StateType::Expr {
+            //insert into map
+            let id = (*state.2).get_name();
+            self.cached_fails.insert((state.1, id));
+        }
+
         let state_pos = state.0;
         self.data.exprs.vec.truncate(state_pos);
         //let _test = format!("{:?}", state);
@@ -342,6 +363,8 @@ impl<'a> Parser<'a> {
         let expr_index = state.0;
         if state.2.get_type() == StateType::Stat {
             self.last_stat_index = Some(state.0);
+            // stats can change parse ablility -- reset cached fails
+            self.cached_fails = HashSet::new();
         }
         self.last_state = Some(state);
 
