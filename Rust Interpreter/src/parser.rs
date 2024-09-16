@@ -18,23 +18,23 @@ mod fill;
 mod if_stat;
 mod litcolor;
 mod litcolor_data;
+mod move_to;
 mod not;
 mod operator;
 mod string_lit;
 mod stroke;
 mod var;
 mod while_stat;
-mod move_to;
 
 mod circle;
 mod line;
 mod print;
 mod rect;
 
+mod line_width;
 pub(crate) mod multi_lit_num;
 mod num_literal;
 mod word_num;
-mod line_width;
 
 #[path = "testing/parsing_tests_simple.rs"]
 mod parsing_tests_simple;
@@ -299,7 +299,8 @@ impl<'a> Parser<'a> {
     fn failed_func(&mut self) -> ParserResult {
         let state = self.stack.pop().unwrap();
 
-        if state.2.get_type() == StateType::Expr {
+        let state_type = state.2.get_type();
+        if state_type == StateType::Expr || state_type == StateType::None {
             //insert into map
             let id = (*state.2).get_name();
             self.cached_fails.insert((state.1, id));

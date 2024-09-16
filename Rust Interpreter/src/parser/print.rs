@@ -72,6 +72,7 @@ impl ParseState for PrintState {
                     *end = End::from_slice(&word, env.global_index);
                     MatchResult::Matched(word.pos, true)
                 } else {
+                    self.parsing_var = true;
                     MatchResult::ContinueWith(word.pos, get_state!(var::VarState::new()))
                 }
                 // curr word was not var

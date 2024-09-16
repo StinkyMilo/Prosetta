@@ -39,7 +39,7 @@ impl ParseState for AssignState {
                     {
                         *value_index = index;
                         *end = End::from_slice(&slice.0, env.global_index);
-                        env.vars.insert(name.to_owned());
+                        env.vars.insert(name.to_ascii_lowercase().to_owned());
                     } else {
                         unreachable!();
                     }
