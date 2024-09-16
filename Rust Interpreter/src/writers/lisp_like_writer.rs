@@ -258,6 +258,20 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 *str_start,
                 String::from_utf8_lossy(str)
             )
+        },
+        Expr::MoveTo { locs, indexes, end } => {
+            format!(
+                "(moveto{} {})",
+                join_locs(locs, Some(*end)),
+                write_exprs(exprs,indexes),
+            )
+        },
+        Expr::LineWidth { locs, child_index, end } => {
+            format!(
+                "(linewidth{} {})",
+                join_locs(locs, Some(*end)),
+                write_expr(exprs,*child_index, 0)
+            )      
         }
     }
 }

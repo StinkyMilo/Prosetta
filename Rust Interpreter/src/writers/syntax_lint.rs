@@ -329,7 +329,16 @@ impl<T: Renderer> SyntaxLinter<T> {
                 //one for each quote
                 self.write_as(source, str.len() + 2, STRING_COLOR);
             }
-
+            Expr::MoveTo { locs, indexes, end } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.add_end(source, *end, stack_index);
+            }
+            Expr::LineWidth { locs, child_index, end } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_expr(source, exprs, *child_index, stack_index + 1);
+                self.add_end(source, *end, stack_index);
+            }
             Expr::NoneExpr | Expr::NoneStat => {}
         };
     }

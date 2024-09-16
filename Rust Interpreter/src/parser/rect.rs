@@ -36,8 +36,15 @@ impl BasicState for RectState {
 
     fn can_close(&self) -> CloseType {
         match self.count {
-            0..=2 => CloseType::Unable,
-            3 => CloseType::Able,
+            0 => CloseType::Unable,
+            1..=3 => CloseType::Able,
+            /*
+                1-argument: width of square from current position
+                2-argument: width and height of rectangle from current position
+                3-argument: x and y coordinates then width of square
+                4-argument: x and y coordinate then width and height of rectangle
+                Draw from the middle
+            */
             4 => CloseType::Force,
             _ => unreachable!(),
         }

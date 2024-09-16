@@ -138,6 +138,16 @@ pub enum Expr {
         str_start: usize,
         str: Vec<u8>,
     },
+    MoveTo {
+        locs: Vec<usize>,
+        indexes: [usize; 2],
+        end: End,
+    },
+    LineWidth {
+        locs: Vec<usize>,
+        child_index: usize,
+        end: End
+    }
 }
 
 impl Expr {

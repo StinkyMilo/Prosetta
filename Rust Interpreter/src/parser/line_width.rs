@@ -3,29 +3,31 @@ use crate::parser::CloseType;
 use basic_func::BasicState;
 
 #[derive(Debug)]
-pub struct CircleState {
+
+pub struct LineWidthState {
     count: u8,
 }
-impl BasicState for CircleState {
+
+impl BasicState for LineWidthState {
     fn get_name(&self) -> &'static str {
-        "Circle"
+        "Line Width"
     }
 
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {
         let ret = self.count == 0;
         if ret {
-            *expr = Expr::Arc {
+            *expr = Expr::LineWidth {
                 locs,
-                indexes: [usize::MAX; 4],
-                end: End::none(),
+                child_index: usize::MAX,
+                end: End::none()
             }
         }
         ret
     }
 
     fn add_child(&mut self, expr: &mut Expr, index: usize) {
-        if let Expr::Arc { indexes, .. } = expr {
-            indexes[self.count as usize] = index;
+        if let Expr::LineWidth { child_index, .. } = expr {
+            *child_index=index;
             self.count += 1;
         } else {
             unreachable!()
@@ -35,21 +37,13 @@ impl BasicState for CircleState {
     fn can_close(&self) -> CloseType {
         match self.count {
             0 => CloseType::Unable,
-            1..=3 => CloseType::Able,
-            /*
-                1-argument: diameter of circle from current position
-                2-argument: width and height of ellipse from current position
-                3-argument: x and y coordinates then diameter of circle
-                4-argument: x and y coordinate then width and height of ellipse
-                Draw from the middle
-            */
-            4 => CloseType::Force,
+            1 => CloseType::Force,
             _ => unreachable!(),
         }
     }
 
     fn set_end(&mut self, expr: &mut Expr, index: End) {
-        if let Expr::Arc { end, .. } = expr {
+        if let Expr::LineWidth { end, .. } = expr {
             *end = index;
         } else {
             unreachable!()
@@ -57,7 +51,7 @@ impl BasicState for CircleState {
     }
 }
 
-impl CircleState {
+impl LineWidthState {
     pub fn new() -> Self {
         Self { count: 0 }
     }

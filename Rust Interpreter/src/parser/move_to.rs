@@ -3,20 +3,20 @@ use crate::parser::CloseType;
 use basic_func::BasicState;
 
 #[derive(Debug)]
-pub struct CircleState {
+pub struct MoveToState {
     count: u8,
 }
-impl BasicState for CircleState {
+impl BasicState for MoveToState {
     fn get_name(&self) -> &'static str {
-        "Circle"
+        "MoveTo"
     }
 
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {
         let ret = self.count == 0;
         if ret {
-            *expr = Expr::Arc {
+            *expr = Expr::MoveTo {
                 locs,
-                indexes: [usize::MAX; 4],
+                indexes: [usize::MAX; 2],
                 end: End::none(),
             }
         }
@@ -24,7 +24,7 @@ impl BasicState for CircleState {
     }
 
     fn add_child(&mut self, expr: &mut Expr, index: usize) {
-        if let Expr::Arc { indexes, .. } = expr {
+        if let Expr::MoveTo { indexes, .. } = expr {
             indexes[self.count as usize] = index;
             self.count += 1;
         } else {
@@ -34,22 +34,14 @@ impl BasicState for CircleState {
 
     fn can_close(&self) -> CloseType {
         match self.count {
-            0 => CloseType::Unable,
-            1..=3 => CloseType::Able,
-            /*
-                1-argument: diameter of circle from current position
-                2-argument: width and height of ellipse from current position
-                3-argument: x and y coordinates then diameter of circle
-                4-argument: x and y coordinate then width and height of ellipse
-                Draw from the middle
-            */
-            4 => CloseType::Force,
+            0..=1 => CloseType::Unable,
+            2 => CloseType::Force,
             _ => unreachable!(),
         }
     }
 
     fn set_end(&mut self, expr: &mut Expr, index: End) {
-        if let Expr::Arc { end, .. } = expr {
+        if let Expr::MoveTo { end, .. } = expr {
             *end = index;
         } else {
             unreachable!()
@@ -57,7 +49,7 @@ impl BasicState for CircleState {
     }
 }
 
-impl CircleState {
+impl MoveToState {
     pub fn new() -> Self {
         Self { count: 0 }
     }
