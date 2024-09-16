@@ -62,6 +62,15 @@ pub struct ParserFlags {
     pub not: bool,
 }
 
+#[derive(PartialEq, Eq, Debug)]
+pub enum StateType {
+    /// for NoneExpr and NoneStat
+    /// is replaceble
+    None,
+    Expr,
+    Stat,
+}
+
 /// A state (which goes onto the parser stack)
 pub trait ParseState: Debug {
     /// called first time to setup the state and after the state continues
@@ -79,9 +88,7 @@ pub trait ParseState: Debug {
     /// gets the name of the state
     fn get_name(&self) -> &'static str;
 
-    ///apparently not called, but
-    ///whether the expr should be replaced by new expr
-    fn do_replace(&self) -> bool;
+    fn get_type(&self) -> StateType;
 }
 
 ///a struct for closing character with an index and a length
@@ -150,6 +157,8 @@ pub enum ParserResult {
     ContinueWith,
     Continue,
     Failed,
+    /// this fail was cached earlier
+    CachedFail,
 }
 
 ///is the state able to be closed
@@ -184,7 +193,7 @@ pub struct Environment<'a> {
     ///the exprs after this
     pub children: &'a mut [Expr],
     ///The last matched expr if exists
-    pub last_matched_index: Option<usize>,
+    pub last_stat_index: Option<usize>,
     ///The current locs (locations of the alias characters)
     pub locs: Option<Vec<usize>>,
     /// the global index (with multiple input buffers)

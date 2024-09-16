@@ -1,6 +1,7 @@
 #![cfg(not(feature = "wasm"))]
 
 use std::{
+    any::Any,
     io::{self, Read},
     mem,
 };
@@ -20,7 +21,20 @@ mod writers;
 use parser::ParserSource;
 use parser_runner::{run_parser, RunnerFlags};
 
+// struct Test;
+// trait Test2 {}
+
+// impl Test2 for Test {}
+
 fn main() {
+    // let t = Test;
+    // let ta: Box<dyn Any> = Box::new(Test);
+    // let ta2: Box<dyn Test2> = Box::new(Test);
+    // println!("{:?}", t.type_id());
+    // println!("{:?}", ta.type_id());
+    // println!("{:?}", (*ta).type_id());
+    // println!("{:?}", ta2.type_id());
+    // println!("{:?}", (*(&*ta2 as &dyn Any)).type_id());
     //playground::print_test();
     //return;
 
@@ -48,8 +62,7 @@ fn main() {
     run_parser(
         parser_flags,
         vis_flags,
-        ParserSource::from_stdin()
-        //ParserSource::from_string(MILO_POEM_2[0].to_vec())
+        ParserSource::from_stdin(), //ParserSource::from_string(MILO_POEM_2[0].to_vec())
     );
 
     let _ = io::stdin().read(&mut [0u8]).unwrap();
@@ -99,13 +112,10 @@ restriction fosters creativity.",
 ];
 
 #[allow(dead_code)]
-static MILO_POEM_2: [&[u8]; 1] = [
-    b"
+static MILO_POEM_2: [&[u8]; 1] = [b"
     was name les int marioooo. int luigi.!
     was name2 mor int marioooo. int luigi.!
-    "
-];
-
+    "];
 
 // while !matches!(
 //     result,

@@ -17,6 +17,7 @@ mod else_stat;
 mod fill;
 mod if_stat;
 mod litcolor;
+mod litcolor_data;
 mod not;
 mod operator;
 mod string_lit;
@@ -44,7 +45,13 @@ mod parsing_tests_simple;
 // #[path = "testing/parsing_tests_other.rs"]
 // mod parsing_tests_other;
 
-use std::{fmt::Debug, hint::black_box, mem};
+use std::{
+    any::{Any, TypeId},
+    collections::HashSet,
+    fmt::Debug,
+    hint::black_box,
+    mem,
+};
 
 use crate::{commands::*, writers::lisp_like_writer};
 
@@ -81,8 +88,10 @@ pub struct Parser<'a> {
     aliases: AliasData,
     ///the number of times the current slice should repeat
     repeat_count: u8,
-    /// was the last matched state a stat
-    last_match_index: Option<usize>,
+    /// the index of the last matched state
+    last_stat_index: Option<usize>,
+    /// the hash map of failed exprs
+    cached_fails: HashSet<(usize, &'static str)>,
 }
 
 impl<'a> Parser<'a> {
@@ -102,7 +111,8 @@ impl<'a> Parser<'a> {
             last_result: LastMatchResult::None,
             aliases: AliasData::new(flags),
             repeat_count: 0,
-            last_match_index: None,
+            last_stat_index: None,
+            cached_fails: HashSet::new(),
         }
     }
     ///get the last state
@@ -114,6 +124,17 @@ impl<'a> Parser<'a> {
     pub fn get_last_state_name(&self) -> &'static str {
         self.get_last_state()
             .map_or(&"None", |state| state.2.get_name())
+    }
+
+    ///get the current stack
+    pub fn get_parser_stack(&self) -> String {
+        let mut str = self.stack.iter().fold(String::new(), |mut str, state| {
+            str += &format!("{}:{}, ", state.2.get_name(), state.1);
+            str
+        });
+        str.pop();
+        str.pop();
+        str
     }
 
     ///get the slice that was last used
@@ -180,6 +201,12 @@ impl<'a> Parser<'a> {
         let stack_index = self.stack.len() - 1;
         let frame = &mut self.stack[stack_index];
 
+        //if cached_fails has state failed at location
+        let id = (*frame.2).get_name();
+        if self.cached_fails.contains(&(frame.1, id)) {
+            self.failed_func();
+            return ParserResult::CachedFail;
+        }
         // should always be in bounds
         // spilt at mut for borrow safety
         // get (parents, this[0] and children[1..])
@@ -215,7 +242,7 @@ impl<'a> Parser<'a> {
             expr,
             children,
             parents,
-            last_matched_index: self.last_match_index,
+            last_stat_index: self.last_stat_index,
             expr_index: frame.0,
             vars: &mut self.data.vars,
             locs: None,
@@ -271,6 +298,12 @@ impl<'a> Parser<'a> {
     ///this function is called if the step fails
     fn failed_func(&mut self) -> ParserResult {
         let state = self.stack.pop().unwrap();
+
+        if state.2.get_type() == StateType::Expr {
+            //insert into map
+            let id = (*state.2).get_name();
+            self.cached_fails.insert((state.1, id));
+        }
 
         let state_pos = state.0;
         self.data.exprs.vec.truncate(state_pos);
@@ -330,9 +363,11 @@ impl<'a> Parser<'a> {
     fn matched_func(&mut self, mut index: usize, closed: bool) -> ParserResult {
         let state = self.stack.pop().unwrap();
         let expr_index = state.0;
-        //if !state.2.do_replace(){
-        self.last_match_index = Some(state.0);
-        //}
+        if state.2.get_type() == StateType::Stat {
+            self.last_stat_index = Some(state.0);
+            // stats can change parse ablility -- reset cached fails
+            self.cached_fails = HashSet::new();
+        }
         self.last_state = Some(state);
 
         // matched final stat

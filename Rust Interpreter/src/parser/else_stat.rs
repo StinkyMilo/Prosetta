@@ -6,13 +6,14 @@ use super::*;
 pub struct ElseState {
     first: bool,
     if_index: usize,
+    has_stat: bool,
 }
 impl ParseState for ElseState {
     fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
         if self.first {
             //get some(index) if it is an "if"
             let if_index = env
-                .last_matched_index
+                .last_stat_index
                 .and_then(|index| matches!(env.parents[index], Expr::If { .. }).then_some(index));
 
             if let Some(index) = if_index {
@@ -29,7 +30,12 @@ impl ParseState for ElseState {
             }
         }
         // non cont stat for seeing closes
-        MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
+        if self.has_stat {
+            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
+            // need a first stat - cont
+        } else {
+            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat_cont()))
+        }
     }
 
     fn step_match(
@@ -43,6 +49,7 @@ impl ParseState for ElseState {
         if let Expr::If { else_index, .. } = &mut env.parents[self.if_index] {
             if let Expr::Else { end, indexes, .. } = env.expr {
                 if let Some(index) = child_index {
+                    self.has_stat = true;
                     indexes.push(index);
                 }
 
@@ -72,8 +79,8 @@ impl ParseState for ElseState {
         "Else"
     }
 
-    fn do_replace(&self) -> bool {
-        false
+    fn get_type(&self) -> StateType {
+        StateType::Stat
     }
 }
 
@@ -82,6 +89,7 @@ impl ElseState {
         Self {
             first: true,
             if_index: usize::MAX,
+            has_stat: false,
         }
     }
 }
