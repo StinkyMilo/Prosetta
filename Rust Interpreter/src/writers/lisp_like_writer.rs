@@ -282,7 +282,21 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
         },
         Expr::Append { locs, indexes, end } => {
             format!(
-                "(rotate{} {})",
+                "(append{} {})",
+                join_locs(locs, Some(*end)),
+                write_exprs(exprs, indexes)
+            )
+        },
+        Expr::Delete { locs, indexes, end } => {
+            format!(
+                "(delete{} {})",
+                join_locs(locs, Some(*end)),
+                write_exprs(exprs, indexes)
+            )
+        },
+        Expr::Replace { locs, indexes, end } => {
+            format!(
+                "(replace{} {})",
                 join_locs(locs, Some(*end)),
                 write_exprs(exprs, indexes)
             )

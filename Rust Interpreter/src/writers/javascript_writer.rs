@@ -202,6 +202,16 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             } else {
                 format!("{}.splice({}, 0, {});", write_expr(exprs, indexes[0]), write_expr(exprs, indexes[2]), write_expr(exprs, indexes[1]))
             }
+        },
+        Expr::Delete { indexes, .. } => {
+            if indexes[1] == usize::MAX {
+                format!("{}.splice(0,1);",write_expr(exprs, indexes[0]))
+            }else {
+                format!("{}.splice({},1);",write_expr(exprs, indexes[0]), write_expr(exprs, indexes[1]))
+            }
+        },
+        Expr::Replace { indexes, .. } => {
+            format!("{}[{}]={};",write_expr(exprs, indexes[0]),write_expr(exprs, indexes[1]), write_expr(exprs, indexes[2]))
         }
     }
 }

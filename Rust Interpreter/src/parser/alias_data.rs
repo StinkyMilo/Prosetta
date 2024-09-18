@@ -59,6 +59,8 @@ fn get_stat_state(alias: &'static [u8], index: usize) -> MatchResult {
             b"pen" => get_state!(line_width::LineWidthState::new()),
             b"tur" => get_state!(rotate::RotateState::new()),
             b"app" => get_state!(append::AppendState::new()),
+            b"del" => get_state!(delete::DeleteState::new()),
+            b"rep" => get_state!(replace::ReplaceState::new()),
             _ => unreachable!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
         },
     )

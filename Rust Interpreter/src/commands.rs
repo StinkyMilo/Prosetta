@@ -157,6 +157,16 @@ pub enum Expr {
         locs: Vec<usize>,
         indexes: [usize; 3],
         end: End
+    },
+    Delete {
+        locs: Vec<usize>,
+        indexes: [usize; 2],
+        end: End
+    },
+    Replace {
+        locs: Vec<usize>,
+        indexes: [usize; 3],
+        end: End
     }
 }
 
