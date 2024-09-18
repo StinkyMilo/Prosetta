@@ -199,13 +199,11 @@ function set_fill(...color) {
 function conv_color(...color) {
   switch (color.length) {
     case 1:
-      print_console("1");
       if (color[0] == 0) {
         return "transparent";
       }
       return color[0];
     case 3:
-      print_console("3");
       return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
   }
 }
