@@ -1,19 +1,42 @@
+use std::usize;
+
 use super::*;
 /// state for equals
 #[derive(Debug)]
-pub struct AssignState;
+pub struct AssignState {
+    first: bool,
+}
 impl ParseState for AssignState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         // set expr
-        *env.expr = Expr::Assign {
-            name_start: word.pos + env.global_index,
-            name: word.str.to_owned(),
-            value_index: usize::MAX,
-            locs: env.locs.take().unwrap_or_default(),
-            end: End::none(),
-        };
-        // setup child state
-        MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
+        if self.first {
+            *env.expr = Expr::Assign {
+                name_start: usize::MAX,
+                name: Vec::new(),
+                value_index: usize::MAX,
+                locs: env.locs.take().unwrap_or_default(),
+                end: End::none(),
+            };
+            self.first = false;
+        }
+
+        // dont make closes varibles
+        if is_close(word) || (word.len() > 0 && (word.str[0] == b'"' || word.str[0] == b'\'')) {
+            MatchResult::Continue
+        } else {
+            //set name
+            if let Expr::Assign {
+                name_start, name, ..
+            } = env.expr
+            {
+                *name_start = word.pos + env.global_index;
+                *name = word.str.to_owned();
+            } else {
+                unreachable!()
+            }
+            // setup child state
+            MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
+        }
     }
 
     fn step_match(
@@ -39,7 +62,7 @@ impl ParseState for AssignState {
                     {
                         *value_index = index;
                         *end = End::from_slice(&slice.0, env.global_index);
-                        env.vars.insert(name.to_owned());
+                        env.vars.insert(name.to_ascii_lowercase().to_owned());
                     } else {
                         unreachable!();
                     }
@@ -64,6 +87,6 @@ impl ParseState for AssignState {
 
 impl AssignState {
     pub fn new() -> Self {
-        Self
+        Self { first: true }
     }
 }

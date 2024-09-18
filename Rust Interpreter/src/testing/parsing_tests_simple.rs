@@ -285,6 +285,34 @@ mod tests_simple {
         );
     }
 
+    #[test]
+    #[timeout(1000)]
+    fn test_pri_mult_str() {
+        let text = b"pri \"mario\" \"luigi\"!".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        assert_eq!(
+            test_lib::assert_result(&mut parser),
+            ParserResult::MatchedLine
+        );
+        assert_eq!(
+            lisp_like_writer::write_first(&parser.data.exprs),
+            "(print@0,1,2$19 (string$4 \"mario\") (string$12 \"luigi\"))"
+        );
+    }
+
+    #[test]
+    #[timeout(1000)]
+    fn test_pri_varible_casing() {
+        let text: Vec<u8> = b"was h1 one. was H2 two. pri h1 H1 h2 H2.".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(assign@0,1,2$10 \"h1\"@4 (litnum 1@7$$3))\n(assign@12,13,14$22 \"H2\"@16 (litnum 2@19$$3))\n\
+            (print@24,25,26$39 (var \"h1\"@28) (var \"h1\"@31) (var \"h2\"@34) (var \"h2\"@37))"
+        );
+    }
+
     // #[test]#[timeout(1000)]
     // fn test_liechtenstein() {
     //     let text = b"The wars in Liechtenstein ravaged the country..".to_vec();

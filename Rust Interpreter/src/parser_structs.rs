@@ -263,7 +263,8 @@ fn is_non_close_but_still_single(char: u8) -> bool {
 
 /// does slice consist of a closing character
 pub fn is_close(slice: &Slice) -> bool {
-    slice.len() > 0 && is_valid_close_char(slice.str[0])
+    // does str close something
+    get_close_data(slice.str).1 != 0
 }
 
 ///get the next valid word and the rest of the string as decided by is_valid_word_char()
@@ -409,15 +410,5 @@ pub fn find_close_slice<'a>(slice: &'a Slice<'a>, mut start: usize) -> Option<(S
 
 /// returns the rest after finding the next closing character
 pub fn find_close<'a>(slice: &'a Slice<'a>, start: usize) -> Option<Slice<'_>> {
-    // find end char
-    let mut end = start;
-    while end < slice.len() && !is_valid_close_char(slice.str[end]) {
-        end += 1;
-    }
-    let test = end < slice.len();
-    // find end of period
-    test.then(|| Slice {
-        str: &slice.str[end..],
-        pos: slice.pos + end,
-    })
+    find_close_slice(slice, start).map(|s| s.1)
 }
