@@ -300,6 +300,27 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 join_locs(locs, Some(*end)),
                 write_exprs(exprs, indexes)
             )
+        },
+        Expr::Find { locs, indexes, end } => {
+            format!(
+                "(find{} {})",
+                join_locs(locs, Some(*end)),
+                write_exprs(exprs, indexes)
+            )
+        },
+        Expr::Index { locs, indexes, end } => {
+            format!(
+                "(index{} {})",
+                join_locs(locs, Some(*end)),
+                write_exprs(exprs, indexes)
+            )
+        },
+        Expr::List { locs, indexes, end } => {
+            format!(
+                "(list{} {})",
+                join_locs(locs, Some(*end)),
+                write_exprs(exprs, indexes)
+            )
         }
     }
 }

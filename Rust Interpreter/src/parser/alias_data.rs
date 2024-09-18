@@ -35,6 +35,9 @@ fn get_expr_state(alias: &'static [u8], index: usize) -> MatchResult {
             b"int" => get_state!(word_num::WordNumState::new()),
             b"not" => get_state!(not::NotState::new()),
             b"col" => get_state!(color::ColorState::new()),
+            b"fin" => get_state!(find::FindState::new()),
+            b"ind" => get_state!(index::IndexState::new()),
+            b"lis" => get_state!(list::ListState::new()),
             _ => unreachable!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
         },
     )

@@ -212,6 +212,15 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         },
         Expr::Replace { indexes, .. } => {
             format!("{}[{}]={};",write_expr(exprs, indexes[0]),write_expr(exprs, indexes[1]), write_expr(exprs, indexes[2]))
+        },
+        Expr::Find {indexes, ..} => {
+            format!("{}.indexOf({})",write_expr(exprs, indexes[0]),write_expr(exprs,indexes[1]))
+        },
+        Expr::Index{indexes, ..} => {
+            format!("{}[{}]",write_expr(exprs, indexes[0]),write_expr(exprs,indexes[1]))
+        },
+        Expr::List { indexes, .. } => {
+            format!("[{}]", write_exprs(exprs, indexes, ", "))
         }
     }
 }
