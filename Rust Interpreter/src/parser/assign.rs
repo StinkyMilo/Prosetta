@@ -4,16 +4,21 @@ use super::*;
 pub struct AssignState;
 impl ParseState for AssignState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
-        // set expr
-        *env.expr = Expr::Assign {
-            name_start: word.pos + env.global_index,
-            name: word.str.to_owned(),
-            value_index: usize::MAX,
-            locs: env.locs.take().unwrap_or_default(),
-            end: End::none(),
-        };
-        // setup child state
-        MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
+        // dont make closes varibles
+        if is_close(word) {
+            MatchResult::Continue
+        } else {
+            // set expr
+            *env.expr = Expr::Assign {
+                name_start: word.pos + env.global_index,
+                name: word.str.to_owned(),
+                value_index: usize::MAX,
+                locs: env.locs.take().unwrap_or_default(),
+                end: End::none(),
+            };
+            // setup child state
+            MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
+        }
     }
 
     fn step_match(
