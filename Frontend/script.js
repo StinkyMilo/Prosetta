@@ -11,9 +11,10 @@ function init() {
   cnsl = document.getElementById("console");
 
   print_console("Welcome to Prosetta!");
-  reset_rotation();
-  clear_canvas();
+  canvas.width = canvas.width;
   has_drawn_shape = false;
+  last_was_line = false;
+  reset_rotation();
   move_to(0, 0);
   ctx.moveTo(x, y);
   set_stroke("black");
@@ -205,13 +206,6 @@ function set_fill(color) {
 
 function set_line_width(width) {
   ctx.lineWidth = width;
-}
-
-function clear_canvas() {
-  set_fill("white");
-  set_stroke("transparent");
-  draw_rect(0, 0, 400, 400);
-  end_shape();
 }
 
 function log_base(base, val) {

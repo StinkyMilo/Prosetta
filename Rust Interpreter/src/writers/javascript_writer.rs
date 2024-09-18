@@ -190,8 +190,11 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         Expr::MoveTo { indexes, .. } => {
             format!("move_to({});", write_exprs(exprs, indexes, ", "))
         }
-        Expr::LineWidth { child_index, ..} => {
-            format!("set_line_width({});",write_expr(exprs,*child_index))
+        Expr::LineWidth { child_index, .. } => {
+            format!("set_line_width({});", write_expr(exprs, *child_index))
+        }
+        Expr::Rotate { index, .. } => {
+            format!("rotate_delta({});", write_expr(exprs, *index))
         }
     }
 }

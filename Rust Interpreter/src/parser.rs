@@ -18,23 +18,24 @@ mod fill;
 mod if_stat;
 mod litcolor;
 mod litcolor_data;
+mod move_to;
 mod not;
 mod operator;
 mod string_lit;
 mod stroke;
 mod var;
 mod while_stat;
-mod move_to;
 
 mod circle;
 mod line;
 mod print;
 mod rect;
+mod rotate;
 
+mod line_width;
 pub(crate) mod multi_lit_num;
 mod num_literal;
 mod word_num;
-mod line_width;
 
 #[path = "testing/parsing_tests_simple.rs"]
 mod parsing_tests_simple;
@@ -45,13 +46,7 @@ mod parsing_tests_simple;
 // #[path = "testing/parsing_tests_other.rs"]
 // mod parsing_tests_other;
 
-use std::{
-    any::{Any, TypeId},
-    collections::HashSet,
-    fmt::Debug,
-    hint::black_box,
-    mem,
-};
+use std::{collections::HashSet, fmt::Debug, hint::black_box, mem};
 
 use crate::{commands::*, writers::lisp_like_writer};
 

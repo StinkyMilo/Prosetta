@@ -246,10 +246,15 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_up_to(source, *str_start);
                 self.write_as(source, *str_length, NUM_COLOR);
             }
-            Expr::MultiLitNum { locs, end, str_start, .. } => {
+            Expr::MultiLitNum {
+                locs,
+                end,
+                str_start,
+                ..
+            } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_up_to(source, *str_start);
-                self.write_as(source, end.index-str_start, NUM_COLOR);
+                self.write_as(source, end.index - str_start, NUM_COLOR);
                 self.add_end(source, *end, stack_index);
             }
             Expr::Print { locs, data, end } => {
@@ -334,9 +339,18 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::LineWidth { locs, child_index, end } => {
+            Expr::LineWidth {
+                locs,
+                child_index,
+                end,
+            } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_expr(source, exprs, *child_index, stack_index + 1);
+                self.add_end(source, *end, stack_index);
+            }
+            Expr::Rotate { locs, index, end } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_expr(source, exprs, *index, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
             Expr::NoneExpr | Expr::NoneStat => {}
