@@ -188,19 +188,25 @@ function draw_ellipse() {
   has_drawn_shape = true;
 }
 
-function set_stroke(color) {
-  if (color == 0) {
-    ctx.strokeStyle = "transparent";
-  } else {
-    ctx.strokeStyle = color;
-  }
+function set_stroke(...color) {
+  ctx.strokeStyle = conv_color(...color);
 }
 
-function set_fill(color) {
-  if (color == 0) {
-    ctx.strokeStyle = "transparent";
-  } else {
-    ctx.fillStyle = color;
+function set_fill(...color) {
+  ctx.fillStyle = conv_color(...color);
+}
+
+function conv_color(...color) {
+  switch (color.length) {
+    case 1:
+      print_console("1");
+      if (color[0] == 0) {
+        return "transparent";
+      }
+      return color[0];
+    case 3:
+      print_console("3");
+      return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
   }
 }
 
