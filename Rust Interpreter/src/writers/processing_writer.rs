@@ -107,8 +107,8 @@ fn write_expr(
                 OperatorType::Add => ("+", 10 * 2),
                 OperatorType::Sub => ("-", 10 * 2),
                 OperatorType::Mult => ("*", 11 * 2),
-                OperatorType::Div => ("/",11*2),
-                OperatorType::Mod => ("%",11*2),
+                OperatorType::Div => ("/", 11 * 2),
+                OperatorType::Mod => ("%", 11 * 2),
             };
             write_var_len_operator(
                 exprs,

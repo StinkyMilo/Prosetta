@@ -19,7 +19,7 @@ impl BasicState for FillState {
             *expr = Expr::Fill {
                 locs,
                 indexes: [usize::MAX; 3],
-                end: End::none()
+                end: End::none(),
             }
         }
         ret

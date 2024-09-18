@@ -17,12 +17,12 @@ mod commands;
 mod parser;
 mod writers;
 
+use crate::parser::ParserResult;
 use parser::ParserSource;
 use parser_runner::{run_parser, RunnerFlags};
-use crate::parser::ParserResult;
 
-use crate::writers::syntax_renderers::html_renderer::HTMLRenderer;
 use crate::writers::syntax_lint::SyntaxLinter;
+use crate::writers::syntax_renderers::html_renderer::HTMLRenderer;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.

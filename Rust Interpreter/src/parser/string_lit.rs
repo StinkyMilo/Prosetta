@@ -20,7 +20,7 @@ impl ParseState for LitStrState {
                     str_start: word.pos + env.global_index,
                     str,
                 };
-                MatchResult::Matched(end+1, false)
+                MatchResult::Matched(end + 1, false)
             } else {
                 MatchResult::Failed
             }
