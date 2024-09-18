@@ -1,21 +1,39 @@
+use std::usize;
+
 use super::*;
 /// state for equals
 #[derive(Debug)]
-pub struct AssignState;
+pub struct AssignState {
+    first: bool,
+}
 impl ParseState for AssignState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
-        // dont make closes varibles
-        if is_close(word) {
-            MatchResult::Continue
-        } else {
-            // set expr
+        // set expr
+        if self.first {
             *env.expr = Expr::Assign {
-                name_start: word.pos + env.global_index,
-                name: word.str.to_owned(),
+                name_start: usize::MAX,
+                name: Vec::new(),
                 value_index: usize::MAX,
                 locs: env.locs.take().unwrap_or_default(),
                 end: End::none(),
             };
+            self.first = false;
+        }
+
+        // dont make closes varibles
+        if is_close(word) || (word.len() > 0 && (word.str[0] == b'"' || word.str[0] == b'\'')) {
+            MatchResult::Continue
+        } else {
+            //set name
+            if let Expr::Assign {
+                name_start, name, ..
+            } = env.expr
+            {
+                *name_start = word.pos + env.global_index;
+                *name = word.str.to_owned();
+            } else {
+                unreachable!()
+            }
             // setup child state
             MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
         }
@@ -69,6 +87,6 @@ impl ParseState for AssignState {
 
 impl AssignState {
     pub fn new() -> Self {
-        Self
+        Self { first: true }
     }
 }
