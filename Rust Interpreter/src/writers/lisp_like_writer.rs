@@ -279,6 +279,13 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 join_locs(locs, Some(*end)),
                 write_expr(exprs, *index, 0)
             )
+        },
+        Expr::Append { locs, indexes, end } => {
+            format!(
+                "(rotate{} {})",
+                join_locs(locs, Some(*end)),
+                write_exprs(exprs, indexes)
+            )
         }
     }
 }

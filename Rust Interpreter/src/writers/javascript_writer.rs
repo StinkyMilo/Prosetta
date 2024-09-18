@@ -195,6 +195,13 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         }
         Expr::Rotate { index, .. } => {
             format!("rotate_delta({});", write_expr(exprs, *index))
+        },
+        Expr::Append { indexes, .. } => {
+            if indexes[2] == usize::MAX {
+                format!("{}.push({});", write_expr(exprs, indexes[0]), write_expr(exprs, indexes[1]))
+            } else {
+                format!("{}.splice({}, 0, {});", write_expr(exprs, indexes[0]), write_expr(exprs, indexes[2]), write_expr(exprs, indexes[1]))
+            }
         }
     }
 }

@@ -11,6 +11,7 @@ mod basic_func;
 
 mod alias;
 pub(crate) mod alias_data;
+mod append;
 mod assign;
 mod color;
 mod else_stat;
