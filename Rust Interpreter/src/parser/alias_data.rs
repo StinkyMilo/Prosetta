@@ -1,15 +1,15 @@
 use super::*;
 
-const BASE_EXPR_ALIASES: [&'static [u8]; 16] = [
+const BASE_EXPR_ALIASES: [&'static [u8]; 19] = [
     b"int", b"tim", b"add", b"sub", b"lit", b"ide", b"mod", b"log", b"exp", b"les", b"mor", b"als",
-    b"oth", b"par", b"inv", b"col",
+    b"oth", b"par", b"inv", b"col", b"app", b"del", b"rep"
 ];
 
 const NOT_ALIAS: &'static [u8] = b"not";
 
-const STAT_ALIASES: [&'static [u8]; 13] = [
+const STAT_ALIASES: [&'static [u8]; 16] = [
     b"arc", b"lin", b"was", b"rec", b"pri", b"whe", b"whi", b"els", b"sto", b"fil", b"mov", b"pen",
-    b"tur",
+    b"tur", b"fin", b"ind", b"lis"
 ];
 
 ///match alias to expr
