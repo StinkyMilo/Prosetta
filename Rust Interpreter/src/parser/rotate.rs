@@ -4,30 +4,30 @@ use basic_func::BasicState;
 
 #[derive(Debug)]
 
-pub struct LineWidthState {
+pub struct RotateState {
     count: u8,
 }
 
-impl BasicState for LineWidthState {
+impl BasicState for RotateState {
     fn get_name(&self) -> &'static str {
-        "Line Width"
+        "Rotate"
     }
 
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {
         let ret = self.count == 0;
         if ret {
-            *expr = Expr::LineWidth {
+            *expr = Expr::Rotate {
                 locs,
-                child_index: usize::MAX,
+                index: usize::MAX,
                 end: End::none(),
             }
         }
         ret
     }
 
-    fn add_child(&mut self, expr: &mut Expr, index: usize) {
-        if let Expr::LineWidth { child_index, .. } = expr {
-            *child_index = index;
+    fn add_child(&mut self, expr: &mut Expr, idx: usize) {
+        if let Expr::Rotate { index, .. } = expr {
+            *index = idx;
             self.count += 1;
         } else {
             unreachable!()
@@ -43,7 +43,7 @@ impl BasicState for LineWidthState {
     }
 
     fn set_end(&mut self, expr: &mut Expr, index: End) {
-        if let Expr::LineWidth { end, .. } = expr {
+        if let Expr::Rotate { end, .. } = expr {
             *end = index;
         } else {
             unreachable!()
@@ -51,7 +51,7 @@ impl BasicState for LineWidthState {
     }
 }
 
-impl LineWidthState {
+impl RotateState {
     pub fn new() -> Self {
         Self { count: 0 }
     }

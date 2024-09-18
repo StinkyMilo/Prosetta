@@ -1,5 +1,5 @@
 var sourcecode, ctx, cnsl, canvas;
-var x, y;
+var x = 0, y = 0, rotation = 0;
 var has_run = false;
 var has_drawn_shape = false;
 var last_was_line = false;
@@ -11,8 +11,10 @@ function init() {
   cnsl = document.getElementById("console");
 
   print_console("Welcome to Prosetta!");
-  clear_canvas();
+  canvas.width = canvas.width;
   has_drawn_shape = false;
+  last_was_line = false;
+  reset_rotation();
   move_to(0, 0);
   ctx.moveTo(x, y);
   set_stroke("black");
@@ -42,23 +44,42 @@ function end_shape() {
 function start_shape() {
   end_shape();
   ctx.beginPath();
-  ctx.moveTo(x, y);
 }
 
 function draw_line() {
-  if (arguments.length == 2) {
-    if (!last_was_line) {
+  switch (arguments.length) {
+    case 1:
+      if (!last_was_line) {
+        start_shape();
+        ctx.moveTo(x, y);
+      }
+      move_distance(arguments[0]);
+      console.log(x, y, arguments[0], rotation);
+      ctx.lineTo(x, y);
+      break;
+    case 2:
+      if (!last_was_line) {
+        start_shape();
+        ctx.moveTo(x, y);
+      }
+      move_delta(arguments[0], arguments[1]);
+      ctx.lineTo(x, y);
+      break;
+    case 3:
       start_shape();
-    }
-    move_delta(arguments[0], arguments[1]);
-    ctx.lineTo(x, y);
-  }
-  else {
-    start_shape();
-    move_to(arguments[0], arguments[1]);
-    ctx.moveTo(x, y);
-    move_to(arguments[2], arguments[3]);
-    ctx.lineTo(x, y);
+      move_to(arguments[0], arguments[1]);
+      ctx.moveTo(x, y);
+      move_distance(arguments[2]);
+      ctx.lineTo(x, y);
+      break;
+    case 4:
+      start_shape();
+      move_to(arguments[0], arguments[1]);
+      ctx.moveTo(x, y);
+      move_to(arguments[2], arguments[3]);
+      ctx.lineTo(x, y);
+      break;
+
   }
   last_was_line = true;
   has_drawn_shape = true;
@@ -72,6 +93,32 @@ function move_to(x1, y1) {
 function move_delta(x1, y1) {
   x += x1;
   y -= y1;
+}
+
+function move_distance(dist) {
+  let dx = Math.cos(rotation_radians()) * dist;
+  let dy = Math.sin(rotation_radians()) * dist;
+  move_delta(dx, dy);
+}
+
+function rotation_radians() {
+  return -rotation * Math.PI / 180;
+}
+
+function rotate_delta(deg) {
+  rotation += deg;
+}
+
+function reset_rotation() {
+  rotation = 0;
+}
+
+function rotate_point(cx, cy, rad, x1, y1) {
+  let cos = Math.cos(rad),
+    sin = Math.sin(rad),
+    nx = (cos * (x1 - cx)) + (sin * (y1 - cy)) + cx,
+    ny = (cos * (y1 - cy)) - (sin * (x1 - cx)) + cy;
+  return [nx, ny];
 }
 
 function draw_rect() {
@@ -97,7 +144,17 @@ function draw_rect() {
       break;
   }
   start_shape();
-  ctx.rect(x - width / 2, y - height / 2, width, height);
+  // let x1, y1, x2, y2, x3, y3, x4, y4;
+  let rad = rotation_radians()
+  let [x1, y1] = rotate_point(x, y, rad, x - width / 2, y - height / 2);
+  let [x2, y2] = rotate_point(x, y, rad, x + width / 2, y - height / 2);
+  let [x3, y3] = rotate_point(x, y, rad, x + width / 2, y + height / 2);
+  let [x4, y4] = rotate_point(x, y, rad, x - width / 2, y + height / 2);
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.lineTo(x3, y3);
+  ctx.lineTo(x4, y4);
+  ctx.closePath();
   last_was_line = false;
   has_drawn_shape = true;
 }
@@ -125,7 +182,8 @@ function draw_ellipse() {
       break;
   }
   start_shape();
-  ctx.ellipse(x, y, width / 2, height / 2, 0, 0, 2 * Math.PI);
+  ctx.ellipse(x, y, width / 2, height / 2, -rotation_radians(), 0, 2 * Math.PI);
+  ctx.closePath();
   last_was_line = false;
   has_drawn_shape = true;
 }
@@ -148,13 +206,6 @@ function set_fill(color) {
 
 function set_line_width(width) {
   ctx.lineWidth = width;
-}
-
-function clear_canvas() {
-  set_fill("white");
-  set_stroke("transparent");
-  draw_rect(0, 0, 400, 400);
-  end_shape();
 }
 
 function log_base(base, val) {
