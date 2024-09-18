@@ -221,6 +221,9 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         },
         Expr::List { indexes, .. } => {
             format!("[{}]", write_exprs(exprs, indexes, ", "))
+        },
+        Expr::ForEach {indexes, name, ..} => {
+            format!("for({}mario of {}) {{\n{}\n}}",String::from_utf8_lossy(&name), write_expr(exprs, indexes[0]), write_exprs(exprs, &indexes[1..], "\n"))
         }
     }
 }

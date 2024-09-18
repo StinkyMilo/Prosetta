@@ -182,6 +182,13 @@ pub enum Expr {
         locs: Vec<usize>,
         indexes: Vec<usize>,
         end: End
+    },
+    ForEach {
+        name_start: usize,
+        name: Vec<u8>,
+        locs: Vec<usize>,
+        indexes: Vec<usize>,
+        end: End
     }
 }
 

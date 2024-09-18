@@ -18,6 +18,7 @@ mod delete;
 mod else_stat;
 mod fill;
 mod find;
+mod foreach;
 mod if_stat;
 mod index;
 mod list;

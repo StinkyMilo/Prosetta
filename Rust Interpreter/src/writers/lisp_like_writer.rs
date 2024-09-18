@@ -321,6 +321,18 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 join_locs(locs, Some(*end)),
                 write_exprs(exprs, indexes)
             )
+        },
+        Expr::ForEach {
+            locs, indexes, end, name, ..
+        } => {
+            let split = indexes.split_at_checked(1).unwrap_or_default();
+            format!(
+                "(foreach{} {} {} then:\n{}\n)",
+                join_locs(locs, Some(*end)),
+                String::from_utf8_lossy(&name),
+                write_expr(exprs, *split.0.first().unwrap_or(&usize::MAX), 0),
+                write_stats(exprs, split.1, indent + 1),
+            )
         }
     }
 }
