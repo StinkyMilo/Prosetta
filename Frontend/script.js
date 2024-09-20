@@ -1,16 +1,16 @@
-var sourcecode, ctx, cnsl, canvas;
+var jscode, sourcecode, ctx, cnsl, canvas;
 var x = 0, y = 0, rotation = 0;
 var has_run = false;
 var has_drawn_shape = false;
 var last_was_line = false;
 
 function init() {
-  sourcecode = document.getElementById("sourcecode");
+  sourcecode = document.getElementById("code");
+  jscode = document.getElementById("js");
   canvas = document.getElementById("outputcanvas");
   ctx = canvas.getContext('2d');
   cnsl = document.getElementById("console");
 
-  print_console("Welcome to Prosetta!");
   canvas.width = canvas.width;
   has_drawn_shape = false;
   last_was_line = false;
@@ -188,19 +188,23 @@ function draw_ellipse() {
   has_drawn_shape = true;
 }
 
-function set_stroke(color) {
-  if (color == 0) {
-    ctx.strokeStyle = "transparent";
-  } else {
-    ctx.strokeStyle = color;
-  }
+function set_stroke(...color) {
+  ctx.strokeStyle = conv_color(...color);
 }
 
-function set_fill(color) {
-  if (color == 0) {
-    ctx.strokeStyle = "transparent";
-  } else {
-    ctx.fillStyle = color;
+function set_fill(...color) {
+  ctx.fillStyle = conv_color(...color);
+}
+
+function conv_color(...color) {
+  switch (color.length) {
+    case 1:
+      if (color[0] == 0) {
+        return "transparent";
+      }
+      return color[0];
+    case 3:
+      return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
   }
 }
 
@@ -227,16 +231,48 @@ function get_color(r, g, b) {
 function runcode() {
   if (has_run) {
     print_console();
+    print_console("Welcome to Prosetta!");
+    print_console("---");
+    print_console();
   }
   has_run = true;
   init();
-  print_console("---");
-  print_console();
   try {
-    eval(sourcecode.value);
+    eval(jscode.value);
     end_shape();
   } catch (error) {
     print_console(error);
   }
   cnsl.scrollTop = cnsl.scrollHeight;
+}
+
+function onPageLoad() {
+  let tabs = document.getElementsByClassName("tabBtn tabDefault");
+  tabs[0].click();
+  init();
+  print_console("Welcome to Prosetta!");
+  print_console("---");
+  print_console();
+  updateCode();
+}
+
+function openTab(event, tab) {
+  let tabContents = document.getElementsByClassName("tabContent");
+  for (let i = 0; i < tabContents.length; i++) {
+    if (tabContents[i].id == tab) {
+      tabContents[i].style.display = "block";
+    }
+    else {
+      tabContents[i].style.display = "none";
+    }
+  }
+  let tabs = document.getElementsByClassName("tabBtn");
+  for (let i = 0; i < tabs.length; i++) {
+    tabs[i].className = tabs[i].className.replace(" active", "");
+  }
+  event.currentTarget.className += " active";
+}
+
+function updateCode() {
+  jscode.innerText = sourcecode.value;
 }
