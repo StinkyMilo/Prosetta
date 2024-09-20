@@ -1,12 +1,16 @@
-var jscode, sourcecode, ctx, cnsl, canvas;
+import init, { ParserRunner } from './wasm-bindings/prosetta.js'
+
+var jscode, sourcecode, syntax, ctx, cnsl, canvas;
 var x = 0, y = 0, rotation = 0;
 var has_run = false;
 var has_drawn_shape = false;
 var last_was_line = false;
+var parser, parsedData;
 
-function init() {
+function init_canvas() {
   sourcecode = document.getElementById("code");
   jscode = document.getElementById("js");
+  syntax = document.getElementById("syntax");
   canvas = document.getElementById("outputcanvas");
   ctx = canvas.getContext('2d');
   cnsl = document.getElementById("console");
@@ -212,23 +216,21 @@ function set_line_width(width) {
   ctx.lineWidth = width;
 }
 
-function log_base(base, val) {
+function log_base(base, val = undefined) {
+  if (val == undefined) {
+    return Math.log(base);
+  }
   return Math.log(val) / Math.log(base);
 }
 
-function log_base(val) {
-  return Math.log(val) / Math.LN10;
+function get_color(...args) {
+  if (args.length == 1) {
+    return args[0];
+  }
+  return `rgb(${args[0]}, ${args[1]}, ${args[2]})`;
 }
 
-function get_color(name) {
-  return name;
-}
-
-function get_color(r, g, b) {
-  return `rgb(${r}, ${g}, ${b})`
-}
-
-function runcode() {
+function runCode() {
   if (has_run) {
     print_console();
     print_console("Welcome to Prosetta!");
@@ -236,7 +238,7 @@ function runcode() {
     print_console();
   }
   has_run = true;
-  init();
+  init_canvas();
   try {
     eval(jscode.value);
     end_shape();
@@ -244,16 +246,6 @@ function runcode() {
     print_console(error);
   }
   cnsl.scrollTop = cnsl.scrollHeight;
-}
-
-function onPageLoad() {
-  let tabs = document.getElementsByClassName("tabBtn tabDefault");
-  tabs[0].click();
-  init();
-  print_console("Welcome to Prosetta!");
-  print_console("---");
-  print_console();
-  updateCode();
 }
 
 function openTab(event, tab) {
@@ -274,5 +266,32 @@ function openTab(event, tab) {
 }
 
 function updateCode() {
-  jscode.innerText = sourcecode.value;
+  parsedData = parser.run_to_completion(sourcecode.value);
+  jscode.innerText = parsedData.get_javascript();
+  syntax.innerHTML = parsedData.get_html();
+  let c = syntax.children;
+  for (let i = 0; i < c.length; i++) {
+    c[i].style.color = c[i].className.substring("term_b_".length, c[i].className.length);
+  }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  initialize();
+});
+
+async function initialize() {
+  let tabs = document.getElementsByClassName("tabBtn tabDefault");
+  tabs[0].click();
+
+  await init();
+  parser = new ParserRunner();
+  init_canvas();
+  print_console("Welcome to Prosetta!");
+  print_console("---");
+  print_console();
+  updateCode();
+}
+
+window.runCode = runCode;
+window.updateCode = updateCode;
+window.openTab = openTab;

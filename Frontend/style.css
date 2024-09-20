@@ -1,6 +1,9 @@
 #outputcanvas {
   background: white;
   margin-left: 10px;
+  border-color: slategray;
+  border-width: 1px;
+  border-style: solid;
 }
 
 .tabContent {
@@ -8,6 +11,9 @@
   width: 533px;
   margin-right: 10px;
   resize: none;
+  border-color: slategray;
+  border-style: solid;
+  border-width: 1px;
 }
 
 #codespace {
