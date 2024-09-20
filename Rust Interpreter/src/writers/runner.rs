@@ -235,7 +235,7 @@ fn run_statement(
             set_global_to_loc(&mut global_index, locs);
             set_global_to_end(&mut global_index, *end);
             (data, global_index)
-        },
+        }
         // this should never run - but if it does than error
         _ => (
             Statement::Error(

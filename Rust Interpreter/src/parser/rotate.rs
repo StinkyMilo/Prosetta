@@ -4,30 +4,30 @@ use basic_func::BasicState;
 
 #[derive(Debug)]
 
-pub struct FillState {
+pub struct RotateState {
     count: u8,
 }
 
-impl BasicState for FillState {
+impl BasicState for RotateState {
     fn get_name(&self) -> &'static str {
-        "Fill"
+        "Rotate"
     }
 
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {
         let ret = self.count == 0;
         if ret {
-            *expr = Expr::Fill {
+            *expr = Expr::Rotate {
                 locs,
-                indexes: [usize::MAX; 3],
+                index: usize::MAX,
                 end: End::none(),
             }
         }
         ret
     }
 
-    fn add_child(&mut self, expr: &mut Expr, index: usize) {
-        if let Expr::Fill { indexes, .. } = expr {
-            indexes[self.count as usize] = index;
+    fn add_child(&mut self, expr: &mut Expr, idx: usize) {
+        if let Expr::Rotate { index, .. } = expr {
+            *index = idx;
             self.count += 1;
         } else {
             unreachable!()
@@ -37,15 +37,13 @@ impl BasicState for FillState {
     fn can_close(&self) -> CloseType {
         match self.count {
             0 => CloseType::Unable,
-            1 => CloseType::Able,
-            2 => CloseType::Unable,
-            3 => CloseType::Force,
+            1 => CloseType::Force,
             _ => unreachable!(),
         }
     }
 
     fn set_end(&mut self, expr: &mut Expr, index: End) {
-        if let Expr::Fill { end, .. } = expr {
+        if let Expr::Rotate { end, .. } = expr {
             *end = index;
         } else {
             unreachable!()
@@ -53,7 +51,7 @@ impl BasicState for FillState {
     }
 }
 
-impl FillState {
+impl RotateState {
     pub fn new() -> Self {
         Self { count: 0 }
     }

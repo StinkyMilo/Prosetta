@@ -19,7 +19,7 @@ impl BasicState for StrokeState {
             *expr = Expr::Stroke {
                 locs,
                 indexes: [usize::MAX; 3],
-                end: End::none()
+                end: End::none(),
             }
         }
         ret

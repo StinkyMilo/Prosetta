@@ -30,6 +30,7 @@ mod circle;
 mod line;
 mod print;
 mod rect;
+mod rotate;
 
 mod line_width;
 pub(crate) mod multi_lit_num;
@@ -45,13 +46,7 @@ mod parsing_tests_simple;
 // #[path = "testing/parsing_tests_other.rs"]
 // mod parsing_tests_other;
 
-use std::{
-    any::{Any, TypeId},
-    collections::HashSet,
-    fmt::Debug,
-    hint::black_box,
-    mem,
-};
+use std::{collections::HashSet, fmt::Debug, hint::black_box, mem};
 
 use crate::{commands::*, writers::lisp_like_writer};
 

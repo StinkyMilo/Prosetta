@@ -1,7 +1,7 @@
 use std::ops::Index;
 
-use crate::parser::End;
 use crate::parser::multi_lit_num::VarOrInt;
+use crate::parser::End;
 
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum OperatorType {
@@ -146,8 +146,13 @@ pub enum Expr {
     LineWidth {
         locs: Vec<usize>,
         child_index: usize,
-        end: End
-    }
+        end: End,
+    },
+    Rotate {
+        locs: Vec<usize>,
+        index: usize,
+        end: End,
+    },
 }
 
 impl Expr {

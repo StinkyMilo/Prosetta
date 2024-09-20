@@ -146,20 +146,16 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
             ..
         } => {
             if let Some(intval) = single_value {
-                format!(
-                    "(litnum{} {})",
-                    join_locs(locs, Some(*end)),
-                    intval
-                )
-            }else{
+                format!("(litnum{} {})", join_locs(locs, Some(*end)), intval)
+            } else {
                 let mut output_vals = "".to_string();
                 let mut is_first = true;
                 for val in values {
                     if is_first {
-                        output_vals += &format!("{}",val);
+                        output_vals += &format!("{}", val);
                         is_first = false;
-                    }else{
-                        output_vals += &format!(" {}",val);
+                    } else {
+                        output_vals += &format!(" {}", val);
                     }
                 }
                 format!(
@@ -168,7 +164,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                     output_vals
                 )
             }
-        },
+        }
         Expr::Print { locs, data, end } => {
             format!(
                 "(print{}{})",
@@ -258,20 +254,31 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 *str_start,
                 String::from_utf8_lossy(str)
             )
-        },
+        }
         Expr::MoveTo { locs, indexes, end } => {
             format!(
                 "(moveto{} {})",
                 join_locs(locs, Some(*end)),
-                write_exprs(exprs,indexes),
+                write_exprs(exprs, indexes),
             )
-        },
-        Expr::LineWidth { locs, child_index, end } => {
+        }
+        Expr::LineWidth {
+            locs,
+            child_index,
+            end,
+        } => {
             format!(
                 "(linewidth{} {})",
                 join_locs(locs, Some(*end)),
-                write_expr(exprs,*child_index, 0)
-            )      
+                write_expr(exprs, *child_index, 0)
+            )
+        }
+        Expr::Rotate { locs, index, end } => {
+            format!(
+                "(rotate{} {})",
+                join_locs(locs, Some(*end)),
+                write_expr(exprs, *index, 0)
+            )
         }
     }
 }

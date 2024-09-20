@@ -19,7 +19,7 @@ impl BasicState for LineWidthState {
             *expr = Expr::LineWidth {
                 locs,
                 child_index: usize::MAX,
-                end: End::none()
+                end: End::none(),
             }
         }
         ret
@@ -27,7 +27,7 @@ impl BasicState for LineWidthState {
 
     fn add_child(&mut self, expr: &mut Expr, index: usize) {
         if let Expr::LineWidth { child_index, .. } = expr {
-            *child_index=index;
+            *child_index = index;
             self.count += 1;
         } else {
             unreachable!()

@@ -103,7 +103,7 @@ impl ParseState for LiteralColorState {
     fn get_name(&self) -> &'static str {
         "ColorLit"
     }
-    
+
     fn get_type(&self) -> StateType {
         StateType::Expr
     }

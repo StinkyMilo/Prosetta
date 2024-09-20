@@ -23,7 +23,7 @@ impl BasicState for OperatorState {
             OperatorType::And => "And",
             OperatorType::Or => "Or",
             OperatorType::Equals => "Equals",
-            OperatorType::Not => "Not"
+            OperatorType::Not => "Not",
         }
     }
 

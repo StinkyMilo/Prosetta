@@ -66,6 +66,4 @@ use crate::{
 //     }
 // }
 
-pub fn size_test() {
-    
-}
+pub fn size_test() {}
