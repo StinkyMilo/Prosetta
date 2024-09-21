@@ -7,9 +7,9 @@ const BASE_EXPR_ALIASES: [&'static [u8]; 16] = [
 
 const NOT_ALIAS: &'static [u8] = b"not";
 
-const STAT_ALIASES: [&'static [u8]; 14] = [
+const STAT_ALIASES: [&'static [u8]; 15] = [
     b"arc", b"lin", b"was", b"rec", b"pri", b"whe", b"whi", b"els", b"sto", b"fil", b"mov", b"pen",
-    b"tur", b"fun"
+    b"tur", b"fun", b"ret"
 ];
 
 ///match alias to expr
@@ -59,6 +59,7 @@ fn get_stat_state(alias: &'static [u8], index: usize) -> MatchResult {
             b"pen" => get_state!(line_width::LineWidthState::new()),
             b"tur" => get_state!(rotate::RotateState::new()),
             b"fun" => get_state!(function::FunctionState::new()),
+            b"ret" => get_state!(return_stat::ReturnState::new()),
             _ => unreachable!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
         },
     )

@@ -168,6 +168,11 @@ pub enum Expr {
         name: Vec<u8>,
         indexes: Vec<usize>,
         end: End
+    },
+    Return {
+        locs: Vec<usize>,
+        indexes: [usize; 1],
+        end: End
     }
 }
 

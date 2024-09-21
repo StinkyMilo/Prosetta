@@ -213,6 +213,9 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             //Trying without a semicolon since JS lets you forget them sometimes and function calls can be either expressions or statements
             format!("{}mario({})",String::from_utf8_lossy(name),write_exprs(exprs,indexes, ", "))
         }
+        Expr::Return { indexes, .. } => {
+            format!("return {};",write_exprs(exprs,indexes,", "))
+        }
     }
 }
 

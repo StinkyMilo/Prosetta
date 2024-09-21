@@ -32,6 +32,7 @@ mod circle;
 mod line;
 mod print;
 mod rect;
+mod return_stat;
 mod rotate;
 
 mod line_width;

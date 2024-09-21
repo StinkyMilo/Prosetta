@@ -4,6 +4,10 @@ use super::*;
 
 /// a super state that wants between n and m arguments and a close
 pub trait BasicState {
+    /// Can this be used here. True by default
+    fn can_happen(&self, _env: &mut Environment) -> bool {
+        true
+    }
     /// get the name
     fn get_name(&self) -> &'static str;
 
@@ -22,13 +26,17 @@ pub trait BasicState {
 
 impl<T: BasicState + Debug> ParseState for T {
     fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
-        let is_first = self.do_first(env.expr, env.locs.take().unwrap_or_default());
-        if is_first {
-            // cont - has required arguments
-            MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr_cont()))
-        } else {
-            // not cont - may have more arguments but may not - need to find close if there
-            MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr()))
+        if !self.can_happen(env){
+            MatchResult::Failed
+        }else{
+            let is_first = self.do_first(env.expr, env.locs.take().unwrap_or_default());
+            if is_first {
+                // cont - has required arguments
+                MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr_cont()))
+            } else {
+                // not cont - may have more arguments but may not - need to find close if there
+                MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr()))
+            }
         }
     }
 
