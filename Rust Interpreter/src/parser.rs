@@ -62,6 +62,8 @@ pub struct ParsedData<'a> {
     pub stat_starts: Vec<usize>,
     ///the set of current varibles
     pub vars: VarSet,
+    //the set of current functions
+    pub funcs: FuncSet,
     ///the parserSource that is used
     pub source: ParserSource<'a>,
 }
@@ -98,6 +100,7 @@ impl<'a> Parser<'a> {
                 exprs: ExprArena { vec: Vec::new() },
                 stat_starts: Vec::new(),
                 vars: VarSet::new(),
+                funcs: FuncSet::new(),
                 source,
             },
             stack: Vec::new(),
@@ -241,6 +244,7 @@ impl<'a> Parser<'a> {
             last_stat_index: self.last_stat_index,
             expr_index: frame.0,
             vars: &mut self.data.vars,
+            funcs: &mut self.data.funcs,
             locs: None,
             global_index: self.pos,
             aliases: &self.aliases,
