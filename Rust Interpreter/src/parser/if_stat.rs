@@ -16,7 +16,7 @@ impl ParseState for IfState {
                 indexes: Vec::new(),
                 end: End::none(),
             };
-            env.vars.add_layer();
+            env.add_var_layer();
             // setup child state
             MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont()))
         } else if self.has_stat {
@@ -54,7 +54,7 @@ impl ParseState for IfState {
                 // close if have close
                 if self.has_stat && is_close(word) {
                     *end = End::from_slice(&word, env.global_index);
-                    env.vars.remove_layer();
+                    env.remove_var_layer();
                     MatchResult::Matched(word.pos, true)
                     // succeeded - continue again with noncont stat
                 } else if child_index.is_some() {

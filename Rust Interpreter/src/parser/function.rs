@@ -32,8 +32,8 @@ impl ParseState for FunctionState {
                     *name_start = word.pos + env.global_index;
                     let temp_name = word.str.to_ascii_lowercase();
                     *name = temp_name.to_owned();
-                    env.vars.insert(temp_name.to_owned());
-                    env.vars.add_layer();
+                    env.funcs.insert(temp_name.to_owned(),0);
+                    env.add_var_layer();
                 } else{
                     unreachable!()
                 }
@@ -45,11 +45,12 @@ impl ParseState for FunctionState {
                 self.has_args=true;
                 MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_stat()))
             }else{
-                if let Expr::Function { arg_starts, arg_names, .. } = env.expr {
+                if let Expr::Function { name, arg_starts, arg_names, .. } = env.expr {
                     arg_starts.push(word.pos + env.global_index);
-                    let name = word.str.to_ascii_lowercase();
-                    arg_names.push(name.to_owned());
-                    env.vars.insert(name.to_owned());
+                    let arg_name = word.str.to_ascii_lowercase();
+                    arg_names.push(arg_name.to_owned());
+                    env.vars.insert(arg_name.to_owned());
+                    env.funcs.inc_arg_count(name.to_vec());
                 }
                 MatchResult::Continue
             }
@@ -74,7 +75,7 @@ impl ParseState for FunctionState {
             // close if have close
             if is_close(word) {
                 *end = End::from_slice(&word, env.global_index);
-                env.vars.remove_layer();
+                env.remove_var_layer();
                 MatchResult::Matched(word.pos, true)
                 // succeeded - continue again with noncont stat
             } else if child_index.is_some() {

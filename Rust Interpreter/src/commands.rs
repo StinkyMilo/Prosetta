@@ -161,6 +161,12 @@ pub enum Expr {
         arg_names: Vec<Vec<u8>>,
         indexes: Vec<usize>,
         end: End
+    },
+    FunctionCall {
+        name_start: usize,
+        name: Vec<u8>,
+        indexes: Vec<usize>,
+        end: End
     }
 }
 

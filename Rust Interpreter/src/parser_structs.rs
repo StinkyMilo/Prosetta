@@ -68,6 +68,11 @@ impl FuncSet{
     pub fn get_arg_count(&self, name: Vec<u8>) -> Option<&usize> {
         self.set.get(&name)
     }
+    pub fn inc_arg_count(&mut self, name: Vec<u8>) {
+        if let Some(val) = self.set.get(&name) {
+            self.set.define(name, val+1)
+        }
+    }
 }
 // pub type StepFunction =
 //     fn(env: &mut Environment, result: LastMatchResult, word: &Slice, rest: &Slice) -> MatchResult;
