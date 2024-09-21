@@ -33,7 +33,7 @@ impl ParseState for FunctionState {
                     let temp_name = word.str.to_ascii_lowercase();
                     *name = temp_name.to_owned();
                     env.funcs.insert(temp_name.to_owned(),0);
-                    env.add_var_layer();
+                    env.vars.add_layer();
                 } else{
                     unreachable!()
                 }
@@ -43,6 +43,7 @@ impl ParseState for FunctionState {
         }else if !self.has_args{
             if is_close(word){
                 self.has_args=true;
+                env.funcs.add_layer();
                 MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_stat()))
             }else{
                 if let Expr::Function { name, arg_starts, arg_names, .. } = env.expr {

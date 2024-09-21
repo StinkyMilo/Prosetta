@@ -44,6 +44,7 @@ impl ParseState for FunctionCallState {
             }
             if let Some(arg_total) = env.funcs.get_arg_count(name.to_vec()) {
                 let can_close = self.count >= *arg_total;
+                println!("[OUTPUT_TEST] count: {}, name: {}, arg total: {}", self.count, String::from_utf8_lossy(&name.to_vec()), *arg_total);
                 if can_close {
                     let close = find_close_slice(&word, 0).or_else(|| find_close_slice(&rest, 0));
                     return match close {

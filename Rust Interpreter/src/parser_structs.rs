@@ -70,7 +70,8 @@ impl FuncSet{
     }
     pub fn inc_arg_count(&mut self, name: Vec<u8>) {
         if let Some(val) = self.set.get(&name) {
-            self.set.define(name, val+1)
+            //Increment in above scope.
+            self.set.define(name.to_vec(), val+1);
         }
     }
 }
