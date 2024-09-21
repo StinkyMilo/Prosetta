@@ -49,7 +49,7 @@ impl ParseState for WhileState {
                 }
 
                 // close if have close
-                if self.has_stat && is_close(word) {
+                if self.has_stat && is_mandatory_close(word) {
                     *end = End::from_slice(&word, env.global_index);
                     env.vars.remove_layer();
                     MatchResult::Matched(word.pos, true)

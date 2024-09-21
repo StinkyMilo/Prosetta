@@ -54,7 +54,7 @@ impl ParseState for ElseState {
                 }
 
                 // close if have close
-                if is_close(word) {
+                if is_mandatory_close(word) {
                     *end = End::from_slice(&word, env.global_index);
                     *else_index = env.expr_index;
                     env.vars.remove_layer();

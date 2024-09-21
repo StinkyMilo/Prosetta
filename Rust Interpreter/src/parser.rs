@@ -376,9 +376,9 @@ impl<'a> Parser<'a> {
                 let line = self.data.source.get_line();
                 self.repeat_count += 1;
                 // get needed counts
-                let (needed_count, offset) = get_close_data(&line[index..]);
-                if self.repeat_count >= needed_count {
-                    index += offset as usize;
+                let cd = get_close_data(&line[index..]);
+                if self.repeat_count >= cd.close_count {
+                    index += cd.close_length as usize;
                     self.repeat_count = 0;
                 }
             }
