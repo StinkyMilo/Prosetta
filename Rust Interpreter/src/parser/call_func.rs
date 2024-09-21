@@ -14,6 +14,7 @@ impl ParseState for FunctionCallState {
             // is varible in scope
             if env.funcs.contains(lower.clone()) {
                 *env.expr = Expr::FunctionCall {
+                    locs: env.locs.take().unwrap_or_default(),
                     name_start: word.pos + env.global_index,
                     name: lower,
                     indexes: Vec::new(),

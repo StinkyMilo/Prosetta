@@ -298,6 +298,14 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 output_vals,
                 write_exprs(exprs, indexes)
             )
+        },
+        Expr::FunctionCall {locs, name, indexes, end, .. } => {
+            format!(
+                "({}{} {})",
+                String::from_utf8_lossy(name),
+                join_locs(locs, Some(*end)),
+                write_exprs(exprs,indexes)
+            )
         }
     }
 }

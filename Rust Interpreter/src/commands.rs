@@ -163,6 +163,7 @@ pub enum Expr {
         end: End
     },
     FunctionCall {
+        locs: Vec<usize>,
         name_start: usize,
         name: Vec<u8>,
         indexes: Vec<usize>,

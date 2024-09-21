@@ -209,6 +209,10 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             }
             format!("function {}mario({}){{\n{}\n}}",String::from_utf8_lossy(name),output_vals,write_exprs(exprs,indexes,"\n"))
         }
+        Expr::FunctionCall { name, indexes, .. } => {
+            //Trying without a semicolon since JS lets you forget them sometimes and function calls can be either expressions or statements
+            format!("{}mario({})",String::from_utf8_lossy(name),write_exprs(exprs,indexes, ", "))
+        }
     }
 }
 
