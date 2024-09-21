@@ -201,13 +201,13 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             let mut is_first = true;
             for val in arg_names {
                 if is_first {
-                    output_vals += &format!("{}", String::from_utf8_lossy(val));
+                    output_vals += &format!("{}mario", String::from_utf8_lossy(val));
                     is_first = false;
                 } else {
-                    output_vals += &format!(", {}", String::from_utf8_lossy(val));
+                    output_vals += &format!(", {}mario", String::from_utf8_lossy(val));
                 }
             }
-            format!("function {}({}){{\n{}\n}}",String::from_utf8_lossy(name),output_vals,write_exprs(exprs,indexes,"\n"))
+            format!("function {}mario({}){{\n{}\n}}",String::from_utf8_lossy(name),output_vals,write_exprs(exprs,indexes,"\n"))
         }
     }
 }
