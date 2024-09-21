@@ -1,0 +1,108 @@
+use super::*;
+/// state for equals
+#[derive(Debug)]
+pub struct FunctionState {
+    first: bool,
+    has_name: bool,
+    has_args: bool
+}
+impl ParseState for FunctionState {
+    fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
+        if self.first {
+            *env.expr = Expr::Function {
+                name_start: usize::MAX,
+                name: Vec::new(),
+                locs: env.locs.take().unwrap_or_default(),
+                indexes: Vec::new(),
+                arg_starts: Vec::new(),
+                arg_names: Vec::new(),
+                end: End::none(),
+            };
+            self.first = false;
+            // setup child state
+            // MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
+        }
+        if !self.has_name{
+            if is_close(word) || (word.len() > 0 && (word.str[0] == b'"' || word.str[0] == b'\'')) {
+                MatchResult::Continue
+            }else {
+                if let Expr::Function { 
+                    name_start, name, ..
+                } = env.expr {
+                    *name_start = word.pos + env.global_index;
+                    let temp_name = word.str.to_ascii_lowercase();
+                    *name = temp_name.to_owned();
+                    env.vars.insert(temp_name.to_owned());
+                    env.vars.add_layer();
+                } else{
+                    unreachable!()
+                }
+                self.has_name=true;
+                MatchResult::Continue
+            }
+        }else if !self.has_args{
+            if is_close(word){
+                self.has_args=true;
+                MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_stat()))
+            }else{
+                if let Expr::Function { arg_starts, arg_names, .. } = env.expr {
+                    arg_starts.push(word.pos + env.global_index);
+                    let name = word.str.to_ascii_lowercase();
+                    arg_names.push(name.to_owned());
+                    env.vars.insert(name.to_owned());
+                }
+                MatchResult::Continue
+            }
+        }else {
+            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
+        }
+    }
+
+    fn step_match(
+        &mut self,
+        env: &mut Environment,
+        child_index: Option<usize>,
+        word: &Slice,
+        _rest: &Slice,
+    ) -> MatchResult {
+        if let Expr::Function { indexes, end, .. } = env.expr {
+            //and stat child
+            if let Some(index) = child_index {
+                indexes.push(index);
+            }
+
+            // close if have close
+            if is_close(word) {
+                *end = End::from_slice(&word, env.global_index);
+                env.vars.remove_layer();
+                MatchResult::Matched(word.pos, true)
+                // succeeded - continue again with noncont stat
+            } else if child_index.is_some() {
+                MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat()))
+                // failed - pass word
+            } else {
+                MatchResult::Continue
+            }
+        } else {
+            unreachable!()
+        }
+    }
+
+    fn get_name(&self) -> &'static str {
+        "Function"
+    }
+
+    fn get_type(&self) -> StateType {
+        StateType::Stat
+    }
+}
+
+impl FunctionState {
+    pub fn new() -> Self {
+        Self {
+            first: true,
+            has_name: false,
+            has_args: false,
+        }
+    }
+}

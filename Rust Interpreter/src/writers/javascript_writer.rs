@@ -196,6 +196,19 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         Expr::Rotate { index, .. } => {
             format!("rotate_delta({});", write_expr(exprs, *index))
         }
+        Expr::Function { name, arg_names, indexes, .. } => {
+            let mut output_vals = "".to_string();
+            let mut is_first = true;
+            for val in arg_names {
+                if is_first {
+                    output_vals += &format!("{}", String::from_utf8_lossy(val));
+                    is_first = false;
+                } else {
+                    output_vals += &format!(", {}", String::from_utf8_lossy(val));
+                }
+            }
+            format!("function {}({}){{\n{}\n}}",String::from_utf8_lossy(name),output_vals,write_exprs(exprs,indexes,"\n"))
+        }
     }
 }
 

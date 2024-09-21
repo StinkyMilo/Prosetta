@@ -15,6 +15,7 @@ mod assign;
 mod color;
 mod else_stat;
 mod fill;
+mod function;
 mod if_stat;
 mod litcolor;
 mod litcolor_data;
