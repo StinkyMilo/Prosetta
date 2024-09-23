@@ -68,7 +68,7 @@ impl<T: BasicState + Debug> ParseState for T {
             }
             CloseType::Able => {
                 // I can close so I close
-                if is_close(word) {
+                if is_mandatory_close(word) {
                     self.set_end(env.expr, End::from_slice(&word, env.global_index));
                     MatchResult::Matched(word.pos, true)
                     // succeeded - continue again with noncont expr

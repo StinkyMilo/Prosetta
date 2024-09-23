@@ -28,7 +28,7 @@ impl ParseState for MultiLitNumState {
         if self.first {
             let locs = env.locs.take().unwrap_or_default();
             self.first = false;
-            if is_close(word) {
+            if is_mandatory_close(word) {
                 *env.expr = Expr::MultiLitNum {
                     str_start: word.pos + env.global_index,
                     locs,
@@ -54,7 +54,7 @@ impl ParseState for MultiLitNumState {
             ..
         } = env.expr
         {
-            if is_close(word) {
+            if is_mandatory_close(word) {
                 *end = End::from_slice(&word, env.global_index);
                 if !self.any_vars {
                     let mut final_val = 0;

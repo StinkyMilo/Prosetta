@@ -68,7 +68,7 @@ impl ParseState for PrintState {
                 } else {
                     data.push(Prints::String(index));
                 }
-                if is_close(word) {
+                if is_mandatory_close(word) {
                     *end = End::from_slice(&word, env.global_index);
                     MatchResult::Matched(word.pos, true)
                 } else {

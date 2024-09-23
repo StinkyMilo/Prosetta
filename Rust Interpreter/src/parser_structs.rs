@@ -316,7 +316,13 @@ fn is_non_close_but_still_single(char: u8) -> bool {
 /// does slice consist of a closing character
 pub fn is_close(slice: &Slice) -> bool {
     // does str close something
-    get_close_data(slice.str).1 != 0
+    get_close_data(slice.str).close_length != 0
+}
+
+/// For when a close is forced rather than able.
+pub fn is_mandatory_close(slice: &Slice) -> bool {
+    let cd = get_close_data(slice.str);
+    cd.close_length != 0 && !cd.only_forced
 }
 
 ///get the next valid word and the rest of the string as decided by is_valid_word_char()
@@ -345,23 +351,61 @@ pub fn get_next_word<'a>(slice: &Slice<'a>, mut start: usize) -> (Slice<'a>, Sli
         },
     )
 }
+pub struct CloseData{
+    pub close_count: u8,
+    pub close_length: u8,
+    pub only_forced: bool
+}
 /// gets the number of times the characters at line[index] should be repeated and the offset after
 /// returns (repeat_count,offset)
-pub fn get_close_data(line: &[u8]) -> (u8, u8) {
+pub fn get_close_data(line: &[u8]) -> CloseData {
     if line.len() >= 3 && line[..3] == b"..."[..] {
-        (10, 3)
+        CloseData{
+            close_count: 10,
+            close_length: 3,
+            only_forced: false
+        }
     } else if line.len() >= 3 && line[..3] == b"---"[..] {
-        (3, 3)
+        CloseData{
+            close_count: 3,
+            close_length: 3,
+            only_forced: false
+        }
     } else if line.len() >= 2 && line[..2] == b"--"[..] {
-        (2, 2)
+        CloseData{
+            close_count: 2,
+            close_length: 2,
+            only_forced: false
+        }
     } else if line.len() >= 1 {
         match line[0] {
-            b'.' | b',' | b':' => (1, 1),
-            b'?' | b'!' => (2, 1),
-            _ => (0, 0),
+            b'.' | b':' => CloseData {
+                close_count: 1,
+                close_length: 1,
+                only_forced: false
+            },
+            b',' | b';' => CloseData {
+                close_count: 1,
+                close_length: 1,
+                only_forced: true
+            },
+            b'?' | b'!' => CloseData {
+                close_count: 2,
+                close_length: 1,
+                only_forced: false
+            },
+            _ => CloseData {
+                close_count: 0,
+                close_length: 0,
+                only_forced: false
+            },
         }
     } else {
-        (0, 0)
+        CloseData {
+            close_count: 0,
+            close_length: 0,
+            only_forced: false
+        }
     }
 }
 
@@ -392,8 +436,8 @@ pub fn get_next_slice<'a>(slice: &Slice<'a>, mut start: usize) -> (Slice<'a>, Sl
     //         end += 1;
     //     }
     let close_data = get_close_data(&slice.str[start..]);
-    if close_data.1 != 0 {
-        end += close_data.1 as usize;
+    if close_data.close_length != 0 {
+        end += close_data.close_length as usize;
     } else if end < slice.len() && is_non_close_but_still_single(slice.str[start]) {
         end += 1;
     } else {
@@ -435,7 +479,7 @@ pub fn find_close_slice<'a>(slice: &'a Slice<'a>, mut start: usize) -> Option<(S
     // find end char
     let mut close_len = 0;
     while start < slice.len() {
-        close_len = get_close_data(&slice.str[start..]).1;
+        close_len = get_close_data(&slice.str[start..]).close_length;
         if close_len == 0 {
             start += 1;
         } else {
