@@ -54,7 +54,7 @@
   --mono-font: "Cascadia Code", Courier;
 }
 
-* {
+div, textarea, button {
   font-family: Verdana, Tahoma, sans-serif;
 }
 
