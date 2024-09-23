@@ -33,7 +33,7 @@ impl VarSet {
         self.set.contains(&lower)
     }
     ///returns (index in word, varible name)
-    pub fn try_get_var(&self, word: &Vec<u8>) -> Option<(usize, Vec<u8>)> {
+    pub fn try_get_var(&self, word: &[u8]) -> Option<(usize, Vec<u8>)> {
         let lower = word.to_ascii_lowercase();
         let mut max_var_length = 0;
         let mut var = None;
