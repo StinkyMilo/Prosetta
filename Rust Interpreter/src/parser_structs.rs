@@ -110,7 +110,16 @@ impl FuncSet{
 /// State.0 is the index of the expr in the list
 /// State.1 is the last string parse location
 /// State.2 is the state itself
-pub type State = (usize, usize, Box<dyn ParseState>);
+//pub type State = (usize, usize, Box<dyn ParseState>);
+#[derive(Debug)]
+
+/// a state on the stack
+pub struct State {
+    pub expr_index: usize,
+    pub first_parse: usize,
+    pub last_parse: usize,
+    pub state: Box<dyn ParseState>,
+}
 
 /// a macro to change the a ParseState to a generic box
 macro_rules! get_state {
