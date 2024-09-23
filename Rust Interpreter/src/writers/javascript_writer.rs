@@ -71,8 +71,37 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             indexes,
             end: _,
         } => {
-            if matches!(func_type, OperatorType::Log) {
-                return format!("log_base({})", write_exprs(exprs, indexes, ", "));
+            let ret = match func_type {
+                OperatorType::Log => format!("log_base({})", write_exprs(exprs, indexes, ", ")),
+                OperatorType::Exp => {
+                    if indexes.len() == 1 {
+                        format!("(Math.E ** {})", write_expr(exprs, indexes[0]))
+                    } else {
+                        format!("({})", write_exprs(exprs, indexes, " ** "))
+                    }
+                }
+                OperatorType::Equals => {
+                    let first_exp = write_expr(exprs, indexes[0]);
+                    let mut r;
+                    if indexes.len() > 2 {
+                        r = format!("({} == {}", first_exp, write_expr(exprs, indexes[1]));
+                        for index in &indexes[2..] {
+                            if *index != usize::MAX {
+                                r += " && ";
+                                r += format!("{} == {}", first_exp, write_expr(exprs, *index))
+                                    .as_str();
+                            }
+                        }
+                        r += ")";
+                    } else {
+                        r = format!("{} == {}", first_exp, write_expr(exprs, indexes[1]));
+                    }
+                    r
+                }
+                _ => "".to_string(),
+            };
+            if ret != "" {
+                return ret;
             }
             let name = match func_type {
                 OperatorType::Add => "+",
