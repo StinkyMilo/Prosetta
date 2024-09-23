@@ -154,6 +154,64 @@ pub enum Expr {
         index: usize,
         end: End,
     },
+    Function {
+        locs: Vec<usize>,
+        name_start: usize,
+        name: Vec<u8>,
+        arg_starts: Vec<usize>,
+        arg_names: Vec<Vec<u8>>,
+        indexes: Vec<usize>,
+        end: End
+    },
+    FunctionCall {
+        locs: Vec<usize>,
+        name_start: usize,
+        name: Vec<u8>,
+        indexes: Vec<usize>,
+        end: End
+    },
+    Return {
+        locs: Vec<usize>,
+        indexes: [usize; 1],
+        end: End
+    },
+    Append {
+        locs: Vec<usize>,
+        indexes: [usize; 3],
+        end: End
+    },
+    Delete {
+        locs: Vec<usize>,
+        indexes: [usize; 2],
+        end: End
+    },
+    Replace {
+        locs: Vec<usize>,
+        indexes: [usize; 3],
+        end: End
+    },
+    Find {
+        locs: Vec<usize>,
+        indexes: [usize; 2],
+        end: End
+    },
+    Index {
+        locs: Vec<usize>,
+        indexes: [usize; 2],
+        end: End
+    },
+    List {
+        locs: Vec<usize>,
+        indexes: Vec<usize>,
+        end: End
+    },
+    ForEach {
+        name_start: usize,
+        name: Vec<u8>,
+        locs: Vec<usize>,
+        indexes: Vec<usize>,
+        end: End
+    }
 }
 
 impl Expr {

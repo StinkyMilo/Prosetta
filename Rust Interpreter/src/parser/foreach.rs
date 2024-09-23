@@ -1,22 +1,40 @@
 use super::*;
 /// state for equals
 #[derive(Debug)]
-pub struct WhileState {
-    has_condition: bool,
+pub struct ForEachState {
+    first: bool,
+    has_list: bool,
     has_stat: bool,
 }
-impl ParseState for WhileState {
-    fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
-        if !self.has_condition {
-            *env.expr = Expr::While {
+impl ParseState for ForEachState {
+    fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
+        if self.first {
+            *env.expr = Expr::ForEach {
+                name_start: usize::MAX,
+                name: Vec::new(),
                 locs: env.locs.take().unwrap_or_default(),
                 indexes: Vec::new(),
                 end: End::none(),
             };
-            env.add_var_layer();
+            self.first = false;
             // setup child state
-            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont()))
-        } else if self.has_stat {
+            // MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
+        } 
+        if is_close(word) || (word.len() > 0 && (word.str[0] == b'"' || word.str[0] == b'\'')) {
+            MatchResult::Continue
+        }else if !self.has_list{
+            if let Expr::ForEach { 
+                name_start, name, ..
+            } = env.expr {
+                *name_start = word.pos + env.global_index;
+                *name = word.str.to_owned();
+                env.vars.add_layer();
+                env.vars.insert(name.to_ascii_lowercase().to_owned());
+            } else{
+                unreachable!()
+            }
+            MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
+        }else if self.has_stat {
             MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
         } else {
             MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat_cont()))
@@ -30,11 +48,11 @@ impl ParseState for WhileState {
         word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
-        if let Expr::While { indexes, end, .. } = env.expr {
-            if !self.has_condition {
+        if let Expr::ForEach { indexes, end, .. } = env.expr {
+            if !self.has_list {
                 //add child and find stats
                 if let Some(index) = child_index {
-                    self.has_condition = true;
+                    self.has_list = true;
                     indexes.push(index);
                     MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat_cont()))
                 } else {
@@ -51,7 +69,7 @@ impl ParseState for WhileState {
                 // close if have close
                 if self.has_stat && is_close(word) {
                     *end = End::from_slice(&word, env.global_index);
-                    env.remove_var_layer();
+                    env.vars.remove_layer();
                     MatchResult::Matched(word.pos, true)
                     // succeeded - continue again with noncont stat
                 } else if child_index.is_some() {
@@ -75,10 +93,11 @@ impl ParseState for WhileState {
     }
 }
 
-impl WhileState {
+impl ForEachState {
     pub fn new() -> Self {
         Self {
-            has_condition: false,
+            first: true,
+            has_list: false,
             has_stat: false,
         }
     }
