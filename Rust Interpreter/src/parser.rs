@@ -6,6 +6,7 @@ pub(crate) use parser_source::*;
 #[path = "parser_structs.rs"]
 pub(crate) mod parser_structs;
 pub(crate) use parser_structs::*;
+use rangemap::RangeSet;
 
 mod basic_func;
 
@@ -46,7 +47,12 @@ mod parsing_tests_simple;
 // #[path = "testing/parsing_tests_other.rs"]
 // mod parsing_tests_other;
 
-use std::{collections::HashSet, fmt::Debug, hint::black_box, mem};
+use std::{
+    collections::{btree_map::Range, HashMap, HashSet},
+    fmt::Debug,
+    hint::black_box,
+    mem,
+};
 
 use crate::{commands::*, writers::lisp_like_writer};
 
@@ -85,8 +91,8 @@ pub struct Parser<'a> {
     repeat_count: u8,
     /// the index of the last matched state
     last_stat_index: Option<usize>,
-    /// the hash map of failed exprs
-    cached_fails: HashSet<(usize, &'static str)>,
+    /// the hash map of ranges of failed exprs
+    cached_fails: HashMap<&'static str, RangeSet<usize>>,
 }
 
 impl<'a> Parser<'a> {
@@ -107,7 +113,7 @@ impl<'a> Parser<'a> {
             aliases: AliasData::new(flags),
             repeat_count: 0,
             last_stat_index: None,
-            cached_fails: HashSet::new(),
+            cached_fails: HashMap::new(),
         }
     }
     ///get the last state
@@ -118,13 +124,13 @@ impl<'a> Parser<'a> {
     ///get the name of the last state
     pub fn get_last_state_name(&self) -> &'static str {
         self.get_last_state()
-            .map_or(&"None", |state| state.2.get_name())
+            .map_or(&"None", |state| state.state.get_name())
     }
 
     ///get the current stack
     pub fn get_parser_stack(&self) -> String {
         let mut str = self.stack.iter().fold(String::new(), |mut str, state| {
-            str += &format!("{}:{}, ", state.2.get_name(), state.1);
+            str += &format!("{}:{}, ", state.state.get_name(), state.last_parse);
             str
         });
         str.pop();
@@ -140,7 +146,9 @@ impl<'a> Parser<'a> {
         //     self.stack.last()
         // })
         self.get_last_state().map_or(b"", |state| {
-            Self::get_slice(self.data.source.get_line(), state.1).0.str
+            Self::get_slice(self.data.source.get_line(), state.last_parse)
+                .0
+                .str
         })
     }
 
@@ -169,11 +177,11 @@ impl<'a> Parser<'a> {
         //debug time
         let _debug = format!(
             "{:?}",
-            Vec::from_iter(self.stack.iter().map(|x| (x.0, x.1)))
+            Vec::from_iter(self.stack.iter().map(|x| (x.expr_index, x.last_parse)))
         );
         let _debug2 = format!(
             "{:?}",
-            Vec::from_iter(self.stack.iter().map(|x| x.2.get_name()))
+            Vec::from_iter(self.stack.iter().map(|x| x.state.get_name()))
         );
         let _expr = format!("{:?}", self.data.exprs.vec);
         let _expr2 = lisp_like_writer::write(&self.data.exprs, &self.data.stat_starts);
@@ -196,16 +204,21 @@ impl<'a> Parser<'a> {
         let stack_index = self.stack.len() - 1;
         let frame = &mut self.stack[stack_index];
 
-        //if cached_fails has state failed at location
-        let id = (*frame.2).get_name();
-        if self.cached_fails.contains(&(frame.1, id)) {
+        let id = frame.state.get_name();
+        // does the failing range of the state include the current parsing location
+        let must_fail = self
+            .cached_fails
+            .get(id)
+            .is_some_and(|range| range.contains(&frame.last_parse));
+
+        if must_fail && !cfg!(feature = "no-cache") {
             self.failed_func();
             return ParserResult::CachedFail;
         }
         // should always be in bounds
         // spilt at mut for borrow safety
         // get (parents, this[0] and children[1..])
-        let parents_this = self.data.exprs.vec.split_at_mut(frame.0);
+        let parents_this = self.data.exprs.vec.split_at_mut(frame.expr_index);
         let _splits1 = format!("{:?}", parents_this);
         // get (this, children)
         let this_children = parents_this.1.split_at_mut_checked(1);
@@ -238,7 +251,7 @@ impl<'a> Parser<'a> {
             children,
             parents,
             last_stat_index: self.last_stat_index,
-            expr_index: frame.0,
+            expr_index: frame.expr_index,
             vars: &mut self.data.vars,
             locs: None,
             global_index: self.pos,
@@ -247,25 +260,25 @@ impl<'a> Parser<'a> {
 
         // setup slice
         let line = self.data.source.get_line();
-        let (word, rest) = Self::get_slice(line, frame.1);
+        let (word, rest) = Self::get_slice(line, frame.last_parse);
 
         let last_result = mem::replace(&mut self.last_result, LastMatchResult::None);
 
         // run step function
         let mut result = match last_result {
             LastMatchResult::None | LastMatchResult::Continue => {
-                frame.2.step(&mut env, &word, &rest)
+                frame.state.step(&mut env, &word, &rest)
             }
             LastMatchResult::New(locs) => {
                 env.locs = locs;
-                frame.2.step(&mut env, &word, &rest)
+                frame.state.step(&mut env, &word, &rest)
             }
             LastMatchResult::Matched(child_index) => {
                 frame
-                    .2
+                    .state
                     .step_match(&mut env, Some(child_index), &word, &rest)
             }
-            LastMatchResult::Failed => frame.2.step_match(&mut env, None, &word, &rest),
+            LastMatchResult::Failed => frame.state.step_match(&mut env, None, &word, &rest),
         };
 
         // run aftermath
@@ -294,14 +307,17 @@ impl<'a> Parser<'a> {
     fn failed_func(&mut self) -> ParserResult {
         let state = self.stack.pop().unwrap();
 
-        let state_type = state.2.get_type();
+        let state_type = state.state.get_type();
         if state_type == StateType::Expr || state_type == StateType::None {
-            //insert into map
-            let id = (*state.2).get_name();
-            self.cached_fails.insert((state.1, id));
+            //insert the range of parsed words into map
+            let id = state.state.get_name();
+            self.cached_fails
+                .entry(id)
+                .or_insert(RangeSet::new())
+                .insert(state.first_parse..state.last_parse + 1);
         }
 
-        let state_pos = state.0;
+        let state_pos = state.expr_index;
         self.data.exprs.vec.truncate(state_pos);
         //let _test = format!("{:?}", state);
         self.repeat_count = 0;
@@ -327,7 +343,7 @@ impl<'a> Parser<'a> {
 
         self.repeat_count = 0;
         // change match starting location to after word
-        frame.1 = new_index;
+        frame.last_parse = new_index;
 
         self.last_result = LastMatchResult::Continue;
 
@@ -348,7 +364,12 @@ impl<'a> Parser<'a> {
             expr_index -= 1;
         }
         self.data.exprs.vec.push(Expr::NoneExpr);
-        self.stack.push((expr_index, index, state));
+        self.stack.push(State {
+            expr_index,
+            first_parse: index,
+            last_parse: index,
+            state,
+        });
 
         self.last_result = LastMatchResult::New(locs);
 
@@ -358,11 +379,11 @@ impl<'a> Parser<'a> {
     ///this function is called if the step matches
     fn matched_func(&mut self, mut index: usize, closed: bool) -> ParserResult {
         let state = self.stack.pop().unwrap();
-        let expr_index = state.0;
-        if state.2.get_type() == StateType::Stat {
-            self.last_stat_index = Some(state.0);
+        let expr_index = state.expr_index;
+        if state.state.get_type() == StateType::Stat {
+            self.last_stat_index = Some(state.expr_index);
             // stats can change parse ablility -- reset cached fails
-            self.cached_fails = HashSet::new();
+            self.cached_fails = HashMap::new();
         }
         self.last_state = Some(state);
 
@@ -384,7 +405,11 @@ impl<'a> Parser<'a> {
             }
             // setup result for next step
             self.last_result = LastMatchResult::Matched(expr_index);
-            self.stack.last_mut().unwrap().1 = index;
+            let parent_state = self.stack.last_mut().unwrap();
+            parent_state.last_parse = index;
+
+            // remove parent expr from cachefail map
+            self.cached_fails.remove(parent_state.state.get_name());
             ParserResult::Matched
         }
     }
@@ -418,16 +443,17 @@ impl<'a> Parser<'a> {
     ///setup a noneStat on the stack
     fn add_new_nonestat(&mut self, new_index: usize) {
         // push match stat on first step of line
-        let index = self.data.exprs.vec.len();
+        let expr_index = self.data.exprs.vec.len();
 
         self.data.exprs.vec.push(Expr::NoneStat);
 
-        self.stack.push((
-            index,
-            new_index,
-            Box::new(alias::NoneState::new_stat_cont()),
-        ));
-        self.data.stat_starts.push(index);
+        self.stack.push(State {
+            expr_index,
+            first_parse: new_index,
+            last_parse: new_index,
+            state: Box::new(alias::NoneState::new_stat_cont()),
+        });
+        self.data.stat_starts.push(expr_index);
         self.last_result = LastMatchResult::None;
     }
 }

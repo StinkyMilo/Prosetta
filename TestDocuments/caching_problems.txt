@@ -1,0 +1,20 @@
+old problem 
+noneexprcont move with coninue
+cachedfail only on fail
+only cached fail at end of string
+
+
+was,noneexprcont,add
+was,noneexprcont,add,.,.,.
+was,noneexprcont,add,.,.,.,add  - fails no close
+was,noneexprcont,add,.,., - Fail
+was,noneexprcont,add,., - Fail
+was,noneexprcont,add,., - maches . .
+was,noneexprcont,add - move up . . 
+was,noneexprcont,add   cached fail as intersects other add range 
+
+solution: remove expr from hashmap on match - no
+
+on state match, noneexprcont yeeted to last parse index - maybe  
+
+solution: remove *parent* from hashmap on match 

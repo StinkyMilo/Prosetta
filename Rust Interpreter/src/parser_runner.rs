@@ -21,8 +21,10 @@ pub struct RunnerFlags {
 }
 
 pub fn run_state(state: ParserResult, parser: &Parser, parser_flags: RunnerFlags, step_count: u64) {
+    let count = if cfg!(feature = "speed") { 10000 } else { 1 };
+
     if parser_flags.assert_steps {
-        if step_count % 10000 == 0 {
+        if step_count % count == 0 {
             println!(
                 "step:\nreturn:[{:?}]\nstack:[{}],word:[{}]",
                 state,
