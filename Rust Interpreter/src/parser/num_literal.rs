@@ -50,11 +50,11 @@ impl LiteralNumState {
     }
 }
 
-fn get_number(word: &[u8]) -> Option<i64> {
+pub fn get_number(word: &[u8]) -> Option<i64> {
     get_number_word(word).or_else(|| get_number_literal(word))
 }
 
-pub fn get_number_literal(mut word: &[u8]) -> Option<i64> {
+fn get_number_literal(mut word: &[u8]) -> Option<i64> {
     let mut neg = 1i64;
     if word.starts_with(b"-") {
         neg = -1;
@@ -77,7 +77,7 @@ pub fn get_number_literal(mut word: &[u8]) -> Option<i64> {
     num.ok().and_then(|num| Some(num * neg))
 }
 
-pub fn get_number_word(word: &[u8]) -> Option<i64> {
+fn get_number_word(word: &[u8]) -> Option<i64> {
     let first_binding = word.to_ascii_lowercase();
     let temp_binding = String::from_utf8_lossy(&*&first_binding);
     let split_match: Vec<&str> = temp_binding.split("-").collect();
