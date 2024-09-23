@@ -173,6 +173,43 @@ pub enum Expr {
         locs: Vec<usize>,
         indexes: [usize; 1],
         end: End
+    },
+    Append {
+        locs: Vec<usize>,
+        indexes: [usize; 3],
+        end: End
+    },
+    Delete {
+        locs: Vec<usize>,
+        indexes: [usize; 2],
+        end: End
+    },
+    Replace {
+        locs: Vec<usize>,
+        indexes: [usize; 3],
+        end: End
+    },
+    Find {
+        locs: Vec<usize>,
+        indexes: [usize; 2],
+        end: End
+    },
+    Index {
+        locs: Vec<usize>,
+        indexes: [usize; 2],
+        end: End
+    },
+    List {
+        locs: Vec<usize>,
+        indexes: Vec<usize>,
+        end: End
+    },
+    ForEach {
+        name_start: usize,
+        name: Vec<u8>,
+        locs: Vec<usize>,
+        indexes: Vec<usize>,
+        end: End
     }
 }
 

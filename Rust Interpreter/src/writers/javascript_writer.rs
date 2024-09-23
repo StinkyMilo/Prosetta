@@ -71,8 +71,37 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             indexes,
             end: _,
         } => {
-            if matches!(func_type, OperatorType::Log) {
-                return format!("log_base({})", write_exprs(exprs, indexes, ", "));
+            let ret = match func_type {
+                OperatorType::Log => format!("log_base({})", write_exprs(exprs, indexes, ", ")),
+                OperatorType::Exp => {
+                    if indexes.len() == 1 {
+                        format!("(Math.E ** {})", write_expr(exprs, indexes[0]))
+                    } else {
+                        format!("({})", write_exprs(exprs, indexes, " ** "))
+                    }
+                }
+                OperatorType::Equals => {
+                    let first_exp = write_expr(exprs, indexes[0]);
+                    let mut r;
+                    if indexes.len() > 2 {
+                        r = format!("({} == {}", first_exp, write_expr(exprs, indexes[1]));
+                        for index in &indexes[2..] {
+                            if *index != usize::MAX {
+                                r += " && ";
+                                r += format!("{} == {}", first_exp, write_expr(exprs, *index))
+                                    .as_str();
+                            }
+                        }
+                        r += ")";
+                    } else {
+                        r = format!("{} == {}", first_exp, write_expr(exprs, indexes[1]));
+                    }
+                    r
+                }
+                _ => "".to_string(),
+            };
+            if ret != "" {
+                return ret;
             }
             let name = match func_type {
                 OperatorType::Add => "+",
@@ -195,6 +224,35 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         }
         Expr::Rotate { index, .. } => {
             format!("rotate_delta({});", write_expr(exprs, *index))
+        },
+        Expr::Append { indexes, .. } => {
+            if indexes[2] == usize::MAX {
+                format!("{}.push({});", write_expr(exprs, indexes[0]), write_expr(exprs, indexes[1]))
+            } else {
+                format!("{}.splice({}, 0, {});", write_expr(exprs, indexes[0]), write_expr(exprs, indexes[2]), write_expr(exprs, indexes[1]))
+            }
+        },
+        Expr::Delete { indexes, .. } => {
+            if indexes[1] == usize::MAX {
+                format!("{}.splice(0,1);",write_expr(exprs, indexes[0]))
+            }else {
+                format!("{}.splice({},1);",write_expr(exprs, indexes[0]), write_expr(exprs, indexes[1]))
+            }
+        },
+        Expr::Replace { indexes, .. } => {
+            format!("{}[{}]={};",write_expr(exprs, indexes[0]),write_expr(exprs, indexes[1]), write_expr(exprs, indexes[2]))
+        },
+        Expr::Find {indexes, ..} => {
+            format!("{}.indexOf({})",write_expr(exprs, indexes[0]),write_expr(exprs,indexes[1]))
+        },
+        Expr::Index{indexes, ..} => {
+            format!("{}[{}]",write_expr(exprs, indexes[0]),write_expr(exprs,indexes[1]))
+        },
+        Expr::List { indexes, .. } => {
+            format!("[{}]", write_exprs(exprs, indexes, ", "))
+        },
+        Expr::ForEach {indexes, name, ..} => {
+            format!("for({}mario of {}) {{\n{}\n}}",String::from_utf8_lossy(&name), write_expr(exprs, indexes[0]), write_exprs(exprs, &indexes[1..], "\n"))
         }
         Expr::Function { name, arg_names, indexes, .. } => {
             let mut output_vals = "".to_string();
