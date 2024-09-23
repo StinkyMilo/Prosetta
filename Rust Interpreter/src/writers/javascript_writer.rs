@@ -30,7 +30,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             value_index,
             end: _,
         } => format!(
-            "{}mario = {};",
+            "window.{}mario = {};",
             String::from_utf8_lossy(&name),
             write_expr(exprs, *value_index)
         ),
@@ -58,7 +58,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         Expr::Var {
             name_start: _,
             name,
-        } => String::from_utf8_lossy(&name).to_string() + "mario",
+        } => format!("window.{}mario", String::from_utf8_lossy(&name).to_string()),
         Expr::WordNum {
             locs: _,
             str_start: _,

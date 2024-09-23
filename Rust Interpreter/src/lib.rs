@@ -1,15 +1,9 @@
 #![cfg(feature = "wasm")]
 
-use std::{
-    io::{self, Read},
-    mem,
-};
-
 use crate::parser::{Parser, ParserFlags};
 
-#[path = "testing/testing.rs"]
-mod testing;
-//mod playground;
+// #[path = "testing/testing.rs"]
+// mod testing;
 
 mod parser_runner;
 
@@ -17,17 +11,17 @@ mod commands;
 mod parser;
 mod writers;
 
-use crate::parser::ParserResult;
+use crate::parser::{ParsedData, ParserResult};
 use parser::ParserSource;
-use parser_runner::{run_parser, RunnerFlags};
 
+use crate::writers::javascript_writer;
 use crate::writers::syntax_lint::SyntaxLinter;
 use crate::writers::syntax_renderers::html_renderer::HTMLRenderer;
 
-// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
-// allocator.
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+// // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
+// // allocator.
+// #[global_allocator]
+// static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 // fn setup() {
 //     console_error_panic_hook::set_once();
@@ -35,31 +29,49 @@ static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-pub fn wasm_run_parser(str: String) -> Vec<String> {
-    //setup();
-    let mut parser = Parser::new(
-        ParserSource::from_string(str.into_bytes()),
-        ParserFlags { not: true },
-    );
+pub struct ParserRunner;
 
-    let mut ret = Vec::new();
+#[wasm_bindgen]
+pub struct ParserRunnerData {
+    data: ParsedData<'static>,
+}
 
-    loop {
-        match parser.step() {
-            ParserResult::NoInput => break,
-            ParserResult::Matched
-            | ParserResult::MatchedLine
-            | ParserResult::Failed
-            | ParserResult::FailedLine => {
-                let data = &parser.data;
-                let iter = data.source.get_iter();
-                let mut lint = SyntaxLinter::<HTMLRenderer>::new();
-                lint.write(&data.exprs, &data.stat_starts, iter);
-                ret.push(String::from_utf8(lint.into_string()).unwrap());
-            }
-            _ => {}
-        };
+#[wasm_bindgen]
+impl ParserRunner {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> Self {
+        Self
     }
 
-    ret
+    pub fn run_to_completion(&mut self, source: &str) -> ParserRunnerData {
+        let mut parser = Parser::new(
+            ParserSource::from_string(source.as_bytes().to_vec()),
+            ParserFlags::default(),
+        );
+
+        loop {
+            if parser.step() == ParserResult::NoInput {
+                break;
+            };
+        }
+
+        ParserRunnerData {
+            data: parser.into_data(),
+        }
+    }
 }
+
+#[wasm_bindgen]
+impl ParserRunnerData {
+    pub fn get_javascript(&self) -> String {
+        javascript_writer::write(&self.data.exprs, &self.data.stat_starts)
+    }
+    pub fn get_html(&self) -> String {
+        let iter = self.data.source.get_iter();
+        let mut lint = SyntaxLinter::<HTMLRenderer>::new();
+        lint.write(&self.data.exprs, &self.data.stat_starts, iter);
+        String::from_utf8_lossy(&lint.into_string()).to_string()
+    }
+}
+
+//wasm-pack build . -F wasm

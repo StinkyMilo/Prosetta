@@ -1,12 +1,19 @@
 #outputcanvas {
   background: white;
   margin-left: 10px;
+  border-color: slategray;
+  border-width: 1px;
+  border-style: solid;
 }
 
-#sourcecode {
-  width: 450px;
+.tabContent {
+  box-sizing: border-box;
+  width: 533px;
   margin-right: 10px;
   resize: none;
+  border-color: slategray;
+  border-style: solid;
+  border-width: 1px;
 }
 
 #codespace {
@@ -14,15 +21,46 @@
   margin-bottom: 10px;
 }
 
+#tabGroup {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.tabBtn {
+  margin-right: 5px;
+  border-radius: 5px;
+}
+
+.tabBtn.active {
+  background-color: gray;
+  color: white;
+  border-radius: 5px;
+}
+
+#js {
+  font-family: var(--mono-font);
+}
+
 #console {
   margin-top: 10px;
   overflow: scroll;
   height: 100px;
-  font-family: "Cascadia Code";
+  font-family: var(--mono-font);
   background: black;
   color: white;
 }
 
+:root {
+  --mono-font: "Cascadia Code", Courier;
+}
+
+div, textarea, button {
+  font-family: Verdana, Tahoma, sans-serif;
+}
+
 body {
-  margin: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }

@@ -2,16 +2,23 @@
 <html>
 
 <head>
-  <script type="text/javascript" src="./script.js"></script>
+  <script type="module" src="./script.js"></script>
   <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
+  <div id="tabGroup">
+    <button class="tabBtn tabDefault" onclick="openTab(event, 'code')">Code</button>
+    <button class="tabBtn" onclick="openTab(event, 'syntax')">Syntax</button>
+    <button class="tabBtn" onclick="openTab(event, 'js')">JS</button>
+  </div>
   <div id="codespace">
-    <textarea id="sourcecode"> </textarea>
+    <textarea class="tabContent" id="code" onkeyup="updateCode()"></textarea>
+    <div style="display: none;" readonly="true" class="tabContent" id="syntax">Syntax</div>
+    <textarea style="display: none;" readonly="true" class="tabContent" id="js">JavaScript</textarea>
     <canvas id="outputcanvas" width="400px" height="400px" />
   </div>
-  <button onclick="runcode();">Run</button>
+  <button onclick="runCode()">Run</button>
   <div id="console" />
 </body>
 

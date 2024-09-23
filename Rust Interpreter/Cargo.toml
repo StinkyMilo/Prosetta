@@ -10,7 +10,7 @@ crate-type = ["cdylib", "rlib"]
 
 [features]
 # wasm = ["dep:wasm-bindgen", "dep:wasm-pack", "dep:getrandom", "dep:wee_alloc"]
-wasm = ["dep:wasm-bindgen", "dep:wee_alloc"]
+wasm = ["dep:wasm-bindgen"]
 runner = []
 image = ["runner", "dep:nannou"]
 
@@ -23,7 +23,7 @@ quickscope = "0.2.0"
 wasm-bindgen = { version = "0.2.93", optional = true }
 #wasm-pack = { version = "0.13.0", optional = true }
 # getrandom = { version = "0.2", features = ["js"], optional=true} 
-wee_alloc = { version = "0.4.5", optional = true }
+#wee_alloc = { version = "0.4.5", optional = true }
 
 [dev-dependencies]
 ntest = "0.9.3"
