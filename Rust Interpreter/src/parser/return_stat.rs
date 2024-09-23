@@ -27,16 +27,16 @@ impl BasicState for ReturnState {
         if ret {
             *expr = Expr::Return {
                 locs,
-                indexes: [usize::MAX; 1],
+                index: None,
                 end: End::none(),
             }
         }
         ret
     }
 
-    fn add_child(&mut self, expr: &mut Expr, index: usize) {
-        if let Expr::Return { indexes, .. } = expr {
-            indexes[self.count as usize] = index;
+    fn add_child(&mut self, expr: &mut Expr, idx: usize) {
+        if let Expr::Return { index, .. } = expr {
+            *index = Some(idx);
             self.count += 1;
         } else {
             unreachable!()
