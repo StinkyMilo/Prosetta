@@ -61,9 +61,11 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
             name,
             value_index,
             end,
+            first,
         } => format!(
-            "(assign{} \"{}\"@{} {})",
+            "(assign{} {}\"{}\"@{} {})",
             join_locs(locs, Some(*end)),
+            if *first { "" } else { "mut " },
             String::from_utf8_lossy(&name),
             name_start,
             write_expr(exprs, *value_index, 0)

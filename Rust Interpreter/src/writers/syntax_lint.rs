@@ -197,6 +197,7 @@ impl<T: Renderer> SyntaxLinter<T> {
                 name,
                 value_index,
                 end,
+                ..
             } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_up_to(source, *name_start);

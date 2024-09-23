@@ -24,13 +24,13 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         Expr::NoneStat => "(todo stat)".to_string(),
         Expr::NoneExpr => "(todo expr)".to_string(),
         Expr::Assign {
-            locs: _,
-            name_start: _,
             name,
             value_index,
-            end: _,
+            first,
+            ..
         } => format!(
-            "window.{}mario = {};",
+            "{}{}mario = {};",
+            if *first { "let " } else { "" },
             String::from_utf8_lossy(&name),
             write_expr(exprs, *value_index)
         ),
@@ -224,37 +224,73 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         }
         Expr::Rotate { index, .. } => {
             format!("rotate_delta({});", write_expr(exprs, *index))
-        },
+        }
         Expr::Append { indexes, .. } => {
             if indexes[2] == usize::MAX {
-                format!("{}.push({});", write_expr(exprs, indexes[0]), write_expr(exprs, indexes[1]))
+                format!(
+                    "{}.push({});",
+                    write_expr(exprs, indexes[0]),
+                    write_expr(exprs, indexes[1])
+                )
             } else {
-                format!("{}.splice({}, 0, {});", write_expr(exprs, indexes[0]), write_expr(exprs, indexes[2]), write_expr(exprs, indexes[1]))
+                format!(
+                    "{}.splice({}, 0, {});",
+                    write_expr(exprs, indexes[0]),
+                    write_expr(exprs, indexes[2]),
+                    write_expr(exprs, indexes[1])
+                )
             }
-        },
+        }
         Expr::Delete { indexes, .. } => {
             if indexes[1] == usize::MAX {
-                format!("{}.splice(0,1);",write_expr(exprs, indexes[0]))
-            }else {
-                format!("{}.splice({},1);",write_expr(exprs, indexes[0]), write_expr(exprs, indexes[1]))
+                format!("{}.splice(0,1);", write_expr(exprs, indexes[0]))
+            } else {
+                format!(
+                    "{}.splice({},1);",
+                    write_expr(exprs, indexes[0]),
+                    write_expr(exprs, indexes[1])
+                )
             }
-        },
+        }
         Expr::Replace { indexes, .. } => {
-            format!("{}[{}]={};",write_expr(exprs, indexes[0]),write_expr(exprs, indexes[1]), write_expr(exprs, indexes[2]))
-        },
-        Expr::Find {indexes, ..} => {
-            format!("{}.indexOf({})",write_expr(exprs, indexes[0]),write_expr(exprs,indexes[1]))
-        },
-        Expr::Index{indexes, ..} => {
-            format!("{}[{}]",write_expr(exprs, indexes[0]),write_expr(exprs,indexes[1]))
-        },
+            format!(
+                "{}[{}]={};",
+                write_expr(exprs, indexes[0]),
+                write_expr(exprs, indexes[1]),
+                write_expr(exprs, indexes[2])
+            )
+        }
+        Expr::Find { indexes, .. } => {
+            format!(
+                "{}.indexOf({})",
+                write_expr(exprs, indexes[0]),
+                write_expr(exprs, indexes[1])
+            )
+        }
+        Expr::Index { indexes, .. } => {
+            format!(
+                "{}[{}]",
+                write_expr(exprs, indexes[0]),
+                write_expr(exprs, indexes[1])
+            )
+        }
         Expr::List { indexes, .. } => {
             format!("[{}]", write_exprs(exprs, indexes, ", "))
-        },
-        Expr::ForEach {indexes, name, ..} => {
-            format!("for({}mario of {}) {{\n{}\n}}",String::from_utf8_lossy(&name), write_expr(exprs, indexes[0]), write_exprs(exprs, &indexes[1..], "\n"))
         }
-        Expr::Function { name, arg_names, indexes, .. } => {
+        Expr::ForEach { indexes, name, .. } => {
+            format!(
+                "for({}mario of {}) {{\n{}\n}}",
+                String::from_utf8_lossy(&name),
+                write_expr(exprs, indexes[0]),
+                write_exprs(exprs, &indexes[1..], "\n")
+            )
+        }
+        Expr::Function {
+            name,
+            arg_names,
+            indexes,
+            ..
+        } => {
             let mut output_vals = "".to_string();
             let mut is_first = true;
             for val in arg_names {
@@ -265,14 +301,23 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                     output_vals += &format!(", {}mario", String::from_utf8_lossy(val));
                 }
             }
-            format!("function {}mario({}){{\n{}\n}}",String::from_utf8_lossy(name),output_vals,write_exprs(exprs,indexes,"\n"))
+            format!(
+                "function {}mario({}){{\n{}\n}}",
+                String::from_utf8_lossy(name),
+                output_vals,
+                write_exprs(exprs, indexes, "\n")
+            )
         }
         Expr::FunctionCall { name, indexes, .. } => {
             //Trying without a semicolon since JS lets you forget them sometimes and function calls can be either expressions or statements
-            format!("{}mario({})",String::from_utf8_lossy(name),write_exprs(exprs,indexes, ", "))
+            format!(
+                "{}mario({})",
+                String::from_utf8_lossy(name),
+                write_exprs(exprs, indexes, ", ")
+            )
         }
         Expr::Return { indexes, .. } => {
-            format!("return {};",write_exprs(exprs,indexes,", "))
+            format!("return {};", write_exprs(exprs, indexes, ", "))
         }
     }
 }

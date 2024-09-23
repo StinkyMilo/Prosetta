@@ -19,7 +19,8 @@ impl VarSet {
         }
     }
     pub fn insert(&mut self, name: Vec<u8>) {
-        self.set.define(name);
+        let lower = name.to_ascii_lowercase();
+        self.set.define(lower);
     }
     pub fn add_layer(&mut self) {
         self.set.push_layer();
@@ -27,8 +28,33 @@ impl VarSet {
     pub fn remove_layer(&mut self) {
         self.set.pop_layer();
     }
-    pub fn contains(&self, name: Vec<u8>) -> bool {
-        self.set.contains(&name)
+    pub fn contains(&self, name: &Vec<u8>) -> bool {
+        let lower = name.to_ascii_lowercase();
+        self.set.contains(&lower)
+    }
+    ///returns (index in word, varible name)
+    pub fn try_get_var(&self, word: &[u8]) -> Option<(usize, Vec<u8>)> {
+        let lower = word.to_ascii_lowercase();
+        let mut max_var_length = 0;
+        let mut var = None;
+        for str in self.set.iter() {
+            let is_longer = str.len() >= max_var_length;
+            // if var could be in word
+            if is_longer && lower.len() >= str.len() {
+                // if found
+                if let Some(index) = word.find(str) {
+                    let is_better = var
+                        .as_ref()
+                        .map_or(true, |(old_index, _)| is_longer || index < *old_index);
+
+                    if is_better {
+                        max_var_length = str.len();
+                        var = Some((index, str.clone()));
+                    }
+                }
+            }
+        }
+        var
     }
 }
 impl Debug for VarSet {
@@ -92,6 +118,7 @@ macro_rules! get_state {
         Box::new($state) as Box<dyn ParseState>
     };
 }
+use bstr::ByteSlice;
 pub(crate) use get_state;
 use quickscope::{ScopeMap, ScopeSet};
 

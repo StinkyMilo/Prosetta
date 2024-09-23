@@ -308,8 +308,23 @@ mod tests_simple {
         test_lib::run_to_completion(&mut parser);
         assert_eq!(
             lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
-            "(assign@0,1,2$10 \"h1\"@4 (litnum 1@7$$3))\n(assign@12,13,14$22 \"H2\"@16 (litnum 2@19$$3))\n\
+            "(assign@0,1,2$10 \"h1\"@4 (litnum 1@7$$3))\n(assign@12,13,14$22 \"h2\"@16 (litnum 2@19$$3))\n\
             (print@24,25,26$39 (var \"h1\"@28) (var \"h1\"@31) (var \"h2\"@34) (var \"h2\"@37))"
+        );
+    }
+
+    #[test]
+    #[timeout(1000)]
+    fn test_varible_substrings() {
+        let text: Vec<u8> =
+            b"was a one. was car car. was car car. was cart cater. was cater handcarts.".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(assign@0,1,2$9 \"a\"@4 (litnum 1@6$$3))\n(assign@11,12,13$22 \"car\"@15 (var \"a\"@20))\n\
+            (assign@24,25,26$35 mut \"car\"@28 (var \"car\"@32))\n(assign@37,38,39$51 \"cart\"@41 (var \"a\"@47))\n\
+            (assign@53,54,55$72 \"cater\"@57 (var \"cart\"@67))"
         );
     }
 

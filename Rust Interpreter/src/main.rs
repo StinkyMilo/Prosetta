@@ -1,7 +1,6 @@
 #![cfg(not(feature = "wasm"))]
 
 use std::{
-    any::Any,
     io::{self, Read},
     mem,
 };
