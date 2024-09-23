@@ -24,9 +24,13 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         Expr::NoneStat => "(todo stat)".to_string(),
         Expr::NoneExpr => "(todo expr)".to_string(),
         Expr::Assign {
-            name, value_index, ..
+            name,
+            value_index,
+            first,
+            ..
         } => format!(
-            "{}mario = {};",
+            "{}{}mario = {};",
+            if *first { "let " } else { "" },
             String::from_utf8_lossy(&name),
             write_expr(exprs, *value_index)
         ),
@@ -249,6 +253,26 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         },
         Expr::ForEach {indexes, name, ..} => {
             format!("for({}mario of {}) {{\n{}\n}}",String::from_utf8_lossy(&name), write_expr(exprs, indexes[0]), write_exprs(exprs, &indexes[1..], "\n"))
+        }
+        Expr::Function { name, arg_names, indexes, .. } => {
+            let mut output_vals = "".to_string();
+            let mut is_first = true;
+            for val in arg_names {
+                if is_first {
+                    output_vals += &format!("{}mario", String::from_utf8_lossy(val));
+                    is_first = false;
+                } else {
+                    output_vals += &format!(", {}mario", String::from_utf8_lossy(val));
+                }
+            }
+            format!("function {}mario({}){{\n{}\n}}",String::from_utf8_lossy(name),output_vals,write_exprs(exprs,indexes,"\n"))
+        }
+        Expr::FunctionCall { name, indexes, .. } => {
+            //Trying without a semicolon since JS lets you forget them sometimes and function calls can be either expressions or statements
+            format!("{}mario({})",String::from_utf8_lossy(name),write_exprs(exprs,indexes, ", "))
+        }
+        Expr::Return { indexes, .. } => {
+            format!("return {};",write_exprs(exprs,indexes,", "))
         }
     }
 }

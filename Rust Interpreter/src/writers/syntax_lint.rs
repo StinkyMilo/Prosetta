@@ -357,12 +357,27 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_expr(source, exprs, *index, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
+            Expr::Function { locs, indexes, end, .. } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.add_end(source, *end, stack_index);
+            }
             Expr::Append {indexes, locs, end} => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
+            Expr::FunctionCall { locs, indexes, end, .. } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.add_end(source, *end, stack_index);
+            }
             Expr::Delete {indexes, locs, end} => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.add_end(source, *end, stack_index);
+            }
+            Expr::Return { locs, indexes, end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);

@@ -62,6 +62,45 @@ impl Debug for VarSet {
         f.debug_struct("VarSet").finish()
     }
 }
+
+pub struct FuncSet {
+    set: ScopeMap<Vec<u8>, usize>
+}
+
+impl Debug for FuncSet{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("FuncSet").finish()
+    }
+}
+
+impl FuncSet{
+    pub fn new () -> Self {
+        Self {
+            set: ScopeMap::new()
+        }
+    }
+    pub fn insert(&mut self, name: Vec<u8>, arg_count: usize) {
+        self.set.define(name, arg_count);
+    }
+    pub fn add_layer(&mut self){
+        self.set.push_layer();
+    }
+    pub fn remove_layer(&mut self){
+        self.set.pop_layer();
+    }
+    pub fn contains(&self, name: Vec<u8>) -> bool {
+        self.set.contains_key(&name)
+    }
+    pub fn get_arg_count(&self, name: Vec<u8>) -> Option<&usize> {
+        self.set.get(&name)
+    }
+    pub fn inc_arg_count(&mut self, name: Vec<u8>) {
+        if let Some(val) = self.set.get(&name) {
+            //Increment in above scope.
+            self.set.define(name.to_vec(), val+1);
+        }
+    }
+}
 // pub type StepFunction =
 //     fn(env: &mut Environment, result: LastMatchResult, word: &Slice, rest: &Slice) -> MatchResult;
 
@@ -81,7 +120,7 @@ macro_rules! get_state {
 }
 use bstr::ByteSlice;
 pub(crate) use get_state;
-use quickscope::ScopeSet;
+use quickscope::{ScopeMap, ScopeSet};
 
 /// add or remove commands based on flags
 #[derive(Default, Debug)]
@@ -211,6 +250,8 @@ impl ParserResult {
 pub struct Environment<'a> {
     ///The set of current varibles
     pub vars: &'a mut VarSet,
+    //The set of current functions
+    pub funcs: &'a mut FuncSet,
     ///The list of expressions
     pub expr: &'a mut Expr,
     ///the index of this expr
@@ -227,6 +268,17 @@ pub struct Environment<'a> {
     pub global_index: usize,
     /// reference to static AliasData
     pub aliases: &'a AliasData,
+}
+
+impl<'a> Environment<'a> { 
+    pub fn add_var_layer(&mut self){
+        self.vars.add_layer();
+        self.funcs.add_layer();
+    }
+    pub fn remove_var_layer(&mut self){
+        self.vars.remove_layer();
+        self.funcs.remove_layer();
+    }
 }
 
 ///a slice of the input text

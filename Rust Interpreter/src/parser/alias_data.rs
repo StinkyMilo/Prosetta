@@ -7,9 +7,9 @@ const BASE_EXPR_ALIASES: [&'static [u8]; 19] = [
 
 const NOT_ALIAS: &'static [u8] = b"not";
 
-const STAT_ALIASES: [&'static [u8]; 17] = [
+const STAT_ALIASES: [&'static [u8]; 19] = [
     b"arc", b"lin", b"was", b"rec", b"pri", b"whe", b"whi", b"els", b"sto", b"fil", b"mov", b"pen",
-    b"tur", b"app", b"del", b"rep", b"fre"
+    b"tur", b"fun", b"ret", b"app", b"del", b"rep", b"fre"
 ];
 
 ///match alias to expr
@@ -61,6 +61,8 @@ fn get_stat_state(alias: &'static [u8], index: usize) -> MatchResult {
             b"mov" => get_state!(move_to::MoveToState::new()),
             b"pen" => get_state!(line_width::LineWidthState::new()),
             b"tur" => get_state!(rotate::RotateState::new()),
+            b"fun" => get_state!(function::FunctionState::new()),
+            b"ret" => get_state!(return_stat::ReturnState::new()),
             b"app" => get_state!(append::AppendState::new()),
             b"del" => get_state!(delete::DeleteState::new()),
             b"rep" => get_state!(replace::ReplaceState::new()),
