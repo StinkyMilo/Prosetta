@@ -7,6 +7,8 @@ enum MatchState {
     Var,
     Num,
     Color,
+    FunctionCallExpr,
+    FunctionCallStat,
     FindAliases,
 }
 
@@ -83,9 +85,11 @@ impl NoneState {
         self.matched = 0;
         // if expr need to check if var or num
         self.next_match_state = if self.data.is_expr {
+            //Expression
             MatchState::Var
         } else {
-            MatchState::FindAliases
+            //Statement
+            MatchState::FunctionCallStat
         }
     }
     pub fn new_stat() -> Self {
@@ -116,8 +120,13 @@ impl NoneState {
         let (new_state, ret) = match self.next_match_state {
             // is word a varible
             MatchState::Var => (
-                MatchState::Num,
+                MatchState::FunctionCallExpr,
                 MatchResult::ContinueWith(word.pos, get_state!(var::VarState::new())),
+            ),
+            // is word a function
+            MatchState::FunctionCallExpr => (
+                MatchState::Num,
+                MatchResult::ContinueWith(word.pos, get_state!(call_func::FunctionCallState::new()))
             ),
             // is word a literal number
             MatchState::Num => (
@@ -132,6 +141,11 @@ impl NoneState {
                 MatchState::FindAliases,
                 MatchResult::ContinueWith(word.pos, get_state!(litcolor::LiteralColorState::new())),
             ),
+            MatchState::FunctionCallStat => (
+                MatchState::FindAliases,
+                MatchResult::ContinueWith(word.pos, get_state!(call_func::FunctionCallState::new()))
+            ),
+            
             // else check aliases
             MatchState::FindAliases => (MatchState::FindAliases, self.match_alias(env, word, rest)),
         };

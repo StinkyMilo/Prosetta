@@ -153,6 +153,27 @@ pub enum Expr {
         index: usize,
         end: End,
     },
+    Function {
+        locs: Vec<usize>,
+        name_start: usize,
+        name: Vec<u8>,
+        arg_starts: Vec<usize>,
+        arg_names: Vec<Vec<u8>>,
+        indexes: Vec<usize>,
+        end: End
+    },
+    FunctionCall {
+        locs: Vec<usize>,
+        name_start: usize,
+        name: Vec<u8>,
+        indexes: Vec<usize>,
+        end: End
+    },
+    Return {
+        locs: Vec<usize>,
+        indexes: [usize; 1],
+        end: End
+    },
     Append {
         locs: Vec<usize>,
         indexes: [usize; 3],

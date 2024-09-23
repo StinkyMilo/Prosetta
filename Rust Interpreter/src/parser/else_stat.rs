@@ -23,7 +23,7 @@ impl ParseState for ElseState {
                     end: End::none(),
                 };
                 // go up layer
-                env.vars.add_layer();
+                env.add_var_layer();
                 self.if_index = index;
             } else {
                 return MatchResult::Failed;
@@ -57,7 +57,7 @@ impl ParseState for ElseState {
                 if is_close(word) {
                     *end = End::from_slice(&word, env.global_index);
                     *else_index = env.expr_index;
-                    env.vars.remove_layer();
+                    env.remove_var_layer();
                     MatchResult::Matched(word.pos, true)
                     // succeeded - continue again with noncont stat
                 } else if child_index.is_some() {
