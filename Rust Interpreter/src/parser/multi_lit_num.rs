@@ -72,7 +72,7 @@ impl ParseState for MultiLitNumState {
                 MatchResult::Matched(word.pos, true)
             } else {
                 let lower = word.str.to_ascii_lowercase();
-                if env.vars.contains(lower.clone()) {
+                if env.vars.contains(&lower) {
                     self.any_vars = true;
                     values.push(VarOrInt::Var(lower));
                 } else if let Some(num_value) = get_number_word(word.str) {

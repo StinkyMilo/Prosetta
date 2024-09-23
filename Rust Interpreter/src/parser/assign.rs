@@ -16,6 +16,7 @@ impl ParseState for AssignState {
                 value_index: usize::MAX,
                 locs: env.locs.take().unwrap_or_default(),
                 end: End::none(),
+                first: false,
             };
             self.first = false;
         }
@@ -26,11 +27,16 @@ impl ParseState for AssignState {
         } else {
             //set name
             if let Expr::Assign {
-                name_start, name, ..
+                name_start,
+                name,
+                first,
+                ..
             } = env.expr
             {
+                let var = word.str.to_ascii_lowercase();
                 *name_start = word.pos + env.global_index;
-                *name = word.str.to_owned();
+                *first = !env.vars.contains(&var);
+                *name = var;
             } else {
                 unreachable!()
             }

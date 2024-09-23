@@ -54,6 +54,7 @@ pub enum Expr {
         locs: Vec<usize>,
         name_start: usize,
         name: Vec<u8>,
+        first: bool,
         value_index: usize,
         end: End,
     },
