@@ -195,6 +195,35 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         }
         Expr::Rotate { index, .. } => {
             format!("rotate_delta({});", write_expr(exprs, *index))
+        },
+        Expr::Append { indexes, .. } => {
+            if indexes[2] == usize::MAX {
+                format!("{}.push({});", write_expr(exprs, indexes[0]), write_expr(exprs, indexes[1]))
+            } else {
+                format!("{}.splice({}, 0, {});", write_expr(exprs, indexes[0]), write_expr(exprs, indexes[2]), write_expr(exprs, indexes[1]))
+            }
+        },
+        Expr::Delete { indexes, .. } => {
+            if indexes[1] == usize::MAX {
+                format!("{}.splice(0,1);",write_expr(exprs, indexes[0]))
+            }else {
+                format!("{}.splice({},1);",write_expr(exprs, indexes[0]), write_expr(exprs, indexes[1]))
+            }
+        },
+        Expr::Replace { indexes, .. } => {
+            format!("{}[{}]={};",write_expr(exprs, indexes[0]),write_expr(exprs, indexes[1]), write_expr(exprs, indexes[2]))
+        },
+        Expr::Find {indexes, ..} => {
+            format!("{}.indexOf({})",write_expr(exprs, indexes[0]),write_expr(exprs,indexes[1]))
+        },
+        Expr::Index{indexes, ..} => {
+            format!("{}[{}]",write_expr(exprs, indexes[0]),write_expr(exprs,indexes[1]))
+        },
+        Expr::List { indexes, .. } => {
+            format!("[{}]", write_exprs(exprs, indexes, ", "))
+        },
+        Expr::ForEach {indexes, name, ..} => {
+            format!("for({}mario of {}) {{\n{}\n}}",String::from_utf8_lossy(&name), write_expr(exprs, indexes[0]), write_exprs(exprs, &indexes[1..], "\n"))
         }
     }
 }
