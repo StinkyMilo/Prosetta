@@ -6,6 +6,7 @@ var has_run = false;
 var has_drawn_shape = false;
 var last_was_line = false;
 var parser, parsedData;
+var old_code;
 
 function init_canvas() {
   sourcecode = document.getElementById("code");
@@ -266,6 +267,10 @@ function openTab(event, tab) {
 }
 
 function updateCode() {
+  if (sourcecode.value == old_code) {
+    return;
+  }
+  old_code = sourcecode.value;
   parsedData = parser.run_to_completion(sourcecode.value);
   jscode.innerText = parsedData.get_javascript();
   syntax.innerHTML = parsedData.get_html();
@@ -289,6 +294,7 @@ async function initialize() {
   print_console("Welcome to Prosetta!");
   print_console("---");
   print_console();
+  old_code = "";
   updateCode();
 }
 
