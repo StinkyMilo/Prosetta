@@ -1,0 +1,112 @@
+var list = [10, 30, 2, 15, 19, 24, 60, 80, 0];
+function getMiddle(startInd,endInd){
+	let len = endInd-startInd;
+	if(len%2 == 0){
+    	return startInd+len/2;
+    }
+    return startInd+(len-1)/2;
+}
+function mergeSort(list,startInd,endInd){
+	if(endInd - startInd <= 0){
+    	return [];
+    }
+    if(endInd - startInd == 1){
+    	return [list[startInd]];
+    }
+    let middle = getMiddle(startInd,endInd);
+    let newLeft = mergeSort(list,startInd,middle);
+    let newRight = mergeSort(list,middle,endInd);
+    let output = [];
+    let leftI = 0;
+    let rightI = 0;
+    while(leftI < newLeft.length || rightI < newRight.length){
+    	if(leftI >= newLeft.length || newLeft[leftI] > newRight[rightI]){
+        	output.push(newRight[rightI]);
+            rightI+=1;
+        }else{
+        	output.push(newLeft[leftI]);
+            leftI+=1;
+        }
+    }
+    return output;
+}
+console.log(list);
+
+Thoughts:
+    Floor equivalent?
+    Length added
+    Auto-formatter that can be edited, and propagates non-whitespace changes back to the original?
+
+was array lis 10 30 2 15 19 24 60 80 0..
+fun middle start end.
+    was len sub end start..
+    whe par mod len 2. 0.
+        ret add start ide len 2 ---
+    .
+    ret add start ide sub len 1. 2 ---
+.
+fun merge array start end.
+    was difference sub end start..
+    whe les difference 1.
+        ret lis ...
+    .
+    whe par difference 1.
+        ret lis ind array start ---
+    .
+    was mid middle start end.
+    was left merge array start mid..
+    was right merge array mid end.
+    was output lis..
+    was yin 0.
+    was yang 0.
+    whi or 
+            les yin cou left..
+            les yang cou right..
+            .
+        .
+        whe or
+                mor add yin 1. cou left..
+                mor ind left yin. ind right yang.
+            .
+            app output ind right yang..
+            was yang add yang 1.
+        els
+            app output ind left yin..
+            was yin add yin 1.
+    ret output.
+.
+was value merge array 0 cou array...
+pri value.
+
+//Smaller version
+
+was array lis 10 30 2 15 19 24 60 80 0..
+fun middle start end.
+    was len sub end start..
+    whe par mod len 2. 0.
+        ret add start ide len 2 ---
+    .
+    ret add start ide sub len 1. 2 ---
+.
+fun merge array start end.
+    was difference sub end start..
+    whe les difference 1.
+        ret lis wacky...
+    .
+.
+was value merge array 0 cou array...
+pri value.
+
+//Even smaller version - non-working
+was array lis 10 30 2 15 19 24 60 80 0..
+fun merge array start end.
+    ret lis..
+.
+was value merge array 0 cou array...
+
+//Even smaller version - working
+was array lis 10 30 2 15 19 24 60 80 0..
+fun merge array start end.
+    ret lis..
+.
+2 3 0.
