@@ -82,7 +82,7 @@ impl ParseState for FunctionState {
                 MatchResult::Matched(word.pos, true)
                 // succeeded - continue again with noncont stat
             } else if child_index.is_some() {
-                MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat()))
+                MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat_cont()))
                 // failed - pass word
             } else {
                 MatchResult::Continue
