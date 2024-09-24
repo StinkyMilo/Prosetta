@@ -84,11 +84,11 @@ Poetic version:
 
 There was array and disarray, a list of 10, 30, 2, 15, 19, 24, 60, 80, 0 items!
 A multi-way fusion: middle, start, end.
-    was len sub end start..
-    whe par mod len 2. 0.
-        ret add start ide len 2 ---
+    The wasted space sub end start ..
+    And when parts are modified in space, two pieces remain. Never zero.
+        ret add start ide space 2 ---
     .
-    ret add start ide sub len 1. 2 ---
+    ret add start ide sub space 1. 2 ---
 .
 fun merge array start end.
     was difference sub end start..

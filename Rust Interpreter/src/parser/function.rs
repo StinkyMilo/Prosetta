@@ -44,7 +44,7 @@ impl ParseState for FunctionState {
             if is_mandatory_close(word){
                 self.has_args=true;
                 env.funcs.add_layer();
-                MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_stat()))
+                MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_stat_cont()))
             }else if is_close(word){
                 MatchResult::Continue
             }else{
@@ -58,7 +58,7 @@ impl ParseState for FunctionState {
                 MatchResult::Continue
             }
         }else {
-            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
+            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat_cont()))
         }
     }
 
