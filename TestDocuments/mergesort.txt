@@ -79,3 +79,48 @@ fun merge array start end.
 .
 was value merge array 0 cou array...
 pri value.
+
+Poetic version:
+
+There was array and disarray, a list of 10, 30, 2, 15, 19, 24, 60, 80, 0 items!
+A multi-way fusion: middle, start, end.
+    was len sub end start..
+    whe par mod len 2. 0.
+        ret add start ide len 2 ---
+    .
+    ret add start ide sub len 1. 2 ---
+.
+fun merge array start end.
+    was difference sub end start..
+    whe les difference 1.
+        ret lis..
+    .
+    whe par difference 1.
+        ret lis ind array start ---
+    .
+    was mid middle start end..
+    was left merge array start mid..
+    was right merge array mid end..
+    was output lis..
+    was yin 0.
+    was yang 0.
+    whi oth 
+            les yin cou left..
+            les yang cou right..
+        .
+        whe oth
+                mor add yin 1. cou left..
+                mor ind left yin. ind right yang..
+            .
+            app output ind right yang..
+            was yang add yang 1..
+        .
+        els
+            app output ind left yin..
+            was yin add yin 1..
+        .
+    .
+    ret output.
+.
+was value merge array 0 cou array...
+pri value.
