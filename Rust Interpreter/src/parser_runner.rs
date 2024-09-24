@@ -28,7 +28,8 @@ pub fn run_state(state: ParserResult, parser: &Parser, parser_flags: RunnerFlags
             let (word, index) = parser.get_last_word();
             let (stack, length) = parser.get_parser_stack();
             println!(
-                "step:\nword:[{}:{}]\nreturn:[{:?}]\nstack:{}[{}]",
+                "step:{}\nword:[{}:{}]\nreturn:[{:?}]\nstack:{}[{}]",
+                step_count,
                 std::str::from_utf8(word).unwrap(),
                 index,
                 state,
