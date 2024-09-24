@@ -1,5 +1,5 @@
 use super::*;
-use num_literal::get_number_word;
+use num_literal::get_number;
 use std::fmt;
 
 #[derive(Debug, PartialEq)]
@@ -75,7 +75,7 @@ impl ParseState for MultiLitNumState {
                 if let Some((_, var)) = env.vars.try_get_var(&word.str) {
                     self.any_vars = true;
                     values.push(VarOrInt::Var(var));
-                } else if let Some(num_value) = get_number_word(word.str) {
+                } else if let Some(num_value) = get_number(word.str) {
                     values.push(VarOrInt::Int(num_value % 10));
                 } else {
                     values.push(VarOrInt::Int((word.len() as i64) % 10));
