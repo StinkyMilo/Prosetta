@@ -25,14 +25,39 @@ pub trait BasicState {
 }
 
 impl<T: BasicState + Debug> ParseState for T {
-    fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
+    fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         if !self.can_happen(env){
             MatchResult::Failed
         }else{
             let is_first = self.do_first(env.expr, env.locs.take().unwrap_or_default());
             if is_first {
-                // cont - has required arguments
-                MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr_cont()))
+                let can_close = self.can_close();
+                match can_close {
+                    CloseType::Able => {
+                        if is_mandatory_close(word) {
+                            self.set_end(env.expr, End::from_slice(&word, env.global_index));
+                            MatchResult::Matched(word.pos, true)
+                            // succeeded - continue again with noncont expr
+                        }  else {
+                            MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr_cont()))
+                        }
+                    },
+                    CloseType::Force => {
+                        let close = find_close_slice(&word, 0).or_else(|| find_close_slice(&rest, 0));
+                        match close {
+                            // will never be a period to find even on future words
+                            None => MatchResult::Failed,
+                            Some(slice) => {
+                                self.set_end(env.expr, End::from_slice(&slice.0, env.global_index));
+                                MatchResult::Matched(slice.0.pos, true)
+                            }
+                        }
+                    },
+                    CloseType::Unable => {
+                        // cont - has required arguments
+                        MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr_cont()))
+                    }
+                }
             } else {
                 // not cont - may have more arguments but may not - need to find close if there
                 MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr()))
