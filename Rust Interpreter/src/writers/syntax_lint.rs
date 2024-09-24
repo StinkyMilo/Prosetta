@@ -377,9 +377,11 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Return { locs, indexes, end } => {
+            Expr::Return { locs, index, end } => {
                 self.write_locs(source, locs, stack_index);
-                self.write_exprs(source, exprs, indexes, stack_index + 1);
+                if let Some(ind) = index {
+                    self.write_expr(source, exprs, *ind, stack_index + 1);   
+                }
                 self.add_end(source, *end, stack_index);
             }
             Expr::Replace {indexes, locs, end} => {
