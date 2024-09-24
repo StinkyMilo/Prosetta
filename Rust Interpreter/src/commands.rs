@@ -211,6 +211,11 @@ pub enum Expr {
         locs: Vec<usize>,
         indexes: Vec<usize>,
         end: End
+    },
+    Length {
+        locs: Vec<usize>,
+        index: usize,
+        end: End
     }
 }
 

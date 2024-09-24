@@ -318,6 +318,9 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         }
         Expr::Return { indexes, .. } => {
             format!("return {};", write_exprs(exprs, indexes, ", "))
+        },
+        Expr::Length { index, .. } => {
+            format!("{}.length",write_expr(exprs,*index))
         }
     }
 }
