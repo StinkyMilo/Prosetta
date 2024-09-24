@@ -25,11 +25,15 @@ pub fn run_state(state: ParserResult, parser: &Parser, parser_flags: RunnerFlags
 
     if parser_flags.assert_steps {
         if step_count % count == 0 {
+            let (word, index) = parser.get_last_word();
+            let (stack, length) = parser.get_parser_stack();
             println!(
-                "step:\nreturn:[{:?}]\nstack:[{}],word:[{}]",
+                "step:\nword:[{}:{}]\nreturn:[{:?}]\nstack:{}[{}]",
+                std::str::from_utf8(word).unwrap(),
+                index,
                 state,
-                parser.get_parser_stack(),
-                std::str::from_utf8(parser.get_last_word()).unwrap()
+                length,
+                stack
             );
         }
     }

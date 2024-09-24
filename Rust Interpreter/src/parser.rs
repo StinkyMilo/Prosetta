@@ -19,9 +19,9 @@ mod color;
 mod delete;
 mod else_stat;
 mod fill;
-mod function;
 mod find;
 mod foreach;
+mod function;
 mod if_stat;
 mod index;
 mod list;
@@ -57,12 +57,7 @@ mod parsing_tests_simple;
 // #[path = "testing/parsing_tests_other.rs"]
 // mod parsing_tests_other;
 
-use std::{
-    collections::{btree_map::Range, HashMap, HashSet},
-    fmt::Debug,
-    hint::black_box,
-    mem,
-};
+use std::{collections::HashMap, fmt::Debug, hint::black_box, mem};
 
 use crate::{commands::*, writers::lisp_like_writer};
 
@@ -102,7 +97,7 @@ pub struct Parser<'a> {
     ///the number of times the current slice should repeat
     repeat_count: u8,
     /// the index of the last matched state
-    last_stat_index: Option<usize>,
+    stat_indexes: Vec<usize>,
     /// the hash map of ranges of failed exprs
     cached_fails: HashMap<&'static str, RangeSet<usize>>,
 }
@@ -125,7 +120,7 @@ impl<'a> Parser<'a> {
             last_result: LastMatchResult::None,
             aliases: AliasData::new(flags),
             repeat_count: 0,
-            last_stat_index: None,
+            stat_indexes: Vec::new(),
             cached_fails: HashMap::new(),
         }
     }
@@ -140,28 +135,31 @@ impl<'a> Parser<'a> {
             .map_or(&"None", |state| state.state.get_name())
     }
 
-    ///get the current stack
-    pub fn get_parser_stack(&self) -> String {
+    ///get the current stack and length
+    pub fn get_parser_stack(&self) -> (String, usize) {
         let mut str = self.stack.iter().fold(String::new(), |mut str, state| {
             str += &format!("{}:{}, ", state.state.get_name(), state.last_parse);
             str
         });
         str.pop();
         str.pop();
-        str
+        (str, self.stack.len())
     }
 
-    ///get the slice that was last used
-    pub fn get_last_word<'b>(&'b self) -> &'b [u8] {
+    ///get the slice that was last used + index
+    pub fn get_last_word<'b>(&'b self) -> (&'b [u8], usize) {
         // (if self.last_result == LastMatchResult::Failed {
         //     self.get_last_state()
         // } else {
         //     self.stack.last()
         // })
-        self.get_last_state().map_or(b"", |state| {
-            Self::get_slice(self.data.source.get_line(), state.last_parse)
-                .0
-                .str
+        self.get_last_state().map_or((b"", usize::MAX), |state| {
+            (
+                Self::get_slice(self.data.source.get_line(), state.last_parse)
+                    .0
+                    .str,
+                state.last_parse,
+            )
         })
     }
 
@@ -263,7 +261,7 @@ impl<'a> Parser<'a> {
             expr,
             children,
             parents,
-            last_stat_index: self.last_stat_index,
+            last_stat_index: self.stat_indexes.last().cloned(),
             expr_index: frame.expr_index,
             vars: &mut self.data.vars,
             funcs: &mut self.data.funcs,
@@ -322,7 +320,16 @@ impl<'a> Parser<'a> {
         let state = self.stack.pop().unwrap();
 
         let state_type = state.state.get_type();
-        if state_type == StateType::Expr || state_type == StateType::None {
+        if state_type == StateType::Stat {
+            // remove self
+            while self
+                .stat_indexes
+                .last()
+                .is_some_and(|index| *index > state.expr_index)
+            {
+                self.stat_indexes.pop();
+            }
+        } else {
             //insert the range of parsed words into map
             let id = state.state.get_name();
             self.cached_fails
@@ -395,7 +402,8 @@ impl<'a> Parser<'a> {
         let state = self.stack.pop().unwrap();
         let expr_index = state.expr_index;
         if state.state.get_type() == StateType::Stat {
-            self.last_stat_index = Some(state.expr_index);
+            // add self
+            self.stat_indexes.push(state.expr_index);
             // stats can change parse ablility -- reset cached fails
             self.cached_fails = HashMap::new();
         }
