@@ -88,20 +88,18 @@ A multi-way fusion: middle, start, end.
     But when parts are modified in space, two pieces remain. Never zero.
         What results is an additional start, once you divide space in two. Somewhere to begin anew!
     .
-    Creation is a handmade start to an idea to be made. sub space 1. 2 ---
-.
-fun merge array start end.
-    was difference sub end start..
-    whe les difference 1.
-        ret lis..
-    .
-    whe par difference 1.
-        ret lis ind array start ---
-    .
-    was mid middle start end..
-    was left merge array start mid..
-    was right merge array mid end..
-    was output lis..
+    Creation is a handmade start to an idea to be made. A sublime space made one, from two...
+
+This is the foundation: merge array; start, end.
+    What was different between sublime end and a new start?
+    When places are different from one another,
+        the result is blissful ---
+    When parts of a different whole form one piece, beauty is made.
+        Our great lives include disarray from the start!!
+    Walk towards Midpoint: the middle of start and end!
+    Walk towards Left: Merge from disarray a new start and midpoint!
+    Walk towards Right: Merge from disarray a midpoint and its new end!
+    Run towards Output: achieve bliss!
     was yin 0.
     was yang 0.
     whi oth 
