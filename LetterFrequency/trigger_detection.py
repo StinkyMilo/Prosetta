@@ -74,6 +74,12 @@ aliases = [
     "els",
     "sto",
     "fil",
+    "mov",
+    "pen",
+    "tur",
+    "ret",
+    "fin",
+    "cou"
 ]
 
 if __name__ == "__main__":
