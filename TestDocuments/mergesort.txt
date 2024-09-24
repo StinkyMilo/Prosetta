@@ -84,11 +84,11 @@ Poetic version:
 
 There was array and disarray, a list of 10, 30, 2, 15, 19, 24, 60, 80, 0 items!
 A multi-way fusion: middle, start, end.
-    The wasted space sub end start ..
-    And when parts are modified in space, two pieces remain. Never zero.
-        ret add start ide space 2 ---
+    The wasted space subtracts the end from the start, leaving little behind.
+    But when parts are modified in space, two pieces remain. Never zero.
+        What results is an additional start, once you divide space in two. Somewhere to begin anew!
     .
-    ret add start ide sub space 1. 2 ---
+    Creation is a handmade start to an idea to be made. sub space 1. 2 ---
 .
 fun merge array start end.
     was difference sub end start..
