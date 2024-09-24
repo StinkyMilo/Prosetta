@@ -41,10 +41,12 @@ impl ParseState for FunctionState {
                 MatchResult::Continue
             }
         }else if !self.has_args{
-            if is_close(word){
+            if is_mandatory_close(word){
                 self.has_args=true;
                 env.funcs.add_layer();
                 MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_stat()))
+            }else if is_close(word){
+                MatchResult::Continue
             }else{
                 if let Expr::Function { name, arg_starts, arg_names, .. } = env.expr {
                     arg_starts.push(word.pos + env.global_index);
