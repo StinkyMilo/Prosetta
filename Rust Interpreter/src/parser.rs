@@ -23,6 +23,7 @@ mod find;
 mod foreach;
 mod function;
 mod if_stat;
+mod ignore;
 mod index;
 mod len;
 mod list;
@@ -75,6 +76,8 @@ pub struct ParsedData<'a> {
     pub vars: VarSet,
     //the set of current functions
     pub funcs: FuncSet,
+    /// the ignored values
+    pub nots: IgnoreSet,
     ///the parserSource that is used
     pub source: ParserSource<'a>,
 }
@@ -112,6 +115,7 @@ impl<'a> Parser<'a> {
                 stat_starts: Vec::new(),
                 vars: VarSet::new(),
                 funcs: FuncSet::new(),
+                nots: IgnoreSet::new(),
                 source,
             },
             stack: Vec::new(),
@@ -266,6 +270,7 @@ impl<'a> Parser<'a> {
             expr_index: frame.expr_index,
             vars: &mut self.data.vars,
             funcs: &mut self.data.funcs,
+            nots: &mut self.data.nots,
             locs: None,
             global_index: self.pos,
             aliases: &self.aliases,

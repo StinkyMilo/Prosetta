@@ -5,11 +5,9 @@ const BASE_EXPR_ALIASES: [&'static [u8]; 20] = [
     b"oth", b"par", b"inv", b"col", b"fin", b"ind", b"lis", b"cou"
 ];
 
-const NOT_ALIAS: &'static [u8] = b"not";
-
-const STAT_ALIASES: [&'static [u8]; 19] = [
+const STAT_ALIASES: [&'static [u8]; 20] = [
     b"arc", b"lin", b"was", b"rec", b"pri", b"whe", b"whi", b"els", b"sto", b"fil", b"mov", b"pen",
-    b"tur", b"fun", b"ret", b"app", b"del", b"rep", b"fre"
+    b"tur", b"fun", b"ret", b"app", b"del", b"rep", b"fre", b"not"
 ];
 
 ///match alias to expr
@@ -33,7 +31,6 @@ fn get_expr_state(alias: &'static [u8], index: usize) -> MatchResult {
 
             b"lit" => get_state!(multi_lit_num::MultiLitNumState::new()),
             b"int" => get_state!(word_num::WordNumState::new()),
-            b"not" => get_state!(not::NotState::new()),
             b"col" => get_state!(color::ColorState::new()),
             b"fin" => get_state!(find::FindState::new()),
             b"ind" => get_state!(index::IndexState::new()),
@@ -68,6 +65,7 @@ fn get_stat_state(alias: &'static [u8], index: usize) -> MatchResult {
             b"del" => get_state!(delete::DeleteState::new()),
             b"rep" => get_state!(replace::ReplaceState::new()),
             b"fre" => get_state!(foreach::ForEachState::new()),
+            b"not" => get_state!(not::NotState::new()),
             _ => unreachable!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
         },
     )
@@ -134,12 +132,8 @@ impl AliasData {
 }
 
 impl AliasData {
-    pub fn new(flags: ParserFlags) -> Self {
-        let mut expr_vec = Vec::from(BASE_EXPR_ALIASES);
-
-        if flags.not {
-            expr_vec.push(NOT_ALIAS);
-        }
+    pub fn new(_flags: ParserFlags) -> Self {
+        let expr_vec = Vec::from(BASE_EXPR_ALIASES);
 
         let stat_vec = Vec::from(STAT_ALIASES);
 

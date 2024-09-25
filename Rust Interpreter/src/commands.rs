@@ -216,6 +216,17 @@ pub enum Expr {
         locs: Vec<usize>,
         index: usize,
         end: End
+    },
+    Not {
+        locs: Vec<usize>,
+        word: Vec<u8>,
+        str_start: usize,
+        str_len: usize,
+        end: End
+    },
+    Ignore {
+        name_start: usize,
+        name: Vec<u8>,
     }
 }
 
