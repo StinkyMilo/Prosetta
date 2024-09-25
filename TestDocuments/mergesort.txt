@@ -1,0 +1,116 @@
+var list = [10, 30, 2, 15, 19, 24, 60, 80, 0];
+function getMiddle(startInd,endInd){
+	let len = endInd-startInd;
+	if(len%2 == 0){
+    	return startInd+len/2;
+    }
+    return startInd+(len-1)/2;
+}
+function mergeSort(list,startInd,endInd){
+	if(endInd - startInd <= 0){
+    	return [];
+    }
+    if(endInd - startInd == 1){
+    	return [list[startInd]];
+    }
+    let middle = getMiddle(startInd,endInd);
+    let newLeft = mergeSort(list,startInd,middle);
+    let newRight = mergeSort(list,middle,endInd);
+    let output = [];
+    let leftI = 0;
+    let rightI = 0;
+    while(leftI < newLeft.length || rightI < newRight.length){
+    	if(leftI >= newLeft.length || newLeft[leftI] > newRight[rightI]){
+        	output.push(newRight[rightI]);
+            rightI+=1;
+        }else{
+        	output.push(newLeft[leftI]);
+            leftI+=1;
+        }
+    }
+    return output;
+}
+console.log(list);
+
+Thoughts:
+    Floor equivalent?
+    Length added
+    Auto-formatter that can be edited, and propagates non-whitespace changes back to the original?
+
+was array lis 10 30 2 15 19 24 60 80 0..
+fun middle start end.
+    was len sub end start..
+    whe par mod len 2. 0.
+        ret add start ide len 2 ---
+    .
+    ret add start ide sub len 1. 2 ---
+.
+fun merge array start end.
+    was difference sub end start..
+    whe les difference 1.
+        ret lis..
+    .
+    whe par difference 1.
+        ret lis ind array start ---
+    .
+    was mid middle start end..
+    was left merge array start mid..
+    was right merge array mid end..
+    was output lis..
+    was yin 0.
+    was yang 0.
+    whi oth 
+            les yin cou left..
+            les yang cou right..
+        .
+        whe oth
+                mor add yin 1. cou left..
+                mor ind left yin. ind right yang..
+            .
+            app output ind right yang..
+            was yang add yang 1..
+        .
+        els
+            app output ind left yin..
+            was yin add yin 1..
+        .
+    .
+    ret output.
+.
+was value merge array 0 cou array...
+pri value.
+
+Poetic version:
+
+There was array and disarray, a list of 10, 30, 2, 15, 19, 24, 60, 80, 0 items!
+A multi-way fusion: middle, start, end.
+    The wasted space subtracts the end from the start, leaving little behind.
+    But when parts are modified in space, two pieces remain. Never zero.
+        What results is an additional start, once you divide space in two. Somewhere to begin anew ---
+    Creation is a handmade start to an idea yet unrealized. A sublime space made one, from two...
+This is the foundation: merge array; start, end.
+    What was different between sublime end and a new start?
+    When places are different from one another,
+        the result is blissful ---
+    When parts of a different whole form one piece, beauty is made.
+        Our great lives include disarray from the start!!
+    Walk towards Midpoint: the middle of start and end!
+    Walk towards Left: Merge from disarray a new start and midpoint!
+    Walk towards Right: Merge from array a midpoint and its new end!
+    Run towards output: achieve bliss!
+    There was yin and yang: zero and infinity.
+    Then there was yang and yin: infinity and zero.
+    Wishing together for a better world,
+            the places yin could leave, it left!
+            And the places yang could leave, it stayed right there ---
+        When you were together,
+                your memory threaded yin into a frenzy! It could have left then, but it stayed.
+                But then memories flooded your mind until none was left of yin, and your mind gave right to yang ---
+            You applied output to the kingdom of right and mighty yang!
+            But soon you wasted yang and adopted yang into a new family!!
+        Elsewhere now,
+            you apply output to the kingdom of what's left of yin!
+            It was yin for whom you adapted your ways. And you brought yin back into a beautiful world! Once more, there is balance!
+    Great output resulted!
+What was best? To merge disarray to destruction with no limit: or to conduct array from inside it? Perhaps you already know.
+The price is best paid twice.

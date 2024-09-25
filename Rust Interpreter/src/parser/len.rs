@@ -4,30 +4,21 @@ use basic_func::BasicState;
 
 #[derive(Debug)]
 
-pub struct ReturnState {
+pub struct LengthState {
     count: u8,
 }
 
-impl BasicState for ReturnState {
-    fn can_happen(&self, env: &mut Environment) -> bool {
-        for parent in &mut *env.parents {
-            if let Expr::Function { .. } = parent {
-                return true;
-            }
-        }
-        false
-    }
-
+impl BasicState for LengthState {
     fn get_name(&self) -> &'static str {
-        "Return"
+        "Length"
     }
 
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {
         let ret = self.count == 0;
         if ret {
-            *expr = Expr::Return {
+            *expr = Expr::Length {
                 locs,
-                index: None,
+                index: usize::MAX,
                 end: End::none(),
             }
         }
@@ -35,8 +26,8 @@ impl BasicState for ReturnState {
     }
 
     fn add_child(&mut self, expr: &mut Expr, idx: usize) {
-        if let Expr::Return { index, .. } = expr {
-            *index = Some(idx);
+        if let Expr::Length { index, .. } = expr {
+            *index = idx;
             self.count += 1;
         } else {
             unreachable!()
@@ -45,14 +36,14 @@ impl BasicState for ReturnState {
 
     fn can_close(&self) -> CloseType {
         match self.count {
-            0 => CloseType::Able,
+            0 => CloseType::Unable,
             1 => CloseType::Force,
             _ => unreachable!(),
         }
     }
 
     fn set_end(&mut self, expr: &mut Expr, index: End) {
-        if let Expr::Return { end, .. } = expr {
+        if let Expr::Length { end, .. } = expr {
             *end = index;
         } else {
             unreachable!()
@@ -60,7 +51,7 @@ impl BasicState for ReturnState {
     }
 }
 
-impl ReturnState {
+impl LengthState {
     pub fn new() -> Self {
         Self { count: 0 }
     }

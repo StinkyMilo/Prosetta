@@ -24,6 +24,7 @@ mod foreach;
 mod function;
 mod if_stat;
 mod index;
+mod len;
 mod list;
 mod litcolor;
 mod litcolor_data;

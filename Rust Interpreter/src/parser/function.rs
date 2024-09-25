@@ -41,10 +41,12 @@ impl ParseState for FunctionState {
                 MatchResult::Continue
             }
         }else if !self.has_args{
-            if is_close(word){
+            if is_mandatory_close(word){
                 self.has_args=true;
                 env.funcs.add_layer();
-                MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_stat()))
+                MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_stat_cont()))
+            }else if is_close(word){
+                MatchResult::Continue
             }else{
                 if let Expr::Function { name, arg_starts, arg_names, .. } = env.expr {
                     arg_starts.push(word.pos + env.global_index);
@@ -56,7 +58,7 @@ impl ParseState for FunctionState {
                 MatchResult::Continue
             }
         }else {
-            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
+            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat_cont()))
         }
     }
 
@@ -80,7 +82,7 @@ impl ParseState for FunctionState {
                 MatchResult::Matched(word.pos, true)
                 // succeeded - continue again with noncont stat
             } else if child_index.is_some() {
-                MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat()))
+                MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat_cont()))
                 // failed - pass word
             } else {
                 MatchResult::Continue

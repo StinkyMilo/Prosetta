@@ -172,7 +172,7 @@ pub enum Expr {
     },
     Return {
         locs: Vec<usize>,
-        indexes: [usize; 1],
+        index: Option<usize>,
         end: End
     },
     Append {
@@ -210,6 +210,11 @@ pub enum Expr {
         name: Vec<u8>,
         locs: Vec<usize>,
         indexes: Vec<usize>,
+        end: End
+    },
+    Length {
+        locs: Vec<usize>,
+        index: usize,
         end: End
     }
 }

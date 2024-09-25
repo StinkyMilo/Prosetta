@@ -316,8 +316,15 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                 write_exprs(exprs, indexes, ", ")
             )
         }
-        Expr::Return { indexes, .. } => {
-            format!("return {};", write_exprs(exprs, indexes, ", "))
+        Expr::Return { index, .. } => {
+            if let Some(ind) = index{
+                format!("return {};", write_expr(exprs, *ind))
+            }else{
+                format!("return;")
+            }
+        },
+        Expr::Length { index, .. } => {
+            format!("{}.length",write_expr(exprs,*index))
         }
     }
 }

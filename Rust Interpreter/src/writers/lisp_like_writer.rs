@@ -363,11 +363,25 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 write_exprs(exprs,indexes)
             )
         },
-        Expr::Return { locs, indexes, end } => {
+        Expr::Return { locs, index, end } => {
+            if let Some(ind) = index{ 
+                format!(
+                    "(return{} {})",
+                    join_locs(locs, Some(*end)),
+                    write_expr(exprs,*ind,0)
+                )
+            }else{
+                format!(
+                    "(return{})",
+                    join_locs(locs, Some(*end))
+                )
+            }
+        },
+        Expr::Length { locs, index, end } => {
             format!(
-                "(return{} {})",
+                "(length{} {})",
                 join_locs(locs, Some(*end)),
-                write_exprs(exprs,indexes)
+                write_expr(exprs,*index,0)
             )
         }
     }
