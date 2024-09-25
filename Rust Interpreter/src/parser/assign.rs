@@ -22,7 +22,9 @@ impl ParseState for AssignState {
         }
 
         // dont make closes varibles
-        if is_close(word) || (word.len() > 0 && (word.str[0] == b'"' || word.str[0] == b'\'')) {
+        if is_close(word)
+            || is_non_close_but_still_single(word.str.first().cloned().unwrap_or_default())
+        {
             MatchResult::Continue
         } else {
             //set name

@@ -327,6 +327,20 @@ mod tests_simple {
         );
     }
 
+    #[test]
+    #[timeout(1000)]
+    fn test_multilitnum_nan() {
+        let text: Vec<u8> =
+            b"was having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about a little and see the watery part of the world!".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(assign@0,1,2$165 \"having\"@4 \
+            (multilitnum@11,12,13$165 2 2 5 2 2 5 1 3 7 0 2 8 2 2 5 1 1 7 1 5 4 5 1 6 3 3 3 6 4 2 3 5))"
+        );
+    }
+
     // #[test]#[timeout(1000)]
     // fn test_liechtenstein() {
     //     let text = b"The wars in Liechtenstein ravaged the country..".to_vec();

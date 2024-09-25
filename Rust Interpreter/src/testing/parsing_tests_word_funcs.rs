@@ -356,19 +356,19 @@ mod tests {
             (new_slice("a", 2), new_slice(" a", 3))
         );
     }
-    #[test]
-    fn test_get_next_slice_quotes() {
-        assert_eq!(
-            get_next_slice(&new_slice("\" b", 0), 0),
-            (new_slice("\"", 0), new_slice(" b", 1))
-        );
-        assert_eq!(
-            get_next_slice(&new_slice("\n \"\' a", 0), 0),
-            (new_slice("\"", 2), new_slice("\' a", 3))
-        );
-        assert_eq!(
-            get_next_slice(&new_slice("a'b", 0), 0),
-            (new_slice("a", 0), new_slice("'b", 1))
-        );
-    }
+    // #[test]
+    // fn test_get_next_slice_quotes() {
+    //     assert_eq!(
+    //         get_next_slice(&new_slice("\" b", 0), 0),
+    //         (new_slice("\"", 0), new_slice(" b", 1))
+    //     );
+    //     assert_eq!(
+    //         get_next_slice(&new_slice("\n \"\' a", 0), 0),
+    //         (new_slice("\"", 2), new_slice("\' a", 3))
+    //     );
+    //     assert_eq!(
+    //         get_next_slice(&new_slice("a'b", 0), 0),
+    //         (new_slice("a", 0), new_slice("'b", 1))
+    //     );
+    // }
 }

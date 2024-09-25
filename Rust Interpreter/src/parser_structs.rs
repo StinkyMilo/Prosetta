@@ -333,7 +333,7 @@ impl<'a> Slice<'a> {
 }
 
 ///the chars that are counted as being part of words
-const OTHER_CHARS: &[u8] = b"-+^/";
+const OTHER_CHARS: &[u8] = b"-+^/'";
 ///can the char be part of a word
 fn is_valid_word_char(char: u8) -> bool {
     char.is_ascii_alphanumeric() || OTHER_CHARS.contains(&char)
@@ -347,9 +347,9 @@ fn is_valid_close_char(char: u8) -> bool {
 }
 
 ///the chars that are returned single but are not closes
-const NON_CLOSE_CHARS: &[u8] = b"\"\'";
+const NON_CLOSE_CHARS: &[u8] = b"\"";
 ///shoudl the char be made into a 1 len slice
-fn is_non_close_but_still_single(char: u8) -> bool {
+pub fn is_non_close_but_still_single(char: u8) -> bool {
     NON_CLOSE_CHARS.contains(&char)
 }
 
@@ -464,17 +464,6 @@ pub fn get_next_slice<'a>(slice: &Slice<'a>, mut start: usize) -> (Slice<'a>, Sl
     // find end of word
     let mut end = start;
 
-    //is slice a closing character aka "."
-    // if end < slice.len()
-    //     && (is_valid_close_char(slice.str[end]) || is_non_close_but_still_single(slice.str[start]))
-    // {
-    //     // is "..."
-    //     if end + 3 <= slice.len() && &slice.str[end..end + 3] == &b"..."[..] {
-    //         end += 3;
-    //     // not "..."
-    //     } else {
-    //         end += 1;
-    //     }
     let close_data = get_close_data(&slice.str[start..]);
     if close_data.close_length != 0 {
         end += close_data.close_length as usize;
