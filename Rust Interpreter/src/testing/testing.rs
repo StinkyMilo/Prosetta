@@ -21,7 +21,7 @@ pub mod test_lib {
     ) {
         let result = parser.step();
         let state = parser.get_last_state_name();
-        let word = std::str::from_utf8(parser.get_last_word()).unwrap();
+        let word = std::str::from_utf8(parser.get_last_word().0).unwrap();
         let message = &format!(
             "result was {:?}(\"{}\",\"{}\"). expected {:?}(\"{}\",\"{}\") at {}:{}",
             result, state, word, exp_result, exp_state, exp_word, file, line

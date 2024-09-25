@@ -28,7 +28,7 @@ impl<T: BasicState + Debug> ParseState for T {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         if !self.can_happen(env){
             MatchResult::Failed
-        }else{
+        } else {
             let is_first = self.do_first(env.expr, env.locs.take().unwrap_or_default());
             if is_first {
                 let can_close = self.can_close();

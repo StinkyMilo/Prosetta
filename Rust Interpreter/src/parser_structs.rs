@@ -34,7 +34,10 @@ impl VarSet {
     }
     ///returns (index in word, varible name)
     pub fn try_get_var(&self, word: &[u8]) -> Option<(usize, Vec<u8>)> {
-        let lower = word.to_ascii_lowercase();
+        let mut lower = word.to_ascii_lowercase();
+        // remove '
+        lower.retain(|&x| x != b'\'');
+
         let mut max_var_length = 0;
         let mut var = None;
         for str in self.set.iter() {
@@ -64,28 +67,29 @@ impl Debug for VarSet {
 }
 
 pub struct FuncSet {
-    set: ScopeMap<Vec<u8>, usize>
+    /// set with <name, arg_count>
+    set: ScopeMap<Vec<u8>, usize>,
 }
 
-impl Debug for FuncSet{
+impl Debug for FuncSet {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("FuncSet").finish()
     }
 }
 
-impl FuncSet{
-    pub fn new () -> Self {
+impl FuncSet {
+    pub fn new() -> Self {
         Self {
-            set: ScopeMap::new()
+            set: ScopeMap::new(),
         }
     }
     pub fn insert(&mut self, name: Vec<u8>, arg_count: usize) {
         self.set.define(name, arg_count);
     }
-    pub fn add_layer(&mut self){
+    pub fn add_layer(&mut self) {
         self.set.push_layer();
     }
-    pub fn remove_layer(&mut self){
+    pub fn remove_layer(&mut self) {
         self.set.pop_layer();
     }
     pub fn contains(&self, name: Vec<u8>) -> bool {
@@ -97,7 +101,7 @@ impl FuncSet{
     pub fn inc_arg_count(&mut self, name: Vec<u8>) {
         if let Some(val) = self.set.get(&name) {
             //Increment in above scope.
-            self.set.define(name.to_vec(), val+1);
+            self.set.define(name.to_vec(), val + 1);
         }
     }
 }
@@ -279,12 +283,12 @@ pub struct Environment<'a> {
     pub aliases: &'a AliasData,
 }
 
-impl<'a> Environment<'a> { 
-    pub fn add_var_layer(&mut self){
+impl<'a> Environment<'a> {
+    pub fn add_var_layer(&mut self) {
         self.vars.add_layer();
         self.funcs.add_layer();
     }
-    pub fn remove_var_layer(&mut self){
+    pub fn remove_var_layer(&mut self) {
         self.vars.remove_layer();
         self.funcs.remove_layer();
     }
@@ -387,60 +391,60 @@ pub fn get_next_word<'a>(slice: &Slice<'a>, mut start: usize) -> (Slice<'a>, Sli
         },
     )
 }
-pub struct CloseData{
+pub struct CloseData {
     pub close_count: u8,
     pub close_length: u8,
-    pub only_forced: bool
+    pub only_forced: bool,
 }
 /// gets the number of times the characters at line[index] should be repeated and the offset after
 /// returns (repeat_count,offset)
 pub fn get_close_data(line: &[u8]) -> CloseData {
     if line.len() >= 3 && line[..3] == b"..."[..] {
-        CloseData{
+        CloseData {
             close_count: 10,
             close_length: 3,
-            only_forced: false
+            only_forced: false,
         }
     } else if line.len() >= 3 && line[..3] == b"---"[..] {
-        CloseData{
+        CloseData {
             close_count: 3,
             close_length: 3,
-            only_forced: false
+            only_forced: false,
         }
     } else if line.len() >= 2 && line[..2] == b"--"[..] {
-        CloseData{
+        CloseData {
             close_count: 2,
             close_length: 2,
-            only_forced: false
+            only_forced: false,
         }
     } else if line.len() >= 1 {
         match line[0] {
             b'.' | b':' => CloseData {
                 close_count: 1,
                 close_length: 1,
-                only_forced: false
+                only_forced: false,
             },
             b',' | b';' => CloseData {
                 close_count: 1,
                 close_length: 1,
-                only_forced: true
+                only_forced: true,
             },
             b'?' | b'!' => CloseData {
                 close_count: 2,
                 close_length: 1,
-                only_forced: false
+                only_forced: false,
             },
             _ => CloseData {
                 close_count: 0,
                 close_length: 0,
-                only_forced: false
+                only_forced: false,
             },
         }
     } else {
         CloseData {
             close_count: 0,
             close_length: 0,
-            only_forced: false
+            only_forced: false,
         }
     }
 }
@@ -544,3 +548,7 @@ pub fn find_close_slice<'a>(slice: &'a Slice<'a>, mut start: usize) -> Option<(S
 pub fn find_close<'a>(slice: &'a Slice<'a>, start: usize) -> Option<Slice<'_>> {
     find_close_slice(slice, start).map(|s| s.1)
 }
+
+// pub fn is_var_word(slice: &Slice) -> bool {
+
+// }

@@ -272,16 +272,15 @@ mod tests_simple {
         );
     }
     //TODO: fix so doesn;t fail
-    // #[test]
-    // #[timeout(1000)]
+    #[test]
+    #[timeout(1000)]
     fn test_else_past() {
         let text = b"whels one whi one pri hi..".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
         test_lib::run_to_completion(&mut parser);
         assert_eq!(
             lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
-            "(assign@0,1,2$10 \"test\"@4 (litnum 4@9$$1))\n(print@12,13,14$33 (var \"test\"@20) (var \"test\"@29))\n\
-            (print@35,36,37$43 (var \"test\"@39))\n(print@45,46,47$53 \"four\"@49)"
+            "(while@10,11,12$25 (litnum 1@14$$3) then:\n  (print@18,19,20$24 \"hi\"@22)\n)"
         );
     }
 
