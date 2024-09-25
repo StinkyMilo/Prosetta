@@ -275,9 +275,9 @@ function updateCode() {
   jscode.innerText = parsedData.get_javascript();
   syntax.innerHTML = parsedData.get_html();
   let c = syntax.children;
-  for (let i = 0; i < c.length; i++) {
-    c[i].style.color = c[i].className.substring("term_b_".length, c[i].className.length);
-  }
+  // for (let i = 0; i < c.length; i++) {
+  //   c[i].style.color = c[i].className.substring("term_b_".length, c[i].className.length);
+  // }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
