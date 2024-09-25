@@ -76,21 +76,25 @@ impl<T: Renderer> SyntaxLinter<T> {
     fn write_up_to(&mut self, source: &mut ParserSourceIter, index: usize) {
         self.write_up_to_as(source, index, BASE_COLOR);
     }
+    fn get_n_or_error(source: &mut ParserSourceIter, num: usize) -> Vec<u8> {
+        get_n(source, num).expect("writing should not find end of buffer")
+    }
     fn write_up_to_as(
         &mut self,
         source: &mut ParserSourceIter,
         index: usize,
         color: (TermColor, bool),
     ) {
-        let num = index
-            .checked_sub(self.index)
-            .expect("index is before the writing index");
-        let buf = get_n(source, num).expect("found end of buffer");
+        let num = index.checked_sub(self.index).expect(&format!(
+            "index {} should be after the writing index {}",
+            index, self.index
+        ));
+        let buf = Self::get_n_or_error(source, num);
         self.renderer.add_with(&buf, color);
         self.index = index;
     }
     fn write_as(&mut self, source: &mut ParserSourceIter, num: usize, color: (TermColor, bool)) {
-        let buf = get_n(source, num).expect("found end of buffer");
+        let buf = Self::get_n_or_error(source, num);
         self.renderer.add_with(&buf, color);
         self.index += num;
     }
@@ -102,7 +106,7 @@ impl<T: Renderer> SyntaxLinter<T> {
             // let num = index
             //     .checked_sub(self.index)
             //     .expect("index is before the end index");
-            let buf = get_n(source, end.0 as usize).expect("found end of buffer");
+            let buf = Self::get_n_or_error(source, end.0 as usize);
             self.renderer.add_with_mult(&buf, end.1);
             self.index += end.0 as usize;
         }
@@ -155,7 +159,10 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_up_to(source, end.index);
             //close is before index
             } else if end.index < self.index {
-                unreachable!("close index has already been passed");
+                unreachable!(
+                    "close index {} should be after writing index {}",
+                    end.index, self.index
+                );
             }
             // setup close
             if let Some((_, vec)) = &mut self.ends {
@@ -273,7 +280,7 @@ impl<T: Renderer> SyntaxLinter<T> {
                 end,
             } => {
                 self.write_locs(source, locs, stack_index);
-                self.write_up_to(source, *start - 1);
+                self.write_up_to(source, *start);
                 self.write_up_to_as(source, end.index, STRING_COLOR);
                 self.add_end(source, *end, stack_index);
                 self.write_end(source);
@@ -357,22 +364,26 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_expr(source, exprs, *index, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Function { locs, indexes, end, .. } => {
+            Expr::Function {
+                locs, indexes, end, ..
+            } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Append {indexes, locs, end} => {
+            Expr::Append { indexes, locs, end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::FunctionCall { locs, indexes, end, .. } => {
+            Expr::FunctionCall {
+                locs, indexes, end, ..
+            } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Delete {indexes, locs, end} => {
+            Expr::Delete { indexes, locs, end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
@@ -380,21 +391,21 @@ impl<T: Renderer> SyntaxLinter<T> {
             Expr::Return { locs, index, end } => {
                 self.write_locs(source, locs, stack_index);
                 if let Some(ind) = index {
-                    self.write_expr(source, exprs, *ind, stack_index + 1);   
+                    self.write_expr(source, exprs, *ind, stack_index + 1);
                 }
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Replace {indexes, locs, end} => {
+            Expr::Replace { indexes, locs, end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Find {indexes, locs, end} => {
+            Expr::Find { indexes, locs, end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Index {indexes, locs, end} => {
+            Expr::Index { indexes, locs, end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
@@ -405,10 +416,7 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.add_end(source, *end, stack_index);
             }
             Expr::ForEach {
-                locs,
-                indexes,
-                end,
-                ..
+                locs, indexes, end, ..
             } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);

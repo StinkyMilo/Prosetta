@@ -341,6 +341,23 @@ mod tests_simple {
         );
     }
 
+    #[test]
+    #[timeout(1000)]
+    fn test_not_no_str() {
+        let text: Vec<u8> =
+            b"was h1 not. one. was h2 not hi. two. was h3 nother hi. three. was h4 nother. four."
+                .to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(assign@0,1,2$15 \"h1\"@4 (skip@7,8,9 @10$$10 (litnum 1@12$$3)))\n\
+            (assign@17,18,19$35 \"h2\"@21 (skip@24,25,26 @28$$30 (litnum 2@32$$3)))\n\
+            (assign@37,38,39$60 \"h3\"@41 (skip@44,45,46 @51$$53 (litnum 3@55$$5)))\n\
+            (assign@62,63,64$81 \"h4\"@66 (skip@69,70,71 @75$$75 (litnum 4@77$$4)))"
+        );
+    }
+
     // #[test]#[timeout(1000)]
     // fn test_liechtenstein() {
     //     let text = b"The wars in Liechtenstein ravaged the country..".to_vec();

@@ -175,7 +175,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         } => {
             format!("print_console({});", write_prints(exprs, data))
         }
-        Expr::Skip { .. } => "".to_string(),
+        Expr::Skip { index, .. } => write_expr(exprs, *index),
         Expr::If { indexes, .. } => {
             format!(
                 "if ({}) {{\n{}\n}}",
@@ -317,14 +317,14 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             )
         }
         Expr::Return { index, .. } => {
-            if let Some(ind) = index{
+            if let Some(ind) = index {
                 format!("return {};", write_expr(exprs, *ind))
-            }else{
+            } else {
                 format!("return;")
             }
-        },
+        }
         Expr::Length { index, .. } => {
-            format!("{}.length",write_expr(exprs,*index))
+            format!("{}.length", write_expr(exprs, *index))
         }
     }
 }
