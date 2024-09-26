@@ -94,7 +94,7 @@ impl<T: Renderer> SyntaxLinter<T> {
         self.index = index;
     }
     fn write_as(&mut self, source: &mut ParserSourceIter, num: usize, color: (TermColor, bool)) {
-        let buf = Self::get_n_or_error(source, num);
+        let buf: Vec<u8> = Self::get_n_or_error(source, num);
         self.renderer.add_with(&buf, color);
         self.index += num;
     }
@@ -132,6 +132,16 @@ impl<T: Renderer> SyntaxLinter<T> {
                 }
             }
         }
+    }
+
+    fn write_var(&mut self, source: &mut ParserSourceIter, var: &Var) {
+        self.write_up_to(source, var.start);
+        for &index in &var.skip_indexes {
+            self.write_up_to_as(source, var.start + index as usize, VAR_COLOR);
+            self.write_as(source, 1, BASE_COLOR);
+        }
+        let len = var.name.len() + var.skip_indexes.len();
+        self.write_up_to_as(source, var.start + len, VAR_COLOR);
     }
 
     fn write_locs(&mut self, source: &mut ParserSourceIter, locs: &Vec<usize>, stack_index: usize) {
@@ -200,15 +210,13 @@ impl<T: Renderer> SyntaxLinter<T> {
         match &exprs[index] {
             Expr::Assign {
                 locs,
-                name_start,
-                name,
+                var,
                 value_index,
                 end,
                 ..
             } => {
                 self.write_locs(source, locs, stack_index);
-                self.write_up_to(source, *name_start);
-                self.write_as(source, name.len(), VAR_COLOR);
+                self.write_var(source, var);
                 self.write_expr(source, exprs, *value_index, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }

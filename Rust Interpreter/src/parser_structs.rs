@@ -1,9 +1,10 @@
 use std::{
     fmt::{self, Debug},
+    iter::Skip,
     usize,
 };
 
-use super::{alias_data::AliasData, Expr};
+use super::{alias_data::AliasData, Expr, Var};
 
 #[path = "testing/parsing_tests_word_funcs.rs"]
 mod parsing_tests_word_funcs;
@@ -538,6 +539,32 @@ pub fn find_close<'a>(slice: &'a Slice<'a>, start: usize) -> Option<Slice<'_>> {
     find_close_slice(slice, start).map(|s| s.1)
 }
 
-// pub fn is_var_word(slice: &Slice) -> bool {
-
-// }
+pub fn try_get_var_word(word: &Slice) -> Option<Var> {
+    if word.len() >= 1
+        && word.len() <= 255
+        && !is_close(word)
+        && !is_non_close_but_still_single(word.str[0])
+    {
+        let mut name = Vec::new();
+        let mut skip_indexes = Vec::new();
+        for j in 0..word.len() {
+            if word.str[j] == b'\'' {
+                skip_indexes.push(j as u8);
+            } else {
+                name.push(word.str[j].to_ascii_lowercase());
+            }
+        }
+        // vars cant be empty
+        if name.is_empty() {
+            None
+        } else {
+            Some(Var {
+                start: word.pos,
+                name,
+                skip_indexes,
+            })
+        }
+    } else {
+        None
+    }
+}

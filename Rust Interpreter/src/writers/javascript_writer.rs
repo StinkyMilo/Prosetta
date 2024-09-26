@@ -24,14 +24,14 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         Expr::NoneStat => "(todo stat)".to_string(),
         Expr::NoneExpr => "(todo expr)".to_string(),
         Expr::Assign {
-            name,
+            var,
             value_index,
             first,
             ..
         } => format!(
             "{}{}mario = {};",
             if *first { "let " } else { "" },
-            String::from_utf8_lossy(&name),
+            String::from_utf8_lossy(&var.name),
             write_expr(exprs, *value_index)
         ),
         Expr::Line {
