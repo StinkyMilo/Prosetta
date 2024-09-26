@@ -9,6 +9,8 @@
 .tabContent {
   box-sizing: border-box;
   width: 533px;
+  height: 400px;
+  overflow: scroll;
   margin-right: 10px;
   resize: none;
   border-color: slategray;

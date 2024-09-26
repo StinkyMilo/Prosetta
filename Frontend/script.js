@@ -4,7 +4,7 @@ var jscode, sourcecode, syntax, ctx, cnsl, canvas;
 var x = 0, y = 0, rotation = 0;
 var has_run = false;
 var has_drawn_shape = false;
-var last_was_line = false;
+var last_shape = "none";
 var parser, parsedData;
 var old_code;
 
@@ -18,7 +18,7 @@ function init_canvas() {
 
   canvas.width = canvas.width;
   has_drawn_shape = false;
-  last_was_line = false;
+  last_shape = "none";
   reset_rotation();
   _move_to(0, 0);
   ctx.moveTo(x, y);
@@ -39,12 +39,12 @@ function print_console() {
 }
 
 function end_shape() {
-  if (!has_drawn_shape) {
+  if (last_shape == "none" || last_shape == "move") {
     return;
   }
   ctx.fill();
   ctx.stroke();
-  last_was_line = false;
+  last_shape = "none";
 }
 
 function start_shape() {
@@ -71,7 +71,7 @@ function bezier_point(t, points) {
 }
 
 function draw_bezier(...xy) {
-  if (!last_was_line) {
+  if (last_shape != "line") {
     start_shape();
     ctx.moveTo(x, y);
   }
@@ -86,14 +86,13 @@ function draw_bezier(...xy) {
   }
   let point = bezier_point(1, points)
   ctx.lineTo(point.x, point.y);
-  last_was_line = true;
-  has_drawn_shape = true;
+  last_shape = "line";
 }
 
 function draw_line() {
   switch (arguments.length) {
     case 1:
-      if (!last_was_line) {
+      if (last_shape != "line") {
         start_shape();
         ctx.moveTo(x, y);
       }
@@ -102,7 +101,7 @@ function draw_line() {
       ctx.lineTo(x, y);
       break;
     case 2:
-      if (!last_was_line) {
+      if (last_shape != "line") {
         start_shape();
         ctx.moveTo(x, y);
       }
@@ -125,12 +124,12 @@ function draw_line() {
       break;
 
   }
-  last_was_line = true;
-  has_drawn_shape = true;
+  last_shape = "line";
 }
 
 function move_to(x1, y1) {
   end_shape();
+  last_shape = "move";
   _move_to(x1, y1);
 }
 
@@ -204,8 +203,7 @@ function draw_rect() {
   ctx.lineTo(x3, y3);
   ctx.lineTo(x4, y4);
   ctx.closePath();
-  last_was_line = false;
-  has_drawn_shape = true;
+  last_shape = "rect";
 }
 
 function draw_ellipse() {
@@ -233,8 +231,7 @@ function draw_ellipse() {
   start_shape();
   ctx.ellipse(x, y, width / 2, height / 2, -rotation_radians(), 0, 2 * Math.PI);
   ctx.closePath();
-  last_was_line = false;
-  has_drawn_shape = true;
+  last_shape = "ellipse";
 }
 
 function set_stroke(...color) {
