@@ -20,7 +20,7 @@ function init_canvas() {
   has_drawn_shape = false;
   last_was_line = false;
   reset_rotation();
-  move_to(0, 0);
+  _move_to(0, 0);
   ctx.moveTo(x, y);
   set_stroke("black");
   set_fill("transparent");
@@ -44,11 +44,50 @@ function end_shape() {
   }
   ctx.fill();
   ctx.stroke();
+  last_was_line = false;
 }
 
 function start_shape() {
   end_shape();
   ctx.beginPath();
+}
+
+function lerp(a, b, t) {
+  return (1 - t) * a + t * b;
+}
+
+function bezier_point(t, points) {
+  if (points.length == 1) {
+    return points[0];
+  }
+
+  let new_points = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    let x = lerp(points[i].x, points[i + 1].x, t);
+    let y = lerp(points[i].y, points[i + 1].y, t);
+    new_points.push({ x: x, y: y });
+  }
+  return bezier_point(t, new_points);
+}
+
+function draw_bezier(...xy) {
+  if (!last_was_line) {
+    start_shape();
+    ctx.moveTo(x, y);
+  }
+  let points = [{ x: x, y: y }];
+  for (let i = 0; i < xy.length; i += 2) {
+    move_delta(xy[i], xy[i + 1]);
+    points.push({ x: x, y: y });
+  }
+  for (let t = 0; t < 1; t += 0.05) {
+    let point = bezier_point(t, points)
+    ctx.lineTo(point.x, point.y);
+  }
+  let point = bezier_point(1, points)
+  ctx.lineTo(point.x, point.y);
+  last_was_line = true;
+  has_drawn_shape = true;
 }
 
 function draw_line() {
@@ -72,16 +111,16 @@ function draw_line() {
       break;
     case 3:
       start_shape();
-      move_to(arguments[0], arguments[1]);
+      _move_to(arguments[0], arguments[1]);
       ctx.moveTo(x, y);
       move_distance(arguments[2]);
       ctx.lineTo(x, y);
       break;
     case 4:
       start_shape();
-      move_to(arguments[0], arguments[1]);
+      _move_to(arguments[0], arguments[1]);
       ctx.moveTo(x, y);
-      move_to(arguments[2], arguments[3]);
+      _move_to(arguments[2], arguments[3]);
       ctx.lineTo(x, y);
       break;
 
@@ -91,6 +130,11 @@ function draw_line() {
 }
 
 function move_to(x1, y1) {
+  end_shape();
+  _move_to(x1, y1);
+}
+
+function _move_to(x1, y1) {
   x = x1 + 200;
   y = 200 - y1;
 }
@@ -138,12 +182,12 @@ function draw_rect() {
       height = arguments[1];
       break;
     case 3:
-      move_to(arguments[0], arguments[1]);
+      _move_to(arguments[0], arguments[1]);
       width = arguments[2];
       height = arguments[2];
       break;
     case 4:
-      move_to(arguments[0], arguments[1]);
+      _move_to(arguments[0], arguments[1]);
       width = arguments[2];
       height = arguments[3];
       break;
@@ -176,12 +220,12 @@ function draw_ellipse() {
       height = arguments[1];
       break;
     case 3:
-      move_to(arguments[0], arguments[1]);
+      _move_to(arguments[0], arguments[1]);
       width = arguments[2];
       height = arguments[2];
       break;
     case 4:
-      move_to(arguments[0], arguments[1]);
+      _move_to(arguments[0], arguments[1]);
       width = arguments[2];
       height = arguments[3];
       break;
@@ -272,7 +316,7 @@ function updateCode() {
   }
   old_code = sourcecode.value;
   parsedData = parser.run_to_completion(sourcecode.value);
-  jscode.innerText = parsedData.get_javascript();
+  jscode.innerHTML = parsedData.get_javascript();
   syntax.innerHTML = parsedData.get_html();
   let c = syntax.children;
   // for (let i = 0; i < c.length; i++) {
