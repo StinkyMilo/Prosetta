@@ -313,7 +313,7 @@ let proxy = URL.createObjectURL(new Blob([`
 `], { type: 'text/javascript' }));
 
 require(["vs/editor/editor.main"], function () {
-	let editor = monaco.editor.create(document.getElementById('container'), {
+	let editor = monaco.editor.create(document.getElementById('code'), {
 		value: [
 			'function x() {',
 			'\tconsole.log("Hello world!");',
@@ -322,4 +322,5 @@ require(["vs/editor/editor.main"], function () {
 		language: 'javascript',
 		theme: 'vs-dark'
 	});
+  init_canvas();
 });
