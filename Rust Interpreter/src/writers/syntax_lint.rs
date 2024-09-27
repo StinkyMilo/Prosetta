@@ -235,10 +235,7 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Var { name_start, name } => {
-                self.write_up_to(source, *name_start);
-                self.write_as(source, name.len(), VAR_COLOR);
-            }
+            Expr::Var { var } => self.write_var(source, var),
             Expr::WordNum {
                 locs,
                 str_start,

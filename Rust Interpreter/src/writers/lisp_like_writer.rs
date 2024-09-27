@@ -89,11 +89,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 write_exprs(exprs, indexes),
             )
         }
-        Expr::Var { name_start, name } => format!(
-            "(var \"{}\"@{})",
-            String::from_utf8_lossy(&name).to_string(),
-            name_start
-        ),
+        Expr::Var { var } => format!("(var {})", write_var(var)),
         Expr::WordNum {
             locs,
             str_start,
@@ -436,14 +432,21 @@ fn write_mult_exprs(exprs: &ExprArena, indexes: &[usize], char: u8, indent: usiz
 }
 
 fn write_var(var: &Var) -> String {
-    format!(
-        "\"{}\"@{}|{}",
-        String::from_utf8_lossy(&var.name),
-        var.start,
-        var.skip_indexes
+    let mut skips_str = String::new();
+    if !var.skip_indexes.is_empty() {
+        skips_str += "|";
+        skips_str += &var
+            .skip_indexes
             .iter()
             .map(|f| f.to_string())
             .collect::<Vec<String>>()
-            .join(","),
+            .join(",");
+    }
+
+    format!(
+        "\"{}\"@{}{}",
+        String::from_utf8_lossy(&var.name),
+        var.start,
+        skips_str
     )
 }

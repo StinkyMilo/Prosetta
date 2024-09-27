@@ -55,10 +55,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         } => {
             format!("draw_rect({});", write_exprs(exprs, indexes, ", "))
         }
-        Expr::Var {
-            name_start: _,
-            name,
-        } => format!("{}mario", String::from_utf8_lossy(&name).to_string()),
+        Expr::Var { var } => format!("{}mario", String::from_utf8_lossy(&var.name).to_string()),
         Expr::WordNum {
             locs: _,
             str_start: _,

@@ -58,7 +58,7 @@ mod parsing_tests_simple;
 // #[path = "testing/parsing_tests_other.rs"]
 // mod parsing_tests_other;
 
-use std::{collections::HashMap, fmt::Debug, hint::black_box, mem};
+use std::{collections::HashMap, fmt::Debug, mem};
 
 use crate::{commands::*, writers::lisp_like_writer};
 
@@ -206,10 +206,10 @@ impl<'a> Parser<'a> {
             }))
         );
         let _last = format!("{:?}", self.last_result);
-        black_box(&_debug);
-        black_box(&_debug2);
-        black_box(&_expr);
-        black_box(&_expr2);
+        // black_box(&_debug);
+        // black_box(&_debug2);
+        // black_box(&_expr);
+        // black_box(&_expr2);
 
         self.last_state = None;
         // get curr frame

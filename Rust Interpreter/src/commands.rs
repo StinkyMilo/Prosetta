@@ -86,8 +86,7 @@ pub enum Expr {
     },
     //expr
     Var {
-        name_start: usize,
-        name: Vec<u8>,
+        var: Var,
     },
     WordNum {
         locs: Vec<usize>,
