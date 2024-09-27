@@ -187,25 +187,25 @@ impl<'a> Parser<'a> {
             }
         }
         //debug time
-        let _debug = format!(
-            "{:?}",
-            Vec::from_iter(self.stack.iter().map(|x| (x.expr_index, x.last_parse)))
-        );
-        let _debug2 = format!(
-            "{:?}",
-            Vec::from_iter(self.stack.iter().map(|x| x.state.get_name()))
-        );
-        let _expr = format!("{:?}", self.data.exprs.vec);
-        let _expr2 = lisp_like_writer::write(&self.data.exprs, &self.data.stat_starts);
-        let _expr_short = format!(
-            "{:?}",
-            Vec::from_iter(self.data.exprs.vec.iter().map(|e| {
-                let mut str = format!("{:?}", e);
-                str.truncate(str.find(" ").unwrap_or(str.len()));
-                str
-            }))
-        );
-        let _last = format!("{:?}", self.last_result);
+        // let _debug = format!(
+        //     "{:?}",
+        //     Vec::from_iter(self.stack.iter().map(|x| (x.expr_index, x.last_parse)))
+        // );
+        // let _debug2 = format!(
+        //     "{:?}",
+        //     Vec::from_iter(self.stack.iter().map(|x| x.state.get_name()))
+        // );
+        // let _expr = format!("{:?}", self.data.exprs.vec);
+        // let _expr2 = lisp_like_writer::write(&self.data.exprs, &self.data.stat_starts);
+        // let _expr_short = format!(
+        //     "{:?}",
+        //     Vec::from_iter(self.data.exprs.vec.iter().map(|e| {
+        //         let mut str = format!("{:?}", e);
+        //         str.truncate(str.find(" ").unwrap_or(str.len()));
+        //         str
+        //     }))
+        // );
+        // let _last = format!("{:?}", self.last_result);
         // black_box(&_debug);
         // black_box(&_debug2);
         // black_box(&_expr);
@@ -231,10 +231,10 @@ impl<'a> Parser<'a> {
         // spilt at mut for borrow safety
         // get (parents, this[0] and children[1..])
         let parents_this = self.data.exprs.vec.split_at_mut(frame.expr_index);
-        let _splits1 = format!("{:?}", parents_this);
+        //let _splits1 = format!("{:?}", parents_this);
         // get (this, children)
         let this_children = parents_this.1.split_at_mut_checked(1);
-        let _splits = format!("{:?} {:?}", _splits1, this_children);
+        //let _splits = format!("{:?} {:?}", _splits1, this_children);
 
         // default_expr is used on failing back to a none state,
         // the corrisponding expr no longer exists
@@ -247,7 +247,7 @@ impl<'a> Parser<'a> {
             children = split.1;
         }
 
-        let _self_expr = format!("{:?}", expr);
+        // let _self_expr = format!("{:?}", expr);
         //black_box(&_debug);
         //let mut last_stat = None;
 
