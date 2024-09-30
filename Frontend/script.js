@@ -7,6 +7,7 @@ var has_drawn_shape = false;
 var last_was_line = false;
 var parser, parsedData;
 var old_code;
+var editor;
 
 function init_canvas() {
   sourcecode = document.getElementById("code");
@@ -267,11 +268,15 @@ function openTab(event, tab) {
 }
 
 function updateCode() {
-  if (sourcecode.value == old_code) {
+  if(editor == null){
     return;
   }
-  old_code = sourcecode.value;
-  parsedData = parser.run_to_completion(sourcecode.value);
+  let new_code = editor.getValue();
+  if (new_code == old_code) {
+    return;
+  }
+  old_code = new_code;
+  parsedData = parser.run_to_completion(new_code);
   jscode.innerText = parsedData.get_javascript();
   syntax.innerHTML = parsedData.get_html();
   let c = syntax.children;
@@ -301,3 +306,27 @@ async function initialize() {
 window.runCode = runCode;
 window.updateCode = updateCode;
 window.openTab = openTab;
+
+require.config({ paths: { 'vs': '../node_modules/monaco-editor/min/vs' }});
+// window.MonacoEnvironment = { getWorkerUrl: () => proxy };
+
+// let proxy = URL.createObjectURL(new Blob([`
+// 	self.MonacoEnvironment = {
+// 		baseUrl: 'https://unpkg.com/monaco-editor@latest/min/'
+// 	};
+// 	importScripts('https://unpkg.com/monaco-editor@latest/min/vs/base/worker/workerMain.js');
+// `], { type: 'text/javascript' }));
+
+//Create main editor environment
+require(["vs/editor/editor.main"], function () {
+	editor = monaco.editor.create(document.getElementById('code'), {
+		value: [
+			'pri hi!!!'
+		].join('\n'),
+		language: 'plaintext',
+		theme: 'vs-dark'
+	});
+  init_canvas();
+  console.log("Editor initialized!",editor);
+  updateCode();
+});
