@@ -35,6 +35,15 @@ pub struct Var {
     pub start: usize,
     pub skip_indexes: Vec<u8>,
 }
+impl Var {
+    pub fn new() -> Self {
+        Self {
+            start: usize::MAX,
+            name: Vec::new(),
+            skip_indexes: Vec::new(),
+        }
+    }
+}
 
 #[derive(PartialEq, Debug)]
 pub enum Expr {
@@ -215,8 +224,7 @@ pub enum Expr {
         end: End,
     },
     ForEach {
-        name_start: usize,
-        name: Vec<u8>,
+        var: Var,
         locs: Vec<usize>,
         indexes: Vec<usize>,
         end: End,
@@ -224,19 +232,19 @@ pub enum Expr {
     Length {
         locs: Vec<usize>,
         index: usize,
-        end: End
+        end: End,
     },
     Not {
         locs: Vec<usize>,
         word: Vec<u8>,
         str_start: usize,
         str_len: usize,
-        end: End
+        end: End,
     },
     Ignore {
         name_start: usize,
         name: Vec<u8>,
-    }
+    },
 }
 
 impl Expr {

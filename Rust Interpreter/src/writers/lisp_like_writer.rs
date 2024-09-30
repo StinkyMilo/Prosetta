@@ -329,14 +329,14 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
             locs,
             indexes,
             end,
-            name,
+            var,
             ..
         } => {
             let split = indexes.split_at_checked(1).unwrap_or_default();
             format!(
                 "(foreach{} {} {} then:\n{}\n)",
                 join_locs(locs, Some(*end)),
-                String::from_utf8_lossy(&name),
+                String::from_utf8_lossy(&var.name),
                 write_expr(exprs, *split.0.first().unwrap_or(&usize::MAX), 0),
                 write_stats(exprs, split.1, indent + 1),
             )
@@ -398,8 +398,14 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 join_locs(locs, Some(*end)),
                 write_expr(exprs, *index, 0)
             )
-        },
-        Expr::Not { locs, word, str_start, str_len, end } => {
+        }
+        Expr::Not {
+            locs,
+            word,
+            str_start,
+            str_len,
+            end,
+        } => {
             format!(
                 "(not{} @{}$${} {})",
                 join_locs(locs, Some(*end)),
@@ -407,7 +413,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 *str_len,
                 String::from_utf8_lossy(word)
             )
-        },
+        }
         Expr::Ignore { name_start, name } => format!(
             "(ignore \"{}\"@{})",
             String::from_utf8_lossy(&name).to_string(),

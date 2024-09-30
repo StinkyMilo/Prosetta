@@ -62,9 +62,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         } => {
             format!("draw_rect({});", write_exprs(exprs, indexes, ", "))
         }
-        Expr::Var {
-            var
-        } => format!("{}_var", String::from_utf8_lossy(&var.name).to_string()),
+        Expr::Var { var } => format!("{}_var", String::from_utf8_lossy(&var.name).to_string()),
         Expr::WordNum {
             locs: _,
             str_start: _,
@@ -283,10 +281,10 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         Expr::List { indexes, .. } => {
             format!("[{}]", write_exprs(exprs, indexes, ", "))
         }
-        Expr::ForEach { indexes, name, .. } => {
+        Expr::ForEach { indexes, var, .. } => {
             format!(
                 "for({}_var of {}) {{\n{}\n}}",
-                String::from_utf8_lossy(&name),
+                String::from_utf8_lossy(&var.name),
                 write_expr(exprs, indexes[0]),
                 write_exprs(exprs, &indexes[1..], "\n")
             )
@@ -330,11 +328,11 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             }
         }
         Expr::Length { index, .. } => {
-            format!("{}.length",write_expr(exprs,*index))
-        },
-        Expr::Not { .. } | Expr::Ignore {..} =>{
+            format!("{}.length", write_expr(exprs, *index))
+        }
+        Expr::Not { .. } | Expr::Ignore { .. } => {
             format!("")
-        },
+        }
     }
 }
 

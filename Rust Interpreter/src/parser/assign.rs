@@ -11,11 +11,7 @@ impl ParseState for AssignState {
         // set expr
         if self.first {
             *env.expr = Expr::Assign {
-                var: Var {
-                    start: usize::MAX,
-                    name: Vec::new(),
-                    skip_indexes: Vec::new(),
-                },
+                var: Var::new(),
                 value_index: usize::MAX,
                 locs: env.locs.take().unwrap_or_default(),
                 end: End::none(),
