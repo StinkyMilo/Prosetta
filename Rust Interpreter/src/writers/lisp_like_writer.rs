@@ -57,17 +57,15 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
         Expr::NoneExpr => "(todo expr)".to_string(),
         Expr::Assign {
             locs,
-            name_start,
-            name,
+            var,
             value_index,
             end,
             first,
         } => format!(
-            "(assign{} {}\"{}\"@{} {})",
+            "(assign{} {}{} {})",
             join_locs(locs, Some(*end)),
             if *first { "" } else { "mut " },
-            String::from_utf8_lossy(&name),
-            name_start,
+            write_var(var),
             write_expr(exprs, *value_index, 0)
         ),
         Expr::Bezier { locs, indexes, end } => {
@@ -98,11 +96,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 write_exprs(exprs, indexes),
             )
         }
-        Expr::Var { name_start, name } => format!(
-            "(var \"{}\"@{})",
-            String::from_utf8_lossy(&name).to_string(),
-            name_start
-        ),
+        Expr::Var { var } => format!("(var {})", write_var(var)),
         Expr::WordNum {
             locs,
             str_start,
@@ -456,4 +450,24 @@ fn write_mult_exprs(exprs: &ExprArena, indexes: &[usize], char: u8, indent: usiz
     }
     ret.pop();
     ret
+}
+
+fn write_var(var: &Var) -> String {
+    let mut skips_str = String::new();
+    if !var.skip_indexes.is_empty() {
+        skips_str += "|";
+        skips_str += &var
+            .skip_indexes
+            .iter()
+            .map(|f| f.to_string())
+            .collect::<Vec<String>>()
+            .join(",");
+    }
+
+    format!(
+        "\"{}\"@{}{}",
+        String::from_utf8_lossy(&var.name),
+        var.start,
+        skips_str
+    )
 }

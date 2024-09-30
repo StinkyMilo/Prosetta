@@ -29,6 +29,12 @@ pub enum Prints {
     /// value, string_index
     Word(Vec<u8>, usize),
 }
+#[derive(PartialEq, Debug)]
+pub struct Var {
+    pub name: Vec<u8>,
+    pub start: usize,
+    pub skip_indexes: Vec<u8>,
+}
 
 #[derive(PartialEq, Debug)]
 pub enum Expr {
@@ -57,8 +63,7 @@ pub enum Expr {
     },
     Assign {
         locs: Vec<usize>,
-        name_start: usize,
-        name: Vec<u8>,
+        var: Var,
         first: bool,
         value_index: usize,
         end: End,
@@ -86,8 +91,7 @@ pub enum Expr {
     },
     //expr
     Var {
-        name_start: usize,
-        name: Vec<u8>,
+        var: Var,
     },
     WordNum {
         locs: Vec<usize>,

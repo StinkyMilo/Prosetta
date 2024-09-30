@@ -11,8 +11,11 @@ impl ParseState for AssignState {
         // set expr
         if self.first {
             *env.expr = Expr::Assign {
-                name_start: usize::MAX,
-                name: Vec::new(),
+                var: Var {
+                    start: usize::MAX,
+                    name: Vec::new(),
+                    skip_indexes: Vec::new(),
+                },
                 value_index: usize::MAX,
                 locs: env.locs.take().unwrap_or_default(),
                 end: End::none(),
@@ -22,26 +25,19 @@ impl ParseState for AssignState {
         }
 
         // dont make closes varibles
-        if is_close(word) || (word.len() > 0 && (word.str[0] == b'"' || word.str[0] == b'\'')) {
-            MatchResult::Continue
-        } else {
+        let var_word = try_get_var_word(word, env.global_index);
+        if let Some(new_var) = var_word {
             //set name
-            if let Expr::Assign {
-                name_start,
-                name,
-                first,
-                ..
-            } = env.expr
-            {
-                let var = word.str.to_ascii_lowercase();
-                *name_start = word.pos + env.global_index;
-                *first = !env.vars.contains(&var);
-                *name = var;
+            if let Expr::Assign { var, first, .. } = env.expr {
+                *first = !env.vars.contains(&new_var.name);
+                *var = new_var;
             } else {
                 unreachable!()
             }
             // setup child state
             MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
+        } else {
+            MatchResult::Continue
         }
     }
 
@@ -60,7 +56,7 @@ impl ParseState for AssignState {
                 None => MatchResult::Failed,
                 Some(slice) => {
                     if let Expr::Assign {
-                        name,
+                        var,
                         value_index,
                         end,
                         ..
@@ -68,7 +64,7 @@ impl ParseState for AssignState {
                     {
                         *value_index = index;
                         *end = End::from_slice(&slice.0, env.global_index);
-                        env.vars.insert(name.to_ascii_lowercase().to_owned());
+                        env.vars.insert(var.name.to_owned());
                     } else {
                         unreachable!();
                     }
