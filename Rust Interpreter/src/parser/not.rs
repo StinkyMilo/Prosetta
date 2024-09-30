@@ -1,58 +1,53 @@
 use super::*;
 
+/// state for num
 #[derive(Debug)]
-
 pub struct NotState;
-
 impl ParseState for NotState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
-        let close = find_close_slice(&word, 0).or_else(|| find_close_slice(&rest, 0));
-        if let Some(slice) = close {
-            *env.expr = Expr::Skip {
-                locs: env.locs.take().unwrap_or_default(),
-                index: usize::MAX,
-                start: word.pos + env.global_index,
-                end: End::from_slice(&slice.0, env.global_index),
-            };
-
-            MatchResult::ContinueWith(slice.0.pos + 1, Box::new(alias::NoneState::new_expr_cont()))
+        // wait for non . word to start
+        if is_close(word) {
+            MatchResult::Continue
         } else {
-            // no . - will never match
-            MatchResult::Failed
+            // find close
+            let close = find_close_slice(rest, 0);
+            //close exists - match
+            if let Some(close) = close {
+                *env.expr = Expr::Not {
+                    locs: env.locs.take().unwrap_or_default(),
+                    str_start: word.pos + env.global_index,
+                    str_len: word.len(),
+                    word:word.str.to_ascii_lowercase(),
+                    end: End::from_slice(&close.0, env.global_index),
+                };
+                env.nots.insert(word.str.to_ascii_lowercase());
+                MatchResult::Matched(close.0.pos, true)
+            } else {
+                // did not find close - fail
+                MatchResult::Failed
+            }
         }
     }
 
     fn step_match(
         &mut self,
-        env: &mut Environment,
-        child_index: Option<usize>,
-        word: &Slice,
+        _env: &mut Environment,
+        _child_index: Option<usize>,
+        _word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
-        // child matched - add index of child and match
-        if let Some(new_index) = child_index {
-            if let Expr::Skip { index, .. } = env.expr {
-                *index = new_index;
-            } else {
-                unreachable!()
-            }
-
-            MatchResult::Matched(word.pos, false)
-        // child failed - I fail
-        } else {
-            MatchResult::Failed
-        }
+        // has no child to match - fn should never be called
+        unreachable!()
     }
 
     fn get_name(&self) -> &'static str {
-        "Not"
+        "Num"
     }
 
     fn get_type(&self) -> StateType {
         StateType::Expr
     }
 }
-
 impl NotState {
     pub fn new() -> Self {
         Self

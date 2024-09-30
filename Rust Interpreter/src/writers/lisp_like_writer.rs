@@ -404,7 +404,21 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 join_locs(locs, Some(*end)),
                 write_expr(exprs, *index, 0)
             )
-        }
+        },
+        Expr::Not { locs, word, str_start, str_len, end } => {
+            format!(
+                "(not{} @{}$${} {})",
+                join_locs(locs, Some(*end)),
+                *str_start,
+                *str_len,
+                String::from_utf8_lossy(word)
+            )
+        },
+        Expr::Ignore { name_start, name } => format!(
+            "(ignore \"{}\"@{})",
+            String::from_utf8_lossy(&name).to_string(),
+            name_start
+        ),
     }
 }
 

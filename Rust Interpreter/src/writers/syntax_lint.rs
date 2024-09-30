@@ -425,6 +425,16 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_expr(source, exprs, *index, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
+            Expr::Not { locs, str_start, str_len, end, .. } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_up_to(source, *str_start);
+                self.write_as(source, *str_len, STRING_COLOR);
+                self.add_end(source, *end, stack_index);
+            },
+            Expr::Ignore { name_start, name } => {
+                self.write_up_to(source, *name_start);
+                self.write_as(source, name.len(), STRING_COLOR);
+            }
             Expr::NoneExpr | Expr::NoneStat => {}
         };
     }

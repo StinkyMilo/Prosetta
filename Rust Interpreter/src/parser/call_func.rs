@@ -9,14 +9,13 @@ impl ParseState for FunctionCallState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         // get lowercase
         if self.is_first {
-            let lower = word.str.to_ascii_lowercase();
             self.is_first=false;
             // is varible in scope
-            if env.funcs.contains(lower.clone()) {
+            if let Some(found) = env.funcs.try_get_func(word.str) {
                 *env.expr = Expr::FunctionCall {
                     locs: env.locs.take().unwrap_or_default(),
                     name_start: word.pos + env.global_index,
-                    name: lower,
+                    name: found.1,
                     indexes: Vec::new(),
                     end: End::none()
                 };

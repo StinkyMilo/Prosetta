@@ -331,8 +331,11 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             }
         }
         Expr::Length { index, .. } => {
-            format!("{}.length", write_expr(exprs, *index))
-        }
+            format!("{}.length",write_expr(exprs,*index))
+        },
+        Expr::Not { .. } | Expr::Ignore {..} =>{
+            format!("")
+        },
     }
 }
 
