@@ -1,8 +1,7 @@
 use std::{
     fmt::{self, Debug},
-    iter::Skip,
     usize,
-    collections::HashSet, fmt::{self, Debug}
+    collections::HashSet
 };
 
 use super::{alias_data::AliasData, Expr, Var};
