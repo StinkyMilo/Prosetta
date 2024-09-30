@@ -94,7 +94,7 @@ impl VarSet {
             // if var could be in word
             if is_longer && lower.len() >= str.len() {
                 // if found
-                if let Some(index) = word.find(str) {
+                if let Some(index) = lower.find(str) {
                     let is_better = var
                         .as_ref()
                         .map_or(true, |(old_index, _)| is_longer || index < *old_index);
@@ -157,7 +157,7 @@ impl FuncSet {
             // if var could be in word
             if is_longer && lower.len() >= str.0.len() {
                 // if found
-                if let Some(index) = word.find(str.0) {
+                if let Some(index) = lower.find(str.0) {
                     let is_better = var
                         .as_ref()
                         .map_or(true, |(old_index, _, _)| is_longer || index < *old_index);
