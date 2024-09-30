@@ -2,7 +2,7 @@ use super::*;
 
 const BASE_EXPR_ALIASES: [&'static [u8]; 20] = [
     b"int", b"tim", b"add", b"sub", b"lit", b"ide", b"mod", b"log", b"exp", b"les", b"mor", b"als",
-    b"oth", b"par", b"inv", b"col", b"fin", b"ind", b"lis", b"cou"
+    b"oth", b"par", b"inv", b"col", b"fin", b"ind", b"lis", b"cou",
 ];
 
 const STAT_ALIASES: [&'static [u8]; 20] = [
@@ -48,6 +48,7 @@ fn get_stat_state(alias: &'static [u8], index: usize) -> MatchResult {
         match alias {
             b"arc" => get_state!(circle::CircleState::new()),
             b"lin" => get_state!(line::LineState::new()),
+            b"bez" => get_state!(bezier::BezierState::new()),
             b"was" => get_state!(assign::AssignState::new()),
             b"rec" => get_state!(rect::RectState::new()),
             b"pri" => get_state!(print::PrintState::new()),

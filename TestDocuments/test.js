@@ -1,36 +1,36 @@
-let arraymario = [10, 30, 2, 15, 19, 24, 60, 80, 0];
-function middlemario(startmario, endmario) {
-    let lenmario = (endmario - startmario);
-    if ((lenmario % 2) == 0) {
-        return (startmario + (lenmario / 2));
+let array_var = [10, 30, 2, 15, 19, 24, 60, 80, 0];
+function middle_var(start_var, end_var) {
+    let len_var = (end_var - start_var);
+    if ((len_var % 2) == 0) {
+        return (start_var + (len_var / 2));
     }
-    return (startmario + ((lenmario - 1) / 2));
+    return (start_var + ((len_var - 1) / 2));
 }
-function mergemario(arraymario, startmario, endmario) {
-    let differencemario = (endmario - startmario);
-    if ((differencemario < 1)) {
+function merge_var(array_var, start_var, end_var) {
+    let difference_var = (end_var - start_var);
+    if ((difference_var < 1)) {
         return [];
     }
-    if (differencemario == 1) {
-        return [arraymario[startmario]];
+    if (difference_var == 1) {
+        return [array_var[start_var]];
     }
-    let midmario = middlemario(startmario, endmario);
-    let leftmario = mergemario(arraymario, startmario, midmario);
-    let rightmario = mergemario(arraymario, midmario, endmario);
-    let outputmario = [];
-    let yinmario = 0;
-    let yangmario = 0;
-    while (((yinmario < leftmario.length) || (yangmario < rightmario.length))) {
-        if ((((yinmario + 1) > leftmario.length) || (leftmario[yinmario] > rightmario[yangmario]))) {
-            outputmario.push(rightmario[yangmario]);
-            yangmario = (yangmario + 1);
+    let mid_var = middle_var(start_var, end_var);
+    let left_var = merge_var(array_var, start_var, mid_var);
+    let right_var = merge_var(array_var, mid_var, end_var);
+    let output_var = [];
+    let yin_var = 0;
+    let yang_var = 0;
+    while (((yin_var < left_var.length) || (yang_var < right_var.length))) {
+        if ((((yin_var + 1) > left_var.length) || (left_var[yin_var] > right_var[yang_var]))) {
+            output_var.push(right_var[yang_var]);
+            yang_var = (yang_var + 1);
         }
         else {
-            outputmario.push(leftmario[yinmario]);
-            yinmario = (yinmario + 1);
+            output_var.push(left_var[yin_var]);
+            yin_var = (yin_var + 1);
         }
-        return outputmario;
+        return output_var;
     }
 }
-let valuemario = mergemario(arraymario, 0, arraymario.length);
-console.log(valuemario);
+let value_var = merge_var(array_var, 0, array_var.length);
+console.log(value_var);
