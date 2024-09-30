@@ -205,6 +205,11 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_expr(source, exprs, *value_index, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
+            Expr::Bezier { locs, indexes, end } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.add_end(source, *end, stack_index);
+            }
             Expr::Line { locs, indexes, end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
@@ -357,22 +362,26 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_expr(source, exprs, *index, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Function { locs, indexes, end, .. } => {
+            Expr::Function {
+                locs, indexes, end, ..
+            } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Append {indexes, locs, end} => {
+            Expr::Append { indexes, locs, end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::FunctionCall { locs, indexes, end, .. } => {
+            Expr::FunctionCall {
+                locs, indexes, end, ..
+            } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Delete {indexes, locs, end} => {
+            Expr::Delete { indexes, locs, end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
@@ -384,17 +393,17 @@ impl<T: Renderer> SyntaxLinter<T> {
                 }
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Replace {indexes, locs, end} => {
+            Expr::Replace { indexes, locs, end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Find {indexes, locs, end} => {
+            Expr::Find { indexes, locs, end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Index {indexes, locs, end} => {
+            Expr::Index { indexes, locs, end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
@@ -405,10 +414,7 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.add_end(source, *end, stack_index);
             }
             Expr::ForEach {
-                locs,
-                indexes,
-                end,
-                ..
+                locs, indexes, end, ..
             } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);

@@ -70,6 +70,13 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
             name_start,
             write_expr(exprs, *value_index, 0)
         ),
+        Expr::Bezier { locs, indexes, end } => {
+            format!(
+                "(bezier{} {})",
+                join_locs(locs, Some(*end)),
+                write_exprs(exprs, indexes),
+            )
+        }
         Expr::Line { locs, indexes, end } => {
             format!(
                 "(line{} {})",
@@ -281,51 +288,55 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 join_locs(locs, Some(*end)),
                 write_expr(exprs, *index, 0)
             )
-        },
+        }
         Expr::Append { locs, indexes, end } => {
             format!(
                 "(append{} {})",
                 join_locs(locs, Some(*end)),
                 write_exprs(exprs, indexes)
             )
-        },
+        }
         Expr::Delete { locs, indexes, end } => {
             format!(
                 "(delete{} {})",
                 join_locs(locs, Some(*end)),
                 write_exprs(exprs, indexes)
             )
-        },
+        }
         Expr::Replace { locs, indexes, end } => {
             format!(
                 "(replace{} {})",
                 join_locs(locs, Some(*end)),
                 write_exprs(exprs, indexes)
             )
-        },
+        }
         Expr::Find { locs, indexes, end } => {
             format!(
                 "(find{} {})",
                 join_locs(locs, Some(*end)),
                 write_exprs(exprs, indexes)
             )
-        },
+        }
         Expr::Index { locs, indexes, end } => {
             format!(
                 "(index{} {})",
                 join_locs(locs, Some(*end)),
                 write_exprs(exprs, indexes)
             )
-        },
+        }
         Expr::List { locs, indexes, end } => {
             format!(
                 "(list{} {})",
                 join_locs(locs, Some(*end)),
                 write_exprs(exprs, indexes)
             )
-        },
+        }
         Expr::ForEach {
-            locs, indexes, end, name, ..
+            locs,
+            indexes,
+            end,
+            name,
+            ..
         } => {
             let split = indexes.split_at_checked(1).unwrap_or_default();
             format!(
@@ -336,7 +347,14 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 write_stats(exprs, split.1, indent + 1),
             )
         }
-        Expr::Function { locs, name, arg_names, indexes, end, ..} => {
+        Expr::Function {
+            locs,
+            name,
+            arg_names,
+            indexes,
+            end,
+            ..
+        } => {
             let mut output_vals = "".to_string();
             let mut is_first = true;
             for val in arg_names {
@@ -354,34 +372,37 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 output_vals,
                 write_exprs(exprs, indexes)
             )
-        },
-        Expr::FunctionCall {locs, name, indexes, end, .. } => {
+        }
+        Expr::FunctionCall {
+            locs,
+            name,
+            indexes,
+            end,
+            ..
+        } => {
             format!(
                 "({}{} {})",
                 String::from_utf8_lossy(name),
                 join_locs(locs, Some(*end)),
-                write_exprs(exprs,indexes)
+                write_exprs(exprs, indexes)
             )
-        },
+        }
         Expr::Return { locs, index, end } => {
-            if let Some(ind) = index{ 
+            if let Some(ind) = index {
                 format!(
                     "(return{} {})",
                     join_locs(locs, Some(*end)),
-                    write_expr(exprs,*ind,0)
+                    write_expr(exprs, *ind, 0)
                 )
-            }else{
-                format!(
-                    "(return{})",
-                    join_locs(locs, Some(*end))
-                )
+            } else {
+                format!("(return{})", join_locs(locs, Some(*end)))
             }
-        },
+        }
         Expr::Length { locs, index, end } => {
             format!(
                 "(length{} {})",
                 join_locs(locs, Some(*end)),
-                write_expr(exprs,*index,0)
+                write_expr(exprs, *index, 0)
             )
         }
     }

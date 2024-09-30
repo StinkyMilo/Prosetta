@@ -40,6 +40,11 @@ pub enum Expr {
         indexes: [usize; 4],
         end: End,
     },
+    Bezier {
+        locs: Vec<usize>,
+        indexes: Vec<usize>,
+        end: End,
+    },
     Line {
         locs: Vec<usize>,
         indexes: [usize; 4],
@@ -161,62 +166,62 @@ pub enum Expr {
         arg_starts: Vec<usize>,
         arg_names: Vec<Vec<u8>>,
         indexes: Vec<usize>,
-        end: End
+        end: End,
     },
     FunctionCall {
         locs: Vec<usize>,
         name_start: usize,
         name: Vec<u8>,
         indexes: Vec<usize>,
-        end: End
+        end: End,
     },
     Return {
         locs: Vec<usize>,
         index: Option<usize>,
-        end: End
+        end: End,
     },
     Append {
         locs: Vec<usize>,
         indexes: [usize; 3],
-        end: End
+        end: End,
     },
     Delete {
         locs: Vec<usize>,
         indexes: [usize; 2],
-        end: End
+        end: End,
     },
     Replace {
         locs: Vec<usize>,
         indexes: [usize; 3],
-        end: End
+        end: End,
     },
     Find {
         locs: Vec<usize>,
         indexes: [usize; 2],
-        end: End
+        end: End,
     },
     Index {
         locs: Vec<usize>,
         indexes: [usize; 2],
-        end: End
+        end: End,
     },
     List {
         locs: Vec<usize>,
         indexes: Vec<usize>,
-        end: End
+        end: End,
     },
     ForEach {
         name_start: usize,
         name: Vec<u8>,
         locs: Vec<usize>,
         indexes: Vec<usize>,
-        end: End
+        end: End,
     },
     Length {
         locs: Vec<usize>,
         index: usize,
-        end: End
-    }
+        end: End,
+    },
 }
 
 impl Expr {

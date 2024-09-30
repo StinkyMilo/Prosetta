@@ -37,6 +37,7 @@ mod stroke;
 mod var;
 mod while_stat;
 
+mod bezier;
 mod circle;
 mod line;
 mod print;
