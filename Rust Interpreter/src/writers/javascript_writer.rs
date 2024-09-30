@@ -29,7 +29,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             first,
             ..
         } => format!(
-            "{}{}mario = {};",
+            "{}{}_var = {};",
             if *first { "let " } else { "" },
             String::from_utf8_lossy(&var.name),
             write_expr(exprs, *value_index)
@@ -40,6 +40,13 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             end: _,
         } => {
             format!("draw_line({});", write_exprs(exprs, indexes, ", "))
+        }
+        Expr::Bezier {
+            locs: _,
+            indexes,
+            end: _,
+        } => {
+            format!("draw_bezier({});", write_exprs(exprs, indexes, ", "))
         }
         Expr::Arc {
             locs: _,
@@ -55,7 +62,10 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         } => {
             format!("draw_rect({});", write_exprs(exprs, indexes, ", "))
         }
-        Expr::Var { var } => format!("{}mario", String::from_utf8_lossy(&var.name).to_string()),
+        Expr::Var {
+            name_start: _,
+            name,
+        } => format!("{}_var", String::from_utf8_lossy(&name).to_string()),
         Expr::WordNum {
             locs: _,
             str_start: _,
@@ -276,7 +286,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         }
         Expr::ForEach { indexes, name, .. } => {
             format!(
-                "for({}mario of {}) {{\n{}\n}}",
+                "for({}_var of {}) {{\n{}\n}}",
                 String::from_utf8_lossy(&name),
                 write_expr(exprs, indexes[0]),
                 write_exprs(exprs, &indexes[1..], "\n")
@@ -292,14 +302,14 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             let mut is_first = true;
             for val in arg_names {
                 if is_first {
-                    output_vals += &format!("{}mario", String::from_utf8_lossy(val));
+                    output_vals += &format!("{}_var", String::from_utf8_lossy(val));
                     is_first = false;
                 } else {
-                    output_vals += &format!(", {}mario", String::from_utf8_lossy(val));
+                    output_vals += &format!(", {}_var", String::from_utf8_lossy(val));
                 }
             }
             format!(
-                "function {}mario({}){{\n{}\n}}",
+                "function {}_var({}){{\n{}\n}}",
                 String::from_utf8_lossy(name),
                 output_vals,
                 write_exprs(exprs, indexes, "\n")
@@ -308,7 +318,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         Expr::FunctionCall { name, indexes, .. } => {
             //Trying without a semicolon since JS lets you forget them sometimes and function calls can be either expressions or statements
             format!(
-                "{}mario({})",
+                "{}_var({})",
                 String::from_utf8_lossy(name),
                 write_exprs(exprs, indexes, ", ")
             )
@@ -321,8 +331,11 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             }
         }
         Expr::Length { index, .. } => {
-            format!("{}.length", write_expr(exprs, *index))
-        }
+            format!("{}.length",write_expr(exprs,*index))
+        },
+        Expr::Not { .. } | Expr::Ignore {..} =>{
+            format!("")
+        },
     }
 }
 

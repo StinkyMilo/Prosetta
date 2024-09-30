@@ -2,6 +2,7 @@ use std::{
     fmt::{self, Debug},
     iter::Skip,
     usize,
+    collections::HashSet, fmt::{self, Debug}
 };
 
 use super::{alias_data::AliasData, Expr, Var};
@@ -9,6 +10,56 @@ use super::{alias_data::AliasData, Expr, Var};
 #[path = "testing/parsing_tests_word_funcs.rs"]
 mod parsing_tests_word_funcs;
 // quickscope
+pub struct IgnoreSet {
+    set: HashSet<Vec<u8>>
+}
+impl IgnoreSet {
+    pub fn new() -> Self {
+        Self {
+            set: HashSet::new(),
+        }
+    }
+    pub fn insert(&mut self, name: Vec<u8>) {
+        let lower = name.to_ascii_lowercase();
+        self.set.insert(lower);
+    }
+    pub fn contains(&self, name: &Vec<u8>) -> bool {
+        let lower = name.to_ascii_lowercase();
+        self.set.contains(&lower)
+    }
+    ///returns (index in word, varible name)
+    pub fn try_get_val(&self, word: &[u8]) -> Option<(usize, Vec<u8>)> {
+        let mut lower = word.to_ascii_lowercase();
+        // remove '
+        lower.retain(|&x| x != b'\'');
+
+        let mut max_var_length = 0;
+        let mut var = None;
+        for str in self.set.iter() {
+            let is_longer = str.len() >= max_var_length;
+            // if var could be in word
+            if is_longer && lower.len() >= str.len() {
+                // if found
+                if let Some(index) = word.find(str) {
+                    let is_better = var
+                        .as_ref()
+                        .map_or(true, |(old_index, _)| is_longer || index < *old_index);
+
+                    if is_better {
+                        max_var_length = str.len();
+                        var = Some((index, str.clone()));
+                    }
+                }
+            }
+        }
+        var
+    }
+}
+impl Debug for IgnoreSet {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("IgnoreSet").finish()
+    }
+}
 
 pub struct VarSet {
     set: ScopeSet<Vec<u8>>,
@@ -123,6 +174,34 @@ impl FuncSet {
     pub fn contains(&self, name: Vec<u8>) -> bool {
         self.set.contains_key(&name)
     }
+
+    pub fn try_get_func(&self, word: &[u8]) -> Option<(usize, Vec<u8>, usize)> {
+        let mut lower = word.to_ascii_lowercase();
+        // remove '
+        lower.retain(|&x| x != b'\'');
+
+        let mut max_var_length = 0;
+        let mut var: Option<(usize, Vec<u8>, usize)>= None;
+        for str in self.set.iter() {
+            let is_longer = str.0.len() >= max_var_length;
+            // if var could be in word
+            if is_longer && lower.len() >= str.0.len() {
+                // if found
+                if let Some(index) = word.find(str.0) {
+                    let is_better = var
+                        .as_ref()
+                        .map_or(true, |(old_index, _, _)| is_longer || index < *old_index);
+
+                    if is_better {
+                        max_var_length = str.0.len();
+                        var = Some((index, str.0.clone(), *str.1));
+                    }
+                }
+            }
+        }
+        var
+    }
+
     pub fn get_arg_count(&self, name: Vec<u8>) -> Option<&usize> {
         self.set.get(&name)
     }
@@ -166,7 +245,7 @@ use quickscope::{ScopeMap, ScopeSet};
 /// add or remove commands based on flags
 #[derive(Default, Debug)]
 pub struct ParserFlags {
-    pub not: bool,
+    pub not: bool
 }
 
 #[derive(PartialEq, Eq, Debug)]
@@ -291,8 +370,10 @@ impl ParserResult {
 pub struct Environment<'a> {
     ///The set of current varibles
     pub vars: &'a mut VarSet,
-    //The set of current functions
+    ///The set of current functions
     pub funcs: &'a mut FuncSet,
+    ///The set of current ignored values
+    pub nots: &'a mut IgnoreSet,
     ///The list of expressions
     pub expr: &'a mut Expr,
     ///the index of this expr

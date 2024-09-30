@@ -4,9 +4,10 @@ var jscode, sourcecode, syntax, ctx, cnsl, canvas;
 var x = 0, y = 0, rotation = 0;
 var has_run = false;
 var has_drawn_shape = false;
-var last_was_line = false;
+var last_shape = "none";
 var parser, parsedData;
 var old_code;
+var editor;
 
 function init_canvas() {
   sourcecode = document.getElementById("code");
@@ -18,9 +19,9 @@ function init_canvas() {
 
   canvas.width = canvas.width;
   has_drawn_shape = false;
-  last_was_line = false;
+  last_shape = "none";
   reset_rotation();
-  move_to(0, 0);
+  _move_to(0, 0);
   ctx.moveTo(x, y);
   set_stroke("black");
   set_fill("transparent");
@@ -39,11 +40,12 @@ function print_console() {
 }
 
 function end_shape() {
-  if (!has_drawn_shape) {
+  if (last_shape == "none" || last_shape == "move") {
     return;
   }
   ctx.fill();
   ctx.stroke();
+  last_shape = "none";
 }
 
 function start_shape() {
@@ -51,10 +53,47 @@ function start_shape() {
   ctx.beginPath();
 }
 
+function lerp(a, b, t) {
+  return (1 - t) * a + t * b;
+}
+
+function bezier_point(t, points) {
+  if (points.length == 1) {
+    return points[0];
+  }
+
+  let new_points = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    let x = lerp(points[i].x, points[i + 1].x, t);
+    let y = lerp(points[i].y, points[i + 1].y, t);
+    new_points.push({ x: x, y: y });
+  }
+  return bezier_point(t, new_points);
+}
+
+function draw_bezier(...xy) {
+  if (last_shape != "line") {
+    start_shape();
+    ctx.moveTo(x, y);
+  }
+  let points = [{ x: x, y: y }];
+  for (let i = 0; i < xy.length; i += 2) {
+    move_delta(xy[i], xy[i + 1]);
+    points.push({ x: x, y: y });
+  }
+  for (let t = 0; t < 1; t += 0.05) {
+    let point = bezier_point(t, points)
+    ctx.lineTo(point.x, point.y);
+  }
+  let point = bezier_point(1, points)
+  ctx.lineTo(point.x, point.y);
+  last_shape = "line";
+}
+
 function draw_line() {
   switch (arguments.length) {
     case 1:
-      if (!last_was_line) {
+      if (last_shape != "line") {
         start_shape();
         ctx.moveTo(x, y);
       }
@@ -63,7 +102,7 @@ function draw_line() {
       ctx.lineTo(x, y);
       break;
     case 2:
-      if (!last_was_line) {
+      if (last_shape != "line") {
         start_shape();
         ctx.moveTo(x, y);
       }
@@ -72,25 +111,30 @@ function draw_line() {
       break;
     case 3:
       start_shape();
-      move_to(arguments[0], arguments[1]);
+      _move_to(arguments[0], arguments[1]);
       ctx.moveTo(x, y);
       move_distance(arguments[2]);
       ctx.lineTo(x, y);
       break;
     case 4:
       start_shape();
-      move_to(arguments[0], arguments[1]);
+      _move_to(arguments[0], arguments[1]);
       ctx.moveTo(x, y);
-      move_to(arguments[2], arguments[3]);
+      _move_to(arguments[2], arguments[3]);
       ctx.lineTo(x, y);
       break;
 
   }
-  last_was_line = true;
-  has_drawn_shape = true;
+  last_shape = "line";
 }
 
 function move_to(x1, y1) {
+  end_shape();
+  last_shape = "move";
+  _move_to(x1, y1);
+}
+
+function _move_to(x1, y1) {
   x = x1 + 200;
   y = 200 - y1;
 }
@@ -138,12 +182,12 @@ function draw_rect() {
       height = arguments[1];
       break;
     case 3:
-      move_to(arguments[0], arguments[1]);
+      _move_to(arguments[0], arguments[1]);
       width = arguments[2];
       height = arguments[2];
       break;
     case 4:
-      move_to(arguments[0], arguments[1]);
+      _move_to(arguments[0], arguments[1]);
       width = arguments[2];
       height = arguments[3];
       break;
@@ -160,8 +204,7 @@ function draw_rect() {
   ctx.lineTo(x3, y3);
   ctx.lineTo(x4, y4);
   ctx.closePath();
-  last_was_line = false;
-  has_drawn_shape = true;
+  last_shape = "rect";
 }
 
 function draw_ellipse() {
@@ -176,12 +219,12 @@ function draw_ellipse() {
       height = arguments[1];
       break;
     case 3:
-      move_to(arguments[0], arguments[1]);
+      _move_to(arguments[0], arguments[1]);
       width = arguments[2];
       height = arguments[2];
       break;
     case 4:
-      move_to(arguments[0], arguments[1]);
+      _move_to(arguments[0], arguments[1]);
       width = arguments[2];
       height = arguments[3];
       break;
@@ -189,8 +232,7 @@ function draw_ellipse() {
   start_shape();
   ctx.ellipse(x, y, width / 2, height / 2, -rotation_radians(), 0, 2 * Math.PI);
   ctx.closePath();
-  last_was_line = false;
-  has_drawn_shape = true;
+  last_shape = "ellipse";
 }
 
 function set_stroke(...color) {
@@ -267,11 +309,15 @@ function openTab(event, tab) {
 }
 
 function updateCode() {
-  if (sourcecode.value == old_code) {
+  if(editor == null){
     return;
   }
-  old_code = sourcecode.value;
-  parsedData = parser.run_to_completion(sourcecode.value);
+  let new_code = editor.getValue();
+  if (new_code == old_code) {
+    return;
+  }
+  old_code = new_code;
+  parsedData = parser.run_to_completion(new_code);
   jscode.innerText = parsedData.get_javascript();
   syntax.innerHTML = parsedData.get_html();
   let c = syntax.children;
@@ -301,3 +347,27 @@ async function initialize() {
 window.runCode = runCode;
 window.updateCode = updateCode;
 window.openTab = openTab;
+
+require.config({ paths: { 'vs': '../node_modules/monaco-editor/min/vs' }});
+// window.MonacoEnvironment = { getWorkerUrl: () => proxy };
+
+// let proxy = URL.createObjectURL(new Blob([`
+// 	self.MonacoEnvironment = {
+// 		baseUrl: 'https://unpkg.com/monaco-editor@latest/min/'
+// 	};
+// 	importScripts('https://unpkg.com/monaco-editor@latest/min/vs/base/worker/workerMain.js');
+// `], { type: 'text/javascript' }));
+
+//Create main editor environment
+require(["vs/editor/editor.main"], function () {
+	editor = monaco.editor.create(document.getElementById('code'), {
+		value: [
+			'pri hi!!!'
+		].join('\n'),
+		language: 'plaintext',
+		theme: 'vs-dark'
+	});
+  init_canvas();
+  console.log("Editor initialized!",editor);
+  updateCode();
+});
