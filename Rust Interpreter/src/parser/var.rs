@@ -4,15 +4,9 @@ use super::*;
 pub struct VarState;
 impl ParseState for VarState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
-        // get lowercase
-        let lower = word.str.to_ascii_lowercase();
-
         // is varible in scope
-        if let Some((index, name)) = env.vars.try_get_var(&lower) {
-            *env.expr = Expr::Var {
-                name_start: word.pos + env.global_index + index,
-                name,
-            };
+        if let Some(var) = env.vars.try_get_var(&word, env.global_index) {
+            *env.expr = Expr::Var { var };
             MatchResult::Matched(rest.pos, false)
         } else {
             // future words could be varible names

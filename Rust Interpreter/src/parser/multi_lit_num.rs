@@ -57,24 +57,15 @@ impl ParseState for MultiLitNumState {
             if is_mandatory_close(word) {
                 *end = End::from_slice(&word, env.global_index);
                 if !self.any_vars {
-                    let mut final_val = 0;
-                    let mut final_val_multiplier = 1;
-                    for i in values.into_iter().rev() {
-                        if let VarOrInt::Int(i_val) = i {
-                            final_val += final_val_multiplier * *i_val;
-                            final_val_multiplier *= 10;
-                        } else {
-                            unreachable!()
-                        }
-                    }
-                    *single_value = Some(final_val);
+                    *single_value = Self::get_final_value(values);
                 }
+
                 MatchResult::Matched(word.pos, true)
             } else {
                 //let lower = word.str.to_ascii_lowercase();
-                if let Some((_, var)) = env.vars.try_get_var(&word.str) {
+                if let Some(var) = env.vars.try_get_var(word, env.global_index) {
                     self.any_vars = true;
-                    values.push(VarOrInt::Var(var));
+                    values.push(VarOrInt::Var(var.name));
                 } else if let Some(num_value) = get_number(word.str) {
                     values.push(VarOrInt::Int(num_value % 10));
                 } else {
@@ -111,7 +102,27 @@ impl MultiLitNumState {
         Self {
             first: true,
             any_vars: false,
-            // any_vars: true,
         }
+    }
+    pub fn get_final_value(values: &Vec<VarOrInt>) -> Option<i64> {
+        let mut val = Some(0i64);
+        // let mut final_val_multiplier = Some(1i64);
+        for i in values.into_iter() {
+            if let VarOrInt::Int(i_val) = *i {
+                if let Some(var) = val {
+                    // let test: i64 = var;
+                    val = var
+                        .checked_mul(10_i64)
+                        .and_then(|val| val.checked_add(i_val))
+                } else {
+                    //overflowed
+                    return None;
+                }
+            } else {
+                unreachable!()
+            }
+        }
+
+        val
     }
 }

@@ -76,21 +76,25 @@ impl<T: Renderer> SyntaxLinter<T> {
     fn write_up_to(&mut self, source: &mut ParserSourceIter, index: usize) {
         self.write_up_to_as(source, index, BASE_COLOR);
     }
+    fn get_n_or_error(source: &mut ParserSourceIter, num: usize) -> Vec<u8> {
+        get_n(source, num).expect("writing should not find end of buffer")
+    }
     fn write_up_to_as(
         &mut self,
         source: &mut ParserSourceIter,
         index: usize,
         color: (TermColor, bool),
     ) {
-        let num = index
-            .checked_sub(self.index)
-            .expect("index is before the writing index");
-        let buf = get_n(source, num).expect("found end of buffer");
+        let num = index.checked_sub(self.index).expect(&format!(
+            "index {} should be after the writing index {}",
+            index, self.index
+        ));
+        let buf = Self::get_n_or_error(source, num);
         self.renderer.add_with(&buf, color);
         self.index = index;
     }
     fn write_as(&mut self, source: &mut ParserSourceIter, num: usize, color: (TermColor, bool)) {
-        let buf = get_n(source, num).expect("found end of buffer");
+        let buf: Vec<u8> = Self::get_n_or_error(source, num);
         self.renderer.add_with(&buf, color);
         self.index += num;
     }
@@ -102,7 +106,7 @@ impl<T: Renderer> SyntaxLinter<T> {
             // let num = index
             //     .checked_sub(self.index)
             //     .expect("index is before the end index");
-            let buf = get_n(source, end.0 as usize).expect("found end of buffer");
+            let buf = Self::get_n_or_error(source, end.0 as usize);
             self.renderer.add_with_mult(&buf, end.1);
             self.index += end.0 as usize;
         }
@@ -130,6 +134,16 @@ impl<T: Renderer> SyntaxLinter<T> {
         }
     }
 
+    fn write_var(&mut self, source: &mut ParserSourceIter, var: &Var) {
+        self.write_up_to(source, var.start);
+        for &index in &var.skip_indexes {
+            self.write_up_to_as(source, var.start + index as usize, VAR_COLOR);
+            self.write_as(source, 1, BASE_COLOR);
+        }
+        let len = var.name.len() + var.skip_indexes.len();
+        self.write_up_to_as(source, var.start + len, VAR_COLOR);
+    }
+
     fn write_locs(&mut self, source: &mut ParserSourceIter, locs: &Vec<usize>, stack_index: usize) {
         let color = LOC_COLOR[stack_index % 3];
         for loc in locs {
@@ -155,7 +169,10 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_up_to(source, end.index);
             //close is before index
             } else if end.index < self.index {
-                unreachable!("close index has already been passed");
+                unreachable!(
+                    "close index {} should be after writing index {}",
+                    end.index, self.index
+                );
             }
             // setup close
             if let Some((_, vec)) = &mut self.ends {
@@ -193,15 +210,13 @@ impl<T: Renderer> SyntaxLinter<T> {
         match &exprs[index] {
             Expr::Assign {
                 locs,
-                name_start,
-                name,
+                var,
                 value_index,
                 end,
                 ..
             } => {
                 self.write_locs(source, locs, stack_index);
-                self.write_up_to(source, *name_start);
-                self.write_as(source, name.len(), VAR_COLOR);
+                self.write_var(source, var);
                 self.write_expr(source, exprs, *value_index, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
@@ -225,10 +240,7 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Var { name_start, name } => {
-                self.write_up_to(source, *name_start);
-                self.write_as(source, name.len(), VAR_COLOR);
-            }
+            Expr::Var { var } => self.write_var(source, var),
             Expr::WordNum {
                 locs,
                 str_start,
@@ -278,7 +290,7 @@ impl<T: Renderer> SyntaxLinter<T> {
                 end,
             } => {
                 self.write_locs(source, locs, stack_index);
-                self.write_up_to(source, *start - 1);
+                self.write_up_to(source, *start);
                 self.write_up_to_as(source, end.index, STRING_COLOR);
                 self.add_end(source, *end, stack_index);
                 self.write_end(source);
@@ -389,7 +401,7 @@ impl<T: Renderer> SyntaxLinter<T> {
             Expr::Return { locs, index, end } => {
                 self.write_locs(source, locs, stack_index);
                 if let Some(ind) = index {
-                    self.write_expr(source, exprs, *ind, stack_index + 1);   
+                    self.write_expr(source, exprs, *ind, stack_index + 1);
                 }
                 self.add_end(source, *end, stack_index);
             }

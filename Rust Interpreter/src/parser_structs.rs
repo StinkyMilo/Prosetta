@@ -1,8 +1,10 @@
 use std::{
-    collections::HashSet, fmt::{self, Debug}, usize
+    fmt::{self, Debug},
+    usize,
+    collections::HashSet
 };
 
-use super::{alias_data::AliasData, Expr};
+use super::{alias_data::AliasData, Expr, Var};
 
 #[path = "testing/parsing_tests_word_funcs.rs"]
 mod parsing_tests_word_funcs;
@@ -82,31 +84,58 @@ impl VarSet {
         self.set.contains(&lower)
     }
     ///returns (index in word, varible name)
-    pub fn try_get_var(&self, word: &[u8]) -> Option<(usize, Vec<u8>)> {
-        let mut lower = word.to_ascii_lowercase();
-        // remove '
-        lower.retain(|&x| x != b'\'');
+    pub fn try_get_var(&self, word: &Slice, global_index: usize) -> Option<Var> {
+        if word.len() > 255 {
+            return None;
+        }
+        // remove ' and make lowercase
+        let (name, mut skip_indexes) = get_var_name_and_skips(word.str);
 
-        let mut max_var_length = 0;
-        let mut var = None;
+        let mut max_var_length = 0u8;
+        let mut var_data: Option<(u8, Vec<u8>)> = None;
         for str in self.set.iter() {
-            let is_longer = str.len() >= max_var_length;
+            let is_longer = str.len() as u8 >= max_var_length;
             // if var could be in word
-            if is_longer && lower.len() >= str.len() {
+            if is_longer && name.len() >= str.len() {
                 // if found
-                if let Some(index) = word.find(str) {
-                    let is_better = var
-                        .as_ref()
-                        .map_or(true, |(old_index, _)| is_longer || index < *old_index);
+                if let Some(index) = name.find(str) {
+                    let is_better = var_data.as_ref().map_or(true, |&(old_index, _)| {
+                        is_longer || (index as u8) < old_index
+                    });
 
                     if is_better {
-                        max_var_length = str.len();
-                        var = Some((index, str.clone()));
+                        max_var_length = str.len() as u8;
+                        var_data = Some((index as u8, str.clone()));
                     }
                 }
             }
         }
-        var
+        if let Some((var_start, name)) = var_data {
+            let start_index = skip_indexes
+                .iter()
+                .position(|&v| v > var_start)
+                .unwrap_or(skip_indexes.len());
+
+            let start = var_start + start_index as u8;
+            let var_end: u8 = start + name.len() as u8;
+            skip_indexes.drain(..start_index);
+
+            let end_index = skip_indexes
+                .iter()
+                .position(|&v| v > var_end)
+                .unwrap_or(skip_indexes.len());
+            skip_indexes.drain(end_index..);
+            for val in &mut skip_indexes {
+                *val -= var_start;
+            }
+            Some(Var {
+                start: global_index + word.pos + start as usize,
+                name,
+                skip_indexes,
+            })
+        } else {
+            None
+        }
     }
 }
 impl Debug for VarSet {
@@ -412,7 +441,7 @@ impl<'a> Slice<'a> {
 }
 
 ///the chars that are counted as being part of words
-const OTHER_CHARS: &[u8] = b"-+^/";
+const OTHER_CHARS: &[u8] = b"-+^/'";
 ///can the char be part of a word
 fn is_valid_word_char(char: u8) -> bool {
     char.is_ascii_alphanumeric() || OTHER_CHARS.contains(&char)
@@ -426,9 +455,9 @@ fn is_valid_close_char(char: u8) -> bool {
 }
 
 ///the chars that are returned single but are not closes
-const NON_CLOSE_CHARS: &[u8] = b"\"\'";
+const NON_CLOSE_CHARS: &[u8] = b"\"";
 ///shoudl the char be made into a 1 len slice
-fn is_non_close_but_still_single(char: u8) -> bool {
+pub fn is_non_close_but_still_single(char: u8) -> bool {
     NON_CLOSE_CHARS.contains(&char)
 }
 
@@ -543,17 +572,6 @@ pub fn get_next_slice<'a>(slice: &Slice<'a>, mut start: usize) -> (Slice<'a>, Sl
     // find end of word
     let mut end = start;
 
-    //is slice a closing character aka "."
-    // if end < slice.len()
-    //     && (is_valid_close_char(slice.str[end]) || is_non_close_but_still_single(slice.str[start]))
-    // {
-    //     // is "..."
-    //     if end + 3 <= slice.len() && &slice.str[end..end + 3] == &b"..."[..] {
-    //         end += 3;
-    //     // not "..."
-    //     } else {
-    //         end += 1;
-    //     }
     let close_data = get_close_data(&slice.str[start..]);
     if close_data.close_length != 0 {
         end += close_data.close_length as usize;
@@ -628,6 +646,38 @@ pub fn find_close<'a>(slice: &'a Slice<'a>, start: usize) -> Option<Slice<'_>> {
     find_close_slice(slice, start).map(|s| s.1)
 }
 
-// pub fn is_var_word(slice: &Slice) -> bool {
+pub fn get_var_name_and_skips(word: &[u8]) -> (Vec<u8>, Vec<u8>) {
+    let mut name = Vec::new();
+    let mut skips = Vec::new();
+    for j in 0..word.len() {
+        if word[j] == b'\'' {
+            skips.push(j as u8);
+        } else {
+            name.push(word[j].to_ascii_lowercase());
+        }
+    }
+    (name, skips)
+}
 
-// }
+pub fn try_get_var_word(word: &Slice, global_index: usize) -> Option<Var> {
+    if word.len() >= 1
+        && word.len() <= 255
+        && !is_close(word)
+        && !is_non_close_but_still_single(word.str[0])
+    {
+        let (name, skip_indexes) = get_var_name_and_skips(word.str);
+
+        // vars cant be empty
+        if name.is_empty() {
+            None
+        } else {
+            Some(Var {
+                start: global_index + word.pos,
+                name,
+                skip_indexes,
+            })
+        }
+    } else {
+        None
+    }
+}
