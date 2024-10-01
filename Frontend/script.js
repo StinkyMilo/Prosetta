@@ -362,7 +362,12 @@ require.config({ paths: { 'vs': '../node_modules/monaco-editor/min/vs' }});
 require(["vs/editor/editor.main"], function () {
 	editor = monaco.editor.create(document.getElementById('code'), {
 		value: [
-			'pri hi!!!'
+			'Wasp fact: there are 10 of them for every human.',
+      'This Wasp total will send you into a frenzy!',
+      'While there are more facts, 1 will suffice for now.',
+      '\tPlus, that wasp total is a great trivium! A totally awesome fact!',
+      '\tThis wasp fact is sublime. This fact is the one and only fact you need!!!',
+      'Your price total will be --- let\'s see here --- fifty dollars, plus tip.'
 		].join('\n'),
 		language: 'plaintext',
 		theme: 'vs-dark'
