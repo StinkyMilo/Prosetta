@@ -30,7 +30,9 @@ while True:
     elif usr == "n" and last_keyword:
         size = os.get_terminal_size()
         last_index += size.lines - 3
-        print("\n".join(keywords[last_keyword][last_index : last_index + size.lines - 3]))
+        print(
+            "\n".join(keywords[last_keyword][last_index : last_index + size.lines - 3])
+        )
         print("*" * size.columns)
     else:
         print(f'"{usr}" is not a valid keyword.')
