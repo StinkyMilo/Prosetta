@@ -65,7 +65,6 @@ aliases = [
     "fun",
     "pri",
     "was",
-    "sta",
     "not",
     "rec",
     "lin",
