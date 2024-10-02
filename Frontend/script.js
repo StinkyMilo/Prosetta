@@ -318,7 +318,7 @@ function updateCode() {
   }
   old_code = new_code;
   parsedData = parser.run_to_completion(new_code);
-  jscode.innerText = parsedData.get_javascript();
+  jscode.innerHTML = parsedData.get_javascript();
   syntax.innerHTML = parsedData.get_html();
   let c = syntax.children;
   // for (let i = 0; i < c.length; i++) {
