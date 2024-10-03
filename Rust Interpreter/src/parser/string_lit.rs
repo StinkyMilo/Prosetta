@@ -50,8 +50,6 @@ impl ParseState for LitStrState {
                         }
                         str.push(VarOrStr::Var(var));
                         self.current_str_start = rest.pos;
-                    }else{
-                        // str.push(VarOrStr::Str(word.str.to_vec()));
                     }
                     MatchResult::Continue
                 }else{

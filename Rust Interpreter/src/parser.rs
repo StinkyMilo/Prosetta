@@ -279,7 +279,7 @@ impl<'a> Parser<'a> {
             locs: None,
             global_index: self.pos,
             aliases: &self.aliases,
-            full_text: line.clone()
+            full_text: line,
         };
 
         let last_result = mem::replace(&mut self.last_result, LastMatchResult::None);
