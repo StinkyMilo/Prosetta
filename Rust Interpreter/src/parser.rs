@@ -33,7 +33,7 @@ mod move_to;
 mod not;
 mod operator;
 mod replace;
-mod string_lit;
+pub(crate) mod string_lit;
 mod stroke;
 mod var;
 mod while_stat;

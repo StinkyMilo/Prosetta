@@ -2,6 +2,7 @@ use std::ops::Index;
 
 use crate::parser::multi_lit_num::VarOrInt;
 use crate::parser::End;
+use crate::parser::string_lit::VarOrStr;
 
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum OperatorType {
@@ -146,7 +147,7 @@ pub enum Expr {
     },
     LitString {
         str_start: usize,
-        str: Vec<u8>,
+        str: Vec<VarOrStr>,
     },
     MoveTo {
         locs: Vec<usize>,
