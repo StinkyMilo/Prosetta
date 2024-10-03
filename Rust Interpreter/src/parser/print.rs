@@ -10,7 +10,7 @@ pub struct PrintState {
 
 impl ParseState for PrintState {
     fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
-        let found_close = is_close(word);
+        let found_close = is_mandatory_close(word);
 
         if self.first {
             let mut end = End::none();

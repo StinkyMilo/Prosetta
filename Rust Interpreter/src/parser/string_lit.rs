@@ -1,6 +1,9 @@
 use super::*;
 #[derive(Debug)]
-
+pub enum VarOrStr {
+    Var(Vec<u8>),
+    Str(Vec<u8>),
+}
 pub struct LitStrState {}
 
 impl ParseState for LitStrState {
@@ -8,7 +11,7 @@ impl ParseState for LitStrState {
         // let g = 0;
         // black_box(&g);
         // println!("G{}", g);
-        if word.len() == 1 && (word.str[0] == b'"' || word.str[0] == b'\'') {
+        if word.len() == 1 && word.str[0] == b'"' {
             let char = word.str[0];
             let end = rest.str.iter().position(|c| *c == char);
             if let Some(end_pos) = end {
