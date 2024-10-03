@@ -350,10 +350,11 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::LitString { str_start, str } => {
+            Expr::LitString { str_start,  str_end, .. } => {
                 self.write_up_to(source, *str_start);
                 //one for each quote
-                self.write_as(source, str.len() + 2, STRING_COLOR);
+                //TODO: different color for variables
+                self.write_as(source, str_end - str_start + 1, STRING_COLOR);
             }
             Expr::MoveTo { locs, indexes, end } => {
                 self.write_locs(source, locs, stack_index);

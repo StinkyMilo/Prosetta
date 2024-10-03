@@ -1,6 +1,6 @@
 use std::usize;
 
-use crate::{commands::*, parser::End};
+use crate::{commands::*, parser::{string_lit::VarOrStr, End}};
 
 fn write_end(end: End) -> String {
     let mut ret = String::new();
@@ -251,12 +251,18 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 write_exprs(exprs, indexes),
             )
         }
-        Expr::LitString { str_start, str } => {
-            format!(
-                "(string${} \"{}\")",
-                *str_start,
-                String::from_utf8_lossy(str)
-            )
+        Expr::LitString { str, .. } => {
+            let mut output: String = String::new();
+            for val in str.iter(){
+                if let VarOrStr::Var(var) = val {
+                    let new_val = format!("{}",String::from_utf8_lossy(&var.name));
+                    output += &new_val[..];
+                }else if let VarOrStr::Str(str) = val {
+                    let new_val = String::from_utf8_lossy(str);
+                    output += &new_val[..];
+                }
+            }
+            format!("\"{}\"", output)
         }
         Expr::MoveTo { locs, indexes, end } => {
             format!(

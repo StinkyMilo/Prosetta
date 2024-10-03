@@ -1,4 +1,4 @@
-use crate::commands::*;
+use crate::{commands::*, parser::string_lit::VarOrStr};
 
 #[allow(dead_code)]
 pub fn write(exprs: &ExprArena, line_starts: &Vec<usize>) -> String {
@@ -220,7 +220,17 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             format!("get_color({})", write_exprs(exprs, indexes, ", "))
         }
         Expr::LitString { str, .. } => {
-            format!("\"{}\"", String::from_utf8_lossy(str))
+            let mut output: String = String::new();
+            for val in str.iter(){
+                if let VarOrStr::Var(var) = val {
+                    let new_val = format!("${{{}_var}}",String::from_utf8_lossy(&var.name));
+                    output += &new_val[..];
+                }else if let VarOrStr::Str(str) = val {
+                    let new_val = String::from_utf8_lossy(str);
+                    output += &new_val[..];
+                }
+            }
+            format!("`{}`", output)
         }
         Expr::MoveTo { indexes, .. } => {
             format!("move_to({});", write_exprs(exprs, indexes, ", "))

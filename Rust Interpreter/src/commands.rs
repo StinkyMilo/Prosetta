@@ -147,6 +147,7 @@ pub enum Expr {
     },
     LitString {
         str_start: usize,
+        str_end: usize,
         str: Vec<VarOrStr>,
     },
     MoveTo {
