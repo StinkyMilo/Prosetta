@@ -114,25 +114,6 @@ impl<T: Renderer> SyntaxLinter<T> {
 }
 
 impl<T: Renderer> SyntaxLinter<T> {
-    fn write_prints(
-        &mut self,
-        source: &mut ParserSourceIter,
-        exprs: &ExprArena,
-        data: &Vec<Prints>,
-    ) {
-        for print in data {
-            match print {
-                // stack index is not used in vars
-                Prints::Var(index) | Prints::String(index) => {
-                    self.write_expr(source, exprs, *index, 0)
-                }
-                Prints::Word(str, index) => {
-                    self.write_up_to(source, *index);
-                    self.write_as(source, str.len(), STRING_COLOR);
-                }
-            }
-        }
-    }
 
     fn write_var(&mut self, source: &mut ParserSourceIter, var: &Var) {
         self.write_up_to(source, var.start);

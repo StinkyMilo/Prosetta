@@ -430,21 +430,6 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
     }
 }
 
-fn write_prints(exprs: &ExprArena, data: &Vec<Prints>) -> String {
-    let mut ret = String::new();
-    for print in data {
-        ret += &match print {
-            Prints::Var(index) | Prints::String(index) => {
-                format!(" {}", write_expr(exprs, *index, 0))
-            }
-            Prints::Word(str, index) => {
-                format!(" \"{}\"@{}", std::str::from_utf8(str).unwrap(), index)
-            }
-        }
-    }
-    ret
-}
-
 fn write_exprs(exprs: &ExprArena, indexes: &[usize]) -> String {
     write_mult_exprs(exprs, indexes, b' ', 0)
 }

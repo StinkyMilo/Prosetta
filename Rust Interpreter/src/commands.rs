@@ -22,15 +22,6 @@ pub enum OperatorType {
 }
 
 #[derive(PartialEq, Debug)]
-pub enum Prints {
-    /// child_index
-    Var(usize),
-    /// child_index
-    String(usize),
-    /// value, string_index
-    Word(Vec<u8>, usize),
-}
-#[derive(PartialEq, Debug)]
 pub struct Var {
     pub name: Vec<u8>,
     pub start: usize,

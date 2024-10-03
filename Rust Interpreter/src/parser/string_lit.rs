@@ -15,6 +15,7 @@ impl ParseState for LitStrState {
         // let g = 0;
         // black_box(&g);
         // println!("G{}", g);
+        
         if word.len() == 1 && word.str[0] == b'"'{
             if self.first {
                 self.first=false;
@@ -33,7 +34,7 @@ impl ParseState for LitStrState {
                         str.push(VarOrStr::Str(env.full_text[self.current_str_start..self.current_str_end].to_vec()));
                     }
                     *str_end = self.current_str_end;
-                    MatchResult::Matched(word.pos, true)
+                    MatchResult::Matched(rest.pos, false)
                 }else{
                     unreachable!()
                 }

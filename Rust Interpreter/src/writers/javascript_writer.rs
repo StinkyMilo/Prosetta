@@ -350,22 +350,6 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
     }
 }
 
-fn write_prints(exprs: &ExprArena, data: &Vec<Prints>) -> String {
-    let mut ret = String::new();
-    for print in data {
-        ret += &match print {
-            Prints::Var(index) | Prints::String(index) => write_expr(exprs, *index),
-            Prints::Word(str, _index) => {
-                format!("\"{}\"", std::str::from_utf8(str).unwrap().to_string())
-            }
-        };
-        ret += ", ";
-    }
-    ret.pop();
-    ret.pop();
-    ret
-}
-
 fn write_exprs(exprs: &ExprArena, indexes: &[usize], delimeter: &str) -> String {
     if indexes.len() == 0 {
         return "".to_string();
