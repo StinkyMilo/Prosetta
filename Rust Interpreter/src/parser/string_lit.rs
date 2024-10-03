@@ -25,8 +25,16 @@ impl ParseState for LitStrState {
                 self.current_str_start=word.pos + env.global_index + 1;
                 MatchResult::Continue
             } else {
-                //Add current str
-                MatchResult::Matched(word.pos, true)
+                if let Expr::LitString { str, .. } = env.expr{
+                    //Add current str
+                    self.current_str_end = word.pos + env.global_index;
+                    if self.current_str_end > self.current_str_start {
+                        str.push(VarOrStr::Str(env.full_text[self.current_str_start..self.current_str_end].to_vec()));
+                    }
+                    MatchResult::Matched(word.pos, true)
+                }else{
+                    unreachable!()
+                }
             }
         } else {
             if self.first {
@@ -36,7 +44,7 @@ impl ParseState for LitStrState {
                     if let Some(var) = env.vars.try_get_var(word, env.global_index){
                         self.current_str_end = word.pos + env.global_index;
                         if self.current_str_end > self.current_str_start {
-                            str.push(VarOrStr::Str())
+                            str.push(VarOrStr::Str(env.full_text[self.current_str_start..self.current_str_end].to_vec()));
                         }
                         str.push(VarOrStr::Var(var));
                         self.current_str_start = rest.pos;
