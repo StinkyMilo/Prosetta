@@ -175,11 +175,13 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             }
         }
         Expr::Print {
-            locs: _,
-            data,
-            end: _,
+            indexes, single_word, ..
         } => {
-            format!("print_console({});", write_prints(exprs, data))
+            if let Some(word) = single_word{
+                format!("print_console(\"{}\");",String::from_utf8_lossy(word))
+            }else{
+                format!("print_console({});", write_exprs(exprs, indexes, ", "))
+            }
         }
         Expr::Skip { index, .. } => write_expr(exprs, *index),
         Expr::If { indexes, .. } => {

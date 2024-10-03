@@ -168,12 +168,20 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 )
             }
         }
-        Expr::Print { locs, data, end } => {
-            format!(
-                "(print{}{})",
-                join_locs(locs, Some(*end)),
-                write_prints(exprs, data)
-            )
+        Expr::Print { locs, indexes, end, single_word, .. } => {
+            if let Some(word) = single_word {
+                format!(
+                    "(print{} {})",
+                    join_locs(locs, Some(*end)),
+                    String::from_utf8_lossy(word)
+                )
+            }else{
+                format!(
+                    "(print{} {})",
+                    join_locs(locs, Some(*end)),
+                    write_exprs(exprs,indexes)
+                )
+            }
         }
         Expr::Skip {
             locs,

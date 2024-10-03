@@ -71,7 +71,8 @@ pub enum Expr {
     },
     Print {
         locs: Vec<usize>,
-        data: Vec<Prints>,
+        indexes: Vec<usize>,
+        single_word: Option<Vec<u8>>,
         end: End,
     },
     If {

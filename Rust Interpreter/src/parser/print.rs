@@ -1,11 +1,11 @@
+use alias::NoneState;
+
 use super::*;
 
 #[derive(Debug)]
 
 pub struct PrintState {
-    first: bool,
-    parsing_var: bool,
-    first_word: Option<(Vec<u8>, usize)>,
+    first: bool
 }
 
 impl ParseState for PrintState {
@@ -22,31 +22,26 @@ impl ParseState for PrintState {
 
             *env.expr = Expr::Print {
                 locs: env.locs.take().unwrap_or_default(),
-                data: Vec::new(),
+                indexes: Vec::new(),
+                single_word: None,
                 end,
             };
         }
 
-        if found_close {
-            if let Expr::Print { data, end, .. } = env.expr {
-                // is "pri hi." then add word
-                if let Some((str, pos)) = self.first_word.take() {
-                    data.push(Prints::Word(str, pos))
-                }
+        if let Expr::Print { single_word, end, .. } = env.expr {
+            if found_close {
                 // set end
                 *end = End::from_slice(&word, env.global_index);
+                MatchResult::Matched(word.pos, true)
             } else {
-                unreachable!()
+                //get first word for "pri hi."
+                if self.first {
+                   *single_word = Some(word.str.to_vec());
+                }
+                MatchResult::ContinueWith(word.pos, get_state!(NoneState::new_expr_cont()))
             }
-            MatchResult::Matched(word.pos, true)
-        } else {
-            //get first word for "pri hi."
-            if self.first {
-                self.first_word = Some((word.str.to_vec(), word.pos));
-            } else {
-                self.first_word = None;
-            }
-            MatchResult::ContinueWith(word.pos, get_state!(var::VarState::new()))
+        }else{
+            unreachable!()
         }
     }
 
@@ -55,47 +50,22 @@ impl ParseState for PrintState {
         env: &mut Environment,
         child_index: Option<usize>,
         word: &Slice,
-        _rest: &Slice,
+        rest: &Slice,
     ) -> MatchResult {
         self.first = false;
-        if let Expr::Print { data, end, .. } = env.expr {
-            // prev word was var
+        if let Expr::Print { indexes, end, single_word, .. } = env.expr {
             if let Some(index) = child_index {
-                //word matched -- first_word now invalid
-                self.first_word = None;
-                if self.parsing_var {
-                    data.push(Prints::Var(index));
-                } else {
-                    data.push(Prints::String(index));
-                }
-                if is_mandatory_close(word) {
-                    *end = End::from_slice(&word, env.global_index);
-                    MatchResult::Matched(word.pos, true)
-                } else {
-                    self.parsing_var = true;
-                    MatchResult::ContinueWith(word.pos, get_state!(var::VarState::new()))
-                }
-                // curr word was not var
-            } else {
-                if self.parsing_var {
-                    self.parsing_var = false;
-                    MatchResult::ContinueWith(word.pos, get_state!(string_lit::LitStrState::new()))
-                } else {
-                    self.parsing_var = true;
-                    MatchResult::Continue
-                }
+                indexes.push(index);
+                *single_word = None;
             }
-        // data.push(Prints::Word(
-        //     word.str.to_owned(),
-        //     word.pos + env.global_index,
-        // ));
-        // MatchResult::Continue
-        // if is_close(word) {
-        //     *end = word.pos;
-        //     MatchResult::Matched(word.pos + 1)
-        // } else {
-        //     MatchResult::ContinueWith(word.pos, get_state!(var::VarState::new()))
-        // }
+            if is_mandatory_close(word){
+                *end = End::from_slice(&word, env.global_index);
+                MatchResult::Matched(word.pos, true)
+            }else if child_index.is_some(){
+                MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr()))
+            }else{
+                MatchResult::Continue
+            }
         } else {
             unreachable!()
         }
@@ -113,9 +83,7 @@ impl ParseState for PrintState {
 impl PrintState {
     pub fn new() -> Self {
         Self {
-            first: true,
-            parsing_var: true,
-            first_word: None,
+            first: true
         }
     }
 }

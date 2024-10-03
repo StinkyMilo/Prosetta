@@ -278,9 +278,9 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_as(source, end.index - str_start, NUM_COLOR);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Print { locs, data, end } => {
+            Expr::Print { locs, indexes, end, .. } => {
                 self.write_locs(source, locs, stack_index);
-                self.write_prints(source, exprs, data);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
             Expr::Skip {
