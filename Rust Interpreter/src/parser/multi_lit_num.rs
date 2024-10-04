@@ -1,20 +1,10 @@
 use super::*;
 use num_literal::get_number;
-use std::fmt;
 
 #[derive(Debug, PartialEq)]
 pub enum VarOrInt {
-    Var(Vec<u8>),
+    Var(Var),
     Int(i64),
-}
-
-impl fmt::Display for VarOrInt {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            VarOrInt::Var(name) => write!(f, "{}", String::from_utf8_lossy(name)),
-            VarOrInt::Int(int_val) => write!(f, "{}", int_val),
-        }
-    }
 }
 
 #[derive(Debug)]
@@ -65,7 +55,7 @@ impl ParseState for MultiLitNumState {
                 //let lower = word.str.to_ascii_lowercase();
                 if let Some(var) = env.vars.try_get_var(word, env.global_index) {
                     self.any_vars = true;
-                    values.push(VarOrInt::Var(var.name));
+                    values.push(VarOrInt::Var(var));
                 } else if let Some(num_value) = get_number(word.str) {
                     values.push(VarOrInt::Int(num_value % 10));
                 } else {

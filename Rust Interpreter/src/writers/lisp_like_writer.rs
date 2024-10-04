@@ -1,6 +1,6 @@
 use std::usize;
 
-use crate::{commands::*, parser::End};
+use crate::{commands::*, parser::{multi_lit_num::VarOrInt, End}};
 
 fn write_end(end: End) -> String {
     let mut ret = String::new();
@@ -154,11 +154,15 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 let mut output_vals = "".to_string();
                 let mut is_first = true;
                 for val in values {
-                    if is_first {
-                        output_vals += &format!("{}", val);
-                        is_first = false;
-                    } else {
-                        output_vals += &format!(" {}", val);
+                    if !is_first{
+                        output_vals += " ";
+                    }else{
+                        is_first=false;
+                    }
+                    if let VarOrInt::Var(var) = val {
+                        output_vals += &format!("{}", String::from_utf8_lossy(&var.name));
+                    }else if let VarOrInt::Int(intval) = val{
+                        output_vals += &format!("{}",intval);
                     }
                 }
                 format!(

@@ -259,6 +259,16 @@ function set_line_width(width) {
   ctx.lineWidth = width;
 }
 
+function get_concat_value(...args){
+  let total = 0;
+  let multiplier = 1;
+  for(let i = args.length-1; i >= 0; i--){
+    total+=args[i]*multiplier;
+    multiplier*=10;
+  }
+  return total;
+}
+
 function log_base(base, val = undefined) {
   if (val == undefined) {
     return Math.log(base);
