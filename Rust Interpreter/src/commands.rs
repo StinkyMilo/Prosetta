@@ -1,7 +1,7 @@
 use std::ops::Index;
 
 use crate::parser::multi_lit_num::VarOrInt;
-use crate::parser::End;
+use crate::parser::{End, SubStrData};
 
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum OperatorType {
@@ -28,24 +28,6 @@ pub enum Prints {
     String(usize),
     /// value, string_index
     Word(Vec<u8>, usize),
-}
-#[derive(PartialEq, Debug)]
-pub struct SubStrData {
-    pub name: Vec<u8>,
-    pub start: usize,
-    pub skip_indexes: Vec<u8>,
-    pub args: u8,
-}
-
-impl SubStrData {
-    pub fn new() -> Self {
-        Self {
-            start: usize::MAX,
-            name: Vec::new(),
-            skip_indexes: Vec::new(),
-            args: 0,
-        }
-    }
 }
 
 #[derive(PartialEq, Debug)]
@@ -187,8 +169,7 @@ pub enum Expr {
     },
     FunctionCall {
         locs: Vec<usize>,
-        name_start: usize,
-        name: Vec<u8>,
+        func: SubStrData,
         indexes: Vec<usize>,
         end: End,
     },
@@ -246,8 +227,7 @@ pub enum Expr {
         end: End,
     },
     Ignore {
-        name_start: usize,
-        name: Vec<u8>,
+        data: SubStrData,
     },
 }
 

@@ -312,11 +312,11 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                 write_exprs(exprs, indexes, "\n")
             )
         }
-        Expr::FunctionCall { name, indexes, .. } => {
+        Expr::FunctionCall { func, indexes, .. } => {
             //Trying without a semicolon since JS lets you forget them sometimes and function calls can be either expressions or statements
             format!(
                 "{}_var({})",
-                String::from_utf8_lossy(name),
+                String::from_utf8_lossy(&func.name),
                 write_exprs(exprs, indexes, ", ")
             )
         }

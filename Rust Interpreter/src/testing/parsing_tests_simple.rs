@@ -141,7 +141,7 @@ mod tests_simple {
 
     #[test]
     #[timeout(1000)]
-    fn lit_zero() {
+    fn test_lit_zero() {
         let text = b"The wizards were literally...".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
         assert_eq!(

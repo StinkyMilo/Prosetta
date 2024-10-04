@@ -28,23 +28,23 @@ impl ParseState for MultiLitNumState {
         if self.first {
             let locs = env.locs.take().unwrap_or_default();
             self.first = false;
-            if is_mandatory_close(word) {
-                *env.expr = Expr::MultiLitNum {
-                    str_start: word.pos + env.global_index,
-                    locs,
-                    end: End::from_slice(&word, env.global_index),
-                    single_value: Some(0),
-                    values: Vec::new(),
-                };
-                return MatchResult::Matched(word.pos, true);
+
+            let (end, single_value) = if is_mandatory_close(word) {
+                (End::from_slice(&word, env.global_index), Some(0))
             } else {
-                *env.expr = Expr::MultiLitNum {
-                    str_start: word.pos + env.global_index,
-                    locs,
-                    end: End::none(),
-                    single_value: None,
-                    values: Vec::new(),
-                };
+                (End::none(), None)
+            };
+
+            *env.expr = Expr::MultiLitNum {
+                str_start: word.pos + env.global_index,
+                locs,
+                end,
+                single_value,
+                values: Vec::new(),
+            };
+
+            if single_value.is_some() {
+                return MatchResult::Matched(word.pos, true);
             }
         }
         if let Expr::MultiLitNum {
@@ -106,11 +106,9 @@ impl MultiLitNumState {
     }
     pub fn get_final_value(values: &Vec<VarOrInt>) -> Option<i64> {
         let mut val = Some(0i64);
-        // let mut final_val_multiplier = Some(1i64);
         for i in values.into_iter() {
             if let VarOrInt::Int(i_val) = *i {
                 if let Some(var) = val {
-                    // let test: i64 = var;
                     val = var
                         .checked_mul(10_i64)
                         .and_then(|val| val.checked_add(i_val))

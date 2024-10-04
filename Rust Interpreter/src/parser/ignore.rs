@@ -4,15 +4,9 @@ use super::*;
 pub struct IgnoreState;
 impl ParseState for IgnoreState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
-        // get lowercase
-        let lower = word.str.to_ascii_lowercase();
-
         // is varible in scope
-        if let Some((index, name)) = env.nots.try_get_val(&lower) {
-            *env.expr = Expr::Ignore {
-                name_start: word.pos + env.global_index + index,
-                name,
-            };
+        if let Some(data) = env.nots.try_get_val(&word, env.global_index) {
+            *env.expr = Expr::Ignore { data };
             MatchResult::Matched(rest.pos, false)
         } else {
             // future words could be varible names

@@ -1,6 +1,9 @@
 use std::usize;
 
-use crate::{commands::*, parser::End};
+use crate::{
+    commands::*,
+    parser::{End, SubStrData},
+};
 
 fn write_end(end: End) -> String {
     let mut ret = String::new();
@@ -369,14 +372,14 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
         }
         Expr::FunctionCall {
             locs,
-            name,
+            func,
             indexes,
             end,
             ..
         } => {
             format!(
                 "({}{} {})",
-                String::from_utf8_lossy(name),
+                String::from_utf8_lossy(&func.name),
                 join_locs(locs, Some(*end)),
                 write_exprs(exprs, indexes)
             )
@@ -407,18 +410,14 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
             end,
         } => {
             format!(
-                "(not{} @{}$${} {})",
+                "(not{} @{}$${} \"{}\")",
                 join_locs(locs, Some(*end)),
                 *str_start,
                 *str_len,
                 String::from_utf8_lossy(word)
             )
         }
-        Expr::Ignore { name_start, name } => format!(
-            "(ignore \"{}\"@{})",
-            String::from_utf8_lossy(&name).to_string(),
-            name_start
-        ),
+        Expr::Ignore { data } => format!("(ignore {})", write_var(data),),
     }
 }
 
