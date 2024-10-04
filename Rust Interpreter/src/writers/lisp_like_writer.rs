@@ -458,7 +458,7 @@ fn write_mult_exprs(exprs: &ExprArena, indexes: &[usize], char: u8, indent: usiz
     ret
 }
 
-fn write_var(var: &Var) -> String {
+fn write_var(var: &SubStrData) -> String {
     let mut skips_str = String::new();
     if !var.skip_indexes.is_empty() {
         skips_str += "|";

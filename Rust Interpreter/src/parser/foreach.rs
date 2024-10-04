@@ -10,7 +10,7 @@ impl ParseState for ForEachState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         if self.first {
             *env.expr = Expr::ForEach {
-                var: Var::new(),
+                var: SubStrData::new(),
                 locs: env.locs.take().unwrap_or_default(),
                 indexes: Vec::new(),
                 end: End::none(),

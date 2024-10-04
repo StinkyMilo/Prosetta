@@ -62,7 +62,7 @@ mod parsing_tests_simple;
 
 use std::{collections::HashMap, fmt::Debug, mem};
 
-use crate::{commands::*, writers::lisp_like_writer};
+use crate::commands::*;
 
 use alias_data::AliasData;
 

@@ -11,7 +11,7 @@ impl ParseState for AssignState {
         // set expr
         if self.first {
             *env.expr = Expr::Assign {
-                var: Var::new(),
+                var: SubStrData::new(),
                 value_index: usize::MAX,
                 locs: env.locs.take().unwrap_or_default(),
                 end: End::none(),

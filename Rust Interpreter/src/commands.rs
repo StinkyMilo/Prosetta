@@ -30,17 +30,20 @@ pub enum Prints {
     Word(Vec<u8>, usize),
 }
 #[derive(PartialEq, Debug)]
-pub struct Var {
+pub struct SubStrData {
     pub name: Vec<u8>,
     pub start: usize,
     pub skip_indexes: Vec<u8>,
+    pub args: u8,
 }
-impl Var {
+
+impl SubStrData {
     pub fn new() -> Self {
         Self {
             start: usize::MAX,
             name: Vec::new(),
             skip_indexes: Vec::new(),
+            args: 0,
         }
     }
 }
@@ -72,7 +75,7 @@ pub enum Expr {
     },
     Assign {
         locs: Vec<usize>,
-        var: Var,
+        var: SubStrData,
         first: bool,
         value_index: usize,
         end: End,
@@ -100,7 +103,7 @@ pub enum Expr {
     },
     //expr
     Var {
-        var: Var,
+        var: SubStrData,
     },
     WordNum {
         locs: Vec<usize>,
@@ -127,6 +130,7 @@ pub enum Expr {
         single_value: Option<i64>,
         end: End,
     },
+    #[allow(dead_code)]
     Skip {
         locs: Vec<usize>,
         index: usize,
@@ -224,7 +228,7 @@ pub enum Expr {
         end: End,
     },
     ForEach {
-        var: Var,
+        var: SubStrData,
         locs: Vec<usize>,
         indexes: Vec<usize>,
         end: End,

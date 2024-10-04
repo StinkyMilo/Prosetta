@@ -1,16 +1,68 @@
 use std::{
+    collections::HashSet,
     fmt::{self, Debug},
     usize,
-    collections::HashSet
 };
 
-use super::{alias_data::AliasData, Expr, Var};
+use super::{alias_data::AliasData, Expr, SubStrData};
 
 #[path = "testing/parsing_tests_word_funcs.rs"]
 mod parsing_tests_word_funcs;
-// quickscope
+
+fn try_get_val<'a>(
+    name: &[u8],
+    iter: &mut dyn Iterator<Item = &'a Vec<u8>>,
+) -> Option<(u8, &'a Vec<u8>)> {
+    let mut max_var_length = 0u8;
+    let mut var_data: Option<(u8, &Vec<u8>)> = None;
+    for str in iter {
+        let is_longer = str.len() as u8 >= max_var_length;
+        // if var could be in word
+        if is_longer && name.len() >= str.len() {
+            // if found
+            if let Some(index) = name.find(str) {
+                let is_better = var_data.as_ref().map_or(true, |&(old_index, _)| {
+                    is_longer || (index as u8) < old_index
+                });
+
+                if is_better {
+                    max_var_length = str.len() as u8;
+                    var_data = Some((index as u8, &str));
+                }
+            }
+        }
+    }
+    var_data
+}
+/// remove skip indexes outside of var str and fix indexes for ones inside, returns var start in term of word start
+fn convert_skip_indexes(skip_indexes: &mut Vec<u8>, var_start: u8, var_len: u8) -> u8 {
+    let mut start_index = 0u8;
+    while start_index < skip_indexes.len() as u8 {
+        if skip_indexes[start_index as usize] <= var_start + start_index {
+            start_index += 1;
+        } else {
+            break;
+        }
+    }
+
+    let start = var_start + start_index;
+    let var_end = start + var_len;
+    skip_indexes.drain(..start_index as usize);
+
+    let end_index = skip_indexes
+        .iter()
+        .position(|&v| v > var_end)
+        .unwrap_or(skip_indexes.len());
+    skip_indexes.drain(end_index..);
+
+    for val in skip_indexes {
+        *val -= start;
+    }
+    start
+}
+
 pub struct IgnoreSet {
-    set: HashSet<Vec<u8>>
+    set: HashSet<Vec<u8>>,
 }
 impl IgnoreSet {
     pub fn new() -> Self {
@@ -84,54 +136,22 @@ impl VarSet {
         self.set.contains(&lower)
     }
     ///returns (index in word, varible name)
-    pub fn try_get_var(&self, word: &Slice, global_index: usize) -> Option<Var> {
+    pub fn try_get_var(&self, word: &Slice, global_index: usize) -> Option<SubStrData> {
         if word.len() > 255 {
             return None;
         }
         // remove ' and make lowercase
         let (name, mut skip_indexes) = get_var_name_and_skips(word.str);
+        let var_data = try_get_val(&name, &mut self.set.iter());
 
-        let mut max_var_length = 0u8;
-        let mut var_data: Option<(u8, Vec<u8>)> = None;
-        for str in self.set.iter() {
-            let is_longer = str.len() as u8 >= max_var_length;
-            // if var could be in word
-            if is_longer && name.len() >= str.len() {
-                // if found
-                if let Some(index) = name.find(str) {
-                    let is_better = var_data.as_ref().map_or(true, |&(old_index, _)| {
-                        is_longer || (index as u8) < old_index
-                    });
-
-                    if is_better {
-                        max_var_length = str.len() as u8;
-                        var_data = Some((index as u8, str.clone()));
-                    }
-                }
-            }
-        }
         if let Some((var_start, name)) = var_data {
-            let start_index = skip_indexes
-                .iter()
-                .position(|&v| v > var_start)
-                .unwrap_or(skip_indexes.len());
+            let start = convert_skip_indexes(&mut skip_indexes, var_start, name.len() as u8);
 
-            let start = var_start + start_index as u8;
-            let var_end: u8 = start + name.len() as u8;
-            skip_indexes.drain(..start_index);
-
-            let end_index = skip_indexes
-                .iter()
-                .position(|&v| v > var_end)
-                .unwrap_or(skip_indexes.len());
-            skip_indexes.drain(end_index..);
-            for val in &mut skip_indexes {
-                *val -= var_start;
-            }
-            Some(Var {
+            Some(SubStrData {
                 start: global_index + word.pos + start as usize,
-                name,
+                name: name.to_vec(),
                 skip_indexes,
+                args: 0,
             })
         } else {
             None
@@ -180,7 +200,7 @@ impl FuncSet {
         lower.retain(|&x| x != b'\'');
 
         let mut max_var_length = 0;
-        let mut var: Option<(usize, Vec<u8>, usize)>= None;
+        let mut var: Option<(usize, Vec<u8>, usize)> = None;
         for str in self.set.iter() {
             let is_longer = str.0.len() >= max_var_length;
             // if var could be in word
@@ -211,16 +231,7 @@ impl FuncSet {
         }
     }
 }
-// pub type StepFunction =
-//     fn(env: &mut Environment, result: LastMatchResult, word: &Slice, rest: &Slice) -> MatchResult;
 
-// (expr_index, string_index, state)
-
-/// a state on the stack
-/// State.0 is the index of the expr in the list
-/// State.1 is the last string parse location
-/// State.2 is the state itself
-//pub type State = (usize, usize, Box<dyn ParseState>);
 #[derive(Debug)]
 
 /// a state on the stack
@@ -244,7 +255,7 @@ use quickscope::{ScopeMap, ScopeSet};
 /// add or remove commands based on flags
 #[derive(Default, Debug)]
 pub struct ParserFlags {
-    pub not: bool
+    pub not: bool,
 }
 
 #[derive(PartialEq, Eq, Debug)]
@@ -659,7 +670,7 @@ pub fn get_var_name_and_skips(word: &[u8]) -> (Vec<u8>, Vec<u8>) {
     (name, skips)
 }
 
-pub fn try_get_var_word(word: &Slice, global_index: usize) -> Option<Var> {
+pub fn try_get_var_word(word: &Slice, global_index: usize) -> Option<SubStrData> {
     if word.len() >= 1
         && word.len() <= 255
         && !is_close(word)
@@ -671,10 +682,11 @@ pub fn try_get_var_word(word: &Slice, global_index: usize) -> Option<Var> {
         if name.is_empty() {
             None
         } else {
-            Some(Var {
+            Some(SubStrData {
                 start: global_index + word.pos,
                 name,
                 skip_indexes,
+                args: 0,
             })
         }
     } else {

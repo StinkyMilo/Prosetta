@@ -134,7 +134,7 @@ impl<T: Renderer> SyntaxLinter<T> {
         }
     }
 
-    fn write_var(&mut self, source: &mut ParserSourceIter, var: &Var) {
+    fn write_var(&mut self, source: &mut ParserSourceIter, var: &SubStrData) {
         self.write_up_to(source, var.start);
         for &index in &var.skip_indexes {
             self.write_up_to_as(source, var.start + index as usize, VAR_COLOR);
