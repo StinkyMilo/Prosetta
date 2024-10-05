@@ -15,7 +15,6 @@ impl ParseState for IgnoreState {
             };
             MatchResult::Matched(rest.pos, false)
         } else {
-            // future words could be varible names
             MatchResult::Failed
         }
     }
