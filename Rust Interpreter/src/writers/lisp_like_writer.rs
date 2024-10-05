@@ -175,20 +175,6 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 write_prints(exprs, data)
             )
         }
-        Expr::Skip {
-            locs,
-            index,
-            start,
-            end,
-        } => {
-            format!(
-                "(skip{} @{}${} {})",
-                join_locs(locs, None),
-                *start,
-                write_end(*end),
-                write_expr(exprs, *index, 0),
-            )
-        }
         Expr::If {
             locs, indexes, end, ..
         } => {
@@ -407,12 +393,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 *str_len,
                 String::from_utf8_lossy(word)
             )
-        },
-        Expr::Ignore { name_start, name } => format!(
-            "(ignore \"{}\"@{})",
-            String::from_utf8_lossy(&name).to_string(),
-            name_start
-        ),
+        }
     }
 }
 

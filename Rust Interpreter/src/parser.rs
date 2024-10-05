@@ -23,7 +23,6 @@ mod find;
 mod foreach;
 mod function;
 mod if_stat;
-mod ignore;
 mod index;
 mod len;
 mod list;

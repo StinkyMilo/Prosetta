@@ -181,7 +181,6 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         } => {
             format!("print_console({});", write_prints(exprs, data))
         }
-        Expr::Skip { index, .. } => write_expr(exprs, *index),
         Expr::If { indexes, .. } => {
             format!(
                 "if ({}) {{\n{}\n}}",
@@ -332,7 +331,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         Expr::Length { index, .. } => {
             format!("{}.length",write_expr(exprs,*index))
         },
-        Expr::Not { .. } | Expr::Ignore {..} =>{
+        Expr::Not { .. }=>{
             format!("")
         },
     }

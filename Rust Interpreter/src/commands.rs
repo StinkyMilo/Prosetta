@@ -118,12 +118,6 @@ pub enum Expr {
         single_value: Option<i64>,
         end: End,
     },
-    Skip {
-        locs: Vec<usize>,
-        index: usize,
-        start: usize,
-        end: End,
-    },
     Color {
         locs: Vec<usize>,
         indexes: [usize; 3],
@@ -232,10 +226,6 @@ pub enum Expr {
         str_start: usize,
         str_len: usize,
         end: End
-    },
-    Ignore {
-        name_start: usize,
-        name: Vec<u8>,
     }
 }
 
