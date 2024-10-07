@@ -333,7 +333,7 @@ function updateCode() {
   }
   old_code = new_code;
   parsedData = parser.run_to_completion(new_code);
-  jscode.innerText = parsedData.get_javascript();
+  jscode.innerHTML = parsedData.get_javascript();
   syntax.innerHTML = parsedData.get_html();
   let c = syntax.children;
   // for (let i = 0; i < c.length; i++) {
@@ -374,14 +374,19 @@ require.config({ paths: { 'vs': '../node_modules/monaco-editor/min/vs' } });
 // `], { type: 'text/javascript' }));
 
 //Create main editor environment
-require(["vs/editor/editor.main"], function() {
-  editor = monaco.editor.create(document.getElementById('code'), {
-    value: [
-      'pri hi!!!'
-    ].join('\n'),
-    language: 'plaintext',
-    theme: 'vs-dark'
-  });
+require(["vs/editor/editor.main"], function () {
+	editor = monaco.editor.create(document.getElementById('code'), {
+		value: [
+			'Wasp fact: there are 10 of them for every human.',
+      'This Wasp total will send you into a frenzy!',
+      'While there are more facts, 1 will suffice for now.',
+      '\tPlus, that wasp total is a great trivium! A totally awesome fact!',
+      '\tThis wasp fact is sublime. This fact is the one and only fact you need!!!',
+      'Your price total will be --- let\'s see here --- fifty dollars, plus tip.'
+		].join('\n'),
+		language: 'plaintext',
+		theme: 'vs-dark'
+	});
   init_canvas();
   console.log("Editor initialized!", editor);
   updateCode();

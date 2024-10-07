@@ -65,7 +65,6 @@ aliases = [
     "fun",
     "pri",
     "was",
-    "sta",
     "not",
     "rec",
     "lin",
@@ -79,7 +78,8 @@ aliases = [
     "tur",
     "ret",
     "fin",
-    "cou"
+    "cou",
+    "bez"
 ]
 
 if __name__ == "__main__":
