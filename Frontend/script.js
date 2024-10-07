@@ -128,10 +128,15 @@ function draw_line() {
   last_shape = "line";
 }
 
-function move_to(x1, y1) {
+function move_to() {
   end_shape();
   last_shape = "move";
-  _move_to(x1, y1);
+  if (arguments.length == 1) {
+    move_distance(arguments[0]);
+  }
+  else {
+    _move_to(arguments[0], arguments[1]);
+  }
 }
 
 function _move_to(x1, y1) {
@@ -259,6 +264,16 @@ function set_line_width(width) {
   ctx.lineWidth = width;
 }
 
+function get_concat_value(...args){
+  let total = 0;
+  let multiplier = 1;
+  for(let i = args.length-1; i >= 0; i--){
+    total+=args[i]*multiplier;
+    multiplier*=10;
+  }
+  return total;
+}
+
 function log_base(base, val = undefined) {
   if (val == undefined) {
     return Math.log(base);
@@ -309,7 +324,7 @@ function openTab(event, tab) {
 }
 
 function updateCode() {
-  if(editor == null){
+  if (editor == null) {
     return;
   }
   let new_code = editor.getValue();
@@ -348,7 +363,7 @@ window.runCode = runCode;
 window.updateCode = updateCode;
 window.openTab = openTab;
 
-require.config({ paths: { 'vs': '../node_modules/monaco-editor/min/vs' }});
+require.config({ paths: { 'vs': '../node_modules/monaco-editor/min/vs' } });
 // window.MonacoEnvironment = { getWorkerUrl: () => proxy };
 
 // let proxy = URL.createObjectURL(new Blob([`
@@ -373,6 +388,6 @@ require(["vs/editor/editor.main"], function () {
 		theme: 'vs-dark'
 	});
   init_canvas();
-  console.log("Editor initialized!",editor);
+  console.log("Editor initialized!", editor);
   updateCode();
 });

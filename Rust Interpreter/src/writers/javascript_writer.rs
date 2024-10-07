@@ -1,4 +1,4 @@
-use crate::commands::*;
+use crate::{commands::*, parser::multi_lit_num::VarOrInt, parser::string_lit::VarOrStr};
 
 #[allow(dead_code)]
 pub fn write(exprs: &ExprArena, line_starts: &Vec<usize>) -> String {
@@ -62,9 +62,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         } => {
             format!("draw_rect({});", write_exprs(exprs, indexes, ", "))
         }
-        Expr::Var {
-            var
-        } => format!("{}_var", String::from_utf8_lossy(&var.name).to_string()),
+        Expr::Var { var } => format!("{}_var", String::from_utf8_lossy(&var.name).to_string()),
         Expr::WordNum {
             locs: _,
             str_start: _,
@@ -164,24 +162,29 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                 let mut output_vals = "".to_string();
                 let mut is_first = true;
                 for val in values {
-                    if is_first {
-                        output_vals += &format!("{}", val);
-                        is_first = false;
-                    } else {
-                        output_vals += &format!(", {}", val);
+                    if !is_first{
+                        output_vals += ", ";
+                    }else{
+                        is_first=false;
+                    }
+                    if let VarOrInt::Var(var) = val {
+                        output_vals += &format!("{}_var", String::from_utf8_lossy(&var.name));
+                    }else if let VarOrInt::Int(intval) = val{
+                        output_vals += &format!("{}",intval);
                     }
                 }
                 format!("get_concat_value({})", output_vals)
             }
         }
         Expr::Print {
-            locs: _,
-            data,
-            end: _,
+            indexes, single_word, ..
         } => {
-            format!("print_console({});", write_prints(exprs, data))
+            if let Some(word) = single_word{
+                format!("print_console(\"{}\");",String::from_utf8_lossy(word))
+            }else{
+                format!("print_console({});", write_exprs(exprs, indexes, ", "))
+            }
         }
-        Expr::Skip { index, .. } => write_expr(exprs, *index),
         Expr::If { indexes, .. } => {
             format!(
                 "if ({}) {{\n{}\n}}",
@@ -220,7 +223,17 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             format!("get_color({})", write_exprs(exprs, indexes, ", "))
         }
         Expr::LitString { str, .. } => {
-            format!("\"{}\"", String::from_utf8_lossy(str))
+            let mut output: String = String::new();
+            for val in str.iter(){
+                if let VarOrStr::Var(var) = val {
+                    let new_val = format!("${{{}_var}}",String::from_utf8_lossy(&var.name));
+                    output += &new_val[..];
+                }else if let VarOrStr::Str(str) = val {
+                    let new_val = String::from_utf8_lossy(str);
+                    output += &new_val[..];
+                }
+            }
+            format!("`{}`", output)
         }
         Expr::MoveTo { indexes, .. } => {
             format!("move_to({});", write_exprs(exprs, indexes, ", "))
@@ -283,7 +296,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         Expr::List { indexes, .. } => {
             format!("[{}]", write_exprs(exprs, indexes, ", "))
         }
-        Expr::ForEach { indexes, name, .. } => {
+        Expr::ForEach { indexes, var, .. } => {
             format!(
                 "for(let {}_var of {}) {{\n{}\n}}",
                 String::from_utf8_lossy(&name),
@@ -314,11 +327,11 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                 write_exprs(exprs, indexes, "\n")
             )
         }
-        Expr::FunctionCall { name, indexes, .. } => {
+        Expr::FunctionCall { func, indexes, .. } => {
             //Trying without a semicolon since JS lets you forget them sometimes and function calls can be either expressions or statements
             format!(
                 "{}_var({})",
-                String::from_utf8_lossy(name),
+                String::from_utf8_lossy(&func.name),
                 write_exprs(exprs, indexes, ", ")
             )
         }
@@ -332,26 +345,10 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         Expr::Length { index, .. } => {
             format!("{}.length",write_expr(exprs,*index))
         },
-        Expr::Not { .. } | Expr::Ignore {..} =>{
+        Expr::Not { .. }=>{
             format!("")
-        },
+        }
     }
-}
-
-fn write_prints(exprs: &ExprArena, data: &Vec<Prints>) -> String {
-    let mut ret = String::new();
-    for print in data {
-        ret += &match print {
-            Prints::Var(index) | Prints::String(index) => write_expr(exprs, *index),
-            Prints::Word(str, _index) => {
-                format!("\"{}\"", std::str::from_utf8(str).unwrap().to_string())
-            }
-        };
-        ret += ", ";
-    }
-    ret.pop();
-    ret.pop();
-    ret
 }
 
 fn write_exprs(exprs: &ExprArena, indexes: &[usize], delimeter: &str) -> String {

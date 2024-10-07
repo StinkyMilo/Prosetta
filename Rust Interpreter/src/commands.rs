@@ -1,7 +1,8 @@
 use std::ops::Index;
 
 use crate::parser::multi_lit_num::VarOrInt;
-use crate::parser::End;
+use crate::parser::{End, SubStrData};
+use crate::parser::string_lit::VarOrStr;
 
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum OperatorType {
@@ -18,22 +19,6 @@ pub enum OperatorType {
     Or,
     Equals,
     Not,
-}
-
-#[derive(PartialEq, Debug)]
-pub enum Prints {
-    /// child_index
-    Var(usize),
-    /// child_index
-    String(usize),
-    /// value, string_index
-    Word(Vec<u8>, usize),
-}
-#[derive(PartialEq, Debug)]
-pub struct Var {
-    pub name: Vec<u8>,
-    pub start: usize,
-    pub skip_indexes: Vec<u8>,
 }
 
 #[derive(PartialEq, Debug)]
@@ -63,14 +48,16 @@ pub enum Expr {
     },
     Assign {
         locs: Vec<usize>,
-        var: Var,
+        var: SubStrData,
         first: bool,
         value_index: usize,
         end: End,
     },
     Print {
         locs: Vec<usize>,
-        data: Vec<Prints>,
+        indexes: Vec<usize>,
+        single_word: Option<Vec<u8>>,
+        single_word_start: usize,
         end: End,
     },
     If {
@@ -91,7 +78,7 @@ pub enum Expr {
     },
     //expr
     Var {
-        var: Var,
+        var: SubStrData,
     },
     WordNum {
         locs: Vec<usize>,
@@ -118,12 +105,6 @@ pub enum Expr {
         single_value: Option<i64>,
         end: End,
     },
-    Skip {
-        locs: Vec<usize>,
-        index: usize,
-        start: usize,
-        end: End,
-    },
     Color {
         locs: Vec<usize>,
         indexes: [usize; 3],
@@ -146,7 +127,8 @@ pub enum Expr {
     },
     LitString {
         str_start: usize,
-        str: Vec<u8>,
+        str_end: usize,
+        str: Vec<VarOrStr>,
     },
     MoveTo {
         locs: Vec<usize>,
@@ -174,8 +156,7 @@ pub enum Expr {
     },
     FunctionCall {
         locs: Vec<usize>,
-        name_start: usize,
-        name: Vec<u8>,
+        func: SubStrData,
         indexes: Vec<usize>,
         end: End,
     },
@@ -215,8 +196,7 @@ pub enum Expr {
         end: End,
     },
     ForEach {
-        name_start: usize,
-        name: Vec<u8>,
+        var: SubStrData,
         locs: Vec<usize>,
         indexes: Vec<usize>,
         end: End,
@@ -224,19 +204,15 @@ pub enum Expr {
     Length {
         locs: Vec<usize>,
         index: usize,
-        end: End
+        end: End,
     },
     Not {
         locs: Vec<usize>,
         word: Vec<u8>,
         str_start: usize,
         str_len: usize,
-        end: End
+        end: End,
     },
-    Ignore {
-        name_start: usize,
-        name: Vec<u8>,
-    }
 }
 
 impl Expr {

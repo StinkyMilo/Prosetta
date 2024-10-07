@@ -10,8 +10,7 @@ impl ParseState for ForEachState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         if self.first {
             *env.expr = Expr::ForEach {
-                name_start: usize::MAX,
-                name: Vec::new(),
+                var: SubStrData::new(),
                 locs: env.locs.take().unwrap_or_default(),
                 indexes: Vec::new(),
                 end: End::none(),
@@ -19,25 +18,25 @@ impl ParseState for ForEachState {
             self.first = false;
             // setup child state
             // MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
-        } 
-        if is_close(word) || (word.len() > 0 && (word.str[0] == b'"' || word.str[0] == b'\'')) {
-            MatchResult::Continue
-        }else if !self.has_list{
-            if let Expr::ForEach { 
-                name_start, name, ..
-            } = env.expr {
-                *name_start = word.pos + env.global_index;
-                *name = word.str.to_owned();
-                env.vars.add_layer();
-                env.vars.insert(name.to_ascii_lowercase().to_owned());
-            } else{
-                unreachable!()
+        }
+        let var_word = try_get_var_word(word, env.global_index);
+        if let Some(new_var) = var_word {
+            if !self.has_list {
+                if let Expr::ForEach { var, .. } = env.expr {
+                    *var = new_var;
+                    env.vars.add_layer();
+                    env.vars.insert(var.name.to_owned());
+                } else {
+                    unreachable!()
+                }
+                MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
+            } else if self.has_stat {
+                MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
+            } else {
+                MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat_cont()))
             }
-            MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
-        }else if self.has_stat {
-            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
         } else {
-            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat_cont()))
+            MatchResult::Continue
         }
     }
 

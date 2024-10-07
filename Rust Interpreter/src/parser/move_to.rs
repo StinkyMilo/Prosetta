@@ -34,7 +34,8 @@ impl BasicState for MoveToState {
 
     fn can_close(&self) -> CloseType {
         match self.count {
-            0..=1 => CloseType::Unable,
+            0 => CloseType::Unable,
+            1 => CloseType::Able,
             2 => CloseType::Force,
             _ => unreachable!(),
         }
