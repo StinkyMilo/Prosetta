@@ -4,6 +4,7 @@ mod tests_simple {
 
     use crate::parser::*;
     use crate::testing::*;
+    use crate::writers::lisp_like_writer;
     //use crate::lisp_like_writer::*;
     //use std::hint;
     #[test]
@@ -140,7 +141,7 @@ mod tests_simple {
 
     #[test]
     #[timeout(1000)]
-    fn lit_zero() {
+    fn test_lit_zero() {
         let text = b"The wizards were literally...".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
         assert_eq!(
@@ -270,7 +271,7 @@ mod tests_simple {
             "(assign@0,1,2$10 \"test\"@4 (litnum 4@9$$1))\n(print@12,13,14$33 (litnum 1@16$$3) (var \"test\"@20) (litnum 2@25$$3) (var \"test\"@29))\n(print@35,36,37$43 (var \"test\"@39))\n(print@45,46,47$53 (litnum 4@49$$4))"
         );
     }
-    //TODO: fix so doesn;t fail
+
     #[test]
     #[timeout(1000)]
     fn test_else_past() {
@@ -358,22 +359,31 @@ mod tests_simple {
     //     );
     // }
 
-    // #[test]
-    // #[timeout(1000)]
-    // fn test_var_apostrophes() {
-    //     let text: Vec<u8> =
-    //         b"wasn't 'cause one. was only 'beca'use'."
-    //             .to_vec();
-    //     let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
-    //     test_lib::run_to_completion(&mut parser);
-    //     assert_eq!(
-    //         lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
-    //         "(assign@0,1,2$15 \"h1\"@4 (skip@7,8,9 @10$$10 (litnum 1@12$$3)))\n\
-    //         (assign@17,18,19$35 \"h2\"@21 (skip@24,25,26 @28$$30 (litnum 2@32$$3)))\n\
-    //         (assign@37,38,39$60 \"h3\"@41 (skip@44,45,46 @51$$53 (litnum 3@55$$5)))\n\
-    //         (assign@62,63,64$81 \"h4\"@66 (skip@69,70,71 @75$$75 (litnum 4@77$$4)))"
-    //     );
-    // }
+    #[test]
+    #[timeout(1000)]
+    fn test_var_apostrophes() {
+        let text: Vec<u8> = b"wasn't 'cause one. was only b'e'ca'use'.".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(assign@0,1,2$17 \"cause\"@7|0 (litnum 1@14$$3))\n\
+            (assign@19,20,21$39 \"only\"@23 (var \"cause\"@32|2))"
+        );
+    }
+
+    #[test]
+    #[timeout(1000)]
+    fn test_for_each() {
+        let text: Vec<u8> = b"fre value lis 1 2 3. pri value..".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(foreach@0,1,2$31 value (list@10,11,12$19 (litnum 1@14$$1) (litnum 2@16$$1) (litnum 3@18$$1)) then:\
+            \n  (print@21,22,23$30 (var \"value\"@25))\n)"
+        );
+    }
 
     // #[test]#[timeout(1000)]
     // fn test_liechtenstein() {

@@ -1,6 +1,6 @@
 use std::usize;
 
-use crate::{commands::*, parser::{string_lit::VarOrStr, End}};
+use crate::{commands::*, parser::{string_lit::VarOrStr, multi_lit_num::VarOrInt, End, SubStrData}};
 
 fn write_end(end: End) -> String {
     let mut ret = String::new();
@@ -154,11 +154,15 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 let mut output_vals = "".to_string();
                 let mut is_first = true;
                 for val in values {
-                    if is_first {
-                        output_vals += &format!("{}", val);
-                        is_first = false;
-                    } else {
-                        output_vals += &format!(" {}", val);
+                    if !is_first{
+                        output_vals += " ";
+                    }else{
+                        is_first=false;
+                    }
+                    if let VarOrInt::Var(var) = val {
+                        output_vals += &format!("{}", String::from_utf8_lossy(&var.name));
+                    }else if let VarOrInt::Int(intval) = val{
+                        output_vals += &format!("{}",intval);
                     }
                 }
                 format!(
@@ -183,20 +187,6 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                     write_exprs(exprs,indexes)
                 )
             }
-        }
-        Expr::Skip {
-            locs,
-            index,
-            start,
-            end,
-        } => {
-            format!(
-                "(skip{} @{}${} {})",
-                join_locs(locs, None),
-                *start,
-                write_end(*end),
-                write_expr(exprs, *index, 0),
-            )
         }
         Expr::If {
             locs, indexes, end, ..
@@ -344,14 +334,14 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
             locs,
             indexes,
             end,
-            name,
+            var,
             ..
         } => {
             let split = indexes.split_at_checked(1).unwrap_or_default();
             format!(
                 "(foreach{} {} {} then:\n{}\n)",
                 join_locs(locs, Some(*end)),
-                String::from_utf8_lossy(&name),
+                String::from_utf8_lossy(&var.name),
                 write_expr(exprs, *split.0.first().unwrap_or(&usize::MAX), 0),
                 write_stats(exprs, split.1, indent + 1),
             )
@@ -384,14 +374,14 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
         }
         Expr::FunctionCall {
             locs,
-            name,
+            func,
             indexes,
             end,
             ..
         } => {
             format!(
                 "({}{} {})",
-                String::from_utf8_lossy(name),
+                String::from_utf8_lossy(&func.name),
                 join_locs(locs, Some(*end)),
                 write_exprs(exprs, indexes)
             )
@@ -413,21 +403,22 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 join_locs(locs, Some(*end)),
                 write_expr(exprs, *index, 0)
             )
-        },
-        Expr::Not { locs, word, str_start, str_len, end } => {
+        }
+        Expr::Not {
+            locs,
+            word,
+            str_start,
+            str_len,
+            end,
+        } => {
             format!(
-                "(not{} @{}$${} {})",
+                "(not{} @{}$${} \"{}\")",
                 join_locs(locs, Some(*end)),
                 *str_start,
                 *str_len,
                 String::from_utf8_lossy(word)
             )
-        },
-        Expr::Ignore { name_start, name } => format!(
-            "(ignore \"{}\"@{})",
-            String::from_utf8_lossy(&name).to_string(),
-            name_start
-        ),
+        }
     }
 }
 
@@ -452,7 +443,7 @@ fn write_mult_exprs(exprs: &ExprArena, indexes: &[usize], char: u8, indent: usiz
     ret
 }
 
-fn write_var(var: &Var) -> String {
+fn write_var(var: &SubStrData) -> String {
     let mut skips_str = String::new();
     if !var.skip_indexes.is_empty() {
         skips_str += "|";

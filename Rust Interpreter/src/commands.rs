@@ -1,7 +1,7 @@
 use std::ops::Index;
 
 use crate::parser::multi_lit_num::VarOrInt;
-use crate::parser::End;
+use crate::parser::{End, SubStrData};
 use crate::parser::string_lit::VarOrStr;
 
 #[derive(PartialEq, Debug, Clone, Copy)]
@@ -19,13 +19,6 @@ pub enum OperatorType {
     Or,
     Equals,
     Not,
-}
-
-#[derive(PartialEq, Debug)]
-pub struct Var {
-    pub name: Vec<u8>,
-    pub start: usize,
-    pub skip_indexes: Vec<u8>,
 }
 
 #[derive(PartialEq, Debug)]
@@ -55,7 +48,7 @@ pub enum Expr {
     },
     Assign {
         locs: Vec<usize>,
-        var: Var,
+        var: SubStrData,
         first: bool,
         value_index: usize,
         end: End,
@@ -85,7 +78,7 @@ pub enum Expr {
     },
     //expr
     Var {
-        var: Var,
+        var: SubStrData,
     },
     WordNum {
         locs: Vec<usize>,
@@ -110,12 +103,6 @@ pub enum Expr {
         locs: Vec<usize>,
         values: Vec<VarOrInt>,
         single_value: Option<i64>,
-        end: End,
-    },
-    Skip {
-        locs: Vec<usize>,
-        index: usize,
-        start: usize,
         end: End,
     },
     Color {
@@ -169,8 +156,7 @@ pub enum Expr {
     },
     FunctionCall {
         locs: Vec<usize>,
-        name_start: usize,
-        name: Vec<u8>,
+        func: SubStrData,
         indexes: Vec<usize>,
         end: End,
     },
@@ -210,8 +196,7 @@ pub enum Expr {
         end: End,
     },
     ForEach {
-        name_start: usize,
-        name: Vec<u8>,
+        var: SubStrData,
         locs: Vec<usize>,
         indexes: Vec<usize>,
         end: End,
@@ -219,19 +204,15 @@ pub enum Expr {
     Length {
         locs: Vec<usize>,
         index: usize,
-        end: End
+        end: End,
     },
     Not {
         locs: Vec<usize>,
         word: Vec<u8>,
         str_start: usize,
         str_len: usize,
-        end: End
+        end: End,
     },
-    Ignore {
-        name_start: usize,
-        name: Vec<u8>,
-    }
 }
 
 impl Expr {

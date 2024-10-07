@@ -1,12 +1,13 @@
 use crate::{
     commands::*,
-    parser::{End, ParserSourceIter},
+    parser::{End, ParserSourceIter, SubStrData},
 };
 
 use super::syntax_renderers::{Renderer, TermColor};
 
 //colors
 const BASE_COLOR: (TermColor, bool) = (TermColor::White, true);
+// const IGNORE_COLOR: (TermColor, bool) = (TermColor::White, false);
 
 const LOC_COLOR: [(TermColor, bool); 3] = [
     (TermColor::Yellow, true),
@@ -115,14 +116,19 @@ impl<T: Renderer> SyntaxLinter<T> {
 
 impl<T: Renderer> SyntaxLinter<T> {
 
-    fn write_var(&mut self, source: &mut ParserSourceIter, var: &Var) {
+    fn write_var(
+        &mut self,
+        source: &mut ParserSourceIter,
+        var: &SubStrData,
+        color: (TermColor, bool),
+    ) {
         self.write_up_to(source, var.start);
         for &index in &var.skip_indexes {
-            self.write_up_to_as(source, var.start + index as usize, VAR_COLOR);
+            self.write_up_to_as(source, var.start + index as usize, color);
             self.write_as(source, 1, BASE_COLOR);
         }
         let len = var.name.len() + var.skip_indexes.len();
-        self.write_up_to_as(source, var.start + len, VAR_COLOR);
+        self.write_up_to_as(source, var.start + len, color);
     }
 
     fn write_locs(&mut self, source: &mut ParserSourceIter, locs: &Vec<usize>, stack_index: usize) {
@@ -197,7 +203,7 @@ impl<T: Renderer> SyntaxLinter<T> {
                 ..
             } => {
                 self.write_locs(source, locs, stack_index);
-                self.write_var(source, var);
+                self.write_var(source, var, VAR_COLOR);
                 self.write_expr(source, exprs, *value_index, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
@@ -221,7 +227,7 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Var { var } => self.write_var(source, var),
+            Expr::Var { var } => self.write_var(source, var, VAR_COLOR),
             Expr::WordNum {
                 locs,
                 str_start,
@@ -263,20 +269,6 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
-            }
-            Expr::Skip {
-                locs,
-                index,
-                start,
-                end,
-            } => {
-                self.write_locs(source, locs, stack_index);
-                self.write_up_to(source, *start);
-                self.write_up_to_as(source, end.index, STRING_COLOR);
-                self.add_end(source, *end, stack_index);
-                self.write_end(source);
-                // same stack_index for same color
-                self.write_expr(source, exprs, *index, stack_index)
             }
             Expr::If {
                 locs,
@@ -408,9 +400,14 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.add_end(source, *end, stack_index);
             }
             Expr::ForEach {
-                locs, indexes, end, ..
+                locs,
+                indexes,
+                var,
+                end,
+                ..
             } => {
                 self.write_locs(source, locs, stack_index);
+                self.write_var(source, var, VAR_COLOR);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
@@ -419,15 +416,17 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_expr(source, exprs, *index, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Not { locs, str_start, str_len, end, .. } => {
+            Expr::Not {
+                locs,
+                str_start,
+                str_len,
+                end,
+                ..
+            } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_up_to(source, *str_start);
                 self.write_as(source, *str_len, STRING_COLOR);
                 self.add_end(source, *end, stack_index);
-            },
-            Expr::Ignore { name_start, name } => {
-                self.write_up_to(source, *name_start);
-                self.write_as(source, name.len(), STRING_COLOR);
             }
             Expr::NoneExpr | Expr::NoneStat => {}
         };

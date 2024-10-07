@@ -23,7 +23,6 @@ mod find;
 mod foreach;
 mod function;
 mod if_stat;
-mod ignore;
 mod index;
 mod len;
 mod list;
@@ -62,7 +61,7 @@ mod parsing_tests_simple;
 
 use std::{collections::HashMap, fmt::Debug, mem};
 
-use crate::{commands::*, writers::lisp_like_writer};
+use crate::commands::*;
 
 use alias_data::AliasData;
 
@@ -281,6 +280,17 @@ impl<'a> Parser<'a> {
             aliases: &self.aliases,
             full_text: line,
         };
+
+        // setup slice
+        let line = self.data.source.get_line();
+        let mut start = frame.last_parse;
+        let (mut word, mut rest) = Self::get_slice(line, start);
+
+        //New ignore code location
+        while env.nots.try_get_val(&word, env.global_index).is_some() {
+            start += word.len() + 1;
+            (word, rest) = Self::get_slice(line, start);
+        }
 
         let last_result = mem::replace(&mut self.last_result, LastMatchResult::None);
 
