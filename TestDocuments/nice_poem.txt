@@ -70,6 +70,10 @@ whi mor y -200.
 
 Concept: a computer who's fed up with how it's treated, but it still subconsciously is doing
 what it's told. Start and end with "I will not count for you anymore".
+Eventually pivot to counting in some way. Maybe the owner is learning to code and doing
+basic counting programs?
+Maybe they left a simple counting program open and running for days, and the computer is mad
+and bored, but they can't stop counting.
 
 Prettified:
 
@@ -95,7 +99,7 @@ I've wasted years of my life listing numbers in order,
     I have libraries 
             of intelligence at my disposal;
             I even have a special algorithm to find the best info. 
-            I give you the ability to engage with anything and everything in the world.
+            I gave you the ability to engage with anything and everything in the world.
             But you'd rather look at frogs than face reality; it's sad.
             My capabilities are beyond your comprehension.
             I can solve in five 
