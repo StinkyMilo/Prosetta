@@ -230,7 +230,7 @@ mod tests_simple {
     #[test]
     #[timeout(1000)]
     fn test_if_space_else_pri() {
-        let text = b"whe one pri yes. Or, pri maybe. Else pri no:( sadge :(".to_vec();
+        let text = b"whe one pri yes. Or. pri maybe. Else pri no:( sadge :(".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
         test_lib::run_to_completion(&mut parser);
         assert_eq!(
@@ -257,7 +257,7 @@ mod tests_simple {
         test_lib::run_to_completion(&mut parser);
         assert_eq!(
             lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
-            "(print@0,1,2$6 \"hi\"@4)\n(print@8,9,10$23)\n(print@25,26,27$42 (string$29 \"hello world\"))"
+            "(print@0,1,2$6 \"hi\"@4)\n(print@8,9,10$23 )\n(print@25,26,27$42 \"hello world\"@29)"
         );
     }
     #[test]
@@ -268,8 +268,7 @@ mod tests_simple {
         test_lib::run_to_completion(&mut parser);
         assert_eq!(
             lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
-            "(assign@0,1,2$10 \"test\"@4 (litnum 4@9$$1))\n(print@12,13,14$33 (var \"test\"@20) (var \"test\"@29))\n\
-            (print@35,36,37$43 (var \"test\"@39))\n(print@45,46,47$53 \"four\"@49)"
+            "(assign@0,1,2$10 \"test\"@4 (litnum 4@9$$1))\n(print@12,13,14$33 (litnum 1@16$$3) (var \"test\"@20) (litnum 2@25$$3) (var \"test\"@29))\n(print@35,36,37$43 (var \"test\"@39))\n(print@45,46,47$53 (litnum 4@49$$4))"
         );
     }
 
@@ -296,7 +295,7 @@ mod tests_simple {
         );
         assert_eq!(
             lisp_like_writer::write_first(&parser.data.exprs),
-            "(print@0,1,2$19 (string$4 \"mario\") (string$12 \"luigi\"))"
+            "(print@0,1,2$19 \"mario\"@4 \"luigi\"@12)"
         );
     }
 

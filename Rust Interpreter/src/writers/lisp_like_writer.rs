@@ -1,9 +1,6 @@
 use std::usize;
 
-use crate::{
-    commands::*,
-    parser::{multi_lit_num::VarOrInt, End, SubStrData},
-};
+use crate::{commands::*, parser::{string_lit::VarOrStr, multi_lit_num::VarOrInt, End, SubStrData}};
 
 fn write_end(end: End) -> String {
     let mut ret = String::new();
@@ -175,12 +172,21 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 )
             }
         }
-        Expr::Print { locs, data, end } => {
-            format!(
-                "(print{}{})",
-                join_locs(locs, Some(*end)),
-                write_prints(exprs, data)
-            )
+        Expr::Print { locs, indexes, end, single_word, single_word_start, .. } => {
+            if let Some(word) = single_word {
+                format!(
+                    "(print{} \"{}\"@{})",
+                    join_locs(locs, Some(*end)),
+                    String::from_utf8_lossy(word),
+                    single_word_start
+                )
+            }else{
+                format!(
+                    "(print{} {})",
+                    join_locs(locs, Some(*end)),
+                    write_exprs(exprs,indexes)
+                )
+            }
         }
         Expr::If {
             locs, indexes, end, ..
@@ -244,12 +250,18 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 write_exprs(exprs, indexes),
             )
         }
-        Expr::LitString { str_start, str } => {
-            format!(
-                "(string${} \"{}\")",
-                *str_start,
-                String::from_utf8_lossy(str)
-            )
+        Expr::LitString { str, str_start, .. } => {
+            let mut output: String = String::new();
+            for val in str.iter(){
+                if let VarOrStr::Var(var) = val {
+                    let new_val = format!("{}",String::from_utf8_lossy(&var.name));
+                    output += &new_val[..];
+                }else if let VarOrStr::Str(str) = val {
+                    let new_val = String::from_utf8_lossy(str);
+                    output += &new_val[..];
+                }
+            }
+            format!("\"{}\"@{}", output, str_start)
         }
         Expr::MoveTo { locs, indexes, end } => {
             format!(
@@ -408,21 +420,6 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
             )
         }
     }
-}
-
-fn write_prints(exprs: &ExprArena, data: &Vec<Prints>) -> String {
-    let mut ret = String::new();
-    for print in data {
-        ret += &match print {
-            Prints::Var(index) | Prints::String(index) => {
-                format!(" {}", write_expr(exprs, *index, 0))
-            }
-            Prints::Word(str, index) => {
-                format!(" \"{}\"@{}", std::str::from_utf8(str).unwrap(), index)
-            }
-        }
-    }
-    ret
 }
 
 fn write_exprs(exprs: &ExprArena, indexes: &[usize]) -> String {

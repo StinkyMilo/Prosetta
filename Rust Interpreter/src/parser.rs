@@ -32,7 +32,7 @@ mod move_to;
 mod not;
 mod operator;
 mod replace;
-mod string_lit;
+pub(crate) mod string_lit;
 mod stroke;
 mod var;
 mod while_stat;
@@ -261,6 +261,10 @@ impl<'a> Parser<'a> {
         //     last_stat = split1.0.get_mut(index);
         // }
 
+        // setup slice
+        let line = self.data.source.get_line();
+        let (word, rest) = Self::get_slice(line, frame.last_parse);
+
         // setup env
         let mut env = Environment {
             expr,
@@ -274,6 +278,7 @@ impl<'a> Parser<'a> {
             locs: None,
             global_index: self.pos,
             aliases: &self.aliases,
+            full_text: line,
         };
 
         // setup slice

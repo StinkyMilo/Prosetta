@@ -115,25 +115,6 @@ impl<T: Renderer> SyntaxLinter<T> {
 }
 
 impl<T: Renderer> SyntaxLinter<T> {
-    fn write_prints(
-        &mut self,
-        source: &mut ParserSourceIter,
-        exprs: &ExprArena,
-        data: &Vec<Prints>,
-    ) {
-        for print in data {
-            match print {
-                // stack index is not used in vars
-                Prints::Var(index) | Prints::String(index) => {
-                    self.write_expr(source, exprs, *index, 0)
-                }
-                Prints::Word(str, index) => {
-                    self.write_up_to(source, *index);
-                    self.write_as(source, str.len(), STRING_COLOR);
-                }
-            }
-        }
-    }
 
     fn write_var(
         &mut self,
@@ -284,9 +265,9 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_as(source, end.index - str_start, NUM_COLOR);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Print { locs, data, end } => {
+            Expr::Print { locs, indexes, end, .. } => {
                 self.write_locs(source, locs, stack_index);
-                self.write_prints(source, exprs, data);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
             Expr::If {
@@ -342,10 +323,11 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::LitString { str_start, str } => {
+            Expr::LitString { str_start,  str_end, .. } => {
                 self.write_up_to(source, *str_start);
                 //one for each quote
-                self.write_as(source, str.len() + 2, STRING_COLOR);
+                //TODO: different color for variables
+                self.write_as(source, str_end - str_start + 1, STRING_COLOR);
             }
             Expr::MoveTo { locs, indexes, end } => {
                 self.write_locs(source, locs, stack_index);

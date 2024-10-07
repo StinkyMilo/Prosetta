@@ -2,6 +2,7 @@ use std::ops::Index;
 
 use crate::parser::multi_lit_num::VarOrInt;
 use crate::parser::{End, SubStrData};
+use crate::parser::string_lit::VarOrStr;
 
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum OperatorType {
@@ -18,16 +19,6 @@ pub enum OperatorType {
     Or,
     Equals,
     Not,
-}
-
-#[derive(PartialEq, Debug)]
-pub enum Prints {
-    /// child_index
-    Var(usize),
-    /// child_index
-    String(usize),
-    /// value, string_index
-    Word(Vec<u8>, usize),
 }
 
 #[derive(PartialEq, Debug)]
@@ -64,7 +55,9 @@ pub enum Expr {
     },
     Print {
         locs: Vec<usize>,
-        data: Vec<Prints>,
+        indexes: Vec<usize>,
+        single_word: Option<Vec<u8>>,
+        single_word_start: usize,
         end: End,
     },
     If {
@@ -134,7 +127,8 @@ pub enum Expr {
     },
     LitString {
         str_start: usize,
-        str: Vec<u8>,
+        str_end: usize,
+        str: Vec<VarOrStr>,
     },
     MoveTo {
         locs: Vec<usize>,
