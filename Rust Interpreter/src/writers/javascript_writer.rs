@@ -1,4 +1,4 @@
-use crate::commands::*;
+use crate::{commands::*, parser::multi_lit_num::VarOrInt};
 
 #[allow(dead_code)]
 pub fn write(exprs: &ExprArena, line_starts: &Vec<usize>) -> String {
@@ -162,11 +162,15 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                 let mut output_vals = "".to_string();
                 let mut is_first = true;
                 for val in values {
-                    if is_first {
-                        output_vals += &format!("{}", val);
-                        is_first = false;
-                    } else {
-                        output_vals += &format!(", {}", val);
+                    if !is_first{
+                        output_vals += ", ";
+                    }else{
+                        is_first=false;
+                    }
+                    if let VarOrInt::Var(var) = val {
+                        output_vals += &format!("{}_var", String::from_utf8_lossy(&var.name));
+                    }else if let VarOrInt::Int(intval) = val{
+                        output_vals += &format!("{}",intval);
                     }
                 }
                 format!("get_concat_value({})", output_vals)
@@ -179,7 +183,6 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         } => {
             format!("print_console({});", write_prints(exprs, data))
         }
-        Expr::Skip { index, .. } => write_expr(exprs, *index),
         Expr::If { indexes, .. } => {
             format!(
                 "if ({}) {{\n{}\n}}",
@@ -328,9 +331,9 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             }
         }
         Expr::Length { index, .. } => {
-            format!("{}.length", write_expr(exprs, *index))
-        }
-        Expr::Not { .. } | Expr::Ignore { .. } => {
+            format!("{}.length",write_expr(exprs,*index))
+        },
+        Expr::Not { .. }=>{
             format!("")
         }
     }

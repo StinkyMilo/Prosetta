@@ -23,7 +23,6 @@ mod find;
 mod foreach;
 mod function;
 mod if_stat;
-mod ignore;
 mod index;
 mod len;
 mod list;
@@ -279,7 +278,14 @@ impl<'a> Parser<'a> {
 
         // setup slice
         let line = self.data.source.get_line();
-        let (word, rest) = Self::get_slice(line, frame.last_parse);
+        let mut start = frame.last_parse;
+        let (mut word, mut rest) = Self::get_slice(line, start);
+
+        //New ignore code location
+        while env.nots.try_get_val(word.str).is_some(){
+            start += word.len()+1;
+            (word, rest) = Self::get_slice(line, start);
+        }
 
         let last_result = mem::replace(&mut self.last_result, LastMatchResult::None);
 

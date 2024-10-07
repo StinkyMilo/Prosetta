@@ -2,7 +2,7 @@ use std::usize;
 
 use crate::{
     commands::*,
-    parser::{End, SubStrData},
+    parser::{multi_lit_num::VarOrInt, End, SubStrData},
 };
 
 fn write_end(end: End) -> String {
@@ -157,11 +157,15 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 let mut output_vals = "".to_string();
                 let mut is_first = true;
                 for val in values {
-                    if is_first {
-                        output_vals += &format!("{}", val);
-                        is_first = false;
-                    } else {
-                        output_vals += &format!(" {}", val);
+                    if !is_first{
+                        output_vals += " ";
+                    }else{
+                        is_first=false;
+                    }
+                    if let VarOrInt::Var(var) = val {
+                        output_vals += &format!("{}", String::from_utf8_lossy(&var.name));
+                    }else if let VarOrInt::Int(intval) = val{
+                        output_vals += &format!("{}",intval);
                     }
                 }
                 format!(
@@ -176,20 +180,6 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 "(print{}{})",
                 join_locs(locs, Some(*end)),
                 write_prints(exprs, data)
-            )
-        }
-        Expr::Skip {
-            locs,
-            index,
-            start,
-            end,
-        } => {
-            format!(
-                "(skip{} @{}${} {})",
-                join_locs(locs, None),
-                *start,
-                write_end(*end),
-                write_expr(exprs, *index, 0),
             )
         }
         Expr::If {
@@ -417,7 +407,6 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 String::from_utf8_lossy(word)
             )
         }
-        Expr::Ignore { data } => format!("(ignore {})", write_var(data),),
     }
 }
 

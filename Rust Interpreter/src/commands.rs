@@ -112,13 +112,6 @@ pub enum Expr {
         single_value: Option<i64>,
         end: End,
     },
-    #[allow(dead_code)]
-    Skip {
-        locs: Vec<usize>,
-        index: usize,
-        start: usize,
-        end: End,
-    },
     Color {
         locs: Vec<usize>,
         indexes: [usize; 3],
