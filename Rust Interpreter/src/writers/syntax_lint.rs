@@ -283,20 +283,6 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_prints(source, exprs, data);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Skip {
-                locs,
-                index,
-                start,
-                end,
-            } => {
-                self.write_locs(source, locs, stack_index);
-                self.write_up_to(source, *start);
-                self.write_up_to_as(source, end.index, STRING_COLOR);
-                self.add_end(source, *end, stack_index);
-                self.write_end(source);
-                // same stack_index for same color
-                self.write_expr(source, exprs, *index, stack_index)
-            }
             Expr::If {
                 locs,
                 // body_end ,
@@ -442,10 +428,6 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_up_to(source, *str_start);
                 self.write_as(source, *str_len, STRING_COLOR);
                 self.add_end(source, *end, stack_index);
-            },
-            Expr::Ignore { name_start, name } => {
-                self.write_up_to(source, *name_start);
-                self.write_as(source, name.len(), STRING_COLOR);
             }
             Expr::NoneExpr | Expr::NoneStat => {}
         };
