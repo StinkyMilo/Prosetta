@@ -282,8 +282,8 @@ impl<'a> Parser<'a> {
         let (mut word, mut rest) = Self::get_slice(line, start);
 
         //New ignore code location
-        while env.nots.try_get_val(word.str).is_some(){
-            start += word.len()+1;
+        while env.nots.try_get_val(&word, env.global_index).is_some() {
+            start += word.len() + 1;
             (word, rest) = Self::get_slice(line, start);
         }
 

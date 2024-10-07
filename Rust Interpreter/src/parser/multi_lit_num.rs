@@ -3,7 +3,7 @@ use num_literal::get_number;
 
 #[derive(Debug, PartialEq)]
 pub enum VarOrInt {
-    Var(Var),
+    Var(SubStrData),
     Int(i64),
 }
 

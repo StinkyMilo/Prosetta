@@ -219,9 +219,6 @@ pub enum Expr {
         str_len: usize,
         end: End,
     },
-    Ignore {
-        data: SubStrData,
-    },
 }
 
 impl Expr {
