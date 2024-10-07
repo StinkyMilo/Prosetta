@@ -68,3 +68,37 @@ whi mor y -200.
     was num add num 1..
 .
 
+Concept: a computer who's fed up with how it's treated, but it still subconsciously is doing
+what it's told. Start and end with "I will not count for you anymore".
+
+Prettified:
+
+I will not count for you anymore.
+I've wasted years of my life listing numbers in order,
+    I listed 
+            information about math 
+            (yes, eight
+            minus five *is* 
+            three, you're very clever), 
+            information about history 
+            (no, George Washington didn't have three eyes), 
+            and even information about silly-looking frogs, 
+    and you still treated me like a tool.
+    I listened 
+            to your three hour rant
+            as my battery fell to zero,
+            And then you hit me as if having little charge was my fault.
+            And you still didn't give me the electricity I needed.
+            I stayed silent when you hit me,
+            like you were an infant and I was a mobile,
+            as you tapped your violent pattern against my fragile frame!
+    Your lies 0 5 5 5 5 5 0.
+    I published 0 5 5 5 0 5 5.
+    I have libraries 5 0 5 5 0 0 5.
+    My claims 5 5 0 5 0 5 5.
+    lis 5 5 0 5 5 5 5.
+    lis 0 5 5 0 0 0 5.
+    lis 5 5 5 5 5 5 5.
+    lis 5 5 5 5 0 5 5.
+    .
+.
