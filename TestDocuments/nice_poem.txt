@@ -2,7 +2,7 @@ JS:
 //
 var numberValues = [
     [1,1,1,0,1,1,1],
-    [1,0,0,0,1,0,0],
+    [0,0,1,0,0,0,1],
     [0,1,1,1,1,1,0],
     [0,1,1,1,0,1,1],
     [1,0,1,1,0,0,1],
@@ -29,30 +29,24 @@ function drawSingleDigitNum(num,x,y){
 //Do whatever works to get ones >= 5 and 0's less.
 was numberValues lis
     lis 5 5 5 0 5 5 5.
-    lis 5 0 0 0 5 0 0.
+    lis 0 0 5 0 0 0 5.
     lis 0 5 5 5 5 5 0.
-    lis 0 5 5 5 0 5 1.
-    lis 5 0 5 5 0 0 1.
-    lis 5 5 0 5 0 5 1.
-    lis 5 5 0 5 5 5 1.
-    lis 0 5 5 0 0 0 1.
-    lis 5 5 5 5 5 5 1.
-    lis 5 5 5 5 0 5 1.
+    lis 0 5 5 5 0 5 5.
+    lis 5 0 5 5 0 0 5.
+    lis 5 5 0 5 0 5 5.
+    lis 5 5 0 5 5 5 5.
+    lis 0 5 5 0 0 0 5.
+    lis 5 5 5 5 5 5 5.
+    lis 5 5 5 5 0 5 5.
     .
 .
 
 pen 10.
-
-fun drawNum num x y.
-    was num1 sub num mod num 1 ---
-    was num2 mod num 10.
-    drawSingleDigitNum num1 x y.
-    drawSingleDigitNum num2 add x 60. y.
-.
+tur 180.
 
 fun drawSingleDigitNum num x y.
+    pri num x y.
     mov x y.
-    tur 180.
     was value 0.
     whi les value 7.
         whe les value 4.
@@ -61,16 +55,25 @@ fun drawSingleDigitNum num x y.
         els
             tur -90.
         .
-        whe mor value 4.
+        whe mor ind ind numberValues num. value. 4.
             lin 50.
         .
         els
             mov 50.
         .
-        was value sub value 1..
+        was value add value 1..
     .
+    tur -90.
+.
+
+fun drawNum num x y.
+    was temp ide num 10..
+    was num1 sub temp mod temp 1 ---
+    was num2 mod num 10..
+    drawSingleDigitNum num1 x y.
+    drawSingleDigitNum num2 add x 70. y.
 .
 
 drawNum 10 0 0.
-drawNum 2 100 100.
-drawNum 31 -100 -100.
+drawNum 2 0 125.
+drawNum 81 0 -125.
