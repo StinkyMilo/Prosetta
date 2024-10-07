@@ -7,7 +7,7 @@ use super::syntax_renderers::{Renderer, TermColor};
 
 //colors
 const BASE_COLOR: (TermColor, bool) = (TermColor::White, true);
-const IGNORE_COLOR: (TermColor, bool) = (TermColor::White, false);
+// const IGNORE_COLOR: (TermColor, bool) = (TermColor::White, false);
 
 const LOC_COLOR: [(TermColor, bool); 3] = [
     (TermColor::Yellow, true),
