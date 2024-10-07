@@ -4,7 +4,7 @@ use super::*;
 
 #[derive(Debug, PartialEq)]
 pub enum VarOrStr {
-    Var(Var),
+    Var(SubStrData),
     Str(Vec<u8>)
 }
 #[derive(Debug)]
