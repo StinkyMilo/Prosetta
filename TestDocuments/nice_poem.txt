@@ -1,32 +1,3 @@
-JS:
-//
-var numberValues = [
-    [1,1,1,0,1,1,1],
-    [0,0,1,0,0,0,1],
-    [0,1,1,1,1,1,0],
-    [0,1,1,1,0,1,1],
-    [1,0,1,1,0,0,1],
-    [1,1,0,1,0,1,1],
-    [1,1,0,1,1,1,1],
-    [0,1,1,0,0,0,1],
-    [1,1,1,1,1,1,1],
-    [1,1,1,1,0,1,1]
-];
-
-//Supports up to 2 digits
-function drawNum(num,x,y){
-    let num1 = num-num%1;
-    let num2 = num%10;
-    drawSingleDigitNum(num1,x,y);
-    drawSingleDigitNum(num2,x+60,y);
-}
-
-function drawSingleDigitNum(num,x,y){
-    move_to(x,y);
-
-}
-
-//Do whatever works to get ones >= 5 and 0's less.
 was numberValues lis
     lis 5 5 5 0 5 5 5.
     lis 0 0 5 0 0 0 5.
@@ -41,8 +12,14 @@ was numberValues lis
     .
 .
 
-pen 10.
+rec 400 400.
+fil black.
+sto white.
+pen 1.
+pen 6.
 tur 180.
+was segDist 20.
+was padding 10.
 
 fun drawSingleDigitNum num x y.
     pri num x y.
@@ -56,10 +33,10 @@ fun drawSingleDigitNum num x y.
             tur -90.
         .
         whe mor ind ind numberValues num. value. 4.
-            lin 50.
+            lin segDist.
         .
         els
-            mov 50.
+            mov segDist.
         .
         was value add value 1..
     .
@@ -71,9 +48,23 @@ fun drawNum num x y.
     was num1 sub temp mod temp 1 ---
     was num2 mod num 10..
     drawSingleDigitNum num1 x y.
-    drawSingleDigitNum num2 add x 70. y.
+    drawSingleDigitNum num2 add x segDist padding. y.
 .
 
-drawNum 10 0 0.
-drawNum 2 0 125.
-drawNum 81 0 -125.
+was y sub 200 add segDist padding...
+was start add -200 padding..
+was x start.
+was width add tim segDist 4. tim padding 2...
+was height add tim segDist 2. padding..
+was num 0.
+
+whi mor y -200.
+    drawNum num x y.
+    was x add x width..
+    whe mor x 200.
+        was x start.
+        was y sub y height..
+    .
+    was num add num 1..
+.
+
