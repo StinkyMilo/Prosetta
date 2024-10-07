@@ -373,6 +373,19 @@ mod tests_simple {
         );
     }
 
+    #[test]
+    #[timeout(1000)]
+    fn test_for_each() {
+        let text: Vec<u8> = b"fre value lis 1 2 3. pri value..".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(foreach@0,1,2$31 value (list@10,11,12$19 (litnum 1@14$$1) (litnum 2@16$$1) (litnum 3@18$$1)) then:\
+            \n  (print@21,22,23$30 (var \"value\"@25))\n)"
+        );
+    }
+
     // #[test]#[timeout(1000)]
     // fn test_liechtenstein() {
     //     let text = b"The wars in Liechtenstein ravaged the country..".to_vec();
