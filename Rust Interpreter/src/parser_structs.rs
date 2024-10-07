@@ -181,32 +181,6 @@ impl FuncSet {
     pub fn contains(&self, name: Vec<u8>) -> bool {
         self.set.contains_key(&name)
     }
-<<<<<<< HEAD
-
-    pub fn try_get_func(&self, word: &[u8]) -> Option<(usize, Vec<u8>, usize)> {
-        let mut lower = word.to_ascii_lowercase();
-        // remove '
-        lower.retain(|&x| x != b'\'');
-
-        let mut max_var_length = 0;
-        let mut var: Option<(usize, Vec<u8>, usize)>= None;
-        for str in self.set.iter() {
-            let is_longer = str.0.len() >= max_var_length;
-            // if var could be in word
-            if is_longer && lower.len() >= str.0.len() {
-                // if found
-                if let Some(index) = lower.find(str.0) {
-                    let is_better = var
-                        .as_ref()
-                        .map_or(true, |(old_index, _, _)| is_longer || index < *old_index);
-
-                    if is_better {
-                        max_var_length = str.0.len();
-                        var = Some((index, str.0.clone(), *str.1));
-                    }
-                }
-            }
-=======
     pub fn try_get_func(&self, word: &Slice, global_index: usize) -> Option<SubStrData> {
         if word.len() > 255 {
             return None;
@@ -225,7 +199,6 @@ impl FuncSet {
             })
         } else {
             None
->>>>>>> main
         }
     }
 

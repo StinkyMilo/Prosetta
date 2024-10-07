@@ -299,7 +299,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         Expr::ForEach { indexes, var, .. } => {
             format!(
                 "for(let {}_var of {}) {{\n{}\n}}",
-                String::from_utf8_lossy(&name),
+                String::from_utf8_lossy(&var.name),
                 write_expr(exprs, indexes[0]),
                 write_exprs(exprs, &indexes[1..], "\n")
             )
