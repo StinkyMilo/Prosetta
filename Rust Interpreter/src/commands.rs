@@ -64,6 +64,7 @@ pub enum Expr {
         locs: Vec<usize>,
         indexes: Vec<usize>,
         single_word: Option<Vec<u8>>,
+        single_word_start: usize,
         end: End,
     },
     If {

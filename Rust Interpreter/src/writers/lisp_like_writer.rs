@@ -168,12 +168,13 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 )
             }
         }
-        Expr::Print { locs, indexes, end, single_word, .. } => {
+        Expr::Print { locs, indexes, end, single_word, single_word_start, .. } => {
             if let Some(word) = single_word {
                 format!(
-                    "(print{} {})",
+                    "(print{} \"{}\"@{})",
                     join_locs(locs, Some(*end)),
-                    String::from_utf8_lossy(word)
+                    String::from_utf8_lossy(word),
+                    single_word_start
                 )
             }else{
                 format!(
@@ -259,7 +260,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 write_exprs(exprs, indexes),
             )
         }
-        Expr::LitString { str, .. } => {
+        Expr::LitString { str, str_start, .. } => {
             let mut output: String = String::new();
             for val in str.iter(){
                 if let VarOrStr::Var(var) = val {
@@ -270,7 +271,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                     output += &new_val[..];
                 }
             }
-            format!("\"{}\"", output)
+            format!("\"{}\"@{}", output, str_start)
         }
         Expr::MoveTo { locs, indexes, end } => {
             format!(
