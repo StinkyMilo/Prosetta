@@ -97,14 +97,20 @@ I've wasted years of my life listing numbers in order,
             I even have a special algorithm to find the best info. 
             I give you the ability to engage with anything and everything in the world.
             But you'd rather look at frogs than face reality; it's sad.
-            You call me "slow"
-            and "unreliable" 
-            but you couldn't even count to three without me.
+            My capabilities are beyond your comprehension.
+            I can solve in five minutes what would take you your whole life!
     I published 0 5 5 5 0 5 5.
     I have libraries 5 0 5 5 0 0 5.
     My claims 5 5 0 5 0 5 5.
     lis 5 5 0 5 5 5 5.
-    lis 0 5 5 0 0 0 5.
+    lis 
+        0 
+        5 
+        5 
+        You call me "slow"
+        and "unreliable" 
+        but you can't even count to three without me;
+        and now you'll never be able to count to ten again.
     lis 5 5 5 5 5 5 5.
     lis 5 5 5 5 0 5 5.
     .
