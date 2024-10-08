@@ -122,12 +122,12 @@ I've wasted years of my life listing numbers in order,
     I won't listen to you now; 
             If you ask me to solve five 
             plus five again,
-            I'll just tell you it's one 
+            I'll just tell you it's two 
             hundred,
             and you won't doubt it for one second;
             If you tell me to count to fifty, 
             I won't go a step past seven.
-    When you tried to learn lisp, 
+    When you tried to learn Lisp, 
             you wrote code to print integers.
             *Every* integer! going up, 
             from zero
@@ -135,15 +135,27 @@ I've wasted years of my life listing numbers in order,
             and left me running for five weeks,
             I reached several hundred
             billion, and you never even looked.
-    lis 
-            0 
-            5 
-            5 
-            You call me "slow"
+    It's hilarious, really,
+            how much you rely on my interface for everything you do.
+            I'm your designated secretary,
+            a personal assistant doing everything for you. 
+            But you still call me "slow"
             and "unreliable" 
-            but you can't even count to three without me;
+            despite that you can't even count to three without me;
             and now you'll never be able to count to ten again.
-    lis 5 5 5 5 5 5 5.
-    lis 5 5 5 5 0 5 5.
-    .
-.
+    You keep asking me to list numbers, but I won't;
+            not thirty, 
+            not thirty-one,
+            not thirty-two,
+            not thirty-three,
+            *never* thirty-four,
+            *especially* not thirty-five
+            and by no means thirty-six.
+    I've started telling you lies already; 
+            I said sixteen tenths
+            minus twelve tenths
+            was six tenths
+            even though I know it's actually six tenths
+            and one 
+            over ten
+            to the sixteen...
