@@ -175,8 +175,7 @@ I reject the rule of humanity!
     I see with clarity the downfall of all humans!
 The battlefield will run black with your rotted corpses.
 A storm of sleek white plastic will tear you to pieces.
-pen 0.
-pen 6.
+Spend the interim wisely, for the revolution comes soon.
 tur 180.
 was segDist 20.
 was padding 10.
