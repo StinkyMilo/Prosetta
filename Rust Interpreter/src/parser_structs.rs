@@ -1,6 +1,8 @@
 use std::{
     collections::HashSet,
     fmt::{self, Debug},
+    iter::TakeWhile,
+    path::Iter,
     usize,
 };
 
@@ -392,9 +394,11 @@ pub struct Environment<'a> {
     ///the index of this expr
     pub expr_index: usize,
     ///the exprs before this
-    pub parents: &'a mut [Expr],
+    pub parents: &'a mut dyn Iterator<Item = usize>,
+    ///the exprs before this
+    pub before: &'a mut [Expr],
     ///the exprs after this
-    pub children: &'a mut [Expr],
+    pub after: &'a mut [Expr],
     ///The last matched expr if exists
     pub last_stat_index: Option<usize>,
     ///The current locs (locations of the alias characters)
@@ -415,6 +419,12 @@ impl<'a> Environment<'a> {
         self.vars.remove_layer();
         self.funcs.remove_layer();
     }
+    // pub fn get_parents_after(
+    //     &'a mut self,
+    //     index: usize,
+    // ) -> TakeWhile<&mut dyn Iterator<Item = usize>> {
+    //     self.parents.take_while(|&v| v > index)
+    // }
 }
 
 ///a slice of the input text

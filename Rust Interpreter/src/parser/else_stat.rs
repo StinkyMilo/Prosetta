@@ -14,7 +14,7 @@ impl ParseState for ElseState {
             //get some(index) if it is an "if"
             let if_index = env
                 .last_stat_index
-                .and_then(|index| matches!(env.parents[index], Expr::If { .. }).then_some(index));
+                .and_then(|index| matches!(env.before[index], Expr::If { .. }).then_some(index));
 
             if let Some(index) = if_index {
                 *env.expr = Expr::Else {
@@ -46,7 +46,7 @@ impl ParseState for ElseState {
         _rest: &Slice,
     ) -> MatchResult {
         self.first = false;
-        if let Expr::If { else_index, .. } = &mut env.parents[self.if_index] {
+        if let Expr::If { else_index, .. } = &mut env.before[self.if_index] {
             if let Expr::Else { end, indexes, .. } = env.expr {
                 if let Some(index) = child_index {
                     self.has_stat = true;

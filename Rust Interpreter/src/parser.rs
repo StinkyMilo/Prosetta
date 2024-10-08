@@ -218,7 +218,8 @@ impl<'a> Parser<'a> {
         self.last_state = None;
         // get curr frame
         let stack_index = self.stack.len() - 1;
-        let frame = &mut self.stack[stack_index];
+        let (parents, frame_arr) = self.stack.split_at_mut(stack_index);
+        let frame = &mut frame_arr[0];
 
         let id = frame.state.get_name();
         // does the failing range of the state include the current parsing location
@@ -243,12 +244,12 @@ impl<'a> Parser<'a> {
         // default_expr is used on failing back to a none state,
         // the corrisponding expr no longer exists
         let mut expr = &mut Expr::NoneExpr;
-        let mut children: &mut [Expr] = &mut [];
-        let parents = parents_this.0;
+        let mut before: &mut [Expr] = &mut [];
+        let after = parents_this.0;
         if let Some(split) = this_children {
             //should always be safe
             expr = split.0.first_mut().unwrap();
-            children = split.1;
+            before = split.1;
         }
 
         // let _self_expr = format!("{:?}", expr);
@@ -260,6 +261,7 @@ impl<'a> Parser<'a> {
         //     // let last_stat_index = self.data.exprs[last_stat];
         //     last_stat = split1.0.get_mut(index);
         // }
+        let parents = &mut parents.iter().map(|e| e.expr_index);
 
         // setup slice
         let line = self.data.source.get_line();
@@ -268,8 +270,9 @@ impl<'a> Parser<'a> {
         // setup env
         let mut env = Environment {
             expr,
-            children,
             parents,
+            after,
+            before,
             last_stat_index: self.stat_indexes.last().cloned(),
             expr_index: frame.expr_index,
             vars: &mut self.data.vars,
@@ -287,7 +290,7 @@ impl<'a> Parser<'a> {
         let (mut word, mut rest) = Self::get_slice(line, start);
 
         //New ignore code location
-        while env.nots.try_get_val(&word, env.global_index).is_some() {
+        while env.nots.try_get_val(&word, 0).is_some() {
             start += word.len() + 1;
             (word, rest) = Self::get_slice(line, start);
         }

@@ -10,6 +10,10 @@ impl BasicState for FindState {
     fn get_name(&self) -> &'static str {
         "Find"
     }
+    
+    fn get_type(&self) -> StateType {
+        StateType::Stat
+    }
 
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool { 
         let ret = self.count == 0;

@@ -9,17 +9,21 @@ pub struct ReturnState {
 }
 
 impl BasicState for ReturnState {
+    fn get_name(&self) -> &'static str {
+        "Return"
+    }
+
+    fn get_type(&self) -> StateType {
+        StateType::Stat
+    }
+
     fn can_happen(&self, env: &mut Environment) -> bool {
-        for parent in &mut *env.parents {
+        for parent in &mut *env.before {
             if let Expr::Function { .. } = parent {
                 return true;
             }
         }
         false
-    }
-
-    fn get_name(&self) -> &'static str {
-        "Return"
     }
 
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {

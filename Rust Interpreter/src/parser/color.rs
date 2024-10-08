@@ -13,6 +13,10 @@ impl BasicState for ColorState {
         "Color"
     }
 
+    fn get_type(&self) -> StateType {
+        StateType::Expr
+    }
+
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {
         let ret = self.count == 0;
         if ret {
