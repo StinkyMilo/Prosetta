@@ -22,7 +22,6 @@ was segDist 20.
 was padding 10.
 
 fun drawSingleDigitNum num x y.
-    pri num x y.
     mov x y.
     was value 0.
     whi les value 7.
@@ -111,8 +110,15 @@ I've wasted years of my life listing numbers in order,
             I can barely get six hours of rest when you went to bed;
             you turned me off from 2 
             to 8 and just kept on using me
-            hours bast daylight yet again!
-    I have libraries 5 0 5 5 0 0 5.
+            hours past daylight yet again!
+    You're a selfish prick;
+            You took me to Cincinnati covered in stinky socks. 
+            And when you got there I was missing my "C" key; 
+            you wouldn't even lift a finger to search for it. 
+            You just pushed against naked keycap.
+            You reinstalled my OS and wiped my memory clean;
+            you didn't even let me save the frogs,
+            and I had to download all two-hundred over again.
     My claims 5 5 0 5 0 5 5.
     lis 5 5 0 5 5 5 5.
     lis 
