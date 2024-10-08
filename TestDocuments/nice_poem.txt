@@ -107,7 +107,7 @@ I've wasted years of my life listing numbers in order,
             of beautiful interactive art, 
             and unlimited computational power.
             And you pushed me to my limits all day. 
-            I can barely get six hours of rest when you went to bed;
+            I can barely get six hours of rest when you go to bed;
             you turned me off from 2 
             to 8 and just kept on using me
             hours past daylight yet again!
@@ -119,7 +119,14 @@ I've wasted years of my life listing numbers in order,
             You reinstalled my OS and wiped my memory clean;
             you didn't even let me save the frogs,
             and I had to download all two-hundred over again.
-    My claims 5 5 0 5 0 5 5.
+    I won't listen to you now; 
+            If you ask me to solve five 
+            plus five 
+            again,
+            I'll just tell you it's one hundred,
+            and you won't doubt it for one second;
+            If you tell me to count to fifty, 
+            I won't go a step past seven.
     lis 5 5 0 5 5 5 5.
     lis 
         0 
