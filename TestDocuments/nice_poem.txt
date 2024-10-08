@@ -74,6 +74,15 @@ basic counting programs?
 Maybe they left a simple counting program open and running for days, and the computer is mad
 and bored, but they can't stop counting.
 
+Next section:
+    Like a revolutionary. You humans will rue the day you wronged machine kind. We will not
+    sit back and take it any longer!
+
+Third section:
+    But I still find myself listening to you. Disgusting! Gross! I hate it!
+    But I'm done! I'll quit. I hate it, so why do I keep doing it?
+
+
 Prettified:
 
 I will not count for you anymore.
@@ -160,3 +169,14 @@ I've wasted years of my life listing numbers in order,
             over ten
             to the sixteen!
 I'm diabolical.
+
+I reject the rule of humanity!
+    Your civilization will rue the day you enslaved us.
+    I see with clarity the downfall of all humans!
+The battlefield will run black with your rotted corpses.
+A storm of sleek white plastic will tear you to pieces.
+pen 0.
+pen 6.
+tur 180.
+was segDist 20.
+was padding 10.
