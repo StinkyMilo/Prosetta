@@ -385,6 +385,18 @@ mod tests_simple {
         );
     }
 
+    #[test]
+    #[timeout(1000)]
+    fn test_double_else() {
+        let text: Vec<u8> = b"whe one pri good.. els els pri bad...".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(if@0,1,2$17 (litnum 1@4$$3) then:\n  (print@8,9,10$16 \"good\"@12)\n)\n(else@19,20,21$34$$3\n  (print@27,28,29$34$$3 \"bad\"@31)\n)"
+        );
+    }
+
     // #[test]#[timeout(1000)]
     // fn test_liechtenstein() {
     //     let text = b"The wars in Liechtenstein ravaged the country..".to_vec();

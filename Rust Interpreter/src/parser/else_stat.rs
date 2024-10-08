@@ -12,25 +12,30 @@ impl ParseState for ElseState {
     fn step(&mut self, env: &mut Environment, word: &Slice, _rest: &Slice) -> MatchResult {
         if self.first {
             //get some(index) if it is an "if"
-            let if_index = env
-                .last_stat_index
-                .and_then(|index| matches!(env.before[index], Expr::If { .. }).then_some(index));
+            let if_index = env.last_stat_index.and_then(|index| {
+                matches!(env.before.get(index), Some(Expr::If { .. })).then_some(index)
+            });
 
             if let Some(index) = if_index {
-                *env.expr = Expr::Else {
-                    locs: env.locs.take().unwrap_or_default(),
-                    indexes: Vec::new(),
-                    end: End::none(),
-                };
-                // go up layer
-                env.add_var_layer();
-                self.if_index = index;
-            } else {
-                return MatchResult::Failed;
+                if !env.parents.into_iter().any(|state| {
+                    matches!(env.before.get(state.expr_index), Some(Expr::Else { .. }))
+                }) {
+                    *env.expr = Expr::Else {
+                        locs: env.locs.take().unwrap_or_default(),
+                        indexes: Vec::new(),
+                        end: End::none(),
+                    };
+                    // go up layer
+                    env.add_var_layer();
+                    self.if_index = index;
+                }
             }
         }
+        // if "if" wasnt found
+        if self.if_index == usize::MAX {
+            MatchResult::Failed
         // non cont stat for seeing closes
-        if self.has_stat {
+        } else if self.has_stat {
             MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
             // need a first stat - cont
         } else {

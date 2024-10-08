@@ -253,8 +253,20 @@ macro_rules! get_state {
         Box::new($state) as Box<dyn ParseState>
     };
 }
-use bstr::ByteSlice;
 pub(crate) use get_state;
+
+macro_rules! only_debug {
+    ($expr:expr) => {
+        if cfg!(debug_assertions) {
+            format!("{:?}", $expr)
+        } else {
+            Default::default()
+        }
+    };
+}
+pub(crate) use only_debug;
+
+use bstr::ByteSlice;
 use quickscope::{ScopeMap, ScopeSet};
 
 /// add or remove commands based on flags
@@ -394,7 +406,7 @@ pub struct Environment<'a> {
     ///the index of this expr
     pub expr_index: usize,
     ///the exprs before this
-    pub parents: &'a mut dyn Iterator<Item = usize>,
+    pub parents: &'a [State],
     ///the exprs before this
     pub before: &'a mut [Expr],
     ///the exprs after this
@@ -407,7 +419,7 @@ pub struct Environment<'a> {
     pub global_index: usize,
     /// reference to static AliasData
     pub aliases: &'a AliasData,
-    pub full_text: &'a [u8]
+    pub full_text: &'a [u8],
 }
 
 impl<'a> Environment<'a> {
@@ -419,12 +431,6 @@ impl<'a> Environment<'a> {
         self.vars.remove_layer();
         self.funcs.remove_layer();
     }
-    // pub fn get_parents_after(
-    //     &'a mut self,
-    //     index: usize,
-    // ) -> TakeWhile<&mut dyn Iterator<Item = usize>> {
-    //     self.parents.take_while(|&v| v > index)
-    // }
 }
 
 ///a slice of the input text
