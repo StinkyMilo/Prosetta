@@ -24,12 +24,6 @@ impl BasicState for ReturnState {
                 Some(Expr::Function { .. })
             )
         })
-        // for parent in &mut *env.before {
-        //     if let Expr::Function { .. } = parent {
-        //         return true;
-        //     }
-        // }
-        // false
     }
 
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {

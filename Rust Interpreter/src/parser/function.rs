@@ -1,3 +1,5 @@
+use std::ops::Sub;
+
 use super::*;
 /// state for equals
 #[derive(Debug)]
@@ -10,8 +12,7 @@ impl ParseState for FunctionState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         if self.first {
             *env.expr = Expr::Function {
-                name_start: usize::MAX,
-                name: Vec::new(),
+                func: SubStrData::new(),
                 locs: env.locs.take().unwrap_or_default(),
                 indexes: Vec::new(),
                 arg_starts: Vec::new(),
@@ -23,22 +24,17 @@ impl ParseState for FunctionState {
             // MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
         }
         if !self.has_name {
-            if is_close(word) || (word.len() > 0 && (word.str[0] == b'"' || word.str[0] == b'\'')) {
-                MatchResult::Continue
-            } else {
-                if let Expr::Function {
-                    name_start, name, ..
-                } = env.expr
-                {
-                    *name_start = word.pos + env.global_index;
-                    let temp_name = word.str.to_ascii_lowercase();
-                    *name = temp_name.to_owned();
-                    env.funcs.insert(temp_name.to_owned(), 0);
+            if let Some(func_data) = try_get_var_word(word, env.global_index) {
+                if let Expr::Function { func, .. } = env.expr {
+                    *func = func_data;
+                    env.funcs.insert(func.name.to_owned(), 0);
                     env.vars.add_layer();
                 } else {
                     unreachable!()
                 }
                 self.has_name = true;
+                MatchResult::Continue
+            } else {
                 MatchResult::Continue
             }
         } else if !self.has_args {
@@ -50,7 +46,7 @@ impl ParseState for FunctionState {
                 MatchResult::Continue
             } else {
                 if let Expr::Function {
-                    name,
+                    func,
                     arg_starts,
                     arg_names,
                     ..
@@ -60,7 +56,7 @@ impl ParseState for FunctionState {
                     let arg_name = word.str.to_ascii_lowercase();
                     arg_names.push(arg_name.to_owned());
                     env.vars.insert(arg_name.to_owned());
-                    env.funcs.inc_arg_count(name);
+                    env.funcs.inc_arg_count(&func.name);
                 }
                 MatchResult::Continue
             }

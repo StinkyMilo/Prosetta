@@ -397,6 +397,30 @@ mod tests_simple {
         );
     }
 
+    #[test]
+    #[timeout(1000)]
+    fn test_ret_out_of_function() {
+        let text: Vec<u8> = b"fun func. ret one! ret. pri hello. ret. func.".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(function@0,1,2$17 \"func\"@4 (args ) (return@10,11,12$17 (litnum 1@14$$3)))\n(print@24,25,26$33 \"hello\"@28)\n(\"func\"@40 )"
+        );
+    }
+
+    #[test]
+    #[timeout(1000)]
+    fn test_0_arg_function() {
+        let text: Vec<u8> = b"fun F'unc'. pri hi... fun'c.".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(function@0,1,2$18$$3 \"func\"@4|1,5 (args ) (print@12,13,14$18$$3 \"hi\"@16))\n(\"func\"@22|3 )"
+        );
+    }
+
     // #[test]#[timeout(1000)]
     // fn test_liechtenstein() {
     //     let text = b"The wars in Liechtenstein ravaged the country..".to_vec();

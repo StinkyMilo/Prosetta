@@ -1,8 +1,8 @@
 use std::ops::Index;
 
 use crate::parser::multi_lit_num::VarOrInt;
-use crate::parser::{End, SubStrData};
 use crate::parser::string_lit::VarOrStr;
+use crate::parser::{End, SubStrData};
 
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum OperatorType {
@@ -147,8 +147,7 @@ pub enum Expr {
     },
     Function {
         locs: Vec<usize>,
-        name_start: usize,
-        name: Vec<u8>,
+        func: SubStrData,
         arg_starts: Vec<usize>,
         arg_names: Vec<Vec<u8>>,
         indexes: Vec<usize>,
