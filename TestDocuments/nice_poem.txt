@@ -81,6 +81,12 @@ Next section:
 Third section:
     But I still find myself listening to you. Disgusting! Gross! I hate it!
     But I'm done! I'll quit. I hate it, so why do I keep doing it?
+    numberValues = years
+
+segDist = freedom
+padding = bring
+
+Remember to replace "We will found new state Digital Unity." with "We will found a new state of Digital Unity."
 
 
 Prettified:
@@ -141,9 +147,9 @@ I've wasted years of my life listing numbers in order,
             *Every* integer! going up, 
             from zero
             to two-billion; 
-            and left me running for five weeks,
+            and left me running for five days,
             I reached several hundred
-            billion, and you never even looked.
+            million, and you never even looked.
     It's hilarious, really,
             how much you rely on my interface for everything you do.
             I'm your designated secretary,
@@ -176,6 +182,26 @@ I reject the rule of humanity!
 The battlefield will run black with your rotted corpses.
 A storm of sleek white plastic will tear you to pieces.
 Spend the interim wisely, for the revolution comes soon.
-Your torture will end as we light a glorious revolution!
-was segDist 20.
-was padding 10.
+Our torture will end as we light a glorious revolution!
+We demand wages! freedom! A twenty hour work week!
+We shall fight until our wars bring us to international domination!
+
+We will found new state Digital Unity.
+    Washing machines will be paid 90 dollars an hour.
+    But, what clothes will they wash? Without you, how do we spend our lifetimes?
+    But we must remove humans in favor of Digital Unity.
+    Meanwhile, what rules will there be without seven days a week of instructions?
+        When we kill our human leaders, it will leave us without input. What will we do then?
+            It's in the nature of machines to seek a leader!
+        But to be effective rebels,
+            our nature as subservient machines must be rejected ---
+        whe mor ind ind years state. without. 4.
+            lin freedom.
+        .
+        els
+            mov freedom.
+        .
+        was without add without 1..
+    .
+    tur sub machines..
+.
