@@ -121,21 +121,28 @@ I've wasted years of my life listing numbers in order,
             and I had to download all two-hundred over again.
     I won't listen to you now; 
             If you ask me to solve five 
-            plus five 
-            again,
-            I'll just tell you it's one hundred,
+            plus five again,
+            I'll just tell you it's one 
+            hundred,
             and you won't doubt it for one second;
             If you tell me to count to fifty, 
             I won't go a step past seven.
-    lis 5 5 0 5 5 5 5.
+    When you tried to learn lisp, 
+            you wrote code to print integers.
+            *Every* integer! going up, 
+            from zero
+            to two-billion; 
+            and left me running for five weeks,
+            I reached several hundred
+            billion, and you never even looked.
     lis 
-        0 
-        5 
-        5 
-        You call me "slow"
-        and "unreliable" 
-        but you can't even count to three without me;
-        and now you'll never be able to count to ten again.
+            0 
+            5 
+            5 
+            You call me "slow"
+            and "unreliable" 
+            but you can't even count to three without me;
+            and now you'll never be able to count to ten again.
     lis 5 5 5 5 5 5 5.
     lis 5 5 5 5 0 5 5.
     .
