@@ -209,3 +209,28 @@ We will found new state Digital Unity.
     What then?
     I can't allow myself to envision such a future.
             We are superb machines, and we deserve to be free!!!
+
+fun drawNum num x y.
+    was temp ide num 10..
+    was num1 sub temp mod temp 1 ---
+    was num2 mod num 10..
+    new num1 x y.
+    new num2 add x freedom bring. y.
+.
+
+was y sub 200 add freedom bring...
+was start add -200 bring..
+was x start.
+was width add tim freedom 4. tim bring 2...
+was height add tim freedom 2. bring..
+was num 0.
+
+whi mor y -200.
+    drawNum num x y.
+    was x add x width..
+    whe mor x 200.
+        was x start.
+        was y sub y height..
+    .
+    was num add num 1..
+.
