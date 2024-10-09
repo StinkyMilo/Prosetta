@@ -9,7 +9,7 @@ impl ParseState for VarState {
             *env.expr = Expr::Var { var };
             MatchResult::Matched(rest.pos, false)
         } else {
-            // future words could be varible names
+            // future words could be variable names
             MatchResult::Failed
         }
     }

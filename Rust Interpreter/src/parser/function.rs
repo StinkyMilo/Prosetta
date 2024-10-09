@@ -32,6 +32,9 @@ impl ParseState for FunctionState {
                 {
                     *name_start = word.pos + env.global_index;
                     let temp_name = word.str.to_ascii_lowercase();
+                    if temp_name.len() < 3 {
+                        return MatchResult::Failed;
+                    }
                     *name = temp_name.to_owned();
                     env.funcs.insert(temp_name.to_owned(), 0);
                     env.vars.add_layer();
@@ -56,8 +59,11 @@ impl ParseState for FunctionState {
                     ..
                 } = env.expr
                 {
-                    arg_starts.push(word.pos + env.global_index);
                     let arg_name = word.str.to_ascii_lowercase();
+                    if arg_name.len() < 3 {
+                        return MatchResult::Continue;
+                    }
+                    arg_starts.push(word.pos + env.global_index);
                     arg_names.push(arg_name.to_owned());
                     env.vars.insert(arg_name.to_owned());
                     env.funcs.inc_arg_count(name);

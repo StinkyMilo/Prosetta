@@ -60,6 +60,9 @@ impl ParseState for AssignState {
                     {
                         *value_index = index;
                         *end = End::from_slice(&slice.0, env.global_index);
+                        if var.name.len() < 3 {
+                            return MatchResult::Failed;
+                        }
                         env.vars.insert(var.name.to_owned());
                     } else {
                         unreachable!();
