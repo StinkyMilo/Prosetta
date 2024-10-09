@@ -235,7 +235,7 @@ was height add tim freedom 2. bring..
 was num 0.
 
 whi mor y -200.
-    drawNum num x y.
+    all num x y.
     was x add x width..
     whe mor x 200.
         was x start.
