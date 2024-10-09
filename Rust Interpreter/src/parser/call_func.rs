@@ -3,7 +3,7 @@ use super::*;
 #[derive(Debug)]
 pub struct FunctionCallState {
     is_first: bool,
-    count: usize,
+    count: u8,
 }
 impl ParseState for FunctionCallState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
@@ -11,7 +11,7 @@ impl ParseState for FunctionCallState {
         if self.is_first {
             self.is_first = false;
             // is varible in scope
-            if let Some(func) = env.funcs.try_get_func(&word, env.global_index) {
+            if let Some(func) = env.symbols.try_get_func(&word, env.global_index) {
                 *env.expr = Expr::FunctionCall {
                     locs: env.locs.take().unwrap_or_default(),
                     func,
@@ -43,14 +43,8 @@ impl ParseState for FunctionCallState {
                 indexes.push(index);
                 self.count += 1;
             }
-            if let Some(arg_total) = env.funcs.get_arg_count(&func.name) {
-                let can_close = self.count >= *arg_total;
-                // println!(
-                //     "[OUTPUT_TEST] count: {}, name: {}, arg total: {}",
-                //     self.count,
-                //     String::from_utf8_lossy(&name.to_vec()),
-                //     *arg_total
-                // );
+            if let Some(arg_total) = env.symbols.get_func_arg_count(&func.name) {
+                let can_close = self.count >= arg_total;
                 if can_close {
                     let close = find_close_slice(&word, 0).or_else(|| find_close_slice(&rest, 0));
                     return match close {
@@ -61,20 +55,22 @@ impl ParseState for FunctionCallState {
                         }
                     };
                 } else {
-                    return if child_index.is_some() {
+                    if child_index.is_some() {
                         MatchResult::ContinueWith(
                             word.pos,
                             get_state!(alias::NoneState::new_expr_cont()),
                         )
                     } else {
                         MatchResult::Failed
-                    };
+                    }
                 }
             } else {
+                //varible should not have dissapeared from symbols
                 unreachable!()
             }
+        } else {
+            unreachable!()
         }
-        MatchResult::Failed
     }
 
     fn get_name(&self) -> &'static str {

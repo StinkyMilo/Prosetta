@@ -73,9 +73,9 @@ pub struct ParsedData<'a> {
     ///the start indexes of statements
     pub stat_starts: Vec<usize>,
     ///the set of current varibles
-    pub vars: VarSet,
+    pub symbols: SymbolSet,
     //the set of current functions
-    pub funcs: FuncSet,
+    // pub funcs: FuncSet,
     /// the ignored values
     pub nots: IgnoreSet,
     ///the parserSource that is used
@@ -113,8 +113,8 @@ impl<'a> Parser<'a> {
             data: ParsedData {
                 exprs: ExprArena { vec: Vec::new() },
                 stat_starts: Vec::new(),
-                vars: VarSet::new(),
-                funcs: FuncSet::new(),
+                symbols: SymbolSet::new(),
+                // funcs: FuncSet::new(),
                 nots: IgnoreSet::new(),
                 source,
             },
@@ -275,8 +275,7 @@ impl<'a> Parser<'a> {
             before,
             last_stat_index: self.stat_indexes.last().cloned(),
             expr_index: frame.expr_index,
-            vars: &mut self.data.vars,
-            funcs: &mut self.data.funcs,
+            symbols: &mut self.data.symbols,
             nots: &mut self.data.nots,
             locs: None,
             global_index: self.pos,

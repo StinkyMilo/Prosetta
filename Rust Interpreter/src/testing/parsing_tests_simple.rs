@@ -405,7 +405,7 @@ mod tests_simple {
         test_lib::run_to_completion(&mut parser);
         assert_eq!(
             lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
-            "(function@0,1,2$17 \"func\"@4 (args ) (return@10,11,12$17 (litnum 1@14$$3)))\n(print@24,25,26$33 \"hello\"@28)\n(\"func\"@40 )"
+            "(function@0,1,2$17 \"func\"@4 (args) (return@10,11,12$17 (litnum 1@14$$3)))\n(print@24,25,26$33 \"hello\"@28)\n(\"func\"@40 )"
         );
     }
 
@@ -417,7 +417,7 @@ mod tests_simple {
         test_lib::run_to_completion(&mut parser);
         assert_eq!(
             lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
-            "(function@0,1,2$18$$3 \"func\"@4|1,5 (args ) (print@12,13,14$18$$3 \"hi\"@16))\n(\"func\"@22|3 )"
+            "(function@0,1,2$18$$3 \"func\"@4|1,5 (args) (print@12,13,14$18$$3 \"hi\"@16))\n(\"func\"@22|3 )"
         );
     }
 

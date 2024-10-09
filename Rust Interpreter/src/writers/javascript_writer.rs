@@ -308,24 +308,30 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         }
         Expr::Function {
             func,
-            arg_names,
+            args,
             indexes,
             ..
         } => {
-            let mut output_vals = "".to_string();
-            let mut is_first = true;
-            for val in arg_names {
-                if is_first {
-                    output_vals += &format!("{}_var", String::from_utf8_lossy(val));
-                    is_first = false;
-                } else {
-                    output_vals += &format!(", {}_var", String::from_utf8_lossy(val));
-                }
-            }
+            // let mut output_vals = "".to_string();
+            // let mut is_first = true;
+            // for val in args {
+            //     if is_first {
+            //         output_vals += &format!("{}_var", String::from_utf8_lossy(&val.name));
+            //         is_first = false;
+            //     } else {
+            //         output_vals += &format!(", {}_var", String::from_utf8_lossy(&val.name));
+            //     }
+            // }
+            let args_str = args
+                .into_iter()
+                .map(|data| String::from_utf8_lossy(&data.name))
+                .collect::<Vec<_>>()
+                .join(", ");
+            
             format!(
                 "function {}_var({}){{\n{}\n}}",
                 String::from_utf8_lossy(&func.name),
-                output_vals,
+                args_str,
                 write_exprs(exprs, indexes, "\n")
             )
         }

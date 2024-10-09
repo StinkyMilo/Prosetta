@@ -21,11 +21,11 @@ impl ParseState for AssignState {
         }
 
         // dont make closes varibles
-        let var_word = try_get_var_word(word, env.global_index);
+        let var_word = try_get_symbol_word(word, env.global_index);
         if let Some(new_var) = var_word {
             //set name
             if let Expr::Assign { var, first, .. } = env.expr {
-                *first = !env.vars.contains(&new_var.name);
+                *first = !env.symbols.contains(&new_var.name);
                 *var = new_var;
             } else {
                 unreachable!()
@@ -60,7 +60,7 @@ impl ParseState for AssignState {
                     {
                         *value_index = index;
                         *end = End::from_slice(&slice.0, env.global_index);
-                        env.vars.insert(var.name.to_owned());
+                        env.symbols.insert_var(var.name.to_owned());
                     } else {
                         unreachable!();
                     }

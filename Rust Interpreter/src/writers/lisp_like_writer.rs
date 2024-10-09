@@ -359,26 +359,29 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
         Expr::Function {
             locs,
             func,
-            arg_names,
+            args,
             indexes,
             end,
             ..
         } => {
-            let mut output_vals = "".to_string();
-            let mut is_first = true;
-            for val in arg_names {
-                if is_first {
-                    output_vals += &format!("{}", String::from_utf8_lossy(val));
-                    is_first = false;
-                } else {
-                    output_vals += &format!(" {}", String::from_utf8_lossy(val));
-                }
-            }
+            // let mut output_vals = "".to_string();
+            // let mut is_first = true;
+            // for val in arg_names {
+            //     if is_first {
+            //         output_vals += &format!("{}", String::from_utf8_lossy(val));
+            //         is_first = false;
+            //     } else {
+            //         output_vals += &format!(" {}", String::from_utf8_lossy(val));
+            //     }
+            // }
+            let args_str = args
+                .into_iter()
+                .fold(String::new(), |str, arg| str + &write_var(arg));
             format!(
-                "(function{} {} (args {}) {})",
+                "(function{} {} (args{}) {})",
                 join_locs(locs, Some(*end)),
                 write_var(func),
-                output_vals,
+                args_str,
                 write_exprs(exprs, indexes)
             )
         }

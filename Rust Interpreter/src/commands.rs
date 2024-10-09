@@ -148,8 +148,7 @@ pub enum Expr {
     Function {
         locs: Vec<usize>,
         func: SubStrData,
-        arg_starts: Vec<usize>,
-        arg_names: Vec<Vec<u8>>,
+        args: Vec<SubStrData>,
         indexes: Vec<usize>,
         end: End,
     },

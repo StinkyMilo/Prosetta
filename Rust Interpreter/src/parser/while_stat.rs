@@ -13,7 +13,7 @@ impl ParseState for WhileState {
                 indexes: Vec::new(),
                 end: End::none(),
             };
-            env.add_var_layer();
+            env.symbols.add_layer();
             // setup child state
             MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont()))
         } else if self.has_stat {
@@ -51,7 +51,7 @@ impl ParseState for WhileState {
                 // close if have close
                 if self.has_stat && is_mandatory_close(word) {
                     *end = End::from_slice(&word, env.global_index);
-                    env.remove_var_layer();
+                    env.symbols.remove_layer();
                     MatchResult::Matched(word.pos, true)
                     // succeeded - continue again with noncont stat
                 } else if child_index.is_some() {
