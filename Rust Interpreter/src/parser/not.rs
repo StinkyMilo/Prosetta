@@ -17,12 +17,9 @@ impl ParseState for NotState {
                     locs: env.locs.take().unwrap_or_default(),
                     str_start: word.pos + env.global_index,
                     str_len: word.len(),
-                    word: word.str.to_ascii_lowercase(),
+                    word:word.str.to_ascii_lowercase(),
                     end: End::from_slice(&close.0, env.global_index),
                 };
-                if word.str.len() < 3 {
-                    return MatchResult::Failed;
-                }
                 env.nots.insert(word.str.to_ascii_lowercase());
                 MatchResult::Matched(close.0.pos, true)
             } else {

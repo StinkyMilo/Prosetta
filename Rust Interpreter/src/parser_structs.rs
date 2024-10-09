@@ -403,7 +403,7 @@ pub struct Environment<'a> {
     pub global_index: usize,
     /// reference to static AliasData
     pub aliases: &'a AliasData,
-    pub full_text: &'a [u8],
+    pub full_text: &'a [u8]
 }
 
 impl<'a> Environment<'a> {
