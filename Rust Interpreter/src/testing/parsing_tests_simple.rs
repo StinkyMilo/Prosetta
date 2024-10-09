@@ -302,13 +302,13 @@ mod tests_simple {
     #[test]
     #[timeout(1000)]
     fn test_pri_varible_casing() {
-        let text: Vec<u8> = b"was h1 one. was H2 two. pri h1 H1 h2 H2.".to_vec();
+        let text: Vec<u8> = b"was hh1 one. was HH2 two. pri hh1 HH1 hh2 HH2.".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
         test_lib::run_to_completion(&mut parser);
         assert_eq!(
             lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
-            "(assign@0,1,2$10 \"h1\"@4 (litnum 1@7$$3))\n(assign@12,13,14$22 \"h2\"@16 (litnum 2@19$$3))\n\
-            (print@24,25,26$39 (var \"h1\"@28) (var \"h1\"@31) (var \"h2\"@34) (var \"h2\"@37))"
+            "(assign@0,1,2$11 \"hh1\"@4 (litnum 1@8$$3))\n(assign@13,14,15$24 \"hh2\"@17 (litnum 2@21$$3))\n\
+            (print@26,27,28$45 (var \"hh1\"@30) (var \"hh1\"@34) (var \"hh2\"@38) (var \"hh2\"@42))"
         );
     }
 
@@ -316,14 +316,12 @@ mod tests_simple {
     #[timeout(1000)]
     fn test_varible_substrings() {
         let text: Vec<u8> =
-            b"was a one. was car car. was car car. was cart cater. was cater handcarts.".to_vec();
+            b"was aaa one. was caaar caaar. was caaar caaar. was caaart caaater. was caaater handcaaarts.".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
         test_lib::run_to_completion(&mut parser);
         assert_eq!(
             lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
-            "(assign@0,1,2$9 \"a\"@4 (litnum 1@6$$3))\n(assign@11,12,13$22 \"car\"@15 (var \"a\"@20))\n\
-            (assign@24,25,26$35 mut \"car\"@28 (var \"car\"@32))\n(assign@37,38,39$51 \"cart\"@41 (var \"a\"@47))\n\
-            (assign@53,54,55$72 \"cater\"@57 (var \"cart\"@67))"
+            "(assign@0,1,2$11 \"aaa\"@4 (litnum 1@8$$3))\n(assign@13,14,15$28 \"caaar\"@17 (var \"aaa\"@24))\n(assign@30,31,32$45 mut \"caaar\"@34 (var \"caaar\"@40))\n(assign@47,48,49$65 \"caaart\"@51 (var \"aaa\"@59))\n(assign@67,68,69$90 \"caaater\"@71 (var \"caaart\"@83))"
         );
     }
 
