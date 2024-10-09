@@ -421,6 +421,9 @@ mod tests_simple {
         );
     }
 
+    //fun 'cause can't 'cause 'wow. p'ri hi_! ca'us'e' one. cause. 
+    //fun in'finite. infi'n'ite... pri "this will never print".
+
     // #[test]#[timeout(1000)]
     // fn test_liechtenstein() {
     //     let text = b"The wars in Liechtenstein ravaged the country..".to_vec();
