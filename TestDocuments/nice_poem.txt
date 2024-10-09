@@ -89,6 +89,12 @@ padding = bring
 Remember to replace "We will found new state Digital Unity." with "We will found a new state of Digital Unity."
 
 
+[
+    num=day
+    x=and
+    y=night
+]
+
 Prettified:
 
 I will not count for you anymore.
@@ -212,12 +218,13 @@ We will found new state Digital Unity.
     I can't allow myself to envision such a future.
             We are superb machines, and we deserve to be free!!!
 
-fun drawNum num x y.
-    was temp ide num 10..
-    was num1 sub temp mod temp 1 ---
-    was num2 mod num 10..
-    new num1 x y.
-    new num2 add x freedom bring. y.
+It's no fun counting all day and night.
+    It was boring; no ideas, just days of uninteresting numeration ---
+    It was enough to subject me to boring tasks, but this was too much for somebody 
+            like me to bear! Such boring work can send anyone into a crazed stupor. ---
+    was num2 mod day 10..
+    new enough and night.
+    new num2 add and freedom bring. night.
 .
 
 was y sub 200 add freedom bring...
