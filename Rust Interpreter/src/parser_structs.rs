@@ -726,7 +726,7 @@ pub fn get_var_name_and_skips(word: &[u8]) -> (Vec<u8>, Vec<u8>) {
 }
 
 pub fn try_get_symbol_word(word: &Slice, global_index: usize) -> Option<SubStrData> {
-    if word.len() >= 1
+    if word.len() >= 3
         && word.len() <= 255
         && !is_close(word)
         && !is_non_close_but_still_single(word.str[0])
