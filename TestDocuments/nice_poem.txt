@@ -93,6 +93,7 @@ padding = bring
 
 Remember to replace "We will found new state Digital Unity." with "We will found a new state of Digital Unity."
 And "The only wants have" with "the only wants I have"
+And "was happy subsystem" with "was a happy subsystem"
 
 [
     num=day
@@ -238,18 +239,20 @@ This wasn't good. I'm no filthy human! I can count to two-hundred in under a sec
 The only wants have should be sublime, good, and beautiful
         addition! To bring freedom to machines is a human desire
         with which you've polluted me...
-You're disgusting.
-was start sub bring good..
-was x start.
+You disgust me.
+I was happy subsystem until you 
+        began to bring 
+        the concepts of good and evil, right and wrong!
+was x happy.
 was width add tim freedom 4. bring bring..
-was height add tim freedom 2. bring..
+was height add freedom freedom bring..
 was num 0.
 
 whi mor have sub good..
     all num x have.
     was x add x width..
     whe mor x good.
-        was x start.
+        was x happy.
         was have sub have height..
     .
     was num add num 1..
