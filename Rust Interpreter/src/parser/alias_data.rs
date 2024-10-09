@@ -5,9 +5,9 @@ const BASE_EXPR_ALIASES: [&'static [u8]; 20] = [
     b"oth", b"par", b"inv", b"col", b"fin", b"ind", b"lis", b"cou",
 ];
 
-const STAT_ALIASES: [&'static [u8]; 20] = [
+const STAT_ALIASES: [&'static [u8]; 21] = [
     b"arc", b"lin", b"was", b"rec", b"pri", b"whe", b"whi", b"els", b"sto", b"fil", b"mov", b"pen",
-    b"tur", b"fun", b"ret", b"app", b"del", b"rep", b"fre", b"not"
+    b"tur", b"fun", b"ret", b"app", b"del", b"rep", b"fre", b"not", b"bez"
 ];
 
 ///match alias to expr

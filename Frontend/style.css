@@ -68,3 +68,9 @@ body {
   margin-top: 5px;
   margin-bottom: 5px;
 }
+
+#syntax,
+#js {
+  background: black;
+  color: white;
+}
