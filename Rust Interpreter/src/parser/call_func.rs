@@ -10,7 +10,7 @@ impl ParseState for FunctionCallState {
         // get lowercase
         if self.is_first {
             self.is_first = false;
-            // is varible in scope
+            // is variable in scope
             if let Some(func) = env.funcs.try_get_func(&word, env.global_index) {
                 *env.expr = Expr::FunctionCall {
                     locs: env.locs.take().unwrap_or_default(),
@@ -20,7 +20,7 @@ impl ParseState for FunctionCallState {
                 };
                 MatchResult::ContinueWith(rest.pos, get_state!(alias::NoneState::new_expr_cont()))
             } else {
-                // future words could be varible names
+                // future words could be variable names
                 MatchResult::Failed
             }
         } else {

@@ -83,7 +83,7 @@ impl VarSet {
         let lower = name.to_ascii_lowercase();
         self.set.contains(&lower)
     }
-    ///returns (index in word, varible name)
+    ///returns (index in word, variable name)
     pub fn try_get_var(&self, word: &Slice, global_index: usize) -> Option<SubStrData> {
         if word.len() > 255 {
             return None;
@@ -381,7 +381,7 @@ impl ParserResult {
 
 ///the parser enviorment
 pub struct Environment<'a> {
-    ///The set of current varibles
+    ///The set of current variables
     pub vars: &'a mut VarSet,
     ///The set of current functions
     pub funcs: &'a mut FuncSet,

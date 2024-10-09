@@ -186,7 +186,7 @@ fn run_statement(
         Expr::Arc { locs, indexes, end } => {
             let data;
             set_global_to_loc(&mut global_index, locs);
-            (data, _) = run_varible_length_args(exprs, vars, indexes, global_index, |vec| {
+            (data, _) = run_variable_length_args(exprs, vars, indexes, global_index, |vec| {
                 match (vec.len(), vec) {
                     (0..=2, ..) => None,
                     (3, [a, b, c]) => Some((Statement::Circle([*a, *b, *c]), false)),
@@ -200,7 +200,7 @@ fn run_statement(
         Expr::Line { locs, indexes, end } => {
             let data;
             set_global_to_loc(&mut global_index, locs);
-            (data, _) = run_varible_length_args(exprs, vars, indexes, global_index, |vec| {
+            (data, _) = run_variable_length_args(exprs, vars, indexes, global_index, |vec| {
                 match (vec.len(), vec) {
                     (0..=3, ..) => None,
                     (4, [a, b, c, d]) => Some((Statement::Line([*a, *b, *c, *d]), true)),
@@ -220,7 +220,7 @@ fn run_statement(
         Expr::Rect { locs, indexes, end } => {
             let data;
             set_global_to_loc(&mut global_index, locs);
-            (data, _) = run_varible_length_args(exprs, vars, indexes, global_index, |vec| {
+            (data, _) = run_variable_length_args(exprs, vars, indexes, global_index, |vec| {
                 match (vec.len(), vec) {
                     (0..=2, ..) => None,
                     (3, [a, b, c]) => Some((Statement::Square([*a, *b, *c]), false)),
@@ -312,7 +312,7 @@ fn run_expr(
 // Some(..,0) = can close
 // Some(..,1) = must close
 type VaribleLengthFn = fn(&[f64]) -> Option<(Statement, bool)>;
-fn run_varible_length_args(
+fn run_variable_length_args(
     exprs: &ExprArena,
     vars: &Vars,
     indexes: &[usize],

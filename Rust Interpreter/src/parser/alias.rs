@@ -109,7 +109,7 @@ impl NoneState {
 
 impl NoneState {
     ///matches based on MatchState
-    ///Expr starts at Var, to check if it is a varible, then it checks if it is a number,
+    ///Expr starts at Var, to check if it is a variable, then it checks if it is a number,
     ///then it tries to find aliases in the word
     ///Stat starts at the aliases directly
     fn run_match_state(
@@ -123,7 +123,7 @@ impl NoneState {
                 MatchState::Var,
                 MatchResult::ContinueWith(word.pos, get_state!(string_lit::LitStrState::new()))
             ),
-            // is word a varible
+            // is word a variable
             MatchState::Var => (
                 MatchState::FunctionCallExpr,
                 MatchResult::ContinueWith(word.pos, get_state!(var::VarState::new())),

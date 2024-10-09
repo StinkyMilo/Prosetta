@@ -4,7 +4,7 @@ use super::*;
 pub struct VarState;
 impl ParseState for VarState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
-        // is varible in scope
+        // is variable in scope
         if let Some(var) = env.vars.try_get_var(&word, env.global_index) {
             *env.expr = Expr::Var { var };
             MatchResult::Matched(rest.pos, false)

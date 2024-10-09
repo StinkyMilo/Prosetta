@@ -72,7 +72,7 @@ pub struct ParsedData<'a> {
     pub exprs: ExprArena,
     ///the start indexes of statements
     pub stat_starts: Vec<usize>,
-    ///the set of current varibles
+    ///the set of current variables
     pub vars: VarSet,
     //the set of current functions
     pub funcs: FuncSet,

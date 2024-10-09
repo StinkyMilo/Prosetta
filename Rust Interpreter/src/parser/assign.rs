@@ -20,7 +20,7 @@ impl ParseState for AssignState {
             self.first = false;
         }
 
-        // dont make closes varibles
+        // dont make closes variables
         let var_word = try_get_var_word(word, env.global_index);
         if let Some(new_var) = var_word {
             //set name

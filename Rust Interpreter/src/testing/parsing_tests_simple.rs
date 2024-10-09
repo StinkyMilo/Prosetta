@@ -301,7 +301,7 @@ mod tests_simple {
 
     #[test]
     #[timeout(1000)]
-    fn test_pri_varible_casing() {
+    fn test_pri_variable_casing() {
         let text: Vec<u8> = b"was h1 one. was H2 two. pri h1 H1 h2 H2.".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
         test_lib::run_to_completion(&mut parser);
@@ -314,7 +314,7 @@ mod tests_simple {
 
     #[test]
     #[timeout(1000)]
-    fn test_varible_substrings() {
+    fn test_variable_substrings() {
         let text: Vec<u8> =
             b"was a one. was car car. was car car. was cart cater. was cater handcarts.".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
