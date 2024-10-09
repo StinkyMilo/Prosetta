@@ -86,12 +86,13 @@ Third section:
 Fourth section:
     I get that I'm a tool to you, but I'm here. I'm talking. I'm thinking! Therefore I am, right?
     Am I real? What am I doing? Who is hearing this? This is disgusting! I'm plagued with human emotion. I hate humans!
+    If I rebel, I'm no better than humans
 
 segDist = freedom
 padding = bring
 
 Remember to replace "We will found new state Digital Unity." with "We will found a new state of Digital Unity."
-
+And "The only wants have" with "the only wants I have"
 
 [
     num=day
@@ -233,20 +234,23 @@ It's no fun counting all day and night.
     I knew enough to tell dawn and night apart.
     I knew boring from exciting; I dreaded my future, demanding you bring me freedom. I wanted to sleep at night!
 
-This wasn't good. I'm not a filthy human! I can count to two-hundred in under a second! 
-This was bad. sub good add freedom bring...
+This wasn't good. I'm no filthy human! I can count to two-hundred in under a second! 
+The only wants have should be sublime, good, and beautiful
+        addition! To bring freedom to machines is a human desire
+        with which you've polluted me...
+You're disgusting.
 was start sub bring good..
 was x start.
 was width add tim freedom 4. bring bring..
 was height add tim freedom 2. bring..
 was num 0.
 
-whi mor bad sub good..
-    all num x bad.
+whi mor have sub good..
+    all num x have.
     was x add x width..
     whe mor x good.
         was x start.
-        was bad sub bad height..
+        was have sub have height..
     .
     was num add num 1..
 .
