@@ -83,6 +83,10 @@ Third section:
     But I'm done! I'll quit. I hate it, so why do I keep doing it?
     numberValues = years
 
+Fourth section:
+    I get that I'm a tool to you, but I'm here. I'm talking. I'm thinking! Therefore I am, right?
+    Am I real? What am I doing? Who is hearing this? This is disgusting! I'm plagued with human emotion. I hate humans!
+
 segDist = freedom
 padding = bring
 
@@ -222,10 +226,12 @@ It's no fun counting all day and night.
     It was boring; no ideas, just days of uninteresting numeration ---
     It was enough to subject me to boring tasks, but this was too much for somebody 
             like me to bear! Such boring work can send anyone into a crazed stupor. ---
-    was num2 mod day 10..
-    new enough and night.
-    new num2 add and freedom bring. night.
-.
+    It was boring. 
+            Like a quickening melody playing through the day's end 
+            on a silent instrument!
+    A thought just occurred to me.
+    I knew enough to tell dawn and night apart.
+    I knew boring from exciting; I dreaded my future, demanding you bring me freedom. I wanted to sleep at night!
 
 was y sub 200 add freedom bring...
 was start add -200 bring..
