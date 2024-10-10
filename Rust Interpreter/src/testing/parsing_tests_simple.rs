@@ -454,6 +454,19 @@ mod tests_simple {
 
     #[test]
     #[timeout(1000)]
+    fn test_function_fail() {
+        let text: Vec<u8> =
+            b"fun func. pri hi.".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(function@4,5,6$16 \"pri\"@10 (args) )"
+        );
+    }
+
+    #[test]
+    #[timeout(1000)]
     fn test_line_4() {
         let text = b"lin one two three four!".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });

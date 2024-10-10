@@ -20,7 +20,12 @@ impl ParseState for FunctionState {
             };
             self.first = false;
         }
-        if let Expr::Function { func, args, .. } = env.expr {
+
+        // reached the end of the string
+        if word.len() == 0 {
+            env.symbols.remove_layer();
+            MatchResult::Failed
+        } else if let Expr::Function { func, args, .. } = env.expr {
             // if parsing stats in body
             if self.is_parsing_body {
                 MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_stat()))
@@ -71,7 +76,11 @@ impl ParseState for FunctionState {
         word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
-        if let Expr::Function {
+        // reached the end of the string
+        if word.len() == 0 {
+            env.symbols.remove_layer();
+            MatchResult::Failed
+        } else if let Expr::Function {
             func, indexes, end, ..
         } = env.expr
         {
