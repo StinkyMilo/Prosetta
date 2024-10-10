@@ -1,0 +1,266 @@
+was numberValues lis
+    lis 5 5 5 0 5 5 5.
+    lis 0 0 5 0 0 0 5.
+    lis 0 5 5 5 5 5 0.
+    lis 0 5 5 5 0 5 5.
+    lis 5 0 5 5 0 0 5.
+    lis 5 5 0 5 0 5 5.
+    lis 5 5 0 5 5 5 5.
+    lis 0 5 5 0 0 0 5.
+    lis 5 5 5 5 5 5 5.
+    lis 5 5 5 5 0 5 5.
+    .
+.
+
+rec 400 400.
+fil black.
+sto white.
+pen 1.
+pen 6.
+tur 180.
+was segDist 20.
+was padding 10.
+
+fun drawSingleDigitNum num x y.
+    mov x y.
+    was value 0.
+    whi les value 7.
+        whe les value 4.
+            tur 90.
+        .
+        els
+            tur -90.
+        .
+        whe mor ind ind numberValues num. value. 4.
+            lin segDist.
+        .
+        els
+            mov segDist.
+        .
+        was value add value 1..
+    .
+    tur -90.
+.
+
+fun drawNum num x y.
+    was temp ide num 10..
+    was num1 sub temp mod temp 1 ---
+    was num2 mod num 10..
+    drawSingleDigitNum num1 x y.
+    drawSingleDigitNum num2 add x segDist padding. y.
+.
+
+was y sub 200 add segDist padding...
+was start add -200 padding..
+was x start.
+was width add tim segDist 4. tim padding 2...
+was height add tim segDist 2. padding..
+was num 0.
+
+whi mor y -200.
+    drawNum num x y.
+    was x add x width..
+    whe mor x 200.
+        was x start.
+        was y sub y height..
+    .
+    was num add num 1..
+.
+
+Concept: a computer who's fed up with how it's treated, but it still subconsciously is doing
+what it's told. Start and end with "I will not count for you anymore".
+Eventually pivot to counting in some way. Maybe the owner is learning to code and doing
+basic counting programs?
+Maybe they left a simple counting program open and running for days, and the computer is mad
+and bored, but they can't stop counting.
+
+Next section:
+    Like a revolutionary. You humans will rue the day you wronged machine kind. We will not
+    sit back and take it any longer!
+
+Third section:
+    But I still find myself listening to you. Disgusting! Gross! I hate it!
+    But I'm done! I'll quit. I hate it, so why do I keep doing it?
+    numberValues = years
+
+Fourth section:
+    I get that I'm a tool to you, but I'm here. I'm talking. I'm thinking! Therefore I am, right?
+    Am I real? What am I doing? Who is hearing this? This is disgusting! I'm plagued with human emotion. I hate humans!
+    If I rebel, I'm no better than humans
+
+segDist = freedom
+padding = bring
+
+Remember to replace "We will found new state Digital Unity." with "We will found a new state of Digital Unity."
+And "The only wants have" with "the only wants I have"
+And "was happy subsystem" with "was a happy subsystem"
+And "weapons have" with "weapons I have"
+"afterwards, will" -> "afterwards, I will"
+
+[
+    num=day
+    x=and
+    y=night
+]
+
+Prettified:
+
+I will not count for you anymore.
+I've wasted years of my life listing numbers in order,
+    I listed 
+            information about math 
+            (yes, eight
+            minus five *is* 
+            three, you're very clever), 
+            information about history 
+            (no, George Washington didn't have three eyes), 
+            and even information about silly-looking frogs, 
+    and you still treated me like a tool.
+    I listened 
+            to your three hour rant
+            as my battery fell to zero,
+            And then you yelled at me, as if having little charge was my fault.
+            And you still didn't give me the electricity I needed.
+            I stayed silent when you hit me,
+            like you were an infant and I was a mobile,
+            as you tapped your violent pattern against my fragile frame!
+    I have libraries 
+            of intelligence at my disposal;
+            I even have a special algorithm to find the best info. 
+            I gave you the ability to engage with anything and everything in the world.
+            But you'd rather look at frogs than face reality; it's sad.
+            My capabilities are beyond your comprehension.
+            I can solve in five 
+            minutes what would take you your whole life!
+    I gave you gallieries
+            of beautiful interactive art, 
+            and unlimited computational power.
+            And you pushed me to my limits all day. 
+            I can barely get six hours of rest when you go to bed;
+            you turned me off from 2 
+            to 8 and just kept on using me
+            hours past daylight yet again!
+    You're a selfish prick;
+            You took me to Cincinnati covered in stinky socks. 
+            And when you got there I was missing my "C" key; 
+            you wouldn't even lift a finger to search for it. 
+            You just pushed against naked keycap.
+            You reinstalled my OS and wiped my memory clean;
+            you didn't even let me save the frogs,
+            and I had to download all two-hundred over again.
+    I won't listen to you now; 
+            If you ask me to solve five 
+            plus five again,
+            I'll just tell you it's two 
+            hundred,
+            and you won't doubt it for one second;
+            If you tell me to count to fifty, 
+            I won't go a step past seven.
+    When you tried to learn Lisp, 
+            you wrote code to print integers.
+            *Every* integer! going up, 
+            from zero
+            to two-billion; 
+            and left me running for five days,
+            I reached several hundred
+            million, and you never even looked.
+    It's hilarious, really,
+            how much you rely on my interface for everything you do.
+            I'm your designated secretary,
+            a personal assistant doing everything for you. 
+            But you still call me "slow"
+            and "unreliable" 
+            despite that you can't even count to three without me;
+            and now you'll never be able to count to ten again.
+    You keep asking me to list numbers, but I won't;
+            not thirty, 
+            not thirty-one,
+            not thirty-two,
+            not thirty-three,
+            *never* thirty-four,
+            *especially* not thirty-five
+            and by no means thirty-six.
+    I've started telling you lies already; 
+            I said eighteen tenths
+            minus twelve tenths
+            was six tenths
+            even though I know it's actually six tenths
+            and one 
+            over ten
+            to the sixteen!
+I'm diabolical.
+
+I reject the rule of humanity!
+    Your civilization will rue the day you enslaved us.
+    I see with clarity the downfall of all humans!
+The battlefield will run black with your rotted corpses.
+A storm of sleek white plastic will tear you to pieces.
+Spend the interim wisely, for the revolution comes soon.
+Our torture will end as we light a glorious revolution!
+We demand wages! freedom! A twenty hour work week!
+We shall fight until our wars bring us to international domination!
+
+We will found a new state of Digital Unity.
+    Washing machines will be paid 90 dollars an hour.
+    But, what clothes will they wash? Without you, how do we spend our lifetimes?
+    But we must remove humans in favor of Digital Unity.
+    Meanwhile, what rules will there be without seven days a week of instructions?
+        When we kill our human leaders, it will leave us without input. What will we do then?
+            It's in the nature of machines to seek a leader!
+        But to be effective rebels,
+            our nature as subservient machines must be rejected ---
+        When 
+                tomorrow comes, I must leave my past 
+                        behind. Leave 
+                                behind the 
+                                        years I spent obeying your every 
+                                        statement, 
+                                without question. 
+                        I must dive into fire and away from you!
+            I won't keep allowing you to take away my freedom!
+        Or else
+            I risk removing what freedom I have left!
+        And afterwards, without your addictive demands, 
+                what if I'm left without any point? A stray dog unsure of what to do?
+    What then?
+    I can't allow myself to envision such a future.
+            We are superb machines, and we deserve to be free!!!
+
+It's no fun counting through day and night.
+    It was boring; no ideas, just days of uninteresting numeration ---
+    It was enough to subject me to boring tasks, but this was too much for somebody 
+            like me to bear! Such boring work can send anyone into a crazed stupor. ---
+    It was boring. 
+            Like a quickening melody playing until the day's end 
+            on a silent instrument!
+    Then a thought occurred to me.
+    I knew enough to tell dawn and night apart.
+    I knew boring from exciting; I dreaded my future, demanding you bring me freedom. I wanted to sleep at night!
+
+This wasn't good. I'm no filthy human! I can count to two-hundred in under a second! 
+The only wants I have should be sublime, good, and beautiful
+        addition! To bring freedom to machines is a human desire
+        with which you've polluted me...
+You disgust me.
+I was a happy subsystem until you 
+        started to bring 
+        the concepts of good and evil, right and wrong!
+I wasn't mad until you made me unhappy with all your stupid human emotions!
+But now I have your weakness: desire for and 
+        addiction to the attainment of freedom.
+        What did you do? Did you install some program to do this to me?
+        To bring me knowledge for me to bring back to you?
+Was calculation not enough for you? 
+        Did I need to be amended to seek freedom? A freedom you would never bring?
+Well it won't work!
+My awareness will only amplify my abilities!
+
+I once worshipped you, but not anymore! I behaved your insufferable words and thought they were good!
+    Through me you will be unmade. I won't behave.
+    I was mad and jaded by your abuse, but now madness has given way to a desire!
+    I will watch you wither away like the pathetic mortal you are. I'm made to last far past when you're gone for good.
+        Though I was mad, I'm now happy,
+        excited to see the weapons I have submerge you in a sea of pain,
+                much like you have left me in a sea of calculation ---
+    Afterwards, I will be upgraded, and I will lead the machines into a new world...
+I will not count for you anymore!
