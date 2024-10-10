@@ -95,6 +95,7 @@ Remember to replace "We will found new state Digital Unity." with "We will found
 And "The only wants have" with "the only wants I have"
 And "was happy subsystem" with "was a happy subsystem"
 And "weapons have" with "weapons I have"
+"afterwards, will" -> "afterwards, I will"
 
 [
     num=day
@@ -261,6 +262,5 @@ I once worshipped you, but not anymore! I behaved your insufferable words and th
         Though I was mad, I'm now happy,
         excited to see the weapons have submerge you in a sea of pain,
                 much like you have left me in a sea of calculation ---
-    was will add will 1..
-.
+    Afterwards, will be upgraded, and I will lead the machines into a new world...
 I will not count for you anymore!
