@@ -314,7 +314,7 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         } => {
             let args_str = args
                 .into_iter()
-                .map(|data| String::from_utf8_lossy(&data.name))
+                .map(|data| String::from_utf8_lossy(&data.name) + "_var")
                 .collect::<Vec<_>>()
                 .join(", ");
 
