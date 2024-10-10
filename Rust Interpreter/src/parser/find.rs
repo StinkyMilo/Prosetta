@@ -12,7 +12,7 @@ impl BasicState for FindState {
     }
     
     fn get_type(&self) -> StateType {
-        StateType::Stat
+        StateType::Expr
     }
 
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool { 
