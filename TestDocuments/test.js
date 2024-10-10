@@ -1,36 +1,50 @@
-let array_var = [10, 30, 2, 15, 19, 24, 60, 80, 0];
-function middle_var(start_var, end_var) {
-    let len_var = (end_var - start_var);
-    if ((len_var % 2) == 0) {
-        return (start_var + (len_var / 2));
-    }
-    return (start_var + ((len_var - 1) / 2));
-}
-function merge_var(array_var, start_var, end_var) {
-    let difference_var = (end_var - start_var);
-    if ((difference_var < 1)) {
-        return [];
-    }
-    if (difference_var == 1) {
-        return [array_var[start_var]];
-    }
-    let mid_var = middle_var(start_var, end_var);
-    let left_var = merge_var(array_var, start_var, mid_var);
-    let right_var = merge_var(array_var, mid_var, end_var);
-    let output_var = [];
-    let yin_var = 0;
-    let yang_var = 0;
-    while (((yin_var < left_var.length) || (yang_var < right_var.length))) {
-        if ((((yin_var + 1) > left_var.length) || (left_var[yin_var] > right_var[yang_var]))) {
-            output_var.push(right_var[yang_var]);
-            yang_var = (yang_var + 1);
+
+let years_var = [[5, 8, 5, 3, 5, 6, 5], [3, 0, 6325, 4, 4, 3, 7], [2, 24344, 264830235, 43, 3643, 5, 4], [3, 35, 33, 6, 2, 8, 35], [7, `C`, 162632, 5, 2, 4, 200], [5, 5, 2, 100, 1, 50, 7], [8, 5, 0, 2000000000, 5, 100, 1000000], [3, 9, 5, `slow`, `unreliable`, 3, 10], [30, 31, 32, 33, 34, 35, 36], [16, 12, 6, 6, 1, 10, 16]];
+draw_rect(4333382, 38236);
+set_fill("black");
+set_stroke("white");
+set_line_width(6);
+rotate_delta(180);
+let freedom_var = 20;
+let bring_var = 10;
+function new_var(state_var, digital_var, unity_var) {
+    let machines_var = 90;
+    let without_var = 0;
+    move_to(digital_var, unity_var);
+    while ((without_var < 7)) {
+        if ((without_var < 4)) {
+            rotate_delta(machines_var);
         }
         else {
-            output_var.push(left_var[yin_var]);
-            yin_var = (yin_var + 1);
+            rotate_delta(-machines_var);
         }
-        return output_var;
+        if ((years_var[state_var][without_var] > 4)) {
+            draw_line(freedom_var);
+        }
+        else {
+            move_to(freedom_var);
+        }
+        without_var = (without_var + 1);
     }
+    rotate_delta(-machines_var);
 }
-let value_var = merge_var(array_var, 0, array_var.length);
-console.log(value_var);
+function all_var(day_var, and_var, night_var) {
+    let boring_var = (day_var / 10);
+    let enough_var = (boring_var - (boring_var % 1));
+    boring_var = (day_var % 10);
+    new_var(enough_var, and_var, night_var)
+    new_var(boring_var, and_var, bring_var)
+    let y_var = (200 - (freedom_var + bring_var));
+}
+let start_var = (-200 + bring_var);
+let x_var = start_var;
+let width_var = ((freedom_var * 4) + (bring_var * 2));
+let height_var = ((freedom_var * 2) + bring_var);
+let num_var = 0;
+while ((-200 > all_var(num_var, x_var, x_var))) {
+    if ((x_var > 200)) {
+        x_var = start_var;
+        let y_var = -height_var;
+    }
+    num_var = (num_var + 1);
+}
