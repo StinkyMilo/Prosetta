@@ -423,8 +423,35 @@ mod tests_simple {
         );
     }
 
-    //fun 'cause can't 'cause 'wow. p'ri hi_! ca'us'e' one. cause.
-    //fun in'finite. infi'n'ite... pri "this will never print".
+    #[test]
+    #[timeout(1000)]
+    fn test_multi_arg_function() {
+        let text: Vec<u8> = b"fun 'cause can't 'cause 'w'ow. p'ri hi! 'cause one two three. \
+        c'a'us'e one two. cause one. cause."
+            .to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(function@0,1,2$38 \"cause\"@4|0 (args \"cant\"@11|3 \"wow\"@24|0,2) \
+            (print@31,33,34$38 \"hi\"@36))\n(\"cause\"@41 (litnum 1@47$$3) (litnum 2@51$$3))\n\
+            (\"cause\"@62|1,3 (litnum 1@71$$3) (litnum 2@75$$3))"
+        );
+    }
+
+    #[test]
+    #[timeout(1000)]
+    fn test_infinite_loop_function() {
+        let text: Vec<u8> =
+            b"fun in'finite. infi'n'ite... 'infinite'? pri \"this will never print\".".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(function@0,1,2$25$$3 \"infinite\"@4|2 (args) (\"infinite\"@15|4,6 ))\n\
+            (\"infinite\"@30|8 )\n(print@41,42,43$68 \"this will never print\"@45)"
+        );
+    }
 
     // #[test]#[timeout(1000)]
     // fn test_liechtenstein() {

@@ -119,7 +119,7 @@ impl SymbolSet {
     pub fn remove_layer(&mut self) {
         self.set.pop_layer();
     }
-    pub fn contains(&self, name: &Vec<u8>) -> bool {
+    pub fn contains(&self, name: &[u8]) -> bool {
         let lower = name.to_ascii_lowercase();
         self.set.contains_key(&lower)
     }

@@ -50,6 +50,7 @@ impl ParseState for FunctionState {
                     if self.args_count != 255 && !env.symbols.contains(&arg_data.name) {
                         env.symbols.insert_var(arg_data.name.to_owned());
                         args.push(arg_data);
+                        self.args_count += 1;
                     }
                     //let arg_name = word.str.to_ascii_lowercase();
                     // arg_names.push(arg_name.to_owned());
