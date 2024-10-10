@@ -19,13 +19,13 @@ impl ParseState for ForEachState {
             // setup child state
             // MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
         }
-        let var_word = try_get_var_word(word, env.global_index);
+        let var_word = try_get_symbol_word(word, env.global_index);
         if let Some(new_var) = var_word {
             if !self.has_list {
                 if let Expr::ForEach { var, .. } = env.expr {
                     *var = new_var;
-                    env.vars.add_layer();
-                    env.vars.insert(var.name.to_owned());
+                    env.symbols.add_layer();
+                    env.symbols.insert_var(var.name.to_owned());
                 } else {
                     unreachable!()
                 }
@@ -68,7 +68,7 @@ impl ParseState for ForEachState {
                 // close if have close
                 if self.has_stat && is_close(word) {
                     *end = End::from_slice(&word, env.global_index);
-                    env.vars.remove_layer();
+                    env.symbols.remove_layer();
                     MatchResult::Matched(word.pos, true)
                     // succeeded - continue again with noncont stat
                 } else if child_index.is_some() {

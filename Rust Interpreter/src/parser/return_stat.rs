@@ -9,17 +9,21 @@ pub struct ReturnState {
 }
 
 impl BasicState for ReturnState {
-    fn can_happen(&self, env: &mut Environment) -> bool {
-        for parent in &mut *env.parents {
-            if let Expr::Function { .. } = parent {
-                return true;
-            }
-        }
-        false
-    }
-
     fn get_name(&self) -> &'static str {
         "Return"
+    }
+
+    fn get_type(&self) -> StateType {
+        StateType::Stat
+    }
+
+    fn can_happen(&self, env: &mut Environment) -> bool {
+        env.parents.into_iter().any(|state| {
+            matches!(
+                env.before.get(state.expr_index),
+                Some(Expr::Function { .. })
+            )
+        })
     }
 
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {

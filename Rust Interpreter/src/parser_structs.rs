@@ -1,3 +1,5 @@
+use bstr::ByteSlice;
+use quickscope::ScopeMap;
 use std::{
     collections::HashSet,
     fmt::{self, Debug},
@@ -12,13 +14,14 @@ mod parsing_tests_word_funcs;
 fn try_get_val<'a>(
     name: &[u8],
     iter: &mut dyn Iterator<Item = &'a Vec<u8>>,
+    pred: &dyn Fn(&[u8]) -> bool,
 ) -> Option<(u8, &'a Vec<u8>)> {
     let mut max_var_length = 0u8;
     let mut var_data: Option<(u8, &Vec<u8>)> = None;
     for str in iter {
         let is_longer = str.len() as u8 >= max_var_length;
         // if var could be in word
-        if is_longer && name.len() >= str.len() {
+        if is_longer && name.len() >= str.len() && (pred)(str) {
             // if found
             if let Some(index) = name.find(str) {
                 let is_better = var_data.as_ref().map_or(true, |&(old_index, _)| {
@@ -60,18 +63,55 @@ fn convert_skip_indexes(skip_indexes: &mut Vec<u8>, var_start: u8, var_len: u8) 
     }
     start
 }
-pub struct VarSet {
-    set: ScopeSet<Vec<u8>>,
+
+fn try_get_from_iter<'a>(
+    word: &Slice,
+    iter: &mut dyn Iterator<Item = &'a Vec<u8>>,
+    global_index: usize,
+    pred: &dyn Fn(&[u8]) -> bool,
+) -> Option<SubStrData> {
+    if word.len() > 255 {
+        return None;
+    }
+    // remove ' and make lowercase
+    let (name, mut skip_indexes) = get_var_name_and_skips(word.str);
+    let var_data = try_get_val(&name, iter, pred);
+
+    if let Some((var_start, name)) = var_data {
+        let start = convert_skip_indexes(&mut skip_indexes, var_start, name.len() as u8);
+
+        Some(SubStrData {
+            start: global_index + word.pos + start as usize,
+            name: name.to_vec(),
+            skip_indexes,
+        })
+    } else {
+        None
+    }
 }
-impl VarSet {
+enum Symbol {
+    ///symbol is a varible
+    Var,
+    ///symbol is a function with a number of arguments
+    Func(u8),
+}
+
+pub struct SymbolSet {
+    set: ScopeMap<Vec<u8>, Symbol>,
+}
+impl SymbolSet {
     pub fn new() -> Self {
         Self {
-            set: ScopeSet::new(),
+            set: ScopeMap::new(),
         }
     }
-    pub fn insert(&mut self, name: Vec<u8>) {
-        let lower = name.to_ascii_lowercase();
-        self.set.define(lower);
+    pub fn insert_var(&mut self, mut name: Vec<u8>) {
+        name.make_ascii_lowercase();
+        self.set.define(name, Symbol::Var);
+    }
+    pub fn insert_func(&mut self, mut name: Vec<u8>, args: u8) {
+        name.make_ascii_lowercase();
+        self.set.define(name, Symbol::Func(args));
     }
     pub fn add_layer(&mut self) {
         self.set.push_layer();
@@ -79,35 +119,35 @@ impl VarSet {
     pub fn remove_layer(&mut self) {
         self.set.pop_layer();
     }
-    pub fn contains(&self, name: &Vec<u8>) -> bool {
+    pub fn contains(&self, name: &[u8]) -> bool {
         let lower = name.to_ascii_lowercase();
-        self.set.contains(&lower)
+        self.set.contains_key(&lower)
     }
-    ///returns (index in word, varible name)
-    pub fn try_get_var(&self, word: &Slice, global_index: usize) -> Option<SubStrData> {
-        if word.len() > 255 {
-            return None;
-        }
-        // remove ' and make lowercase
-        let (name, mut skip_indexes) = get_var_name_and_skips(word.str);
-        let var_data = try_get_val(&name, &mut self.set.iter());
-
-        if let Some((var_start, name)) = var_data {
-            let start = convert_skip_indexes(&mut skip_indexes, var_start, name.len() as u8);
-
-            Some(SubStrData {
-                start: global_index + word.pos + start as usize,
-                name: name.to_vec(),
-                skip_indexes,
-            })
+    pub fn get_func_arg_count(&self, name: &Vec<u8>) -> Option<u8> {
+        let lower = name.to_ascii_lowercase();
+        if let Some(Symbol::Func(count)) = self.set.get(&lower) {
+            Some(*count)
         } else {
             None
         }
     }
+    ///returns (index in word, varible name)
+    ///
+    pub fn try_get_var(&self, word: &Slice, global_index: usize) -> Option<SubStrData> {
+        try_get_from_iter(word, &mut self.set.keys(), global_index, &|name| {
+            matches!(self.set.get(name), Some(Symbol::Var))
+        })
+    }
+
+    pub fn try_get_func(&self, word: &Slice, global_index: usize) -> Option<SubStrData> {
+        try_get_from_iter(word, &mut self.set.keys(), global_index, &|name| {
+            matches!(self.set.get(name), Some(Symbol::Func(..)))
+        })
+    }
 }
-impl Debug for VarSet {
+impl Debug for SymbolSet {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("VarSet").finish()
+        f.debug_struct("SymbolSet").finish()
     }
 }
 
@@ -136,7 +176,7 @@ impl IgnoreSet {
         }
         // remove ' and make lowercase
         let (name, mut skip_indexes) = get_var_name_and_skips(word.str);
-        let var_data = try_get_val(&name, &mut self.set.iter());
+        let var_data = try_get_val(&name, &mut self.set.iter(), &|_| true);
 
         if let Some((var_start, name)) = var_data {
             let start = convert_skip_indexes(&mut skip_indexes, var_start, name.len() as u8);
@@ -158,66 +198,66 @@ impl Debug for IgnoreSet {
     }
 }
 
-pub struct FuncSet {
-    /// set with <name, arg_count>
-    set: ScopeMap<Vec<u8>, usize>,
-}
+// pub struct FuncSet {
+//     /// set with <name, arg_count>
+//     set: ScopeMap<Vec<u8>, usize>,
+// }
 
-impl FuncSet {
-    pub fn new() -> Self {
-        Self {
-            set: ScopeMap::new(),
-        }
-    }
-    pub fn insert(&mut self, name: Vec<u8>, arg_count: usize) {
-        self.set.define(name, arg_count);
-    }
-    pub fn add_layer(&mut self) {
-        self.set.push_layer();
-    }
-    pub fn remove_layer(&mut self) {
-        self.set.pop_layer();
-    }
-    pub fn contains(&self, name: Vec<u8>) -> bool {
-        self.set.contains_key(&name)
-    }
-    pub fn try_get_func(&self, word: &Slice, global_index: usize) -> Option<SubStrData> {
-        if word.len() > 255 {
-            return None;
-        }
-        // remove ' and make lowercase
-        let (name, mut skip_indexes) = get_var_name_and_skips(word.str);
-        let var_data = try_get_val(&name, &mut self.set.keys());
+// impl FuncSet {
+//     pub fn new() -> Self {
+//         Self {
+//             set: ScopeMap::new(),
+//         }
+//     }
+//     pub fn insert(&mut self, name: Vec<u8>, arg_count: usize) {
+//         self.set.define(name, arg_count);
+//     }
+//     pub fn add_layer(&mut self) {
+//         self.set.push_layer();
+//     }
+//     pub fn remove_layer(&mut self) {
+//         self.set.pop_layer();
+//     }
+//     pub fn contains(&self, name: Vec<u8>) -> bool {
+//         self.set.contains_key(&name)
+//     }
+//     pub fn try_get_func(&self, word: &Slice, global_index: usize) -> Option<SubStrData> {
+//         if word.len() > 255 {
+//             return None;
+//         }
+//         // remove ' and make lowercase
+//         let (name, mut skip_indexes) = get_var_name_and_skips(word.str);
+//         let var_data = try_get_val(&name, &mut self.set.keys());
 
-        if let Some((var_start, name)) = var_data {
-            let start = convert_skip_indexes(&mut skip_indexes, var_start, name.len() as u8);
+//         if let Some((var_start, name)) = var_data {
+//             let start = convert_skip_indexes(&mut skip_indexes, var_start, name.len() as u8);
 
-            Some(SubStrData {
-                start: global_index + word.pos + start as usize,
-                name: name.to_vec(),
-                skip_indexes,
-            })
-        } else {
-            None
-        }
-    }
+//             Some(SubStrData {
+//                 start: global_index + word.pos + start as usize,
+//                 name: name.to_vec(),
+//                 skip_indexes,
+//             })
+//         } else {
+//             None
+//         }
+//     }
 
-    pub fn get_arg_count(&self, name: &[u8]) -> Option<&usize> {
-        self.set.get(name)
-    }
-    pub fn inc_arg_count(&mut self, name: &[u8]) {
-        if let Some(val) = self.set.get(name) {
-            //Increment in above scope.
-            self.set.define(name.to_vec(), val + 1);
-        }
-    }
-}
+//     pub fn get_arg_count(&self, name: &[u8]) -> Option<&usize> {
+//         self.set.get(name)
+//     }
+// pub fn inc_arg_count(&mut self, name: &[u8]) {
+//     if let Some(val) = self.set.get(name) {
+//         //Increment in above scope.
+//         self.set.define(name.to_vec(), val + 1);
+//     }
+// }
+// }
 
-impl Debug for FuncSet {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("FuncSet").finish()
-    }
-}
+// impl Debug for FuncSet {
+//     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+//         f.debug_struct("FuncSet").finish()
+//     }
+// }
 #[derive(PartialEq, Debug)]
 pub struct SubStrData {
     pub name: Vec<u8>,
@@ -251,9 +291,18 @@ macro_rules! get_state {
         Box::new($state) as Box<dyn ParseState>
     };
 }
-use bstr::ByteSlice;
 pub(crate) use get_state;
-use quickscope::{ScopeMap, ScopeSet};
+
+macro_rules! only_debug {
+    ($expr:expr) => {
+        if cfg!(debug_assertions) {
+            format!("{:?}", $expr)
+        } else {
+            Default::default()
+        }
+    };
+}
+pub(crate) use only_debug;
 
 /// add or remove commands based on flags
 #[derive(Default, Debug)]
@@ -382,9 +431,9 @@ impl ParserResult {
 ///the parser enviorment
 pub struct Environment<'a> {
     ///The set of current varibles
-    pub vars: &'a mut VarSet,
+    pub symbols: &'a mut SymbolSet,
     ///The set of current functions
-    pub funcs: &'a mut FuncSet,
+    // pub funcs: &'a mut FuncSet,
     ///The set of current ignored values
     pub nots: &'a mut IgnoreSet,
     ///The list of expressions
@@ -392,9 +441,11 @@ pub struct Environment<'a> {
     ///the index of this expr
     pub expr_index: usize,
     ///the exprs before this
-    pub parents: &'a mut [Expr],
+    pub parents: &'a [State],
+    ///the exprs before this
+    pub before: &'a mut [Expr],
     ///the exprs after this
-    pub children: &'a mut [Expr],
+    pub after: &'a mut [Expr],
     ///The last matched expr if exists
     pub last_stat_index: Option<usize>,
     ///The current locs (locations of the alias characters)
@@ -403,19 +454,19 @@ pub struct Environment<'a> {
     pub global_index: usize,
     /// reference to static AliasData
     pub aliases: &'a AliasData,
-    pub full_text: &'a [u8]
+    pub full_text: &'a [u8],
 }
 
-impl<'a> Environment<'a> {
-    pub fn add_var_layer(&mut self) {
-        self.vars.add_layer();
-        self.funcs.add_layer();
-    }
-    pub fn remove_var_layer(&mut self) {
-        self.vars.remove_layer();
-        self.funcs.remove_layer();
-    }
-}
+// impl<'a> Environment<'a> {
+//     pub fn add_var_layer(&mut self) {
+//         self.vars.add_layer();
+//         self.funcs.add_layer();
+//     }
+//     pub fn remove_var_layer(&mut self) {
+//         self.vars.remove_layer();
+//         self.funcs.remove_layer();
+//     }
+// }
 
 ///a slice of the input text
 #[derive(PartialEq)]
@@ -674,8 +725,8 @@ pub fn get_var_name_and_skips(word: &[u8]) -> (Vec<u8>, Vec<u8>) {
     (name, skips)
 }
 
-pub fn try_get_var_word(word: &Slice, global_index: usize) -> Option<SubStrData> {
-    if word.len() >= 1
+pub fn try_get_symbol_word(word: &Slice, global_index: usize) -> Option<SubStrData> {
+    if word.len() >= 3
         && word.len() <= 255
         && !is_close(word)
         && !is_non_close_but_still_single(word.str[0])

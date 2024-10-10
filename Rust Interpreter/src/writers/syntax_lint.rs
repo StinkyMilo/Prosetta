@@ -115,7 +115,6 @@ impl<T: Renderer> SyntaxLinter<T> {
 }
 
 impl<T: Renderer> SyntaxLinter<T> {
-
     fn write_var(
         &mut self,
         source: &mut ParserSourceIter,
@@ -265,7 +264,9 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_as(source, end.index - str_start, NUM_COLOR);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::Print { locs, indexes, end, .. } => {
+            Expr::Print {
+                locs, indexes, end, ..
+            } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
@@ -323,7 +324,9 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
-            Expr::LitString { str_start,  str_end, .. } => {
+            Expr::LitString {
+                str_start, str_end, ..
+            } => {
                 self.write_up_to(source, *str_start);
                 //one for each quote
                 //TODO: different color for variables
@@ -349,9 +352,17 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.add_end(source, *end, stack_index);
             }
             Expr::Function {
-                locs, indexes, end, ..
+                locs,
+                indexes,
+                end,
+                func,
+                args,
             } => {
                 self.write_locs(source, locs, stack_index);
+                self.write_var(source, func, VAR_COLOR);
+                for arg in args {
+                    self.write_var(source, arg, VAR_COLOR);
+                }
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
@@ -361,9 +372,13 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.add_end(source, *end, stack_index);
             }
             Expr::FunctionCall {
-                locs, indexes, end, ..
+                locs,
+                indexes,
+                end,
+                func,
             } => {
                 self.write_locs(source, locs, stack_index);
+                self.write_var(source, func, VAR_COLOR);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }

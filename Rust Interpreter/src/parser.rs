@@ -61,7 +61,7 @@ mod parsing_tests_simple;
 
 use std::{collections::HashMap, fmt::Debug, mem};
 
-use crate::commands::*;
+use crate::{commands::*, writers::lisp_like_writer};
 
 use alias_data::AliasData;
 
@@ -73,9 +73,9 @@ pub struct ParsedData<'a> {
     ///the start indexes of statements
     pub stat_starts: Vec<usize>,
     ///the set of current varibles
-    pub vars: VarSet,
+    pub symbols: SymbolSet,
     //the set of current functions
-    pub funcs: FuncSet,
+    // pub funcs: FuncSet,
     /// the ignored values
     pub nots: IgnoreSet,
     ///the parserSource that is used
@@ -113,8 +113,8 @@ impl<'a> Parser<'a> {
             data: ParsedData {
                 exprs: ExprArena { vec: Vec::new() },
                 stat_starts: Vec::new(),
-                vars: VarSet::new(),
-                funcs: FuncSet::new(),
+                symbols: SymbolSet::new(),
+                // funcs: FuncSet::new(),
                 nots: IgnoreSet::new(),
                 source,
             },
@@ -191,34 +191,29 @@ impl<'a> Parser<'a> {
             }
         }
         //debug time
-        // let _debug = format!(
-        //     "{:?}",
-        //     Vec::from_iter(self.stack.iter().map(|x| (x.expr_index, x.last_parse)))
-        // );
-        // let _debug2 = format!(
-        //     "{:?}",
-        //     Vec::from_iter(self.stack.iter().map(|x| x.state.get_name()))
-        // );
-        // let _expr = format!("{:?}", self.data.exprs.vec);
-        // let _expr2 = lisp_like_writer::write(&self.data.exprs, &self.data.stat_starts);
-        // let _expr_short = format!(
-        //     "{:?}",
-        //     Vec::from_iter(self.data.exprs.vec.iter().map(|e| {
-        //         let mut str = format!("{:?}", e);
-        //         str.truncate(str.find(" ").unwrap_or(str.len()));
-        //         str
-        //     }))
-        // );
-        // let _last = format!("{:?}", self.last_result);
-        // black_box(&_debug);
-        // black_box(&_debug2);
-        // black_box(&_expr);
-        // black_box(&_expr2);
+        let _debug = only_debug!(Vec::from_iter(
+            self.stack.iter().map(|x| (x.expr_index, x.last_parse))
+        ));
+        let _debug2 = only_debug!(Vec::from_iter(
+            self.stack.iter().map(|x| x.state.get_name())
+        ));
+        let _expr = only_debug!(self.data.exprs.vec);
+        let _expr2 = only_debug!(lisp_like_writer::write(
+            &self.data.exprs,
+            &self.data.stat_starts
+        ));
+        let _expr_short = only_debug!(Vec::from_iter(self.data.exprs.vec.iter().map(|e| {
+            let mut str = format!("{:?}", e);
+            str.truncate(str.find(" ").unwrap_or(str.len()));
+            str
+        })));
+        let _last = only_debug!(self.last_result);
 
         self.last_state = None;
         // get curr frame
         let stack_index = self.stack.len() - 1;
-        let frame = &mut self.stack[stack_index];
+        let (parents, frame_arr) = self.stack.split_at_mut(stack_index);
+        let frame = &mut frame_arr[0];
 
         let id = frame.state.get_name();
         // does the failing range of the state include the current parsing location
@@ -243,12 +238,12 @@ impl<'a> Parser<'a> {
         // default_expr is used on failing back to a none state,
         // the corrisponding expr no longer exists
         let mut expr = &mut Expr::NoneExpr;
-        let mut children: &mut [Expr] = &mut [];
-        let parents = parents_this.0;
+        let mut after: &mut [Expr] = &mut [];
+        let before = parents_this.0;
         if let Some(split) = this_children {
             //should always be safe
             expr = split.0.first_mut().unwrap();
-            children = split.1;
+            after = split.1;
         }
 
         // let _self_expr = format!("{:?}", expr);
@@ -263,34 +258,30 @@ impl<'a> Parser<'a> {
 
         // setup slice
         let line = self.data.source.get_line();
-        let (word, rest) = Self::get_slice(line, frame.last_parse);
+        let mut start = frame.last_parse;
+        let (mut word, mut rest) = Self::get_slice(line, start);
+
+        //New ignore code location
+        while self.data.nots.try_get_val(&word, 0).is_some() {
+            start = rest.pos;
+            (word, rest) = Self::get_slice(line, start);
+        }
 
         // setup env
         let mut env = Environment {
             expr,
-            children,
             parents,
+            after,
+            before,
             last_stat_index: self.stat_indexes.last().cloned(),
             expr_index: frame.expr_index,
-            vars: &mut self.data.vars,
-            funcs: &mut self.data.funcs,
+            symbols: &mut self.data.symbols,
             nots: &mut self.data.nots,
             locs: None,
             global_index: self.pos,
             aliases: &self.aliases,
             full_text: line,
         };
-
-        // setup slice
-        let line = self.data.source.get_line();
-        let mut start = frame.last_parse;
-        let (mut word, mut rest) = Self::get_slice(line, start);
-
-        //New ignore code location
-        while env.nots.try_get_val(&word, env.global_index).is_some() {
-            start += word.len() + 1;
-            (word, rest) = Self::get_slice(line, start);
-        }
 
         let last_result = mem::replace(&mut self.last_result, LastMatchResult::None);
 

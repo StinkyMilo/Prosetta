@@ -238,6 +238,22 @@ mod tests_simple {
             "(if@0,1,2$19 (litnum 1@4$$3) then:\n  (print@8,9,10$15 \"yes\"@12)\n)\n(print@21,22,23$30 \"maybe\"@25)\n(print@37,38,39$43 \"no\"@41)"
         );
     }
+
+    #[test]
+    #[timeout(1000)]
+    fn test_if_space_else_rect() {
+        let text = b"whe one pri yes! Recording one two. Else pri no:( double sadge :(".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(if@0,1,2$15 (litnum 1@4$$3) then:\n  \
+            (print@8,9,10$15 \"yes\"@12)\n)\n\
+            (rect@17,18,19$34 (litnum 1@27$$3) (litnum 2@31$$3))\n\
+            (print@41,42,43$47 \"no\"@45)"
+        );
+    }
+
     #[test]
     #[timeout(1000)]
     fn test_in_word_hyphen() {
@@ -302,13 +318,13 @@ mod tests_simple {
     #[test]
     #[timeout(1000)]
     fn test_pri_varible_casing() {
-        let text: Vec<u8> = b"was h1 one. was H2 two. pri h1 H1 h2 H2.".to_vec();
+        let text: Vec<u8> = b"was hi1 one. was HI2 two. pri hi1 Hi1 hi2 Hi2.".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
         test_lib::run_to_completion(&mut parser);
         assert_eq!(
             lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
-            "(assign@0,1,2$10 \"h1\"@4 (litnum 1@7$$3))\n(assign@12,13,14$22 \"h2\"@16 (litnum 2@19$$3))\n\
-            (print@24,25,26$39 (var \"h1\"@28) (var \"h1\"@31) (var \"h2\"@34) (var \"h2\"@37))"
+            "(assign@0,1,2$11 \"hi1\"@4 (litnum 1@8$$3))\n(assign@13,14,15$24 \"hi2\"@17 (litnum 2@21$$3))\n\
+            (print@26,27,28$45 (var \"hi1\"@30) (var \"hi1\"@34) (var \"hi2\"@38) (var \"hi2\"@42))"
         );
     }
 
@@ -316,14 +332,16 @@ mod tests_simple {
     #[timeout(1000)]
     fn test_varible_substrings() {
         let text: Vec<u8> =
-            b"was a one. was car car. was car car. was cart cater. was cater handcarts.".to_vec();
+            b"was cat one. was car cat. was car car. was cart cater. was cater handcarts.".to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
         test_lib::run_to_completion(&mut parser);
         assert_eq!(
             lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
-            "(assign@0,1,2$9 \"a\"@4 (litnum 1@6$$3))\n(assign@11,12,13$22 \"car\"@15 (var \"a\"@20))\n\
-            (assign@24,25,26$35 mut \"car\"@28 (var \"car\"@32))\n(assign@37,38,39$51 \"cart\"@41 (var \"a\"@47))\n\
-            (assign@53,54,55$72 \"cater\"@57 (var \"cart\"@67))"
+            "(assign@0,1,2$11 \"cat\"@4 (litnum 1@8$$3))\n\
+            (assign@13,14,15$24 \"car\"@17 (var \"cat\"@21))\n\
+            (assign@26,27,28$37 mut \"car\"@30 (var \"car\"@34))\n\
+            (assign@39,40,41$53 \"cart\"@43 (var \"cat\"@48))\n\
+            (assign@55,56,57$74 \"cater\"@59 (var \"cart\"@69))"
         );
     }
 
@@ -341,23 +359,6 @@ mod tests_simple {
             (multilitnum@11,12,13$165 2 2 5 2 2 5 1 3 7 0 2 8 2 2 5 1 1 7 1 5 4 5 1 6 3 3 3 6 4 2 3 5))"
         );
     }
-
-    // #[test]
-    // #[timeout(1000)]
-    // fn test_not_no_str() {
-    //     let text: Vec<u8> =
-    //         b"was h1 not. one. was h2 not hi. two. was h3 nother hi. three. was h4 nother. four."
-    //             .to_vec();
-    //     let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
-    //     test_lib::run_to_completion(&mut parser);
-    //     assert_eq!(
-    //         lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
-    //         "(assign@0,1,2$15 \"h1\"@4 (skip@7,8,9 @10$$10 (litnum 1@12$$3)))\n\
-    //         (assign@17,18,19$35 \"h2\"@21 (skip@24,25,26 @28$$30 (litnum 2@32$$3)))\n\
-    //         (assign@37,38,39$60 \"h3\"@41 (skip@44,45,46 @51$$53 (litnum 3@55$$5)))\n\
-    //         (assign@62,63,64$81 \"h4\"@66 (skip@69,70,71 @75$$75 (litnum 4@77$$4)))"
-    //     );
-    // }
 
     #[test]
     #[timeout(1000)]
@@ -385,81 +386,84 @@ mod tests_simple {
         );
     }
 
-    // #[test]#[timeout(1000)]
-    // fn test_liechtenstein() {
-    //     let text = b"The wars in Liechtenstein ravaged the country..".to_vec();
-    //     let mut parser = Parser::new(ParserSource::from_string(text), Default::default());
-    //     assert_eq!(
-    //         test_lib::assert_result(&mut parser),
-    //         ParserResult::MatchedLine
-    //     );
-    //     assert_eq!(
-    //         lisp_like_writer::write_first(&parser.data.exprs),
-    //         "(assign@4,5,7$46 \"in\"@9 (wordnum@13,19,21$45 @26$$7))"
-    //     );
-    // }
+    #[test]
+    #[timeout(1000)]
+    fn test_double_else() {
+        let text: Vec<u8> = b"whe one pri good.. els els pri bad...".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(if@0,1,2$17 (litnum 1@4$$3) then:\n  (print@8,9,10$16 \"good\"@12)\n)\n(else@19,20,21$34$$3\n  (print@27,28,29$34$$3 \"bad\"@31)\n)"
+        );
+    }
 
-    // #[test]#[timeout(1000)]
-    // fn test_nottingham() {
-    //     let text = b"I was in Nottingham and it literally snowed the entire time I was there! All eight days!".to_vec();
-    //     let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
-    //     assert_eq!(
-    //         test_lib::assert_result(&mut parser),
-    //         ParserResult::MatchedLine
-    //     );
-    //     assert_eq!(
-    //         lisp_like_writer::write_first(&parser.data.exprs),
-    //         "(assign@2,3,4$87 \"in\"@6 (skip@9,10,11 @20$71 (litnum 8@77$5)))"
-    //     );
-    // }
+    #[test]
+    #[timeout(1000)]
+    fn test_ret_out_of_function() {
+        let text: Vec<u8> = b"fun func. ret one! ret. pri hello. ret. func.".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(function@0,1,2$17 \"func\"@4 (args) (return@10,11,12$17 (litnum 1@14$$3)))\n(print@24,25,26$33 \"hello\"@28)\n(\"func\"@40 )"
+        );
+    }
 
-    // #[test]#[timeout(1000)]
-    // fn test_easy_as_123() {
-    //     let text = b"It was as nice andd easy as one two three..".to_vec();
-    //     let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
-    //     assert_eq!(
-    //         test_lib::assert_result(&mut parser),
-    //         ParserResult::MatchedLine
-    //     );
-    //     assert_eq!(
-    //         lisp_like_writer::write_first(&parser.data.exprs),
-    //         "(assign@3,4,5$42 \"as\"@7 (add@15,17,18$41 (litnum 1@28$3) (litnum 2@32$3) (litnum 3@36$5)))"
-    //     );
-    // }
+    #[test]
+    #[timeout(1000)]
+    fn test_0_arg_function() {
+        let text: Vec<u8> = b"fun F'unc'. pri hi... fun'c.".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(function@0,1,2$18$$3 \"func\"@4|1,5 (args) (print@12,13,14$18$$3 \"hi\"@16))\n(\"func\"@22|3 )"
+        );
+    }
 
-    // // #[test]#[timeout(1000)]
-    // // fn test_it_was_not_as_easy() {
-    // //     let text = b"It was as bad andd not as easy as one two three...".to_vec();
-    // //     let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
-    // //     assert_eq!(
-    // //         test_lib::assert_result(&mut parser),
-    // //         ParserResult::FailedLine
-    // //     );
-    // // }
+    #[test]
+    #[timeout(1000)]
+    fn test_multi_arg_function() {
+        let text: Vec<u8> = b"fun 'cause can't 'cause 'w'ow. p'ri hi! 'cause one two three. \
+        c'a'us'e one two. cause one. cause."
+            .to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(function@0,1,2$38 \"cause\"@4|0 (args \"cant\"@11|3 \"wow\"@24|0,2) \
+            (print@31,33,34$38 \"hi\"@36))\n(\"cause\"@41 (litnum 1@47$$3) (litnum 2@51$$3))\n\
+            (\"cause\"@62|1,3 (litnum 1@71$$3) (litnum 2@75$$3))"
+        );
+    }
 
-    // // #[test]#[timeout(1000)]
-    // // fn test_it_was_easy_as_one() {
-    // //     let text = b"It was as bad add one but not two three...".to_vec();
-    // //     let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
-    // //     assert_eq!(
-    // //         test_lib::assert_result(&mut parser),
-    // //         ParserResult::FailedLine
-    // //     );
-    // // }
+    #[test]
+    #[timeout(1000)]
+    fn test_infinite_loop_function() {
+        let text: Vec<u8> =
+            b"fun in'finite. infi'n'ite... 'infinite'? pri \"this will never print\".".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(function@0,1,2$25$$3 \"infinite\"@4|2 (args) (\"infinite\"@15|4,6 ))\n\
+            (\"infinite\"@30|8 )\n(print@41,42,43$68 \"this will never print\"@45)"
+        );
+    }
 
-    // #[test]#[timeout(1000)]
-    // fn test_submarine() {
-    //     let text = b"It was SS Submarine seven..".to_vec();
-    //     let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
-    //     assert_eq!(
-    //         test_lib::assert_result(&mut parser),
-    //         ParserResult::MatchedLine
-    //     );
-    //     assert_eq!(
-    //         lisp_like_writer::write_first(&parser.data.exprs),
-    //         "(assign@3,4,5$26 \"SS\"@7 (sub@10,11,12$25 (litnum 7@20$5)))"
-    //     );
-    // }
+    #[test]
+    #[timeout(1000)]
+    fn test_function_fail() {
+        let text: Vec<u8> =
+            b"fun func. pri hi.".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        test_lib::run_to_completion(&mut parser);
+        assert_eq!(
+            lisp_like_writer::write(&parser.data.exprs, &parser.data.stat_starts),
+            "(function@4,5,6$16 \"pri\"@10 (args) )"
+        );
+    }
 
     #[test]
     #[timeout(1000)]

@@ -162,26 +162,28 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                 let mut output_vals = "".to_string();
                 let mut is_first = true;
                 for val in values {
-                    if !is_first{
+                    if !is_first {
                         output_vals += ", ";
-                    }else{
-                        is_first=false;
+                    } else {
+                        is_first = false;
                     }
                     if let VarOrInt::Var(var) = val {
                         output_vals += &format!("{}_var", String::from_utf8_lossy(&var.name));
-                    }else if let VarOrInt::Int(intval) = val{
-                        output_vals += &format!("{}",intval);
+                    } else if let VarOrInt::Int(intval) = val {
+                        output_vals += &format!("{}", intval);
                     }
                 }
                 format!("get_concat_value({})", output_vals)
             }
         }
         Expr::Print {
-            indexes, single_word, ..
+            indexes,
+            single_word,
+            ..
         } => {
-            if let Some(word) = single_word{
-                format!("print_console(\"{}\");",String::from_utf8_lossy(word))
-            }else{
+            if let Some(word) = single_word {
+                format!("print_console(\"{}\");", String::from_utf8_lossy(word))
+            } else {
                 format!("print_console({});", write_exprs(exprs, indexes, ", "))
             }
         }
@@ -224,11 +226,11 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
         }
         Expr::LitString { str, .. } => {
             let mut output: String = String::new();
-            for val in str.iter(){
+            for val in str.iter() {
                 if let VarOrStr::Var(var) = val {
-                    let new_val = format!("${{{}_var}}",String::from_utf8_lossy(&var.name));
+                    let new_val = format!("${{{}_var}}", String::from_utf8_lossy(&var.name));
                     output += &new_val[..];
-                }else if let VarOrStr::Str(str) = val {
+                } else if let VarOrStr::Str(str) = val {
                     let new_val = String::from_utf8_lossy(str);
                     output += &new_val[..];
                 }
@@ -305,25 +307,21 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             )
         }
         Expr::Function {
-            name,
-            arg_names,
+            func,
+            args,
             indexes,
             ..
         } => {
-            let mut output_vals = "".to_string();
-            let mut is_first = true;
-            for val in arg_names {
-                if is_first {
-                    output_vals += &format!("{}_var", String::from_utf8_lossy(val));
-                    is_first = false;
-                } else {
-                    output_vals += &format!(", {}_var", String::from_utf8_lossy(val));
-                }
-            }
+            let args_str = args
+                .into_iter()
+                .map(|data| String::from_utf8_lossy(&data.name) + "_var")
+                .collect::<Vec<_>>()
+                .join(", ");
+
             format!(
                 "function {}_var({}){{\n{}\n}}",
-                String::from_utf8_lossy(name),
-                output_vals,
+                String::from_utf8_lossy(&func.name),
+                args_str,
                 write_exprs(exprs, indexes, "\n")
             )
         }
@@ -343,9 +341,9 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             }
         }
         Expr::Length { index, .. } => {
-            format!("{}.length",write_expr(exprs,*index))
-        },
-        Expr::Not { .. }=>{
+            format!("{}.length", write_expr(exprs, *index))
+        }
+        Expr::Not { .. } => {
             format!("")
         }
     }
