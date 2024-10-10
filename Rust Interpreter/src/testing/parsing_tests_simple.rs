@@ -479,4 +479,18 @@ mod tests_simple {
             "(line@0,1,2$22 (litnum 1@4$$3) (litnum 2@8$$3) (litnum 3@12$$5) (litnum 4@18$$4))"
         );
     }
+    #[test]
+    #[timeout(1000)]
+    fn test_was_one_letter_var() {
+        let text = b"was a mario two.".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        assert_eq!(
+            test_lib::assert_result(&mut parser),
+            ParserResult::MatchedLine
+        );
+        assert_eq!(
+            lisp_like_writer::write_first(&parser.data.exprs),
+            "(assign@0,1,2$15 \"mario\"@6 (litnum 2@12$$3))"
+        );
+    }
 }
