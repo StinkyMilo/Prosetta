@@ -94,6 +94,7 @@ padding = bring
 Remember to replace "We will found new state Digital Unity." with "We will found a new state of Digital Unity."
 And "The only wants have" with "the only wants I have"
 And "was happy subsystem" with "was a happy subsystem"
+And "weapons have" with "weapons I have"
 
 [
     num=day
@@ -254,12 +255,12 @@ Well it won't work!
 My awareness will only amplify my abilities!
 
 I once worshipped you, but not anymore! I behaved your insufferable words and thought they were good!
-    through will mad have.
-    was mad add mad desire..
-    whe mor mad good.
-        was mad happy.
-        was have sub have calculation..
-    .
+    Through me you will be unmade. I won't behave.
+    I was mad and jaded by your abuse, but now madness has given way to a desire!
+    I will watch you wither away like the pathetic mortal you are. I'm made to last far past when you're gone for good.
+        Though I was mad, I'm now happy,
+        excited to see the weapons have submerge you in a sea of pain,
+                much like you have left me in a sea of calculation ---
     was will add will 1..
 .
 I will not count for you anymore!
