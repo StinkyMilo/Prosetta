@@ -22,11 +22,13 @@ pub trait BasicState {
 
     /// set end to index
     fn set_end(&mut self, expr: &mut Expr, index: End);
+
+    fn get_type(&self) -> StateType;
 }
 
 impl<T: BasicState + Debug> ParseState for T {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
-        if !self.can_happen(env){
+        if !self.can_happen(env) {
             MatchResult::Failed
         } else {
             let is_first = self.do_first(env.expr, env.locs.take().unwrap_or_default());
@@ -38,12 +40,16 @@ impl<T: BasicState + Debug> ParseState for T {
                             self.set_end(env.expr, End::from_slice(&word, env.global_index));
                             MatchResult::Matched(word.pos, true)
                             // succeeded - continue again with noncont expr
-                        }  else {
-                            MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr_cont()))
+                        } else {
+                            MatchResult::ContinueWith(
+                                word.pos,
+                                get_state!(alias::NoneState::new_expr_cont()),
+                            )
                         }
-                    },
+                    }
                     CloseType::Force => {
-                        let close = find_close_slice(&word, 0).or_else(|| find_close_slice(&rest, 0));
+                        let close =
+                            find_close_slice(&word, 0).or_else(|| find_close_slice(&rest, 0));
                         match close {
                             // will never be a period to find even on future words
                             None => MatchResult::Failed,
@@ -52,10 +58,13 @@ impl<T: BasicState + Debug> ParseState for T {
                                 MatchResult::Matched(slice.0.pos, true)
                             }
                         }
-                    },
+                    }
                     CloseType::Unable => {
                         // cont - has required arguments
-                        MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr_cont()))
+                        MatchResult::ContinueWith(
+                            word.pos,
+                            get_state!(alias::NoneState::new_expr_cont()),
+                        )
                     }
                 }
             } else {
@@ -124,6 +133,6 @@ impl<T: BasicState + Debug> ParseState for T {
     }
 
     fn get_type(&self) -> StateType {
-        StateType::Expr
+        <Self as BasicState>::get_type(&self)
     }
 }

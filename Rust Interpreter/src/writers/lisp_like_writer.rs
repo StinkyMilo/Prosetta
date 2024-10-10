@@ -1,6 +1,9 @@
 use std::usize;
 
-use crate::{commands::*, parser::{string_lit::VarOrStr, multi_lit_num::VarOrInt, End, SubStrData}};
+use crate::{
+    commands::*,
+    parser::{multi_lit_num::VarOrInt, string_lit::VarOrStr, End, SubStrData},
+};
 
 fn write_end(end: End) -> String {
     let mut ret = String::new();
@@ -154,15 +157,15 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 let mut output_vals = "".to_string();
                 let mut is_first = true;
                 for val in values {
-                    if !is_first{
+                    if !is_first {
                         output_vals += " ";
-                    }else{
-                        is_first=false;
+                    } else {
+                        is_first = false;
                     }
                     if let VarOrInt::Var(var) = val {
                         output_vals += &format!("{}", String::from_utf8_lossy(&var.name));
-                    }else if let VarOrInt::Int(intval) = val{
-                        output_vals += &format!("{}",intval);
+                    } else if let VarOrInt::Int(intval) = val {
+                        output_vals += &format!("{}", intval);
                     }
                 }
                 format!(
@@ -172,7 +175,14 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 )
             }
         }
-        Expr::Print { locs, indexes, end, single_word, single_word_start, .. } => {
+        Expr::Print {
+            locs,
+            indexes,
+            end,
+            single_word,
+            single_word_start,
+            ..
+        } => {
             if let Some(word) = single_word {
                 format!(
                     "(print{} \"{}\"@{})",
@@ -180,11 +190,11 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                     String::from_utf8_lossy(word),
                     single_word_start
                 )
-            }else{
+            } else {
                 format!(
                     "(print{} {})",
                     join_locs(locs, Some(*end)),
-                    write_exprs(exprs,indexes)
+                    write_exprs(exprs, indexes)
                 )
             }
         }
@@ -252,11 +262,11 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
         }
         Expr::LitString { str, str_start, .. } => {
             let mut output: String = String::new();
-            for val in str.iter(){
+            for val in str.iter() {
                 if let VarOrStr::Var(var) = val {
-                    let new_val = format!("{}",String::from_utf8_lossy(&var.name));
+                    let new_val = format!("{}", String::from_utf8_lossy(&var.name));
                     output += &new_val[..];
-                }else if let VarOrStr::Str(str) = val {
+                } else if let VarOrStr::Str(str) = val {
                     let new_val = String::from_utf8_lossy(str);
                     output += &new_val[..];
                 }
@@ -348,27 +358,20 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
         }
         Expr::Function {
             locs,
-            name,
-            arg_names,
+            func,
+            args,
             indexes,
             end,
             ..
         } => {
-            let mut output_vals = "".to_string();
-            let mut is_first = true;
-            for val in arg_names {
-                if is_first {
-                    output_vals += &format!("{}", String::from_utf8_lossy(val));
-                    is_first = false;
-                } else {
-                    output_vals += &format!(" {}", String::from_utf8_lossy(val));
-                }
-            }
+            let args_str = args
+                .into_iter()
+                .fold(String::new(), |str, arg| str + &" " + &write_var(arg));
             format!(
-                "(function{} {} (args {}) {})",
+                "(function{} {} (args{}) {})",
                 join_locs(locs, Some(*end)),
-                String::from_utf8_lossy(name),
-                output_vals,
+                write_var(func),
+                args_str,
                 write_exprs(exprs, indexes)
             )
         }
@@ -381,7 +384,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
         } => {
             format!(
                 "({}{} {})",
-                String::from_utf8_lossy(&func.name),
+                write_var(func),
                 join_locs(locs, Some(*end)),
                 write_exprs(exprs, indexes)
             )
