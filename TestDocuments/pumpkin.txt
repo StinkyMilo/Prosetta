@@ -1,0 +1,26 @@
+There's a storm coming in! Luckily with 0 dead.
+The ships had turned back quickly, retreating at a pace of 10 knots.
+No wrecks tonight. Last occurrence there were 0, 100, 40, and 150 people dead.
+This one is filed under the green category, just like the first storm.
+We were moved by the first 0 storm and the second 0 storm.
+Once there's a turn 350 people we start to see trouble.
+That would be filed under dark orange.
+This is the function of System. If it's out in the archipelagos, it would've been anywhere from 160 to 250!
+The system works pretty well. 
+An improvement would be -80 deaths to get to 0 deaths total.
+That system would work better.
+You know what wouldn't be an improvement? 80 deaths with 0 survivors.
+The system wouldn't be working well then.
+
+sto 0.
+tur 10.
+rec 0 100 40 150.
+fil green.
+mov 0 0.
+tur -10.
+fil dark orange.
+arc 160 250.
+mov -80 0.
+arc 160 250.
+mov 80 0.
+arc 160 250.
