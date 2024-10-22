@@ -1,0 +1,75 @@
+fun tri xpos ypos size.
+	mov add xpos ide size 2.. ypos.
+	lin size.
+	tur 120.
+	lin size.
+	tur 120.
+	lin size.
+	tur 120.
+	fil black.
+.
+
+fun sierpinski xpos ypos size depth.
+	whe les depth 2.
+        tri xpos ypos size.
+	.els
+		was nextDepth sub depth 1..
+		was halfSize ide size 2..
+		was quarterSize ide size 4..
+		sierpinski sub xpos quarterSize. ypos halfSize nextDepth.
+		sierpinski add xpos quarterSize. ypos halfSize  nextDepth.
+		sierpinski xpos add ypos halfSize. halfSize nextDepth.
+	.
+.
+
+tur 180.
+sierpinski 0 -200 400 5.
+
+Prettified:
+
+[
+    x=has
+    y=appeared
+    size=Worcester
+]
+[
+    x=tears
+    y=the
+    size=dance,
+    depth = floor
+]
+
+
+Alert! A funky triangle has appeared in Worcester.
+	Moving is 
+        advised as this shape 
+            has sick moves;
+            residents of Worcester should be ready 2 boogie! 
+        Mister three-steps is appeared.
+	Calling all Worcester groovers.
+    This warrants grooving to a little 1 2 hullabaloo!
+	Turn around town and keep grooving.
+	Line the Worcester streets.
+	Turn around town and keep grooving.
+	Line the Worcester streets.
+	Turn around town and keep grooving.
+	Line the Worcester streets.
+    The festival is back; zero wait and zero hassle!
+
+
+Alert! A funky Sierpinski tears up the dance floor.
+    Dance wherever you please; this floor is built 2 last.
+        And sir triangle tears up the dance floor just as hard!
+	Elsewhere
+		It was a groovy suburban floor with one beautiful trapezoid!
+		It was a beautiful worldwide dance 2 remember!
+		It was an epic ride. Dancers fought 4 a cause!
+		Sierpinski scrubs up and tears up an epic groove. Taste the beautiful groovy beat.
+		Sierpinski's ascended move tears up an epic harmony. The beautiful groovy beast has done it.
+		Sierpinski tears up a landslide in the beautiful summer. A beautiful, groovy day indeed.
+	.
+.
+
+Turn up to Worcester today to light a glorious revolution!
+Sierpinski came from zero to a sublime two-hundred. No, four-hundred and five.
+He and the triangle shall start a new, groovalicious, geometrical age!
