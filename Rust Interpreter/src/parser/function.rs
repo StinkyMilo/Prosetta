@@ -88,6 +88,7 @@ impl ParseState for FunctionState {
             if let Some(index) = child_index {
                 indexes.push(index);
             }
+            println!("{}", String::from_utf8_lossy(word.str));
 
             // close if have close
             if is_mandatory_close(word) {
@@ -98,7 +99,7 @@ impl ParseState for FunctionState {
                 MatchResult::Matched(word.pos, true)
                 // succeeded - continue again with noncont stat
             } else if child_index.is_some() {
-                MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat_cont()))
+                MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat()))
                 // failed - pass word
             } else {
                 MatchResult::Continue
