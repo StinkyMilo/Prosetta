@@ -1,18 +1,17 @@
 {
-  "name": "prosetta-ui",
+  "name": "codemirrortest",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Milo Jacobs, Flynn Duniho, Nate Westfall",
+  "author": "",
   "license": "ISC",
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.2",
     "@rollup/plugin-node-resolve": "^15.3.0",
-    "@rollup/plugin-wasm": "^6.2.2",
     "codemirror": "^6.0.1",
-    "express": "^4.21.0"
+    "rollup": "^4.24.0"
   }
 }
