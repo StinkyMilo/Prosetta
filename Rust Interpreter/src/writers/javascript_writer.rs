@@ -3,23 +3,23 @@ use crate::{commands::*, parser::multi_lit_num::VarOrInt, parser::string_lit::Va
 #[allow(dead_code)]
 pub fn write(exprs: &ExprArena, line_starts: &Vec<usize>) -> String {
     let mut str = "".to_string();
+    let mut indent: usize = 0;
     for statement in line_starts {
-        str += &write_expr(exprs, *statement);
+        str += &write_expr(exprs, *statement, &mut indent);
         str += "\n";
     }
     str
 }
-#[allow(dead_code)]
-pub fn write_first(exprs: &ExprArena) -> String {
-    write_expr(exprs, 0)
+
+fn get_indent(indent: &usize) -> String {
+    let mut str = "".to_string();
+    for _ in 0..*indent {
+        str += "\t"
+    }
+    str
 }
 
-#[allow(dead_code)]
-pub fn write_one(exprs: &ExprArena, index: usize) -> String {
-    write_expr(exprs, index)
-}
-
-fn write_expr(exprs: &ExprArena, index: usize) -> String {
+fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
     match &exprs[index] {
         Expr::NoneStat => "(todo stat)".to_string(),
         Expr::NoneExpr => "(todo expr)".to_string(),
@@ -29,38 +29,55 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             first,
             ..
         } => format!(
-            "{}{}_var = {};",
+            "{}{}{}_var = {};",
+            get_indent(indent),
             if *first { "let " } else { "" },
             String::from_utf8_lossy(&var.name),
-            write_expr(exprs, *value_index)
+            write_expr(exprs, *value_index, indent)
         ),
         Expr::Line {
             locs: _,
             indexes,
             end: _,
         } => {
-            format!("draw_line({});", write_exprs(exprs, indexes, ", "))
+            format!(
+                "{}draw_line({});",
+                get_indent(indent),
+                write_exprs(exprs, indexes, ", ", indent)
+            )
         }
         Expr::Bezier {
             locs: _,
             indexes,
             end: _,
         } => {
-            format!("draw_bezier({});", write_exprs(exprs, indexes, ", "))
+            format!(
+                "{}draw_bezier({});",
+                get_indent(indent),
+                write_exprs(exprs, indexes, ", ", indent)
+            )
         }
         Expr::Arc {
             locs: _,
             indexes,
             end: _,
         } => {
-            format!("draw_ellipse({});", write_exprs(exprs, indexes, ", "))
+            format!(
+                "{}draw_ellipse({});",
+                get_indent(indent),
+                write_exprs(exprs, indexes, ", ", indent)
+            )
         }
         Expr::Rect {
             locs: _,
             indexes,
             end: _,
         } => {
-            format!("draw_rect({});", write_exprs(exprs, indexes, ", "))
+            format!(
+                "{}draw_rect({});",
+                get_indent(indent),
+                write_exprs(exprs, indexes, ", ", indent)
+            )
         }
         Expr::Var { var } => format!("{}_var", String::from_utf8_lossy(&var.name).to_string()),
         Expr::WordNum {
@@ -76,29 +93,39 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             end: _,
         } => {
             let ret = match func_type {
-                OperatorType::Log => format!("log_base({})", write_exprs(exprs, indexes, ", ")),
+                OperatorType::Log => {
+                    format!("log_base({})", write_exprs(exprs, indexes, ", ", indent))
+                }
                 OperatorType::Exp => {
                     if indexes.len() == 1 {
-                        format!("(Math.E ** {})", write_expr(exprs, indexes[0]))
+                        format!("(Math.E ** {})", write_expr(exprs, indexes[0], indent))
                     } else {
-                        format!("({})", write_exprs(exprs, indexes, " ** "))
+                        format!("({})", write_exprs(exprs, indexes, " ** ", indent))
                     }
                 }
                 OperatorType::Equals => {
-                    let first_exp = write_expr(exprs, indexes[0]);
+                    let first_exp = write_expr(exprs, indexes[0], indent);
                     let mut r;
                     if indexes.len() > 2 {
-                        r = format!("({} == {}", first_exp, write_expr(exprs, indexes[1]));
+                        r = format!(
+                            "({} == {}",
+                            first_exp,
+                            write_expr(exprs, indexes[1], indent)
+                        );
                         for index in &indexes[2..] {
                             if *index != usize::MAX {
                                 r += " && ";
-                                r += format!("{} == {}", first_exp, write_expr(exprs, *index))
-                                    .as_str();
+                                r += format!(
+                                    "{} == {}",
+                                    first_exp,
+                                    write_expr(exprs, *index, indent)
+                                )
+                                .as_str();
                             }
                         }
                         r += ")";
                     } else {
-                        r = format!("{} == {}", first_exp, write_expr(exprs, indexes[1]));
+                        r = format!("{} == {}", first_exp, write_expr(exprs, indexes[1], indent));
                     }
                     r
                 }
@@ -123,22 +150,22 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                 OperatorType::Not => "!",
             };
             match indexes.len() {
-                1 => format!("{}{}", name, write_expr(exprs, indexes[0])),
+                1 => format!("{}{}", name, write_expr(exprs, indexes[0], indent)),
                 2 => format!(
                     "({} {} {})",
-                    write_expr(exprs, indexes[0]),
+                    write_expr(exprs, indexes[0], indent),
                     name,
-                    write_expr(exprs, indexes[1])
+                    write_expr(exprs, indexes[1], indent)
                 ),
                 _ => {
                     let mut ret = String::new();
                     ret += "(";
-                    ret += write_expr(exprs, indexes[0]).as_str();
+                    ret += write_expr(exprs, indexes[0], indent).as_str();
                     for i in &indexes[1..] {
                         ret += " ";
                         ret += name;
                         ret += " ";
-                        ret += write_expr(exprs, *i).as_str();
+                        ret += write_expr(exprs, *i, indent).as_str();
                     }
                     ret += ")";
                     ret
@@ -182,47 +209,92 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             ..
         } => {
             if let Some(word) = single_word {
-                format!("print_console(\"{}\");", String::from_utf8_lossy(word))
+                format!(
+                    "{}print_console(\"{}\");",
+                    get_indent(indent),
+                    String::from_utf8_lossy(word)
+                )
             } else {
-                format!("print_console({});", write_exprs(exprs, indexes, ", "))
+                format!(
+                    "{}print_console({});",
+                    get_indent(indent),
+                    write_exprs(exprs, indexes, ", ", indent)
+                )
             }
         }
         Expr::If { indexes, .. } => {
-            format!(
-                "if ({}) {{\n{}\n}}",
-                write_expr(exprs, indexes[0]),
-                write_exprs(exprs, &indexes[1..], "\n")
-            )
+            let ind = get_indent(indent);
+            *indent += 1;
+            let str = format!(
+                "{}if ({}) {{\n{}\n{}}}",
+                ind,
+                write_expr(exprs, indexes[0], indent),
+                write_exprs(exprs, &indexes[1..], "\n", indent),
+                ind
+            );
+            *indent -= 1;
+            return str;
         }
         Expr::While { indexes, .. } => {
-            format!(
-                "while ({}) {{\n{}\n}}",
-                write_expr(exprs, indexes[0]),
-                write_exprs(exprs, &indexes[1..], "\n")
-            )
+            let ind = get_indent(indent);
+            *indent += 1;
+            let str = format!(
+                "{}while ({}) {{\n{}\n{}}}",
+                ind,
+                write_expr(exprs, indexes[0], indent),
+                write_exprs(exprs, &indexes[1..], "\n", indent),
+                ind
+            );
+            *indent -= 1;
+            return str;
         }
         Expr::Else { indexes, .. } => {
-            format!("else {{\n{}\n}}", write_exprs(exprs, indexes, "\n"))
+            let ind = get_indent(indent);
+            *indent += 1;
+            let str = format!(
+                "{}else {{\n{}\n{}}}",
+                ind,
+                write_exprs(exprs, indexes, "\n", indent),
+                ind
+            );
+            *indent -= 1;
+            return str;
         }
         Expr::LitCol { value, .. } => {
             format!("\"{}\"", String::from_utf8_lossy(&value))
         }
         Expr::Stroke { indexes, .. } => {
             if indexes[1] == usize::MAX {
-                format!("set_stroke({});", write_expr(exprs, indexes[0]))
+                format!(
+                    "{}set_stroke({});",
+                    get_indent(indent),
+                    write_expr(exprs, indexes[0], indent)
+                )
             } else {
-                format!("set_stroke({});", write_exprs(exprs, indexes, ", "))
+                format!(
+                    "{}set_stroke({});",
+                    get_indent(indent),
+                    write_exprs(exprs, indexes, ", ", indent)
+                )
             }
         }
         Expr::Fill { indexes, .. } => {
             if indexes[1] == usize::MAX {
-                format!("set_fill({});", write_expr(exprs, indexes[0]))
+                format!(
+                    "{}set_fill({});",
+                    get_indent(indent),
+                    write_expr(exprs, indexes[0], indent)
+                )
             } else {
-                format!("set_fill({});", write_exprs(exprs, indexes, ", "))
+                format!(
+                    "{}set_fill({});",
+                    get_indent(indent),
+                    write_exprs(exprs, indexes, ", ", indent)
+                )
             }
         }
         Expr::Color { indexes, .. } => {
-            format!("get_color({})", write_exprs(exprs, indexes, ", "))
+            format!("get_color({})", write_exprs(exprs, indexes, ", ", indent))
         }
         Expr::LitString { str, .. } => {
             let mut output: String = String::new();
@@ -238,73 +310,100 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
             format!("`{}`", output)
         }
         Expr::MoveTo { indexes, .. } => {
-            format!("move_to({});", write_exprs(exprs, indexes, ", "))
+            format!(
+                "{}move_to({});",
+                get_indent(indent),
+                write_exprs(exprs, indexes, ", ", indent)
+            )
         }
         Expr::LineWidth { child_index, .. } => {
-            format!("set_line_width({});", write_expr(exprs, *child_index))
+            format!(
+                "{}set_line_width({});",
+                get_indent(indent),
+                write_expr(exprs, *child_index, indent)
+            )
         }
         Expr::Rotate { index, .. } => {
-            format!("rotate_delta({});", write_expr(exprs, *index))
+            format!(
+                "{}rotate_delta({});",
+                get_indent(indent),
+                write_expr(exprs, *index, indent)
+            )
         }
         Expr::Append { indexes, .. } => {
             if indexes[2] == usize::MAX {
                 format!(
-                    "{}.push({});",
-                    write_expr(exprs, indexes[0]),
-                    write_expr(exprs, indexes[1])
+                    "{}{}.push({});",
+                    get_indent(indent),
+                    write_expr(exprs, indexes[0], indent),
+                    write_expr(exprs, indexes[1], indent)
                 )
             } else {
                 format!(
-                    "{}.splice({}, 0, {});",
-                    write_expr(exprs, indexes[0]),
-                    write_expr(exprs, indexes[2]),
-                    write_expr(exprs, indexes[1])
+                    "{}{}.splice({}, 0, {});",
+                    get_indent(indent),
+                    write_expr(exprs, indexes[0], indent),
+                    write_expr(exprs, indexes[2], indent),
+                    write_expr(exprs, indexes[1], indent)
                 )
             }
         }
         Expr::Delete { indexes, .. } => {
             if indexes[1] == usize::MAX {
-                format!("{}.splice(0,1);", write_expr(exprs, indexes[0]))
+                format!(
+                    "{}{}.splice(0,1);",
+                    get_indent(indent),
+                    write_expr(exprs, indexes[0], indent)
+                )
             } else {
                 format!(
-                    "{}.splice({},1);",
-                    write_expr(exprs, indexes[0]),
-                    write_expr(exprs, indexes[1])
+                    "{}{}.splice({},1);",
+                    get_indent(indent),
+                    write_expr(exprs, indexes[0], indent),
+                    write_expr(exprs, indexes[1], indent)
                 )
             }
         }
         Expr::Replace { indexes, .. } => {
             format!(
-                "{}[{}]={};",
-                write_expr(exprs, indexes[0]),
-                write_expr(exprs, indexes[1]),
-                write_expr(exprs, indexes[2])
+                "{}{}[{}]={};",
+                get_indent(indent),
+                write_expr(exprs, indexes[0], indent),
+                write_expr(exprs, indexes[1], indent),
+                write_expr(exprs, indexes[2], indent)
             )
         }
         Expr::Find { indexes, .. } => {
             format!(
-                "{}.indexOf({})",
-                write_expr(exprs, indexes[0]),
-                write_expr(exprs, indexes[1])
+                "{}{}.indexOf({})",
+                get_indent(indent),
+                write_expr(exprs, indexes[0], indent),
+                write_expr(exprs, indexes[1], indent)
             )
         }
         Expr::Index { indexes, .. } => {
             format!(
                 "{}[{}]",
-                write_expr(exprs, indexes[0]),
-                write_expr(exprs, indexes[1])
+                write_expr(exprs, indexes[0], indent),
+                write_expr(exprs, indexes[1], indent)
             )
         }
         Expr::List { indexes, .. } => {
-            format!("[{}]", write_exprs(exprs, indexes, ", "))
+            format!("[{}]", write_exprs(exprs, indexes, ", ", indent))
         }
         Expr::ForEach { indexes, var, .. } => {
-            format!(
-                "for(let {}_var of {}) {{\n{}\n}}",
+            let ind = get_indent(indent);
+            *indent += 1;
+            let str = format!(
+                "{}for(let {}_var of {}) {{\n{}\n{}}}",
+                ind,
                 String::from_utf8_lossy(&var.name),
-                write_expr(exprs, indexes[0]),
-                write_exprs(exprs, &indexes[1..], "\n")
-            )
+                write_expr(exprs, indexes[0], indent),
+                write_exprs(exprs, &indexes[1..], "\n", indent),
+                ind
+            );
+            *indent -= 1;
+            return str;
         }
         Expr::Function {
             func,
@@ -318,30 +417,37 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
                 .collect::<Vec<_>>()
                 .join(", ");
 
-            format!(
-                "function {}_var({}){{\n{}\n}}",
+            *indent += 1;
+            let str = format!(
+                "function {}_var({}) {{\n{}\n}}",
                 String::from_utf8_lossy(&func.name),
                 args_str,
-                write_exprs(exprs, indexes, "\n")
-            )
+                write_exprs(exprs, indexes, "\n", indent)
+            );
+            *indent -= 1;
+            return str;
         }
         Expr::FunctionCall { func, indexes, .. } => {
             //Trying without a semicolon since JS lets you forget them sometimes and function calls can be either expressions or statements
             format!(
                 "{}_var({})",
                 String::from_utf8_lossy(&func.name),
-                write_exprs(exprs, indexes, ", ")
+                write_exprs(exprs, indexes, ", ", indent)
             )
         }
         Expr::Return { index, .. } => {
             if let Some(ind) = index {
-                format!("return {};", write_expr(exprs, *ind))
+                format!(
+                    "{}return {};",
+                    get_indent(indent),
+                    write_expr(exprs, *ind, indent)
+                )
             } else {
-                format!("return;")
+                format!("{}return;", get_indent(indent))
             }
         }
         Expr::Length { index, .. } => {
-            format!("{}.length", write_expr(exprs, *index))
+            format!("{}.length", write_expr(exprs, *index, indent))
         }
         Expr::Not { .. } => {
             format!("")
@@ -349,16 +455,21 @@ fn write_expr(exprs: &ExprArena, index: usize) -> String {
     }
 }
 
-fn write_exprs(exprs: &ExprArena, indexes: &[usize], delimeter: &str) -> String {
+fn write_exprs(
+    exprs: &ExprArena,
+    indexes: &[usize],
+    delimeter: &str,
+    indent: &mut usize,
+) -> String {
     if indexes.len() == 0 {
         return "".to_string();
     }
     let mut ret = String::new();
-    ret += write_expr(exprs, indexes[0]).as_str();
+    ret += write_expr(exprs, indexes[0], indent).as_str();
     for index in &indexes[1..] {
         if *index != usize::MAX {
             ret += delimeter;
-            ret += write_expr(exprs, *index).as_str();
+            ret += write_expr(exprs, *index, indent).as_str();
         }
     }
     ret
