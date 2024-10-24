@@ -377,16 +377,7 @@ function getNewTooltip(word){
   //Later, we'll want to use the rust endpoints though
   let widget = document.createElement("div");
   widget.innerHTML = word;
-  widget.style=`
-    position: absolute; 
-    background-color:darkslategrey; 
-    color: lightgrey;
-    width: 8vw;
-    height: 5vw;
-    border: 1px solid black;
-    border-radius: 0.5vw;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.4);
-  `;
+  widget.className="tooltip";
   return widget;
 }
 
@@ -394,11 +385,8 @@ let activeWidget;
 let lastWord;
 let currentTimeout;
 
-editor.on("cursorActivity",(instance)=>{
-  
-})
-
 function clearWidget(){
+  // removeWithFadeout(activeWidget);
   activeWidget?.remove();
   activeWidget=null;
   lastWord="";
@@ -406,6 +394,20 @@ function clearWidget(){
     clearTimeout(currentTimeout);
     currentTimeout=null;
   }
+}
+
+//This isn't working. TODO fix
+function removeWithFadeout(element){
+  if(element==null){
+    return;
+  }
+  element.style.animation = "";
+  element.style.transition = "opacity 0.5s ease";
+  element.style.opacity = 1;
+  console.log(element.style);
+  setTimeout(()=>{
+    element.remove();
+  },500);
 }
 
 window.onmousemove=function(e){
