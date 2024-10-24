@@ -392,19 +392,52 @@ function getNewTooltip(word){
 
 let activeWidget;
 let lastWord;
+let currentTimeout;
 
 editor.on("cursorActivity",(instance)=>{
-  let wordPos = instance.findWordAt(instance.getCursor());
-  let word = instance.getRange(wordPos.anchor, wordPos.head);
+  
+})
+
+function clearWidget(){
+  activeWidget?.remove();
+  activeWidget=null;
+  lastWord="";
+  if(currentTimeout != null){
+    clearTimeout(currentTimeout);
+    currentTimeout=null;
+  }
+}
+
+window.onmousemove=function(e){
+  let pos = {left:e.clientX, top:e.clientY};
+  let textPos = editor.coordsChar(pos);
+  if(textPos.outside){
+    clearWidget();
+    return;
+  }
+  let wordPos = editor.findWordAt(textPos);
+  let word = editor.getRange(wordPos.anchor, wordPos.head);
   if(word.match(/^\s*$/) || word == lastWord){
     return;
   }
-  if(activeWidget != null){
-    activeWidget.remove();
+  if(currentTimeout != null){
+    clearTimeout(currentTimeout);
   }
-  activeWidget = getNewTooltip(word);
-  instance.addWidget(wordPos.head, activeWidget);
-})
+  clearWidget();
+  currentTimeout = setTimeout(()=>{
+    if(activeWidget != null){
+      activeWidget.remove();
+    }
+    activeWidget = getNewTooltip(word);
+    let midPos = {line:0,ch:0};
+    if(wordPos.head.line == wordPos.anchor.line){
+      midPos = {line:wordPos.head.line,ch:(wordPos.head.ch + wordPos.anchor.ch)/2};
+    }else{
+      midPos = wordPos.head;
+    }
+    editor.addWidget(midPos, activeWidget);
+  },500);
+}
 
 /**
  * cursorActivity event gets when cursor or selection moves
