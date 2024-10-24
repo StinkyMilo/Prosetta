@@ -363,8 +363,40 @@ window.runCode = runCode;
 window.updateCode = updateCode;
 window.openTab = openTab;
 
-//Create main editor environment
+import CodeMirror from 'codemirror';
 editor = CodeMirror(document.getElementById("code"), {
   value: "Draw a rectangle around my thirty fifty dollar bills!",
-  mode:  "javascript"
+  mode: "plaintext"
 });
+
+const worker = new Worker('lsp-worker.js');
+
+// const connection = {
+//   on: (e) => console.log(e),
+//   getHoverTooltip: (e) => {
+//     worker.postMessage({
+//       jsonrpc: "2.0",
+//       id: 1,
+//       method: 'textDocument/hover',
+//       params: {
+//         textDocument: "",
+//         position: { line: e.line, character: e.ch }
+//       }
+//     });
+//   },
+//   send: (message) => worker.postMessage(message),
+//   onNotification: (cb) => worker.onmessage = (event) => cb(event.data),
+//   onRequest: (cb) => worker.onmessage = (event) => cb(event.data),
+// };
+
+import { CodeMirrorAdapter } from 'lsp-codemirror';
+import LspWwConnection from './lsp-connection.js';
+const connection = new LspWwConnection({
+	serverUri: 'prosetta/lsp',
+	mode: 'plaintext',
+	rootUri: `file:///`,
+	documentUri: `file:///poem.txt`,
+	documentText: () => editor.getValue(),
+}).connect(worker);
+const lspAdapter = new CodeMirrorAdapter(connection, { quickSuggestionsDelay: 25 }, editor);
+connection.sendInitialize()

@@ -10,6 +10,16 @@
   "license": "ISC",
   "dependencies": {
     "codemirror": "^5.65.18",
-    "express": "^4.21.0"
+    "express": "^4.21.0",
+    "lodash-es": "^4.17.21",
+    "lsp-codemirror": "^0.2.9",
+    "setimmediate": "^1.0.5",
+    "vscode-languageserver-protocol": "^3.17.5"
+  },
+  "devDependencies": {
+    "css-loader": "^7.1.2",
+    "svg-inline-loader": "^0.8.2",
+    "webpack": "^5.95.0",
+    "webpack-cli": "^5.1.4"
   }
 }
