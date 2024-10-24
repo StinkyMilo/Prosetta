@@ -375,22 +375,33 @@ editor = CodeMirror(document.getElementById("code"), {
 function getNewTooltip(word){
   //For now, don't use rust endpoints; just choose the first alias.
   //Later, we'll want to use the rust endpoints though
+  let widget = document.createElement("div");
+  widget.innerHTML = word;
+  widget.style=`
+    position: absolute; 
+    background-color:darkslategrey; 
+    color: lightgrey;
+    width: 8vw;
+    height: 5vw;
+    border: 1px solid #000000;
+  `;
+  return widget;
 }
 
-/*
-  Destroys the active tooltip
-*/
-function changeActiveTooltip(){
-
-}
+let activeWidget;
+let lastWord;
 
 editor.on("cursorActivity",(instance)=>{
   let wordPos = instance.findWordAt(instance.getCursor());
   let word = instance.getRange(wordPos.anchor, wordPos.head);
-  let widget = document.createElement("p");
-  widget.innerHTML = word;
-  widget.style="position:absolute;"
-  instance.addWidget(wordPos.head,widget);
+  if(word.match(/^\s*$/) || word == lastWord){
+    return;
+  }
+  if(activeWidget != null){
+    activeWidget.remove();
+  }
+  activeWidget = getNewTooltip(word);
+  instance.addWidget(wordPos.head, activeWidget);
 })
 
 /**
