@@ -369,6 +369,12 @@ editor = CodeMirror(document.getElementById("code"), {
   mode:  "javascript"
 });
 
+editor.on("cursorActivity",(instance)=>{
+  let wordPos = instance.findWordAt(instance.getCursor());
+  let word = instance.getRange(wordPos.anchor, wordPos.head);
+  
+})
+
 /**
  * cursorActivity event gets when cursor or selection moves
  * beforeCursorEnter event fires when the cursor enters the marked range
