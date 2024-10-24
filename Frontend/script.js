@@ -368,3 +368,14 @@ editor = CodeMirror(document.getElementById("code"), {
   value: "Draw a rectangle around my thirty fifty dollar bills!",
   mode:  "javascript"
 });
+
+/**
+ * cursorActivity event gets when cursor or selection moves
+ * beforeCursorEnter event fires when the cursor enters the marked range
+ * doc.replaceSelection will replace the current selection with a given string
+ * doc.getCursor retrieves one end of the primary selection
+ * cm.findWordAt returns the start and end of the word at a given position
+ * doc.setBookmark might be what you want for a popup? I'm not 100% sure from the description. The widget would make sense
+ * cm.addWidget might also be what you want. addLineWidget moves below lines down
+ * show-hint extension shows autocomplete hints, not what we want now but could be useful later
+ */
