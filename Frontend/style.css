@@ -87,6 +87,7 @@ body {
   animation: fadeInAnimation ease 0.25s;
   animation-iteration-count: 1;
   animation-fill-mode: forwards;
+  overflow-y: scroll;
 }
 
 @keyframes fadeInAnimation{

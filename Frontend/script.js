@@ -383,16 +383,18 @@ function getNewTooltip(word){
 
 let activeWidget;
 let lastWord;
-let currentTimeout;
+let displayTimeout;
+let removeTimeout;
 
 function clearWidget(){
   // removeWithFadeout(activeWidget);
+  console.log("REMOVING");
   activeWidget?.remove();
   activeWidget=null;
   lastWord="";
-  if(currentTimeout != null){
-    clearTimeout(currentTimeout);
-    currentTimeout=null;
+  if(displayTimeout != null){
+    clearTimeout(displayTimeout);
+    displayTimeout=null;
   }
 }
 
@@ -411,10 +413,22 @@ function removeWithFadeout(element){
 }
 
 window.onmousemove=function(e){
+  if(activeWidget != null && (e.target == activeWidget || activeWidget.contains(e.target))){
+    if(removeTimeout != null){
+      clearTimeout(removeTimeout);
+      removeTimeout=null;
+    }
+    return;
+  }
   let pos = {left:e.clientX, top:e.clientY};
   let textPos = editor.coordsChar(pos);
   if(textPos.outside){
-    clearWidget();
+    if(removeTimeout == null && activeWidget != null){
+      removeTimeout = setTimeout(()=>{
+        console.log("CLEARING FROM TEXTPOS OUTSIDE");
+        clearWidget();
+      },250);
+    }
     return;
   }
   let wordPos = editor.findWordAt(textPos);
@@ -422,14 +436,17 @@ window.onmousemove=function(e){
   if(word.match(/^\s*$/) || word == lastWord){
     return;
   }
-  if(currentTimeout != null){
-    clearTimeout(currentTimeout);
+  if(removeTimeout != null){
+    clearTimeout(removeTimeout);
+    removeTimeout=null;
   }
-  clearWidget();
-  currentTimeout = setTimeout(()=>{
-    if(activeWidget != null){
-      activeWidget.remove();
-    }
+  if(displayTimeout != null){
+    clearTimeout(displayTimeout);
+    displayTimeout=null;
+  }
+  displayTimeout = setTimeout(()=>{
+    console.log("DISPLAY START");
+    clearWidget();
     activeWidget = getNewTooltip(word);
     let midPos = {line:0,ch:0};
     if(wordPos.head.line == wordPos.anchor.line){
