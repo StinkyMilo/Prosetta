@@ -363,32 +363,8 @@ window.runCode = runCode;
 window.updateCode = updateCode;
 window.openTab = openTab;
 
-require.config({ paths: { 'vs': '../node_modules/monaco-editor/min/vs' } });
-// window.MonacoEnvironment = { getWorkerUrl: () => proxy };
-
-// let proxy = URL.createObjectURL(new Blob([`
-// 	self.MonacoEnvironment = {
-// 		baseUrl: 'https://unpkg.com/monaco-editor@latest/min/'
-// 	};
-// 	importScripts('https://unpkg.com/monaco-editor@latest/min/vs/base/worker/workerMain.js');
-// `], { type: 'text/javascript' }));
-
 //Create main editor environment
-require(["vs/editor/editor.main"], function() {
-  editor = monaco.editor.create(document.getElementById('code'), {
-    value: [
-      'Wasp fact: there are 10 of them for every human.',
-      'This Wasp total will send you into a frenzy!',
-      'While there are more facts, 1 will suffice for now.',
-      '\tPlus, that wasp total is a great trivium! A totally awesome fact!',
-      '\tThis wasp fact is sublime. This fact is the one and only fact you need!!!',
-      'Your price total will be --- let\'s see here --- fifty dollars, plus tip.'
-    ].join('\n'),
-    language: 'plaintext',
-    theme: 'vs-dark'
-  });
-  initialize();
-  init_canvas();
-  console.log("Editor initialized!", editor);
-  updateCode();
+editor = CodeMirror(document.getElementById("code"), {
+  value: "Draw a rectangle around my thirty fifty dollar bills!",
+  mode:  "javascript"
 });
