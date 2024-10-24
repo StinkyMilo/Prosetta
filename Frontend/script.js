@@ -454,6 +454,7 @@ window.onmousemove=function(e){
     }else{
       midPos = wordPos.head;
     }
+    lastWord=word;
     editor.addWidget(midPos, activeWidget);
   },500);
 }
