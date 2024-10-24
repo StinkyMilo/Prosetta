@@ -373,7 +373,8 @@ editor = CodeMirror(document.getElementById("code"), {
   Returns a node that contains the alternate word suggestions
 */
 function getNewTooltip(word){
-
+  //For now, don't use rust endpoints; just choose the first alias.
+  //Later, we'll want to use the rust endpoints though
 }
 
 /*
