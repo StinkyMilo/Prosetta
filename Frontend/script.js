@@ -369,10 +369,27 @@ editor = CodeMirror(document.getElementById("code"), {
   mode:  "javascript"
 });
 
+/*
+  Returns a node that contains the alternate word suggestions
+*/
+function getNewTooltip(word){
+
+}
+
+/*
+  Destroys the active tooltip
+*/
+function changeActiveTooltip(){
+
+}
+
 editor.on("cursorActivity",(instance)=>{
   let wordPos = instance.findWordAt(instance.getCursor());
   let word = instance.getRange(wordPos.anchor, wordPos.head);
-  
+  let widget = document.createElement("p");
+  widget.innerHTML = word;
+  widget.style="position:absolute;"
+  instance.addWidget(wordPos.head,widget);
 })
 
 /**
@@ -385,3 +402,16 @@ editor.on("cursorActivity",(instance)=>{
  * cm.addWidget might also be what you want. addLineWidget moves below lines down
  * show-hint extension shows autocomplete hints, not what we want now but could be useful later
  */
+
+/*
+  Plan:
+    Change cursorActivity to mouse move
+    Find word start-end for mouse move
+    If it's over a new word (not the word it was over last):
+      Cancel any existing timeouts
+      Start a new timeout
+    If a timeout completes,
+      Create a tooltip for the corresponding word, put at the word's end position
+      
+
+*/
