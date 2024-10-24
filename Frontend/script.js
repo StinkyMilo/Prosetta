@@ -425,7 +425,6 @@ window.onmousemove=function(e){
   if(textPos.outside){
     if(removeTimeout == null && activeWidget != null){
       removeTimeout = setTimeout(()=>{
-        console.log("CLEARING FROM TEXTPOS OUTSIDE");
         clearWidget();
       },250);
     }
@@ -445,7 +444,6 @@ window.onmousemove=function(e){
     displayTimeout=null;
   }
   displayTimeout = setTimeout(()=>{
-    console.log("DISPLAY START");
     clearWidget();
     activeWidget = getNewTooltip(word);
     let midPos = {line:0,ch:0};
