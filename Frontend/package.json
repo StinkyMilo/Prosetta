@@ -9,7 +9,7 @@
   "author": "Milo Jacobs, Flynn Duniho, Nate Westfall",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.21.0",
-    "monaco-editor": "^0.52.0"
+    "codemirror": "^5.65.18",
+    "express": "^4.21.0"
   }
 }
