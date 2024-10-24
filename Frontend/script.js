@@ -383,7 +383,8 @@ function getNewTooltip(word){
     color: lightgrey;
     width: 8vw;
     height: 5vw;
-    border: 1px solid #000000;
+    border: 1px solid white;
+    border-radius: 0.5vw;
   `;
   return widget;
 }
