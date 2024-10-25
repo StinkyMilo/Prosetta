@@ -18,9 +18,7 @@ impl Default for WindowsRenderer {
 }
 
 impl Renderer for WindowsRenderer {
-    fn set_color(&mut self, color: (TermColor, bool)) {
-        self.new_color = color;
-    }
+    type Output = Vec<u8>;
 
     fn add(&mut self, text: &[u8]) {
         self.check_color();
@@ -51,11 +49,15 @@ impl Renderer for WindowsRenderer {
         self.push(char);
     }
 
-    fn into_string(self) -> Vec<u8> {
+    fn into_data(self) -> Vec<u8> {
         self.str
     }
 }
 impl WindowsRenderer {
+    fn set_color(&mut self, color: (TermColor, bool)) {
+        self.new_color = color;
+    }
+    
     fn check_color(&mut self) {
         if self.old_color != self.new_color {
             Self::change_color(&mut self.str, self.new_color);
