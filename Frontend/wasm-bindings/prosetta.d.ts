@@ -2,6 +2,11 @@
 /* eslint-disable */
 /**
 */
+export class Highlight {
+  free(): void;
+}
+/**
+*/
 export class ParserRunner {
   free(): void;
 /**
@@ -25,18 +30,24 @@ export class ParserRunnerData {
 * @returns {string}
 */
   get_html(): string;
+/**
+* @returns {(Highlight)[]}
+*/
+  get_lines(): (Highlight)[];
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
+  readonly __wbg_highlight_free: (a: number, b: number) => void;
   readonly __wbg_parserrunner_free: (a: number, b: number) => void;
   readonly __wbg_parserrunnerdata_free: (a: number, b: number) => void;
   readonly parserrunner_new: () => number;
   readonly parserrunner_run_to_completion: (a: number, b: number, c: number) => number;
   readonly parserrunnerdata_get_javascript: (a: number, b: number) => void;
   readonly parserrunnerdata_get_html: (a: number, b: number) => void;
+  readonly parserrunnerdata_get_lines: (a: number, b: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;

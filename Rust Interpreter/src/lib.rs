@@ -16,7 +16,7 @@ use parser::ParserSource;
 
 use crate::writers::javascript_writer;
 use crate::writers::syntax_lint::SyntaxLinter;
-use crate::writers::syntax_renderers::html_renderer::HTMLRenderer;
+use crate::writers::syntax_renderers::{html_renderer::HTMLRenderer,line_renderer::{LineRenderer,Highlight}};
 
 // // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // // allocator.
@@ -70,7 +70,13 @@ impl ParserRunnerData {
         let iter = self.data.source.get_iter();
         let mut lint = SyntaxLinter::<HTMLRenderer>::new();
         lint.write(&self.data.exprs, &self.data.stat_starts, iter);
-        String::from_utf8_lossy(&lint.into_string()).to_string()
+        String::from_utf8_lossy(&lint.into_data()).to_string()
+    }
+    pub fn get_lines(&self) -> Vec<Highlight> {
+        let iter = self.data.source.get_iter();
+        let mut lint = SyntaxLinter::<LineRenderer>::new();
+        lint.write(&self.data.exprs, &self.data.stat_starts, iter);
+        lint.into_data()
     }
 }
 
