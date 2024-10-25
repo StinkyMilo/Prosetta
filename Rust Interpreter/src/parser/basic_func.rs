@@ -110,7 +110,7 @@ impl<T: BasicState + Debug> ParseState for T {
                     MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr()))
                     // failed - pass word
                 } else {
-                    MatchResult::Continue
+                    MatchResult::Continue(0)
                 }
             }
             CloseType::Force => {

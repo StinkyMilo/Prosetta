@@ -38,7 +38,7 @@ impl ParseState for FunctionState {
                     env.symbols.insert_func(func.name.to_owned(), 0);
                     self.has_name = true;
                 }
-                MatchResult::Continue
+                MatchResult::Continue(0)
             //if doesn't yet have arg
             } else {
                 if is_mandatory_close(word) {
@@ -62,7 +62,7 @@ impl ParseState for FunctionState {
                     // env.vars.insert(arg_name.to_owned());
                     //env.funcs.inc_arg_count(&func.name);
                 }
-                MatchResult::Continue
+                MatchResult::Continue(0)
             }
         } else {
             unreachable!()
@@ -101,7 +101,7 @@ impl ParseState for FunctionState {
                 MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat_cont()))
                 // failed - pass word
             } else {
-                MatchResult::Continue
+                MatchResult::Continue(0)
             }
         } else {
             unreachable!()

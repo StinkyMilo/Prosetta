@@ -449,3 +449,5 @@ impl<T: Renderer> SyntaxLinter<T> {
 }
 
 //The wizards were literally nine at most!
+
+//list[line_num, index, color,length] 

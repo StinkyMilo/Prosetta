@@ -27,7 +27,7 @@ impl ParseState for LiteralColorState {
                     };
                     self.wsf
                         .append(&mut word.str.to_owned().to_ascii_lowercase());
-                    MatchResult::Continue
+                    MatchResult::Continue(0)
                 }
                 LitColorFoundResult::Failed => MatchResult::Failed,
                 LitColorFoundResult::FoundOnLast => {
@@ -82,7 +82,7 @@ impl ParseState for LiteralColorState {
                 LitColorFoundResult::CouldFind => {
                     self.wsf
                         .append(&mut word.str.to_owned().to_ascii_lowercase());
-                    MatchResult::Continue
+                    MatchResult::Continue(0)
                 }
                 //Cannot be a color
                 LitColorFoundResult::Failed => MatchResult::Failed,

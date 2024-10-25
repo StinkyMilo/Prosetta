@@ -34,6 +34,7 @@ mod operator;
 mod replace;
 pub(crate) mod string_lit;
 mod stroke;
+mod title;
 mod var;
 mod while_stat;
 
@@ -306,7 +307,7 @@ impl<'a> Parser<'a> {
         let new_locs = env.locs.take();
 
         // reached end of line - upgrade result to failed
-        if word.len() == 0 && matches!(result, MatchResult::Continue) {
+        if word.len() == 0 && matches!(result, MatchResult::Continue(0)) {
             result = MatchResult::Failed;
         }
 
@@ -318,7 +319,7 @@ impl<'a> Parser<'a> {
                 self.continue_with_func(index, state, new_locs)
             }
             // continue with me
-            MatchResult::Continue => self.continue_func(rest.pos),
+            MatchResult::Continue(index) => self.continue_func(rest.pos + index),
             // I failed, go back on stack with fail
             MatchResult::Failed => self.failed_func(),
         }
@@ -473,6 +474,23 @@ impl<'a> Parser<'a> {
     }
     ///setup a noneStat on the stack
     fn add_new_nonestat(&mut self, new_index: usize) {
+        // push match stat on first step of line
+        let expr_index = self.data.exprs.vec.len();
+
+        self.data.exprs.vec.push(Expr::NoneStat);
+
+        self.stack.push(State {
+            expr_index,
+            first_parse: new_index,
+            last_parse: new_index,
+            state: Box::new(alias::NoneState::new_stat_cont()),
+        });
+        self.data.stat_starts.push(expr_index);
+        self.last_result = LastMatchResult::None;
+        self.cached_fails = HashMap::new();
+    }
+    ///setup a noneStat on the stack
+    fn add_title(&mut self, new_index: usize) {
         // push match stat on first step of line
         let expr_index = self.data.exprs.vec.len();
 

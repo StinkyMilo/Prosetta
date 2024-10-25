@@ -368,8 +368,8 @@ pub enum MatchResult {
     Matched(usize, bool),
     /// returned to add a child onto the stack with an index and the state to continue with
     ContinueWith(usize, Box<dyn ParseState>),
-    /// returned to give the same state the next word
-    Continue,
+    /// returned to give the same state with the offset (usually 0)
+    Continue(usize),
     /// returned to go to the parent state with a failure
     Failed,
 }
@@ -521,7 +521,7 @@ fn is_valid_close_char(char: u8) -> bool {
 }
 
 ///the chars that are returned single but are not closes
-const NON_CLOSE_CHARS: &[u8] = b"\"";
+const NON_CLOSE_CHARS: &[u8] = b"\"&";
 ///shoudl the char be made into a 1 len slice
 pub fn is_non_close_but_still_single(char: u8) -> bool {
     NON_CLOSE_CHARS.contains(&char)
@@ -743,6 +743,28 @@ pub fn try_get_symbol_word(word: &Slice, global_index: usize) -> Option<SubStrDa
                 skip_indexes,
             })
         }
+    } else {
+        None
+    }
+}
+///get a slice that starts at the next \n
+pub fn find_newline<'a>(slice: &'a Slice<'a>) -> Option<Slice<'_>> {
+    let mut start = 0;
+    while start < slice.len() {
+        let char = slice.str[start];
+        if char == b'\n' {
+            break;
+        } else {
+            start += 1;
+        }
+    }
+
+    if start < slice.len() {
+        let end = start;
+        Some(Slice {
+            str: &slice.str[start..end],
+            pos: slice.pos + start,
+        })
     } else {
         None
     }

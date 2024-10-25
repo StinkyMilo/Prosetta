@@ -7,7 +7,7 @@ impl ParseState for NotState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         // wait for non . word to start
         if is_close(word) {
-            MatchResult::Continue
+            MatchResult::Continue(0)
         } else {
             // find close
             let close = find_close_slice(rest, 0);

@@ -61,7 +61,7 @@ impl ParseState for MultiLitNumState {
                 } else {
                     values.push(VarOrInt::Int((word.len() as i64) % 10));
                 }
-                MatchResult::Continue
+                MatchResult::Continue(0)
             }
         } else {
             unreachable!()
