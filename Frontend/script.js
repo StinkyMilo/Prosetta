@@ -1,4 +1,5 @@
 import init, { ParserRunner } from './wasm-bindings/prosetta.js'
+import {getAliasTriggered, wordsForAliases} from './wordsForAliases.js';
 
 var jscode, sourcecode, syntax, ctx, cnsl, canvas;
 var x = 0, y = 0, rotation = 0;
@@ -372,17 +373,25 @@ editor = CodeMirror(document.getElementById("code"), {
 /*
   Returns a node that contains the alternate word suggestions
 */
-function getNewTooltip(word){
+function getNewTooltip(alias){
   //For now, don't use rust endpoints; just choose the first alias.
   //Later, we'll want to use the rust endpoints though
   let widget = document.createElement("div");
-  widget.innerHTML = word;
   widget.className="tooltip";
+  let header = document.createElement("h1");
+  header.innerHTML = alias;
+  widget.appendChild(header);
+  let words = wordsForAliases[alias];
+  for(let i = 0; i < words.length; i++){
+    let wordElement = document.createElement("p");
+    wordElement.innerHTML = words[i];
+    widget.appendChild(wordElement);
+  }
   return widget;
 }
 
 let activeWidget;
-let lastWord;
+let lastWordPos = {line: -1, ch: -1};
 let displayTimeout;
 let removeTimeout;
 
@@ -391,7 +400,7 @@ function clearWidget(){
   console.log("REMOVING");
   activeWidget?.remove();
   activeWidget=null;
-  lastWord="";
+  lastWordPos={line:-1,ch:-1};
   if(displayTimeout != null){
     clearTimeout(displayTimeout);
     displayTimeout=null;
@@ -432,7 +441,13 @@ window.onmousemove=function(e){
   }
   let wordPos = editor.findWordAt(textPos);
   let word = editor.getRange(wordPos.anchor, wordPos.head);
-  if(word.match(/^\s*$/) || word == lastWord){
+  let midPos = {line:0,ch:0};
+  if(wordPos.head.line == wordPos.anchor.line){
+    midPos = {line:wordPos.head.line,ch:(wordPos.head.ch + wordPos.anchor.ch)/2};
+  }else{
+    midPos = wordPos.head;
+  }
+  if(word.match(/^\s*$/) || (midPos.line == lastWordPos.line && midPos.ch == lastWordPos.ch)){
     return;
   }
   if(removeTimeout != null){
@@ -443,16 +458,14 @@ window.onmousemove=function(e){
     clearTimeout(displayTimeout);
     displayTimeout=null;
   }
+  let alias = getAliasTriggered(word);
+  if(alias == null){
+    return;
+  }
   displayTimeout = setTimeout(()=>{
     clearWidget();
-    activeWidget = getNewTooltip(word);
-    let midPos = {line:0,ch:0};
-    if(wordPos.head.line == wordPos.anchor.line){
-      midPos = {line:wordPos.head.line,ch:(wordPos.head.ch + wordPos.anchor.ch)/2};
-    }else{
-      midPos = wordPos.head;
-    }
-    lastWord=word;
+    activeWidget = getNewTooltip(alias);
+    lastWordPos=midPos;
     editor.addWidget(midPos, activeWidget);
   },500);
 }
