@@ -22,7 +22,11 @@ impl Default for LineRenderer {
     }
 }
 
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
 #[derive(Debug)]
+#[allow(dead_code)]
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 pub struct Highlight {
     line: usize,
     index: usize,
@@ -105,22 +109,22 @@ impl LineRenderer {
     }
     fn get_color_str(color: &(TermColor, bool)) -> &'static str {
         match color {
-            (TermColor::Black, false) => "black",
-            (TermColor::Black, true) => "b_black",
-            (TermColor::Red, false) => "red",
-            (TermColor::Red, true) => "b_red",
-            (TermColor::Green, false) => "green",
-            (TermColor::Green, true) => "b_green",
-            (TermColor::Yellow, false) => "yellow",
-            (TermColor::Yellow, true) => "b_yellow",
-            (TermColor::Blue, false) => "blue",
-            (TermColor::Blue, true) => "b_blue",
-            (TermColor::Purple, false) => "purple",
-            (TermColor::Purple, true) => "b_purple",
-            (TermColor::Cyan, false) => "cyan",
-            (TermColor::Cyan, true) => "b_cyan",
-            (TermColor::White, false) => "white",
-            (TermColor::White, true) => "b_white",
+            (TermColor::Black, false) => "term_black",
+            (TermColor::Black, true) => "term_b_black",
+            (TermColor::Red, false) => "term_red",
+            (TermColor::Red, true) => "term_b_red",
+            (TermColor::Green, false) => "term_green",
+            (TermColor::Green, true) => "term_b_green",
+            (TermColor::Yellow, false) => "term_yellow",
+            (TermColor::Yellow, true) => "term_b_yellow",
+            (TermColor::Blue, false) => "term_blue",
+            (TermColor::Blue, true) => "term_b_blue",
+            (TermColor::Purple, false) => "term_purple",
+            (TermColor::Purple, true) => "term_b_purple",
+            (TermColor::Cyan, false) => "term_cyan",
+            (TermColor::Cyan, true) => "term_b_cyan",
+            (TermColor::White, false) => "term_white",
+            (TermColor::White, true) => "term_b_white",
         }
     }
 }
