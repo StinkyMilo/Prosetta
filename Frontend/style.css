@@ -74,3 +74,10 @@ body {
   background: black;
   color: white;
 }
+
+.CodeMirror-lsp-tooltip {
+  position: absolute;
+  background-color: lightgrey;
+  padding: 5px;
+  border-radius: 3px;
+}

@@ -1,62 +1,8 @@
-import * as events from "events"
+import { EventEmitter } from "events"
+import * as marked from 'marked';
 import * as lsProtocol from "vscode-languageserver-protocol"
 
-const ServerCapabilitiesProviders = {
-  "textDocument/hover": "hoverProvider",
-  "textDocument/completion": "completionProvider",
-  "textDocument/signatureHelp": "signatureHelpProvider",
-  "textDocument/definition": "definitionProvider",
-  "textDocument/typeDefinition": "typeDefinitionProvider",
-  "textDocument/implementation": "implementationProvider",
-  "textDocument/references": "referencesProvider",
-  "textDocument/documentHighlight": "documentHighlightProvider",
-  "textDocument/documentSymbol": "documentSymbolProvider",
-  "textDocument/workspaceSymbol": "workspaceSymbolProvider",
-  "textDocument/codeAction": "codeActionProvider",
-  "textDocument/codeLens": "codeLensProvider",
-  "textDocument/documentFormatting": "documentFormattingProvider",
-  "textDocument/documentRangeFormatting": "documentRangeFormattingProvider",
-  "textDocument/documentOnTypeFormatting": "documentOnTypeFormattingProvider",
-  "textDocument/rename": "renameProvider",
-  "textDocument/documentLink": "documentLinkProvider",
-  "textDocument/color": "colorProvider",
-  "textDocument/foldingRange": "foldingRangeProvider",
-  "textDocument/declaration": "declarationProvider",
-  "textDocument/executeCommand": "executeCommandProvider"
-}
-
-function registerServerCapability(serverCapabilities, registration) {
-  const serverCapabilitiesCopy = JSON.parse(JSON.stringify(serverCapabilities))
-  const { method, registerOptions } = registration
-  const providerName = ServerCapabilitiesProviders[method]
-
-  if (providerName) {
-    if (!registerOptions) {
-      serverCapabilitiesCopy[providerName] = true
-    } else {
-      serverCapabilitiesCopy[providerName] = Object.assign(
-        {},
-        JSON.parse(JSON.stringify(registerOptions))
-      )
-    }
-  } else {
-    throw new Error("Could not register server capability.")
-  }
-
-  return serverCapabilitiesCopy
-}
-
-function unregisterServerCapability(serverCapabilities, unregistration) {
-  const serverCapabilitiesCopy = JSON.parse(JSON.stringify(serverCapabilities))
-  const { method } = unregistration
-  const providerName = ServerCapabilitiesProviders[method]
-
-  delete serverCapabilitiesCopy[providerName]
-
-  return serverCapabilitiesCopy
-}
-
-class LspWwConnection extends events.EventEmitter {
+class LspWwConnection extends EventEmitter {
   isConnected = false
   isInitialized = false
   documentVersion = 0
@@ -78,7 +24,7 @@ class LspWwConnection extends events.EventEmitter {
   awaitWorkerMessage() {
     return new Promise((resolve) => {
       this.worker.onmessage = (event) => {
-        resolve(event.data); // Resolve the promise with the message data
+        resolve(event.data);
       };
     });
   }
@@ -88,9 +34,6 @@ class LspWwConnection extends events.EventEmitter {
    */
   connect(worker) {
     this.worker = worker
-    worker.onmessage = (e) => {
-      console.log("in client: ", e.data);
-    }
     this.isConnected = true;
 
     //     rpc.listen({
@@ -267,14 +210,11 @@ class LspWwConnection extends events.EventEmitter {
         }
       ]
     }
-    this.connection.sendNotification(
-      "textDocument/didChange",
-      textDocumentChange
-    )
-    this.documentVersion++
+    this.worker.postMessage(this.rpc("textDocument/didChange", textDocumentChange))
+    this.documentVersion++;
   }
 
-  getHoverTooltip(location) {
+  async getHoverTooltip(location) {
     if (!this.isInitialized) {
       return
     }
@@ -288,9 +228,10 @@ class LspWwConnection extends events.EventEmitter {
         character: location.ch
       }
     }))
-    // .then(params => {
-    //   this.emit("hover", params)
-    // })
+    const msg = await this.awaitWorkerMessage();
+    msg.result.contents.type = "object";
+    msg.result.contents.value = marked.parse(msg.result.contents.value);
+    this.emit("hover", msg.result);
   }
 
   getCompletion(location, token, triggerCharacter, triggerKind) {
@@ -585,6 +526,61 @@ class LspWwConnection extends events.EventEmitter {
       this.serverCapabilities && this.serverCapabilities.referencesProvider
     )
   }
+}
+
+const ServerCapabilitiesProviders = {
+  "textDocument/hover": "hoverProvider",
+  "textDocument/completion": "completionProvider",
+  "textDocument/signatureHelp": "signatureHelpProvider",
+  "textDocument/definition": "definitionProvider",
+  "textDocument/typeDefinition": "typeDefinitionProvider",
+  "textDocument/implementation": "implementationProvider",
+  "textDocument/references": "referencesProvider",
+  "textDocument/documentHighlight": "documentHighlightProvider",
+  "textDocument/documentSymbol": "documentSymbolProvider",
+  "textDocument/workspaceSymbol": "workspaceSymbolProvider",
+  "textDocument/codeAction": "codeActionProvider",
+  "textDocument/codeLens": "codeLensProvider",
+  "textDocument/documentFormatting": "documentFormattingProvider",
+  "textDocument/documentRangeFormatting": "documentRangeFormattingProvider",
+  "textDocument/documentOnTypeFormatting": "documentOnTypeFormattingProvider",
+  "textDocument/rename": "renameProvider",
+  "textDocument/documentLink": "documentLinkProvider",
+  "textDocument/color": "colorProvider",
+  "textDocument/foldingRange": "foldingRangeProvider",
+  "textDocument/declaration": "declarationProvider",
+  "textDocument/executeCommand": "executeCommandProvider"
+}
+
+function registerServerCapability(serverCapabilities, registration) {
+  const serverCapabilitiesCopy = JSON.parse(JSON.stringify(serverCapabilities))
+  const { method, registerOptions } = registration
+  const providerName = ServerCapabilitiesProviders[method]
+
+  if (providerName) {
+    if (!registerOptions) {
+      serverCapabilitiesCopy[providerName] = true
+    } else {
+      serverCapabilitiesCopy[providerName] = Object.assign(
+        {},
+        JSON.parse(JSON.stringify(registerOptions))
+      )
+    }
+  } else {
+    throw new Error("Could not register server capability.")
+  }
+
+  return serverCapabilitiesCopy
+}
+
+function unregisterServerCapability(serverCapabilities, unregistration) {
+  const serverCapabilitiesCopy = JSON.parse(JSON.stringify(serverCapabilities))
+  const { method } = unregistration
+  const providerName = ServerCapabilitiesProviders[method]
+
+  delete serverCapabilitiesCopy[providerName]
+
+  return serverCapabilitiesCopy
 }
 
 export default LspWwConnection

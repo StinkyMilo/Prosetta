@@ -98,7 +98,6 @@ function draw_line() {
         ctx.moveTo(x, y);
       }
       move_distance(arguments[0]);
-      console.log(x, y, arguments[0], rotation);
       ctx.lineTo(x, y);
       break;
     case 2:
@@ -390,13 +389,95 @@ const worker = new Worker('lsp-worker.js');
 // };
 
 import { CodeMirrorAdapter } from 'lsp-codemirror';
+import * as marked from 'marked';
+import { MarkupContent } from 'vscode-languageserver-protocol';
 import LspWwConnection from './lsp-connection.js';
 const connection = new LspWwConnection({
-	serverUri: 'prosetta/lsp',
-	mode: 'plaintext',
-	rootUri: `file:///`,
-	documentUri: `file:///poem.txt`,
-	documentText: () => editor.getValue(),
+  serverUri: 'prosetta/lsp',
+  mode: 'plaintext',
+  rootUri: `file:///`,
+  documentUri: `file:///poem.txt`,
+  documentText: () => editor.getValue(),
 }).connect(worker);
-const lspAdapter = new CodeMirrorAdapter(connection, { quickSuggestionsDelay: 25 }, editor);
+const lspAdapter = new CodeMirrorAdapter(connection, { quickSuggestionsDelay: 200 }, editor);
+lspAdapter._showTooltip = function(el, coords) {
+  if (this.isShowingContextMenu) {
+    this._removeTooltip();
+  }
+
+  let top = coords.y;
+
+  this.tooltip = document.createElement('div');
+  this.tooltip.classList.add('CodeMirror-lsp-tooltip');
+  this.tooltip.style.left = `${coords.x}px`;
+  this.tooltip.style.top = `${top}px`;
+  this.tooltip.appendChild(el);
+  document.body.appendChild(this.tooltip);
+
+  // Measure and reposition after rendering first version
+  requestAnimationFrame(() => {
+    this.tooltip.style.left = `${coords.x}px`;
+    this.tooltip.style.top = `${top}px`;
+  });
+
+  this.isShowingContextMenu = true;
+}.bind(lspAdapter);
+lspAdapter.connection.off('hover', lspAdapter.handleHover);
+lspAdapter.handleHover = function(response) {
+  this._removeHover();
+  this._removeTooltip();
+
+  if (!response || !response.contents || (Array.isArray(response.contents) && response.contents.length === 0)) {
+    return;
+  }
+
+  let start = this.hoverCharacter;
+  let end = this.hoverCharacter;
+  if (response.range) {
+    start = {
+      line: response.range.start.line,
+      ch: response.range.start.character,
+    };
+    end = {
+      line: response.range.end.line,
+      ch: response.range.end.character,
+    };
+
+    this.hoverMarker = this.editor.getDoc().markText(start, end, {
+      className: 'CodeMirror-lsp-hover'
+    });
+  }
+
+  let tooltipText;
+  const htmlElement = document.createElement('div');
+  if (MarkupContent.is(response.contents)) {
+    tooltipText = response.contents.value;
+
+    htmlElement.innerHTML = marked.parse(tooltipText);
+  } else {
+    if (Array.isArray(response.contents)) {
+      const firstItem = response.contents[0];
+      if (MarkupContent.is(firstItem)) {
+        tooltipText = firstItem.value;
+      } else if (firstItem === null) {
+        return;
+      } else if (typeof firstItem === 'object') {
+        tooltipText = firstItem.value;
+      } else {
+        tooltipText = firstItem;
+      }
+    } else if (typeof response.contents === 'string') {
+      tooltipText = response.contents;
+    }
+
+    htmlElement.innerText = tooltipText;
+  }
+  const coords = this.editor.charCoords(start, 'page');
+  this._showTooltip(htmlElement, {
+    x: coords.left,
+    y: coords.top,
+  });
+}.bind(lspAdapter)
+lspAdapter.connection.on('hover', lspAdapter.handleHover);
+// lspAdapter._addListeners();
 connection.sendInitialize()

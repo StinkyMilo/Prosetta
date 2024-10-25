@@ -1,10 +1,9 @@
+let text = []
 self.onmessage = function(event) {
   const message = event.data;
-  console.log("in webworker: ", message);
 
   switch (message.method) {
     case 'initialize':
-      console.log("init ls");
       postMessage({
         jsonrpc: "2.0",
         id: message.id,
@@ -21,9 +20,18 @@ self.onmessage = function(event) {
       break;
 
     case 'textDocument/didOpen':
+      text = message.params.textDocument.text.split("\n");
+      break;
+
     case 'textDocument/didChange':
-      const text = message.params.textDocument.text;
-      console.log("Document content: ", text);
+      let changes = message.params.contentChanges;
+      if (changes[0].range === undefined) {
+        text = changes[0].text.split("\n");
+      } else {
+        for (let change in changes) {
+          text.splice(change.range.start, change.range.end - change.range.start, ...change.text.split("\n"));
+        }
+      }
       break;
 
     case 'textDocument/completion':
@@ -50,10 +58,9 @@ self.onmessage = function(event) {
       const hoverResult = {
         contents: {
           kind: 'markdown',
-          value: 'This is a simple hover information.',
+          value: `# ${getWordAtPosition(message.params.position)}\nThis is a simple hover information.\n\nthird line`,
         },
       };
-      console.log("hover!");
       postMessage({
         jsonrpc: "2.0",
         id: message.id,
@@ -65,3 +72,17 @@ self.onmessage = function(event) {
       console.warn("Unknown message", message);
   }
 };
+
+function getWordAtPosition(position) {
+  let line = text[position.line];
+  let character = position.character;
+  const words = line.split(/\s+/);
+  for (const word of words) {
+    const start = line.indexOf(word);
+    const end = start + word.length;
+    if (character >= start && character <= end) {
+      return word;
+    }
+  }
+  return '';
+}
