@@ -1,7 +1,7 @@
 import init, { ParserRunner } from './wasm-bindings/prosetta.js'
 import { getAliasTriggered, wordsForAliases } from './wordsForAliases.js';
 
-var jscode, sourcecode, syntax, ctx, cnsl, canvas;
+var jscode, sourcecode, highlights, ctx, cnsl, canvas;
 var x = 0, y = 0, rotation = 0;
 var has_run = false;
 var has_drawn_shape = false;
@@ -13,7 +13,7 @@ var editor;
 function init_canvas() {
   sourcecode = document.getElementById("code");
   jscode = document.getElementById("js");
-  syntax = "";
+  highlights = "";
   canvas = document.getElementById("outputcanvas");
   ctx = canvas.getContext('2d');
   cnsl = document.getElementById("console");
@@ -331,11 +331,21 @@ function updateCode() {
   editor_code = editor.getValue();
   parsedData = parser.run_to_completion(editor_code);
   jscode.innerHTML = parsedData.get_javascript();
-  syntax = parsedData.get_html().split("<br>");
-  let c = syntax.children;
+  highlights = parsedData.get_highlights();
+  let c = highlights.children;
   // for (let i = 0; i < c.length; i++) {
   //   c[i].style.color = c[i].className.substring("term_b_".length, c[i].className.length);
   // }
+}
+
+function updateHighlights(cm) {
+  for (let hl in highlights) {
+    cm.markText(
+      { line: hl.line, ch: hl.start },
+      { line: hl.line, ch: hl.start + hl.length },
+      { className: hl.class}
+    );
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -467,15 +477,7 @@ function setup_editor() {
     }, 500);
   }
 
-  editor.on("change", (cm, change) => { updateCode(); });
-
-  editor.on("renderLine", function(cm, line, element) {
-    if (syntax === undefined) {
-      return;
-    }
-    const lineNumber = cm.getLineNumber(line);
-    element.innerHTML = syntax[lineNumber];
-  });
+  editor.on("change", (cm, change) => { updateCode(); updateHighlights(cm); });
   editor.setValue("Draw a rectangle around\nmy thirty fifty dollar bills!");
 
   /**
