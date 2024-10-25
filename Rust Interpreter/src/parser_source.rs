@@ -4,6 +4,8 @@ use std::{
     iter::{self, Flatten},
 };
 
+use bstr::{ByteSlice, ByteVec};
+
 pub type ParserSourceIter<'a> = Flatten<std::vec::IntoIter<Box<dyn Iterator<Item = &'a u8> + 'a>>>;
 
 macro_rules! make_iter {
@@ -64,7 +66,13 @@ impl<'a> ParserSource<'a> {
         if does_str_need_newline(&str) {
             str.push(b'\n');
         }
-        self.sources.push(Source::String { str, first: true });
+
+        for slice in str.split_str("\n\n") {
+            let mut str = slice.to_vec();
+            str.push_str(b"\n\n");
+            self.sources.push(Source::String { str, first: true });
+        }
+
         self
     }
 }
@@ -142,11 +150,9 @@ impl<'a> ParserSource<'a> {
     /// get input from stdin stoping on 0 len input
     /// returns has_failed
     fn get_from_stdin(stdin: &mut StdinLock<'a>, start: &mut usize, buf: &mut Vec<u8>) -> bool {
-        // only allow one input
-        if buf.len() != 0 {
-            return true;
-        }
+        println!("Input text to be parsed:");
         let mut has_input = false;
+        // let mut has_first_empty = false;
         *start = buf.len();
         loop {
             let mut new_input = Vec::new();
@@ -163,17 +169,24 @@ impl<'a> ParserSource<'a> {
             }
 
             if has_failed || new_input.len() == 0 {
+                // if has_first_empty {
+                buf.push(b'\n');
                 return !has_input;
             }
+            //     } else {
+            //         has_first_empty = true;
+            //     }
+            // } else {
+            //     has_first_empty = false;
+            // }
 
             has_input = true;
             if buf.len() == 0 {
                 *buf = new_input;
-                buf.push(b'\n');
             } else {
                 buf.append(&mut new_input);
-                buf.push(b'\n');
             }
+            buf.push(b'\n');
         }
     }
 }
@@ -181,7 +194,3 @@ impl<'a> ParserSource<'a> {
 fn does_str_need_newline(str: &Vec<u8>) -> bool {
     !str.last().is_some_and(|f| *f == b'\n')
 }
-// "
-// The wizards state  was dire.
-// They saw zero in their looking glass.
-// "

@@ -486,6 +486,7 @@ impl<'a> Parser<'a> {
         });
         self.data.stat_starts.push(expr_index);
         self.last_result = LastMatchResult::None;
+        self.cached_fails = HashMap::new();
     }
 }
 
