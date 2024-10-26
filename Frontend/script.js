@@ -332,7 +332,7 @@ function updateCode() {
   highlights = parsedData.get_highlights();
   updateHighlights();
   // this should not need to exist but godfobid 
-  highlights.forEach(e=>e.free());
+  highlights.forEach(e => e.free());
   parsedData.free();
 }
 
@@ -431,7 +431,7 @@ function setup_editor() {
     }, 500);
   }
 
-  window.onmousemove = function (e) {
+  window.onmousemove = function(e) {
     if (activeWidget != null && (e.target == activeWidget || activeWidget.contains(e.target))) {
       if (removeTimeout != null) {
         clearTimeout(removeTimeout);
