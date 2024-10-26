@@ -19,9 +19,7 @@ impl Default for HTMLRenderer {
 }
 
 impl Renderer for HTMLRenderer {
-    fn set_color(&mut self, color: (TermColor, bool)) {
-        self.new_color = color;
-    }
+    type Output = Vec<u8>;
 
     fn add(&mut self, text: &[u8]) {
         let vec = text.replace(b"\n", b"<br>");
@@ -53,7 +51,7 @@ impl Renderer for HTMLRenderer {
         self.push(char);
     }
 
-    fn into_string(self) -> Vec<u8> {
+    fn into_data(self) -> Vec<u8> {
         self.str
     }
 }
@@ -61,6 +59,9 @@ impl Renderer for HTMLRenderer {
 const BASE_COLOR: (TermColor, bool) = (TermColor::White, true);
 
 impl HTMLRenderer {
+    fn set_color(&mut self, color: (TermColor, bool)) {
+        self.new_color = color;
+    }
     fn check_color(&mut self) {
         if self.old_color != self.new_color {
             Self::change_color(&mut self.str, self.new_color, self.old_color);
