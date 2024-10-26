@@ -22,16 +22,30 @@ impl Default for LineRenderer {
     }
 }
 
+use serde::{Deserialize, Serialize};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
-#[derive(Debug)]
 #[allow(dead_code)]
 #[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[derive(PartialEq, Eq, Clone, Debug, Serialize, Deserialize)]
 pub struct Highlight {
-    line: usize,
-    index: usize,
-    length: usize,
-    color: Vec<&'static str>,
+    pub line: usize,
+    pub index: usize,
+    pub length: usize,
+    color: Vec<String>,
+}
+
+#[cfg(feature = "wasm")]
+use serde_wasm_bindgen::to_value;
+#[cfg(feature = "wasm")]
+use wasm_bindgen::JsValue;
+#[cfg(feature = "wasm")]
+#[allow(dead_code)]
+#[wasm_bindgen]
+impl Highlight {
+    pub fn get_colors(&self) -> JsValue {
+        serde_wasm_bindgen::to_value(&self.color).unwrap()
+    }
 }
 
 impl Renderer for LineRenderer {
@@ -107,7 +121,7 @@ impl LineRenderer {
         self.curr_index += str.len();
         self.old_color = self.new_color.clone();
     }
-    fn get_color_str(color: &(TermColor, bool)) -> &'static str {
+    fn get_color_str(color: &(TermColor, bool)) -> String {
         match color {
             (TermColor::Black, false) => "term_black",
             (TermColor::Black, true) => "term_b_black",
@@ -126,5 +140,6 @@ impl LineRenderer {
             (TermColor::White, false) => "term_white",
             (TermColor::White, true) => "term_b_white",
         }
+        .to_string()
     }
 }

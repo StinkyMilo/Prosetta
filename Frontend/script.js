@@ -1,4 +1,4 @@
-import init, { ParserRunner } from './wasm-bindings/prosetta.js'
+import init, { Highlight, ParserRunner } from './wasm-bindings/prosetta.js'
 import { getAliasTriggered, wordsForAliases } from './wordsForAliases.js';
 
 var jscode, sourcecode, highlights, ctx, cnsl, canvas;
@@ -7,7 +7,6 @@ var has_run = false;
 var has_drawn_shape = false;
 var last_shape = "none";
 var parser, parsedData;
-var editor_code;
 var editor;
 
 function init_canvas() {
@@ -328,22 +327,20 @@ function updateCode() {
   if (editor == null) {
     return;
   }
-  editor_code = editor.getValue();
-  parsedData = parser.run_to_completion(editor_code);
+  parsedData = parser.run_to_completion(editor.getValue());
   jscode.innerHTML = parsedData.get_javascript();
   highlights = parsedData.get_highlights();
-  let c = highlights.children;
-  // for (let i = 0; i < c.length; i++) {
-  //   c[i].style.color = c[i].className.substring("term_b_".length, c[i].className.length);
-  // }
+  updateHighlights();
 }
 
-function updateHighlights(cm) {
-  for (let hl in highlights) {
-    cm.markText(
-      { line: hl.line, ch: hl.start },
-      { line: hl.line, ch: hl.start + hl.length },
-      { className: hl.class}
+function updateHighlights() {
+  editor.doc.getAllMarks().forEach(marker => marker.clear());
+  for (let h of highlights) {
+    let hl = Highlight.__wrap(h.__wbg_ptr);
+    editor.markText(
+      { line: hl.line, ch: hl.index },
+      { line: hl.line, ch: hl.index + hl.length },
+      { className: hl.get_colors() }
     );
   }
 }
@@ -477,7 +474,7 @@ function setup_editor() {
     }, 500);
   }
 
-  editor.on("change", (cm, change) => { updateCode(); updateHighlights(cm); });
+  editor.on("change", (cm, change) => { updateCode(); });
   editor.setValue("Draw a rectangle around\nmy thirty fifty dollar bills!");
 
   /**

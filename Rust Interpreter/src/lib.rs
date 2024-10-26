@@ -72,7 +72,7 @@ impl ParserRunnerData {
         lint.write(&self.data.exprs, &self.data.stat_starts, iter);
         String::from_utf8_lossy(&lint.into_data()).to_string()
     }
-    pub fn get_lines(&self) -> Vec<Highlight> {
+    pub fn get_highlights(&self) -> Vec<Highlight> {
         let iter = self.data.source.get_iter();
         let mut lint = SyntaxLinter::<LineRenderer>::new();
         lint.write(&self.data.exprs, &self.data.stat_starts, iter);
