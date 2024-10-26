@@ -336,6 +336,8 @@ function updateCode() {
   parsedData = parser.run_to_completion(new_code);
   jscode.innerHTML = parsedData.get_javascript();
   syntax.innerHTML = parsedData.get_html();
+  // test to see lines
+  console.log(parsedData.get_lines())
   let c = syntax.children;
   // for (let i = 0; i < c.length; i++) {
   //   c[i].style.color = c[i].className.substring("term_b_".length, c[i].className.length);

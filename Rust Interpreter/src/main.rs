@@ -25,7 +25,9 @@ use parser_runner::{run_parser, RunnerFlags};
 
 // impl Test2 for Test {}
 
+const TEST: &'static str = "hello world";
 fn main() {
+    let t = TEST.clone();
     // let t = Test;
     // let ta: Box<dyn Any> = Box::new(Test);
     // let ta2: Box<dyn Test2> = Box::new(Test);

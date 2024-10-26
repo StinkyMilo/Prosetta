@@ -4,6 +4,18 @@
 */
 export class Highlight {
   free(): void;
+/**
+*/
+  color: (string)[];
+/**
+*/
+  index: number;
+/**
+*/
+  length: number;
+/**
+*/
+  line: number;
 }
 /**
 */
@@ -41,6 +53,14 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly __wbg_highlight_free: (a: number, b: number) => void;
+  readonly __wbg_get_highlight_line: (a: number) => number;
+  readonly __wbg_set_highlight_line: (a: number, b: number) => void;
+  readonly __wbg_get_highlight_index: (a: number) => number;
+  readonly __wbg_set_highlight_index: (a: number, b: number) => void;
+  readonly __wbg_get_highlight_length: (a: number) => number;
+  readonly __wbg_set_highlight_length: (a: number, b: number) => void;
+  readonly __wbg_get_highlight_color: (a: number, b: number) => void;
+  readonly __wbg_set_highlight_color: (a: number, b: number, c: number) => void;
   readonly __wbg_parserrunner_free: (a: number, b: number) => void;
   readonly __wbg_parserrunnerdata_free: (a: number, b: number) => void;
   readonly parserrunner_new: () => number;

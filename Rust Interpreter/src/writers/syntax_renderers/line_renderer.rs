@@ -24,14 +24,15 @@ impl Default for LineRenderer {
 
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[allow(dead_code)]
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", wasm_bindgen(getter_with_clone))]
+// #[cfg_attr(feature = "wasm", wasm_bindgen(getter_with_clone))]
 pub struct Highlight {
-    line: usize,
-    index: usize,
-    length: usize,
-    color: Vec<&'static str>,
+    pub line: usize,
+    pub index: usize,
+    pub length: usize,
+    pub color: Vec<String>,
 }
 
 impl Renderer for LineRenderer {
@@ -100,7 +101,7 @@ impl LineRenderer {
                     line: self.curr_line,
                     index: self.curr_index,
                     length: str.len(),
-                    color: self.new_color.iter().map(Self::get_color_str).collect(),
+                    color: self.new_color.iter().map(|e|Self::get_color_str(e).to_string()).collect(),
                 });
             }
         }
