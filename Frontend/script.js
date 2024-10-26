@@ -11,6 +11,7 @@ var editor;
 
 function init_canvas() {
   sourcecode = document.getElementById("code");
+  sourcecode = document.getElementById("code");
   jscode = document.getElementById("js");
   highlights = "";
   canvas = document.getElementById("outputcanvas");
