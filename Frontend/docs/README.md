@@ -1,4 +1,4 @@
 # Prosetta
  A Poetic, Graphical Esolang
 
-<editor></editor>
+<editor code='hi' output-method='canvas'></editor>

@@ -348,11 +348,7 @@ function updateHighlights() {
   }
 }
 
-// document.addEventListener("DOMContentLoaded", () => {
-//   initialize();
-// });
-
-async function initialize() {
+async function initialize(startingCode) {
   let tabs = document.getElementsByClassName("tabBtn tabDefault");
   tabs[0].click();
 
@@ -366,20 +362,19 @@ async function initialize() {
   print_console("Welcome to Prosetta!");
   print_console("---");
   print_console();
-  old_code = "";
-  editor = CodeMirror(document.getElementById("code"), {
-    value: "Draw a rectangle around my thirty fifty dollar bills!",
-    mode:  "plaintext"
-  });
   updateCode();
-  setup_editor();
+  setup_editor(startingCode);
 }
 
 window.runCode = runCode;
 window.updateCode = updateCode;
 window.openTab = openTab;
 
-//Create main editor environment
+function setup_editor(startingCode) {
+  editor = CodeMirror(document.getElementById("code"), {
+    value: "",
+    mode: "plaintext"
+  });
 
   /*
     Returns a node that contains the alternate word suggestions
@@ -483,7 +478,7 @@ window.openTab = openTab;
   }
 
   editor.on("change", (cm, change) => { updateCode(); });
-  editor.setValue("Draw a rectangle around\nmy thirty fifty dollar bills!");
+  editor.setValue(startingCode);
 
   /**
    * cursorActivity event gets when cursor or selection moves
@@ -509,29 +504,4 @@ window.openTab = openTab;
   
   */
 }
-
 export default initialize;
-
-/**
- * cursorActivity event gets when cursor or selection moves
- * beforeCursorEnter event fires when the cursor enters the marked range
- * doc.replaceSelection will replace the current selection with a given string
- * doc.getCursor retrieves one end of the primary selection
- * cm.findWordAt returns the start and end of the word at a given position
- * doc.setBookmark might be what you want for a popup? I'm not 100% sure from the description. The widget would make sense
- * cm.addWidget might also be what you want. addLineWidget moves below lines down
- * show-hint extension shows autocomplete hints, not what we want now but could be useful later
- */
-
-/*
-  Plan:
-    Change cursorActivity to mouse move
-    Find word start-end for mouse move
-    If it's over a new word (not the word it was over last):
-      Cancel any existing timeouts
-      Start a new timeout
-    If a timeout completes,
-      Create a tooltip for the corresponding word, put at the word's end position
-      
-
-*/

@@ -8,7 +8,7 @@
   <script type="module">
     import initialize from './script.js';
     document.addEventListener("DOMContentLoaded", () => {
-      initialize();
+      initialize("Draw a rectangle around my thirty fifty dollar bills!");
     });
   </script>
   <link rel="stylesheet" href="./style.css">
@@ -19,7 +19,6 @@
   <div id="container"></div>
   <div id="tabGroup">
     <button class="tabBtn tabDefault" onclick="openTab(event, 'code')">Code</button>
-    <button class="tabBtn" onclick="openTab(event, 'syntax')">Syntax</button>
     <button class="tabBtn" onclick="openTab(event, 'js')">JS</button>
   </div>
   <div id="codespace">
