@@ -493,4 +493,18 @@ mod tests_simple {
             "(assign@0,1,2$15 \"mario\"@6 (litnum 2@12$$3))"
         );
     }
+    #[test]
+    #[timeout(1000)]
+    fn test_double_newline() {
+        let text = b"was twelve\ntwo.\nwas twelve\n\ntwo.".to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { not: true });
+        assert_eq!(
+            test_lib::assert_result(&mut parser),
+            ParserResult::MatchedLine
+        );
+        assert_eq!(
+            lisp_like_writer::write_first(&parser.data.exprs),
+            "(assign@0,1,2$14 \"twelve\"@4 (litnum 2@11$$3))"
+        );
+    }
 }
