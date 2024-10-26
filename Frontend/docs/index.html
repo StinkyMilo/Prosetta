@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="Description">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <script src="//cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+  <link rel="stylesheet" href="../node_modules/codemirror/lib/codemirror.css">
+  <script src="../node_modules/codemirror/lib/codemirror.js"></script>
+  <script src="../node_modules/codemirror/mode/javascript/javascript.js"></script>
+  <!-- <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/external-script.min.js"></script> -->
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../color.css">
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module">
+    import initialize from "../script.js";
+    window.$docsify = {
+      name: '',
+      repo: '',
+      vueComponents:{
+        'editor':{
+          'template':
+          `
+            <div id="tabGroup">
+                <button class="tabBtn tabDefault" onclick="openTab(event, 'code')">Code</button>
+                <button class="tabBtn" onclick="openTab(event, 'syntax')">Syntax</button>
+                <button class="tabBtn" onclick="openTab(event, 'js')">JS</button>
+            </div>
+            <div id="codespace">
+                <div class="tabContent" id="code" onkeyup="updateCode()"></div>
+                <div style="display: none;" readonly="true" class="tabContent" id="syntax">Syntax</div>
+                <textarea style="display: none;" readonly="true" class="tabContent" id="js">JavaScript</textarea>
+                <canvas id="outputcanvas" width="400px" height="400px" />
+            </div>
+            <button onclick="runCode()">Run</button>
+            <div id="console" />
+          `,
+          /*
+            Code is the program string
+            output method is 'console' or 'canvas'
+            Mode is 'minimal' or 'wordier'
+          */
+          props:['code','outputMethod'],
+          data() {
+            return {
+              code:this.code,
+              outputMethod:this.outputMethod,
+              mode:'minimal'
+            };
+          },
+          mounted(){
+            initialize().then(runCode);
+          }
+        }
+      }
+    }
+    
+  </script>
+  <!-- Docsify v4 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+</body>
+</html>

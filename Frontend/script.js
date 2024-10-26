@@ -342,9 +342,9 @@ function updateCode() {
   // }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  initialize();
-});
+// document.addEventListener("DOMContentLoaded", () => {
+//   initialize();
+// });
 
 async function initialize() {
   let tabs = document.getElementsByClassName("tabBtn tabDefault");
@@ -357,6 +357,10 @@ async function initialize() {
   print_console("---");
   print_console();
   old_code = "";
+  editor = CodeMirror(document.getElementById("code"), {
+    value: "Draw a rectangle around my thirty fifty dollar bills!",
+    mode:  "javascript"
+  });
   updateCode();
 }
 
@@ -365,10 +369,6 @@ window.updateCode = updateCode;
 window.openTab = openTab;
 
 //Create main editor environment
-editor = CodeMirror(document.getElementById("code"), {
-  value: "Draw a rectangle around my thirty fifty dollar bills!",
-  mode:  "javascript"
-});
 
 /*
   Returns a node that contains the alternate word suggestions
@@ -469,6 +469,8 @@ window.onmousemove=function(e){
     editor.addWidget(midPos, activeWidget);
   },500);
 }
+
+export default initialize;
 
 /**
  * cursorActivity event gets when cursor or selection moves
