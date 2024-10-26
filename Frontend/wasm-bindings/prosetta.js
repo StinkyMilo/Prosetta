@@ -232,7 +232,7 @@ function logError(f, args) {
     }
 }
 
-const HighlightFinalization = { register: () => {}, unregister: () => {} };
+const HighlightFinalization = { register: () => {}, unregister: () => {} }
 /**
 */
 export class Highlight {
