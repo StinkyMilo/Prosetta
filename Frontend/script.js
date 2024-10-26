@@ -1,4 +1,4 @@
-import init, { Highlight, ParserRunner } from './wasm-bindings/prosetta.js'
+import init, { Highlight, ParserRunner, get_heap_size } from './wasm-bindings/prosetta.js'
 import { getAliasTriggered, wordsForAliases } from './wordsForAliases.js';
 
 var jscode, sourcecode, highlights, ctx, cnsl, canvas;
@@ -331,6 +331,9 @@ function updateCode() {
   jscode.innerHTML = parsedData.get_javascript();
   highlights = parsedData.get_highlights();
   updateHighlights();
+  // this should not need to exist but godfobid 
+  highlights.forEach(e=>e.free());
+  parsedData.free();
 }
 
 function updateHighlights() {
@@ -340,7 +343,7 @@ function updateHighlights() {
     editor.markText(
       { line: hl.line, ch: hl.index },
       { line: hl.line, ch: hl.index + hl.length },
-      { className: hl.get_colors() }
+      { className: hl.color.at(-1) }
     );
   }
 }
@@ -353,7 +356,11 @@ async function initialize() {
   let tabs = document.getElementsByClassName("tabBtn tabDefault");
   tabs[0].click();
 
-  await init();
+  let wasm = await init();
+  console.log(wasm)
+  setInterval(() =>
+    console.log("wasm is using",
+      wasm.memory.buffer.byteLength, "total and ", get_heap_size(), " on heap"), 1000);
   parser = new ParserRunner();
   init_canvas();
   print_console("Welcome to Prosetta!");
@@ -424,7 +431,7 @@ function setup_editor() {
     }, 500);
   }
 
-  window.onmousemove = function(e) {
+  window.onmousemove = function (e) {
     if (activeWidget != null && (e.target == activeWidget || activeWidget.contains(e.target))) {
       if (removeTimeout != null) {
         clearTimeout(removeTimeout);

@@ -191,23 +191,23 @@ impl<'a> Parser<'a> {
             }
         }
         //debug time
-        let _debug = only_debug!(Vec::from_iter(
-            self.stack.iter().map(|x| (x.expr_index, x.last_parse))
-        ));
-        let _debug2 = only_debug!(Vec::from_iter(
-            self.stack.iter().map(|x| x.state.get_name())
-        ));
-        let _expr = only_debug!(self.data.exprs.vec);
-        let _expr2 = only_debug!(lisp_like_writer::write(
-            &self.data.exprs,
-            &self.data.stat_starts
-        ));
-        let _expr_short = only_debug!(Vec::from_iter(self.data.exprs.vec.iter().map(|e| {
-            let mut str = format!("{:?}", e);
-            str.truncate(str.find(" ").unwrap_or(str.len()));
-            str
-        })));
-        let _last = only_debug!(self.last_result);
+        // let _debug = only_debug!(Vec::from_iter(
+        //     self.stack.iter().map(|x| (x.expr_index, x.last_parse))
+        // ));
+        // let _debug2 = only_debug!(Vec::from_iter(
+        //     self.stack.iter().map(|x| x.state.get_name())
+        // ));
+        // let _expr = only_debug!(self.data.exprs.vec);
+        // let _expr2 = only_debug!(lisp_like_writer::write(
+        //     &self.data.exprs,
+        //     &self.data.stat_starts
+        // ));
+        // let _expr_short = only_debug!(Vec::from_iter(self.data.exprs.vec.iter().map(|e| {
+        //     let mut str = format!("{:?}", e);
+        //     str.truncate(str.find(" ").unwrap_or(str.len()));
+        //     str
+        // })));
+        // let _last = only_debug!(self.last_result);
 
         self.last_state = None;
         // get curr frame

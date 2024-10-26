@@ -1,13 +1,16 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* @returns {number}
+*/
+export function get_heap_size(): number;
+/**
 */
 export class Highlight {
   free(): void;
 /**
-* @returns {any}
 */
-  get_colors(): any;
+  color: (string)[];
 /**
 */
   index: number;
@@ -53,14 +56,7 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly __wbg_highlight_free: (a: number, b: number) => void;
-  readonly __wbg_get_highlight_line: (a: number) => number;
-  readonly __wbg_set_highlight_line: (a: number, b: number) => void;
-  readonly __wbg_get_highlight_index: (a: number) => number;
-  readonly __wbg_set_highlight_index: (a: number, b: number) => void;
-  readonly __wbg_get_highlight_length: (a: number) => number;
-  readonly __wbg_set_highlight_length: (a: number, b: number) => void;
-  readonly highlight_get_colors: (a: number) => number;
+  readonly get_heap_size: () => number;
   readonly __wbg_parserrunner_free: (a: number, b: number) => void;
   readonly __wbg_parserrunnerdata_free: (a: number, b: number) => void;
   readonly parserrunner_new: () => number;
@@ -68,6 +64,15 @@ export interface InitOutput {
   readonly parserrunnerdata_get_javascript: (a: number, b: number) => void;
   readonly parserrunnerdata_get_html: (a: number, b: number) => void;
   readonly parserrunnerdata_get_highlights: (a: number, b: number) => void;
+  readonly __wbg_highlight_free: (a: number, b: number) => void;
+  readonly __wbg_get_highlight_line: (a: number) => number;
+  readonly __wbg_set_highlight_line: (a: number, b: number) => void;
+  readonly __wbg_get_highlight_index: (a: number) => number;
+  readonly __wbg_set_highlight_index: (a: number, b: number) => void;
+  readonly __wbg_get_highlight_length: (a: number) => number;
+  readonly __wbg_set_highlight_length: (a: number, b: number) => void;
+  readonly __wbg_get_highlight_color: (a: number, b: number) => void;
+  readonly __wbg_set_highlight_color: (a: number, b: number, c: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;

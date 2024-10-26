@@ -26,27 +26,27 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 #[allow(dead_code)]
-#[cfg_attr(feature = "wasm", wasm_bindgen)]
+#[cfg_attr(feature = "wasm", wasm_bindgen(getter_with_clone))]
 #[derive(PartialEq, Eq, Clone, Debug, Serialize, Deserialize)]
 pub struct Highlight {
     pub line: usize,
     pub index: usize,
     pub length: usize,
-    color: Vec<String>,
+    pub color: Vec<String>,
 }
 
-#[cfg(feature = "wasm")]
-use serde_wasm_bindgen::to_value;
-#[cfg(feature = "wasm")]
-use wasm_bindgen::JsValue;
-#[cfg(feature = "wasm")]
-#[allow(dead_code)]
-#[wasm_bindgen]
-impl Highlight {
-    pub fn get_colors(&self) -> JsValue {
-        serde_wasm_bindgen::to_value(&self.color).unwrap()
-    }
-}
+// #[cfg(feature = "wasm")]
+// use serde_wasm_bindgen::to_value;
+// #[cfg(feature = "wasm")]
+// use wasm_bindgen::JsValue;
+// #[cfg(feature = "wasm")]
+// #[allow(dead_code)]
+// #[wasm_bindgen]
+// impl Highlight {
+//     pub fn get_colors(&self) -> JsValue {
+//         serde_wasm_bindgen::to_value(&self.color).unwrap()
+//     }
+// }
 
 impl Renderer for LineRenderer {
     type Output = Vec<Highlight>;
