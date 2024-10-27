@@ -1,2 +1,6 @@
-* [Home](/)
-* [Test2](Test2.md)
+- [Home](/)
+- [Language Overview](Overview.md)
+    - [The Alias System](Part1.md)
+        - [Hello](Part1.md#Hello)
+        - [Hi](Part1.md#Hi)
+    - [Part 2](Part2.md)

@@ -28,7 +28,7 @@
         'editor':{
           'template':
           `
-            <button class="changeModeBtn" @click="switchMode()">Mode: {{mode}}</button>
+            <button class="changeModeBtn" @click="switchMode()" v-show="codeWordier != null">Mode: {{mode}}</button>
             <div id="tabGroup">
                 <button class="tabBtn tabDefault" onclick="openTab(event, 'code')">Code</button>
                 <button class="tabBtn" onclick="openTab(event, 'js')">JS</button>
@@ -46,6 +46,7 @@
             Code is the program string
             output method is 'console' or 'canvas'
             Mode is 'minimal' or 'wordier'
+            If codeWordier is null, don't show the toggle
           */
           props:['code','code-wordier','output-method'],
           setup(props){
