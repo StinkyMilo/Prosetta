@@ -19,6 +19,7 @@
   <div id="app"></div>
   <script type="module">
     import initialize from "../script.js";
+    let editor;
     window.$docsify = {
       name: '',
       repo: '',
@@ -26,6 +27,7 @@
         'editor':{
           'template':
           `
+            <button class="changeModeBtn" @click="switchMode()">Mode: {{mode}}</button>
             <div id="tabGroup">
                 <button class="tabBtn tabDefault" onclick="openTab(event, 'code')">Code</button>
                 <button class="tabBtn" onclick="openTab(event, 'js')">JS</button>
@@ -35,7 +37,7 @@
                 <div style="display: none;" readonly="true" class="tabContent" id="syntax">Syntax</div>
                 <textarea style="display: none;" readonly="true" class="tabContent" id="js">JavaScript</textarea>
                 <canvas id="outputcanvas" width="400px" height="400px" v-show="outputMethod=='canvas'" />
-                <div id="console" style="width: 400px; height: 400px" v-show="outputMethod=='console'"/>
+                <div id="console" style="width: 400px; height: 400px; margin-top: 0;" v-show="outputMethod=='console'"/>
             </div>
             <button onclick="runCode()">Run</button>
           `,
@@ -44,20 +46,32 @@
             output method is 'console' or 'canvas'
             Mode is 'minimal' or 'wordier'
           */
-          props:['code','output-method'],
+          props:['code','code-wordier','output-method'],
           setup(props){
             console.log("PROPS",props);
           },
           data() {
             return {
               code:this.code,
+              codeWordier:this.codeWordier,
               outputMethod:this.outputMethod,
-              mode:'minimal'
+              mode:'minimal',
+              switchMode:()=>{
+                if(this.mode=='wordier'){
+                  editor.setValue(this.code.substring(1));
+                  runCode();
+                  this.mode='minimal';
+                }else{
+                  editor.setValue(this.codeWordier.substring(1));
+                  runCode();
+                  this.mode='wordier';
+                }
+              }
             };
           },
-          mounted(){
-            console.log(this.outputMethod,this.mode);
-            initialize(this.code).then(runCode);
+          mounted: async function(){
+            editor = await initialize(this.code.substring(1));
+            runCode();
           }
         }
       }

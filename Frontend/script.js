@@ -363,7 +363,7 @@ async function initialize(startingCode) {
   print_console("---");
   print_console();
   updateCode();
-  setup_editor(startingCode);
+  return setup_editor(startingCode);
 }
 
 window.runCode = runCode;
@@ -479,6 +479,7 @@ function setup_editor(startingCode) {
 
   editor.on("change", (cm, change) => { updateCode(); });
   editor.setValue(startingCode);
+  return editor;
 
   /**
    * cursorActivity event gets when cursor or selection moves
