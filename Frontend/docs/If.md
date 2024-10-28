@@ -13,6 +13,6 @@ when par var one, pri "value is one"!
 `' 
 :code-wordier="`
 'Was var one?'
-When I compared var to one, I printed &quot value is one&quot!
+When I compared var to one: I printed &quot value is one&quot!
 `"
 output-method='console'></editor>
