@@ -404,7 +404,7 @@ function setup_editor(startingCode) {
 
   function clearWidget() {
     // removeWithFadeout(activeWidget);
-    console.log("REMOVING");
+    // console.log("REMOVING");
     activeWidget?.remove();
     activeWidget = null;
     lastWordPos = { line: -1, ch: -1 };
@@ -439,7 +439,7 @@ function setup_editor(startingCode) {
     let pos = { left: e.clientX, top: e.clientY + window.scrollY };
     let textPos = editor.coordsChar(pos);
     // console.log(pos,textPos);
-    console.log(editor.charCoords({ch:0,line:0}),pos);
+    // console.log(editor.charCoords({ch:0,line:0}),pos);
     if (textPos.outside) {
       if (removeTimeout == null && activeWidget != null) {
         removeTimeout = setTimeout(() => {
