@@ -18,6 +18,10 @@
   border-width: 1px;
 }
 
+.noScroll{
+  overflow: hidden;
+}
+
 #codespace {
   display: flex;
   margin-bottom: 10px;

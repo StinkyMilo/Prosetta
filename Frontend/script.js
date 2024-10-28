@@ -375,6 +375,7 @@ function setup_editor(startingCode) {
     value: "",
     mode: "plaintext"
   });
+  editor.setSize("100%","100%");
 
   /*
     Returns a node that contains the alternate word suggestions
@@ -448,7 +449,7 @@ function setup_editor(startingCode) {
       return;
     }
     let wordPos = editor.findWordAt(textPos);
-    let word = editor.getRange(wordPos.anchor, wordPos.head);
+    let word = editor.getRange(wordPos.anchor, wordPos.head).toLowerCase();
     let midPos = { line: 0, ch: 0 };
     if (wordPos.head.line == wordPos.anchor.line) {
       midPos = { line: wordPos.head.line, ch: (wordPos.head.ch + wordPos.anchor.ch) / 2 };
