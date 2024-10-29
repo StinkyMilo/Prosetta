@@ -307,7 +307,7 @@ pub(crate) use only_debug;
 /// add or remove commands based on flags
 #[derive(Default, Debug)]
 pub struct ParserFlags {
-    pub not: bool,
+    pub title: bool,
 }
 
 #[derive(PartialEq, Eq, Debug)]
@@ -432,8 +432,6 @@ impl ParserResult {
 pub struct Environment<'a> {
     ///The set of current varibles
     pub symbols: &'a mut SymbolSet,
-    ///The set of current functions
-    // pub funcs: &'a mut FuncSet,
     ///The set of current ignored values
     pub nots: &'a mut IgnoreSet,
     ///The list of expressions
@@ -456,17 +454,6 @@ pub struct Environment<'a> {
     pub aliases: &'a AliasData,
     pub full_text: &'a [u8],
 }
-
-// impl<'a> Environment<'a> {
-//     pub fn add_var_layer(&mut self) {
-//         self.vars.add_layer();
-//         self.funcs.add_layer();
-//     }
-//     pub fn remove_var_layer(&mut self) {
-//         self.vars.remove_layer();
-//         self.funcs.remove_layer();
-//     }
-// }
 
 ///a slice of the input text
 #[derive(PartialEq)]

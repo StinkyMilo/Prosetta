@@ -2,7 +2,7 @@ use std::ops::Index;
 
 use crate::parser::multi_lit_num::VarOrInt;
 use crate::parser::string_lit::VarOrStr;
-use crate::parser::{End, SubStrData};
+use crate::parser::{End, SubStrData, Title};
 
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum OperatorType {
@@ -26,6 +26,9 @@ pub enum Expr {
     NoneStat,
     NoneExpr,
     //stats
+    Title {
+        data: Title,
+    },
     Arc {
         locs: Vec<usize>,
         indexes: [usize; 4],

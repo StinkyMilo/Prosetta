@@ -66,6 +66,41 @@ use crate::{commands::*, writers::lisp_like_writer};
 
 use alias_data::AliasData;
 
+#[derive(Debug, PartialEq)]
+pub enum Import {
+    List,
+    Func,
+}
+
+impl Import {
+    pub fn get_name(&self) -> &'static str {
+        match self {
+            Import::List => "List",
+            Import::Func => "Func",
+        }
+    }
+    pub fn all(&self) -> &[Import] {
+        &[Import::List, Import::Func]
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub struct Title {
+    pub title: Vec<u8>,
+    pub authors: Vec<(Vec<u8>, usize)>,
+    pub imports: Vec<(Import, usize, usize)>,
+    pub delim: Vec<(usize, usize)>,
+}
+// impl Title{
+//     pub fn empty()->Self{
+//         Self {
+//             title: b"No Title".to_vec(),
+//             authors: vec![(b"No Author".to_vec()],
+//             imports: Vec::new(),
+//             delim: Vec::new(),
+//         }
+//     }
+// }
 ///The data that is currently parsed
 #[derive(Debug)]
 pub struct ParsedData<'a> {
@@ -75,12 +110,12 @@ pub struct ParsedData<'a> {
     pub stat_starts: Vec<usize>,
     ///the set of current varibles
     pub symbols: SymbolSet,
-    //the set of current functions
-    // pub funcs: FuncSet,
     /// the ignored values
     pub nots: IgnoreSet,
     ///the parserSource that is used
     pub source: ParserSource<'a>,
+    // ///the title and authors
+    // pub title: Option<Title>,
 }
 
 #[derive(Debug)]
@@ -110,14 +145,20 @@ pub struct Parser<'a> {
 impl<'a> Parser<'a> {
     ///make a new parser with a source and command flags
     pub fn new(source: ParserSource<'a>, flags: ParserFlags) -> Self {
+        // let title = (!flags.title).then(|| Title {
+        //     title: b"No Title".to_vec(),
+        //     author: vec![b"No Author".to_vec()],
+        //     imports:
+        // });
+
         Parser {
             data: ParsedData {
                 exprs: ExprArena { vec: Vec::new() },
                 stat_starts: Vec::new(),
                 symbols: SymbolSet::new(),
-                // funcs: FuncSet::new(),
                 nots: IgnoreSet::new(),
                 source,
+                // title,
             },
             stack: Vec::new(),
             last_state: None,

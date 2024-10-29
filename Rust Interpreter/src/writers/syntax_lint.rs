@@ -94,14 +94,15 @@ impl<T: Renderer> SyntaxLinter<T> {
         self.renderer.add_with(&buf, color);
         self.index = index;
     }
+    fn write_num(&mut self, source: &mut ParserSourceIter, index: usize) {
+        self.write_as(source, index, BASE_COLOR);
+    }
     fn write_as(&mut self, source: &mut ParserSourceIter, num: usize, color: (TermColor, bool)) {
         let buf: Vec<u8> = Self::get_n_or_error(source, num);
         self.renderer.add_with(&buf, color);
         self.index += num;
     }
-    // fn insert(&mut self, text: &[u8], color: (TermColor, bool)) {
-    //     self.renderer.add_with(&text, color);
-    // }
+
     fn write_end(&mut self, source: &mut ParserSourceIter) {
         if let Some(end) = self.ends.take() {
             // let num = index
@@ -194,6 +195,16 @@ impl<T: Renderer> SyntaxLinter<T> {
         }
         self.write_end(source);
         match &exprs[index] {
+            Expr::Title { data } => {
+                self.write_up_to_as(source, data.title.len(), STRING_COLOR);
+                // skip \n after title and color by
+                self.write_num(source, 1);
+                self.write_as(source, 2, LOC_COLOR[0]);
+                // let mut color = STRING_COLOR;
+                // for 
+                // self.write_up_to(source, data.authors.1);
+            }
+
             Expr::Assign {
                 locs,
                 var,
@@ -450,4 +461,4 @@ impl<T: Renderer> SyntaxLinter<T> {
 
 //The wizards were literally nine at most!
 
-//list[line_num, index, color,length] 
+//list[line_num, index, color,length]
