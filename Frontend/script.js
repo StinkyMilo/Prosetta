@@ -11,6 +11,7 @@ var editor;
 
 function init_canvas() {
   sourcecode = document.getElementById("code");
+  sourcecode = document.getElementById("code");
   jscode = document.getElementById("js");
   highlights = "";
   canvas = document.getElementById("outputcanvas");
@@ -331,15 +332,11 @@ function updateCode() {
   jscode.innerHTML = parsedData.get_javascript();
   highlights = parsedData.get_highlights();
   updateHighlights();
-  // this should not need to exist but godfobid 
-  highlights.forEach(e => e.free());
-  parsedData.free();
 }
 
 function updateHighlights() {
   editor.doc.getAllMarks().forEach(marker => marker.clear());
-  for (let h of highlights) {
-    let hl = Highlight.__wrap(h.__wbg_ptr);
+  for (let hl of highlights) {
     editor.markText(
       { line: hl.line, ch: hl.index },
       { line: hl.line, ch: hl.index + hl.length },
