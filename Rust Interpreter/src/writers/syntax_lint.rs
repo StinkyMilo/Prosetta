@@ -38,8 +38,8 @@ impl<T: Renderer> SyntaxLinter<T> {
             ends: None,
         }
     }
-    pub fn into_string(self) -> Vec<u8> {
-        self.renderer.into_string()
+    pub fn into_data(self) -> <T as Renderer>::Output {
+        self.renderer.into_data()
     }
 }
 
