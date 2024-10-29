@@ -1,4 +1,4 @@
-# Col - Color Constructor
+# Fil - Fill Shape
 
 Sets the fill color to a specified value and ends the current shape with the new fill value. The color can be made with the color constructor or be a literal color name.
 
