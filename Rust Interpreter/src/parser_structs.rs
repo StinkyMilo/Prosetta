@@ -11,26 +11,26 @@ use super::{alias_data::AliasData, Expr};
 #[path = "testing/parsing_tests_word_funcs.rs"]
 mod parsing_tests_word_funcs;
 
-fn try_get_val<'a>(
+pub fn try_get_best_val<'a>(
     name: &[u8],
-    iter: &mut dyn Iterator<Item = &'a Vec<u8>>,
+    iter: &mut dyn Iterator<Item = &'a [u8]>,
     pred: &dyn Fn(&[u8]) -> bool,
-) -> Option<(u8, &'a Vec<u8>)> {
+) -> Option<(u8, &'a [u8], usize)> {
     let mut max_var_length = 0u8;
-    let mut var_data: Option<(u8, &Vec<u8>)> = None;
-    for str in iter {
+    let mut var_data: Option<(u8, &[u8], usize)> = None;
+    for (index, str) in iter.enumerate() {
         let is_longer = str.len() as u8 >= max_var_length;
         // if var could be in word
         if is_longer && name.len() >= str.len() && (pred)(str) {
             // if found
-            if let Some(index) = name.find(str) {
-                let is_better = var_data.as_ref().map_or(true, |&(old_index, _)| {
-                    is_longer || (index as u8) < old_index
+            if let Some(str_index) = name.find(str) {
+                let is_better = var_data.as_ref().map_or(true, |&(old_index, _, _)| {
+                    is_longer || (str_index as u8) < old_index
                 });
 
                 if is_better {
                     max_var_length = str.len() as u8;
-                    var_data = Some((index as u8, &str));
+                    var_data = Some((str_index as u8, str, index));
                 }
             }
         }
@@ -66,7 +66,7 @@ fn convert_skip_indexes(skip_indexes: &mut Vec<u8>, var_start: u8, var_len: u8) 
 
 fn try_get_from_iter<'a>(
     word: &Slice,
-    iter: &mut dyn Iterator<Item = &'a Vec<u8>>,
+    iter: &mut dyn Iterator<Item = &'a [u8]>,
     global_index: usize,
     pred: &dyn Fn(&[u8]) -> bool,
 ) -> Option<SubStrData> {
@@ -75,9 +75,9 @@ fn try_get_from_iter<'a>(
     }
     // remove ' and make lowercase
     let (name, mut skip_indexes) = get_var_name_and_skips(word.str);
-    let var_data = try_get_val(&name, iter, pred);
+    let var_data = try_get_best_val(&name, iter, pred);
 
-    if let Some((var_start, name)) = var_data {
+    if let Some((var_start, name, _)) = var_data {
         let start = convert_skip_indexes(&mut skip_indexes, var_start, name.len() as u8);
 
         Some(SubStrData {
@@ -134,15 +134,21 @@ impl SymbolSet {
     ///returns (index in word, varible name)
     ///
     pub fn try_get_var(&self, word: &Slice, global_index: usize) -> Option<SubStrData> {
-        try_get_from_iter(word, &mut self.set.keys(), global_index, &|name| {
-            matches!(self.set.get(name), Some(Symbol::Var))
-        })
+        try_get_from_iter(
+            word,
+            &mut self.set.keys().map(|e| e.as_slice()),
+            global_index,
+            &|name| matches!(self.set.get(name), Some(Symbol::Var)),
+        )
     }
 
     pub fn try_get_func(&self, word: &Slice, global_index: usize) -> Option<SubStrData> {
-        try_get_from_iter(word, &mut self.set.keys(), global_index, &|name| {
-            matches!(self.set.get(name), Some(Symbol::Func(..)))
-        })
+        try_get_from_iter(
+            word,
+            &mut self.set.keys().map(|e| e.as_slice()),
+            global_index,
+            &|name| matches!(self.set.get(name), Some(Symbol::Func(..))),
+        )
     }
 }
 impl Debug for SymbolSet {
@@ -176,9 +182,10 @@ impl IgnoreSet {
         }
         // remove ' and make lowercase
         let (name, mut skip_indexes) = get_var_name_and_skips(word.str);
-        let var_data = try_get_val(&name, &mut self.set.iter(), &|_| true);
+        let var_data =
+            try_get_best_val(&name, &mut self.set.iter().map(|e| e.as_slice()), &|_| true);
 
-        if let Some((var_start, name)) = var_data {
+        if let Some((var_start, name, _)) = var_data {
             let start = convert_skip_indexes(&mut skip_indexes, var_start, name.len() as u8);
 
             Some(SubStrData {
@@ -735,8 +742,7 @@ pub fn try_get_symbol_word(word: &Slice, global_index: usize) -> Option<SubStrDa
     }
 }
 ///get a slice that starts at the next \n
-pub fn find_newline<'a>(slice: &'a Slice<'a>) -> Option<Slice<'_>> {
-    let mut start = 0;
+pub fn find_newline<'a>(slice: &'a Slice<'a>, mut start: usize) -> Option<Slice<'_>> {
     while start < slice.len() {
         let char = slice.str[start];
         if char == b'\n' {

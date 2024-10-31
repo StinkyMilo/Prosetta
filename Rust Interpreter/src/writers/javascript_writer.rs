@@ -1,5 +1,3 @@
-use std::borrow::Cow;
-
 use crate::{
     commands::*,
     parser::{multi_lit_num::VarOrInt, string_lit::VarOrStr},
@@ -34,7 +32,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
                 .iter()
                 .map(|name| String::from_utf8_lossy(&name.0))
                 .collect::<Vec<_>>()
-                .join(",");
+                .join(", ");
             format!(
                 "`{}`;\n\"By {}\";\n",
                 String::from_utf8_lossy(&data.title),

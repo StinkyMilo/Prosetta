@@ -66,10 +66,11 @@ use crate::{commands::*, writers::lisp_like_writer};
 
 use alias_data::AliasData;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq,Clone, Copy)]
 pub enum Import {
     List,
     Func,
+    Graph,
 }
 
 impl Import {
@@ -77,19 +78,40 @@ impl Import {
         match self {
             Import::List => "List",
             Import::Func => "Func",
+            Import::Graph => "Func",
         }
     }
-    pub fn all(&self) -> &[Import] {
-        &[Import::List, Import::Func]
+    pub fn get_all() -> &'static [(Import, &'static [u8])] {
+        &[
+            (Import::List, b"list"),
+            (Import::Func, b"func"),
+            (Import::Graph, b"graph"),
+        ]
     }
 }
 
 #[derive(Debug, PartialEq)]
 pub struct Title {
     pub title: Vec<u8>,
-    pub authors: Vec<(Vec<u8>, usize)>,
-    pub imports: Vec<(Import, usize, usize)>,
-    pub delim: Vec<(usize, usize)>,
+    // the imports: (name, position, length)
+    pub authors: Vec<(Vec<u8>, usize, usize)>,
+    // the imports: (type, position, length)
+    pub imports: Vec<(Import, usize, u8)>,
+    // the sepatators: (position, length)
+    pub delim: Vec<(usize, u8)>,
+    // the start of "by"
+    pub by_start: usize,
+}
+impl Title {
+    pub fn new() -> Self {
+        Self {
+            title: Vec::new(),
+            authors: Vec::new(),
+            imports: Vec::new(),
+            delim: Vec::new(),
+            by_start: usize::MAX,
+        }
+    }
 }
 // impl Title{
 //     pub fn empty()->Self{
@@ -140,6 +162,8 @@ pub struct Parser<'a> {
     stat_indexes: Vec<usize>,
     /// the hash map of ranges of failed exprs
     cached_fails: HashMap<&'static str, RangeSet<usize>>,
+    ///does the parser need to parse a title
+    parse_title: bool,
 }
 
 impl<'a> Parser<'a> {
@@ -160,6 +184,7 @@ impl<'a> Parser<'a> {
                 source,
                 // title,
             },
+            parse_title: flags.title,
             stack: Vec::new(),
             last_state: None,
             pos: 0,
@@ -462,8 +487,9 @@ impl<'a> Parser<'a> {
 
         // matched final stat
         if self.stack.is_empty() {
+            self.parse_title = false;
             // setup next
-            self.add_new_nonestat(index);
+            self.add_new_start_state(index);
             ParserResult::MatchedLine
         } else {
             if closed {
@@ -505,7 +531,7 @@ impl<'a> Parser<'a> {
         if let Some(data) = data {
             let found_data = trim_ascii_whitespace(data).len() > 0;
             if found_data {
-                self.add_new_nonestat(0);
+                self.add_new_start_state(0);
                 self.parsing_line = true;
             }
             found_data
@@ -514,7 +540,14 @@ impl<'a> Parser<'a> {
         }
     }
     ///setup a noneStat on the stack
-    fn add_new_nonestat(&mut self, new_index: usize) {
+    fn add_new_start_state(&mut self, new_index: usize) {
+        // if need to parse title -- put it on stack
+        let state = if self.parse_title {
+            get_state!(title::TitleState::new())
+        } else {
+            get_state!(alias::NoneState::new_stat_cont())
+        };
+
         // push match stat on first step of line
         let expr_index = self.data.exprs.vec.len();
 
@@ -524,25 +557,9 @@ impl<'a> Parser<'a> {
             expr_index,
             first_parse: new_index,
             last_parse: new_index,
-            state: Box::new(alias::NoneState::new_stat_cont()),
+            state,
         });
-        self.data.stat_starts.push(expr_index);
-        self.last_result = LastMatchResult::None;
-        self.cached_fails = HashMap::new();
-    }
-    ///setup a noneStat on the stack
-    fn add_title(&mut self, new_index: usize) {
-        // push match stat on first step of line
-        let expr_index = self.data.exprs.vec.len();
 
-        self.data.exprs.vec.push(Expr::NoneStat);
-
-        self.stack.push(State {
-            expr_index,
-            first_parse: new_index,
-            last_parse: new_index,
-            state: Box::new(alias::NoneState::new_stat_cont()),
-        });
         self.data.stat_starts.push(expr_index);
         self.last_result = LastMatchResult::None;
         self.cached_fails = HashMap::new();

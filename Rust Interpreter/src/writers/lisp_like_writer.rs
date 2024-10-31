@@ -61,9 +61,10 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
         Expr::Title { data } => {
             let author_str = data.authors.iter().fold(String::new(), |str, author| {
                 format!(
-                    "{str} \"{}\"@{}",
+                    "{str} \"{}\"@{}$${}",
                     String::from_utf8_lossy(&author.0),
-                    author.1
+                    author.1,
+                    author.2
                 )
             });
 
@@ -72,8 +73,9 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
             });
 
             format!(
-                "(title \"{}\" (authors{author_str}) (imports \"{imports_str}\"))",
+                "(title \"{}\" (authors{author_str})@{} (imports{imports_str}))",
                 String::from_utf8_lossy(&data.title),
+                data.by_start
             )
         }
         Expr::Assign {

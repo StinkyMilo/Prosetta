@@ -1,3 +1,5 @@
+use std::usize;
+
 use crate::{
     commands::*,
     parser::{End, ParserSourceIter, SubStrData},
@@ -94,9 +96,9 @@ impl<T: Renderer> SyntaxLinter<T> {
         self.renderer.add_with(&buf, color);
         self.index = index;
     }
-    fn write_num(&mut self, source: &mut ParserSourceIter, index: usize) {
-        self.write_as(source, index, BASE_COLOR);
-    }
+    // fn write_num(&mut self, source: &mut ParserSourceIter, index: usize) {
+    //     self.write_as(source, index, BASE_COLOR);
+    // }
     fn write_as(&mut self, source: &mut ParserSourceIter, num: usize, color: (TermColor, bool)) {
         let buf: Vec<u8> = Self::get_n_or_error(source, num);
         self.renderer.add_with(&buf, color);
@@ -196,13 +198,51 @@ impl<T: Renderer> SyntaxLinter<T> {
         self.write_end(source);
         match &exprs[index] {
             Expr::Title { data } => {
-                self.write_up_to_as(source, data.title.len(), STRING_COLOR);
-                // skip \n after title and color by
-                self.write_num(source, 1);
+                self.write_up_to_as(source, data.by_start, STRING_COLOR);
+                // color by
                 self.write_as(source, 2, LOC_COLOR[0]);
-                // let mut color = STRING_COLOR;
-                // for 
-                // self.write_up_to(source, data.authors.1);
+                //write authors
+                let mut authors = data.authors.iter().peekable();
+                let mut imports = data.imports.iter().peekable();
+                let mut delims = data.delim.iter().peekable();
+                loop {
+                    // get lowest indexed thing or break -- this is atrocious
+                    let Some((write_delim, index, length)) = (match (delims.peek(), authors.peek())
+                    {
+                        (None, None) => None,
+                        (Some(delim), None) => Some((true, delim.0, delim.1.into())),
+                        (None, Some(author)) => Some((false, author.1, author.2)),
+                        (Some(delim), Some(author)) => Some(if delim.0 < author.1 {
+                            (true, delim.0, delim.1.into())
+                        } else {
+                            (false, author.1, author.2)
+                        }),
+                    }) else {
+                        break;
+                    };
+
+                    // write delim
+                    if write_delim {
+                        self.write_up_to(source, index);
+                        self.write_as(source, length, LOC_COLOR[1]);
+                        delims.next();
+                    //write name
+                    } else {
+                        self.write_up_to(source, index);
+                        while let Some(&&(_, imp_index, imp_length)) = imports.peek() {
+                            // if import before end -- write that
+                            if imp_index < index + length {
+                                self.write_up_to_as(source, imp_index, VAR_COLOR);
+                                self.write_as(source, imp_length.into(), LOC_COLOR[2]);
+                                imports.next();
+                            } else {
+                                break;
+                            }
+                        }
+                        self.write_up_to_as(source, index + length, VAR_COLOR);
+                        authors.next();
+                    }
+                }
             }
 
             Expr::Assign {
