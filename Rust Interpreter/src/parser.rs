@@ -66,7 +66,7 @@ use crate::{commands::*, writers::lisp_like_writer};
 
 use alias_data::AliasData;
 
-#[derive(Debug, PartialEq,Clone, Copy)]
+#[derive(Debug, PartialEq, Clone, Copy, Hash, Eq)]
 pub enum Import {
     List,
     Func,
@@ -174,6 +174,11 @@ impl<'a> Parser<'a> {
         //     author: vec![b"No Author".to_vec()],
         //     imports:
         // });
+        let aliases = if flags.title {
+            AliasData::none()
+        } else {
+            AliasData::all()
+        };
 
         Parser {
             data: ParsedData {
@@ -190,7 +195,7 @@ impl<'a> Parser<'a> {
             pos: 0,
             parsing_line: false,
             last_result: LastMatchResult::None,
-            aliases: AliasData::new(flags),
+            aliases,
             repeat_count: 0,
             stat_indexes: Vec::new(),
             cached_fails: HashMap::new(),
@@ -425,6 +430,7 @@ impl<'a> Parser<'a> {
         // failed final stat - couldn't parse anything on line
         if self.stack.is_empty() {
             self.parsing_line = false;
+            self.parse_title = false;
             self.data.stat_starts.pop();
             ParserResult::FailedLine
         } else {
@@ -479,7 +485,7 @@ impl<'a> Parser<'a> {
         let expr_index = state.expr_index;
         if state.state.get_type() == StateType::Stat {
             // add self
-            self.stat_indexes.push(state.expr_index);
+            self.stat_indexes.push(expr_index);
             // stats can change parse ablility -- reset cached fails
             self.cached_fails = HashMap::new();
         }
@@ -487,6 +493,13 @@ impl<'a> Parser<'a> {
 
         // matched final stat
         if self.stack.is_empty() {
+            if self.parse_title {
+                if let Expr::Title { data } = &self.data.exprs[expr_index] {
+                    self.aliases = AliasData::new(&mut data.imports.iter().map(|e| &e.0))
+                } else {
+                    unreachable!()
+                };
+            }
             self.parse_title = false;
             // setup next
             self.add_new_start_state(index);
