@@ -1,19 +1,16 @@
-import init, { Highlight, ParserRunner, get_heap_size } from './wasm-bindings/prosetta.js'
 import { getAliasTriggered, wordsForAliases } from './wordsForAliases.js';
 
-var jscode, sourcecode, highlights, ctx, cnsl, canvas;
+var jscode, sourcecode, ctx, cnsl, canvas;
 var x = 0, y = 0, rotation = 0;
 var has_run = false;
 var has_drawn_shape = false;
 var last_shape = "none";
-var parser, parsedData;
+var worker;
 var editor;
 
 function init_canvas() {
   sourcecode = document.getElementById("code");
-  sourcecode = document.getElementById("code");
   jscode = document.getElementById("js");
-  highlights = "";
   canvas = document.getElementById("outputcanvas");
   ctx = canvas.getContext('2d');
   cnsl = document.getElementById("console");
@@ -328,33 +325,15 @@ function updateCode() {
   if (editor == null) {
     return;
   }
-  parsedData = parser.run_to_completion(editor.getValue());
-  jscode.innerHTML = parsedData.get_javascript();
-  highlights = parsedData.get_highlights();
-  updateHighlights();
-}
-
-function updateHighlights() {
-  editor.doc.getAllMarks().forEach(marker => marker.clear());
-  for (let hl of highlights) {
-    editor.markText(
-      { line: hl.line, ch: hl.index },
-      { line: hl.line, ch: hl.index + hl.length },
-      { className: hl.color.at(-1) }
-    );
-  }
+  msg_worker("changed", editor.getValue());
 }
 
 async function initialize(startingCode) {
   let tabs = document.getElementsByClassName("tabBtn tabDefault");
   tabs[0].click();
 
-  let wasm = await init();
-  console.log(wasm)
-  setInterval(() =>
-    console.log("wasm is using",
-      wasm.memory.buffer.byteLength, "total and ", get_heap_size(), " on heap"), 1000);
-  parser = new ParserRunner();
+  setup_webworker();
+  worker.postMessage({ command: "initialize" });
   init_canvas();
   print_console("Welcome to Prosetta!");
   print_console("---");
@@ -367,12 +346,16 @@ window.runCode = runCode;
 window.updateCode = updateCode;
 window.openTab = openTab;
 
+function msg_worker(command, data) {
+  worker.postMessage({ command: command, data: data });
+}
+
 function setup_editor(startingCode) {
   editor = CodeMirror(document.getElementById("code"), {
     value: "",
     mode: "plaintext"
   });
-  editor.setSize("100%","100%");
+  editor.setSize("100%", "100%");
 
   /*
     Returns a node that contains the alternate word suggestions
@@ -480,7 +463,6 @@ function setup_editor(startingCode) {
   editor.on("change", (cm, change) => { updateCode(); });
   editor.setValue(startingCode);
   return editor;
-
   /**
    * cursorActivity event gets when cursor or selection moves
    * beforeCursorEnter event fires when the cursor enters the marked range
@@ -505,4 +487,30 @@ function setup_editor(startingCode) {
   
   */
 }
+
+function setup_webworker() {
+  worker = new Worker("language_worker.js");
+  worker.onmessage = e => {
+    let command = e.data.command;
+    let data = e.data.data;
+    switch (command) {
+      case "parsed":
+        if (editor.getValue() != data.text) {
+          break;
+        }
+        jscode.innerHTML = data.js;
+        let highlights = data.hl;
+        editor.doc.getAllMarks().forEach(marker => marker.clear());
+        for (let hl of highlights) {
+          editor.markText(
+            { line: hl.line, ch: hl.index },
+            { line: hl.line, ch: hl.index + hl.length },
+            { className: hl.color.at(-1) }
+          );
+        }
+        break;
+    }
+  };
+}
+
 export default initialize;
