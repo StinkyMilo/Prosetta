@@ -7,8 +7,9 @@ use std::time::SystemTime;
 use crate::{
     parser::{ParsedData, Parser, ParserFlags, ParserResult, ParserSource},
     writers::{
-        javascript_writer, lisp_like_writer, syntax_lint::SyntaxLinter,
-        syntax_renderers::wind_renderer::WindowsRenderer,
+        javascript_writer, lisp_like_writer,
+        syntax_lint::SyntaxLinter,
+        syntax_renderers::{line_renderer::LineRenderer, wind_renderer::WindowsRenderer},
     },
 };
 
@@ -19,6 +20,7 @@ pub struct RunnerFlags {
     pub input: bool,
     pub whole_program: bool,
     pub linted: bool,
+    pub line_rendered: bool,
 }
 
 pub fn run_state(state: ParserResult, parser: &Parser, parser_flags: RunnerFlags, step_count: u64) {
@@ -65,8 +67,14 @@ pub fn run_after(data: ParsedData, parser_flags: RunnerFlags) {
         lint.write(&data.exprs, &data.stat_starts, iter);
         println!(
             "   linted:\n{}",
-            std::str::from_utf8(&lint.into_string()).unwrap()
+            std::str::from_utf8(&lint.into_data()).unwrap()
         );
+    }
+    if parser_flags.line_rendered {
+        let iter = data.source.get_iter();
+        let mut lint = SyntaxLinter::<LineRenderer>::new();
+        lint.write(&data.exprs, &data.stat_starts, iter);
+        println!("   line renderered:\n{:?}", lint.into_data());
     }
 }
 

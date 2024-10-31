@@ -56,6 +56,7 @@ fn main() {
         input: true,
         whole_program: true,
         linted: true,
+        line_rendered: true,
     };
 
     run_parser(

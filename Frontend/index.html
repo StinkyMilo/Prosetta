@@ -2,23 +2,26 @@
 <html>
 
 <head>
-  <link rel="stylesheet" href="../node_modules/codemirror/lib/codemirror.css">
-  <script src="../node_modules/codemirror/lib/codemirror.js"></script>
-  <script src="../node_modules/codemirror/mode/javascript/javascript.js"></script>
-  <script type="module" src="./script.js"></script>
+  <link rel="stylesheet" href="./node_modules/codemirror/lib/codemirror.css">
+  <script src="./node_modules/codemirror/lib/codemirror.js"></script>
+  <script src="./node_modules/codemirror/mode/javascript/javascript.js"></script>
+  <script type="module">
+    import initialize from './script.js';
+    document.addEventListener("DOMContentLoaded", () => {
+      initialize("Draw a rectangle around my thirty fifty dollar bills!");
+    });
+  </script>
   <link rel="stylesheet" href="./style.css">
   <link rel="stylesheet" href="./color.css">
 </head>
 
 <body>
-  <div id="container"></div>
   <div id="tabGroup">
     <button class="tabBtn tabDefault" onclick="openTab(event, 'code')">Code</button>
-    <button class="tabBtn" onclick="openTab(event, 'syntax')">Syntax</button>
     <button class="tabBtn" onclick="openTab(event, 'js')">JS</button>
   </div>
   <div id="codespace">
-    <div class="tabContent" id="code" onkeyup="updateCode()"></div>
+    <div class="tabContent noScroll" id="code"></div>
     <div style="display: none;" readonly="true" class="tabContent" id="syntax">Syntax</div>
     <textarea style="display: none;" readonly="true" class="tabContent" id="js">JavaScript</textarea>
     <canvas id="outputcanvas" width="400px" height="400px" />

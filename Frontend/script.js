@@ -1,19 +1,19 @@
-import init, { ParserRunner } from './wasm-bindings/prosetta.js'
-import {getAliasTriggered, wordsForAliases} from './wordsForAliases.js';
+import init, { Highlight, ParserRunner, get_heap_size } from './wasm-bindings/prosetta.js'
+import { getAliasTriggered, wordsForAliases } from './wordsForAliases.js';
 
-var jscode, sourcecode, syntax, ctx, cnsl, canvas;
+var jscode, sourcecode, highlights, ctx, cnsl, canvas;
 var x = 0, y = 0, rotation = 0;
 var has_run = false;
 var has_drawn_shape = false;
 var last_shape = "none";
 var parser, parsedData;
-var old_code;
 var editor;
 
 function init_canvas() {
   sourcecode = document.getElementById("code");
+  sourcecode = document.getElementById("code");
   jscode = document.getElementById("js");
-  syntax = document.getElementById("syntax");
+  highlights = "";
   canvas = document.getElementById("outputcanvas");
   ctx = canvas.getContext('2d');
   cnsl = document.getElementById("console");
@@ -328,168 +328,181 @@ function updateCode() {
   if (editor == null) {
     return;
   }
-  let new_code = editor.getValue();
-  if (new_code == old_code) {
-    return;
-  }
-  old_code = new_code;
-  parsedData = parser.run_to_completion(new_code);
+  parsedData = parser.run_to_completion(editor.getValue());
   jscode.innerHTML = parsedData.get_javascript();
-  syntax.innerHTML = parsedData.get_html();
-  let c = syntax.children;
-  // for (let i = 0; i < c.length; i++) {
-  //   c[i].style.color = c[i].className.substring("term_b_".length, c[i].className.length);
-  // }
+  highlights = parsedData.get_highlights();
+  updateHighlights();
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  initialize();
-});
+function updateHighlights() {
+  editor.doc.getAllMarks().forEach(marker => marker.clear());
+  for (let hl of highlights) {
+    editor.markText(
+      { line: hl.line, ch: hl.index },
+      { line: hl.line, ch: hl.index + hl.length },
+      { className: hl.color.at(-1) }
+    );
+  }
+}
 
-async function initialize() {
+async function initialize(startingCode) {
   let tabs = document.getElementsByClassName("tabBtn tabDefault");
   tabs[0].click();
 
-  await init();
+  let wasm = await init();
+  console.log(wasm)
+  setInterval(() =>
+    console.log("wasm is using",
+      wasm.memory.buffer.byteLength, "total and ", get_heap_size(), " on heap"), 1000);
   parser = new ParserRunner();
   init_canvas();
   print_console("Welcome to Prosetta!");
   print_console("---");
   print_console();
-  old_code = "";
   updateCode();
+  return setup_editor(startingCode);
 }
 
 window.runCode = runCode;
 window.updateCode = updateCode;
 window.openTab = openTab;
 
-//Create main editor environment
-editor = CodeMirror(document.getElementById("code"), {
-  value: "Draw a rectangle around my thirty fifty dollar bills!",
-  mode:  "javascript"
-});
+function setup_editor(startingCode) {
+  editor = CodeMirror(document.getElementById("code"), {
+    value: "",
+    mode: "plaintext"
+  });
+  editor.setSize("100%","100%");
 
-/*
-  Returns a node that contains the alternate word suggestions
-*/
-function getNewTooltip(alias){
-  //For now, don't use rust endpoints; just choose the first alias.
-  //Later, we'll want to use the rust endpoints though
-  let widget = document.createElement("div");
-  widget.className="tooltip";
-  let header = document.createElement("h1");
-  header.innerHTML = alias;
-  widget.appendChild(header);
-  let words = wordsForAliases[alias];
-  for(let i = 0; i < words.length; i++){
-    let wordElement = document.createElement("p");
-    wordElement.innerHTML = words[i];
-    widget.appendChild(wordElement);
+  /*
+    Returns a node that contains the alternate word suggestions
+  */
+  function getNewTooltip(alias) {
+    //For now, don't use rust endpoints; just choose the first alias.
+    //Later, we'll want to use the rust endpoints though
+    let widget = document.createElement("div");
+    widget.className = "tooltip";
+    let header = document.createElement("h1");
+    header.innerHTML = alias;
+    widget.appendChild(header);
+    let words = wordsForAliases[alias];
+    for (let i = 0; i < words.length; i++) {
+      let wordElement = document.createElement("p");
+      wordElement.innerHTML = words[i];
+      widget.appendChild(wordElement);
+    }
+    return widget;
   }
-  return widget;
-}
 
-let activeWidget;
-let lastWordPos = {line: -1, ch: -1};
-let displayTimeout;
-let removeTimeout;
+  let activeWidget;
+  let lastWordPos = { line: -1, ch: -1 };
+  let displayTimeout;
+  let removeTimeout;
 
-function clearWidget(){
-  // removeWithFadeout(activeWidget);
-  console.log("REMOVING");
-  activeWidget?.remove();
-  activeWidget=null;
-  lastWordPos={line:-1,ch:-1};
-  if(displayTimeout != null){
-    clearTimeout(displayTimeout);
-    displayTimeout=null;
+  function clearWidget() {
+    // removeWithFadeout(activeWidget);
+    // console.log("REMOVING");
+    activeWidget?.remove();
+    activeWidget = null;
+    lastWordPos = { line: -1, ch: -1 };
+    if (displayTimeout != null) {
+      clearTimeout(displayTimeout);
+      displayTimeout = null;
+    }
   }
-}
 
-//This isn't working. TODO fix
-function removeWithFadeout(element){
-  if(element==null){
-    return;
+  //This isn't working. TODO fix
+  function removeWithFadeout(element) {
+    if (element == null) {
+      return;
+    }
+    element.style.animation = "";
+    element.style.transition = "opacity 0.5s ease";
+    element.style.opacity = 1;
+    console.log(element.style);
+    setTimeout(() => {
+      element.remove();
+    }, 500);
   }
-  element.style.animation = "";
-  element.style.transition = "opacity 0.5s ease";
-  element.style.opacity = 1;
-  console.log(element.style);
-  setTimeout(()=>{
-    element.remove();
-  },500);
-}
 
-window.onmousemove=function(e){
-  if(activeWidget != null && (e.target == activeWidget || activeWidget.contains(e.target))){
-    if(removeTimeout != null){
+  window.onmousemove = function(e) {
+    if (activeWidget != null && (e.target == activeWidget || activeWidget.contains(e.target))) {
+      if (removeTimeout != null) {
+        clearTimeout(removeTimeout);
+        removeTimeout = null;
+      }
+      return;
+    }
+    let pos = { left: e.clientX, top: e.clientY + window.scrollY };
+    let textPos = editor.coordsChar(pos);
+    // console.log(pos,textPos);
+    // console.log(editor.charCoords({ch:0,line:0}),pos);
+    if (textPos.outside) {
+      if (removeTimeout == null && activeWidget != null) {
+        removeTimeout = setTimeout(() => {
+          clearWidget();
+        }, 250);
+      }
+      return;
+    }
+    let wordPos = editor.findWordAt(textPos);
+    let word = editor.getRange(wordPos.anchor, wordPos.head).toLowerCase();
+    let midPos = { line: 0, ch: 0 };
+    if (wordPos.head.line == wordPos.anchor.line) {
+      midPos = { line: wordPos.head.line, ch: (wordPos.head.ch + wordPos.anchor.ch) / 2 };
+    } else {
+      midPos = wordPos.head;
+    }
+    if (word.match(/^\s*$/) || (midPos.line == lastWordPos.line && midPos.ch == lastWordPos.ch)) {
+      return;
+    }
+    if (removeTimeout != null) {
       clearTimeout(removeTimeout);
-      removeTimeout=null;
+      removeTimeout = null;
     }
-    return;
-  }
-  let pos = {left:e.clientX, top:e.clientY};
-  let textPos = editor.coordsChar(pos);
-  if(textPos.outside){
-    if(removeTimeout == null && activeWidget != null){
-      removeTimeout = setTimeout(()=>{
-        clearWidget();
-      },250);
+    if (displayTimeout != null) {
+      clearTimeout(displayTimeout);
+      displayTimeout = null;
     }
-    return;
+    let alias = getAliasTriggered(word);
+    if (alias == null) {
+      return;
+    }
+    console.log(alias);
+    displayTimeout = setTimeout(() => {
+      clearWidget();
+      activeWidget = getNewTooltip(alias);
+      lastWordPos = midPos;
+      editor.addWidget(midPos, activeWidget);
+    }, 500);
   }
-  let wordPos = editor.findWordAt(textPos);
-  let word = editor.getRange(wordPos.anchor, wordPos.head);
-  let midPos = {line:0,ch:0};
-  if(wordPos.head.line == wordPos.anchor.line){
-    midPos = {line:wordPos.head.line,ch:(wordPos.head.ch + wordPos.anchor.ch)/2};
-  }else{
-    midPos = wordPos.head;
-  }
-  if(word.match(/^\s*$/) || (midPos.line == lastWordPos.line && midPos.ch == lastWordPos.ch)){
-    return;
-  }
-  if(removeTimeout != null){
-    clearTimeout(removeTimeout);
-    removeTimeout=null;
-  }
-  if(displayTimeout != null){
-    clearTimeout(displayTimeout);
-    displayTimeout=null;
-  }
-  let alias = getAliasTriggered(word);
-  if(alias == null){
-    return;
-  }
-  displayTimeout = setTimeout(()=>{
-    clearWidget();
-    activeWidget = getNewTooltip(alias);
-    lastWordPos=midPos;
-    editor.addWidget(midPos, activeWidget);
-  },500);
+
+  editor.on("change", (cm, change) => { updateCode(); });
+  editor.setValue(startingCode);
+  return editor;
+
+  /**
+   * cursorActivity event gets when cursor or selection moves
+   * beforeCursorEnter event fires when the cursor enters the marked range
+   * doc.replaceSelection will replace the current selection with a given string
+   * doc.getCursor retrieves one end of the primary selection
+   * cm.findWordAt returns the start and end of the word at a given position
+   * doc.setBookmark might be what you want for a popup? I'm not 100% sure from the description. The widget would make sense
+   * cm.addWidget might also be what you want. addLineWidget moves below lines down
+   * show-hint extension shows autocomplete hints, not what we want now but could be useful later
+   */
+
+  /*
+    Plan:
+      Change cursorActivity to mouse move
+      Find word start-end for mouse move
+      If it's over a new word (not the word it was over last):
+        Cancel any existing timeouts
+        Start a new timeout
+      If a timeout completes,
+        Create a tooltip for the corresponding word, put at the word's end position
+        
+  
+  */
 }
-
-/**
- * cursorActivity event gets when cursor or selection moves
- * beforeCursorEnter event fires when the cursor enters the marked range
- * doc.replaceSelection will replace the current selection with a given string
- * doc.getCursor retrieves one end of the primary selection
- * cm.findWordAt returns the start and end of the word at a given position
- * doc.setBookmark might be what you want for a popup? I'm not 100% sure from the description. The widget would make sense
- * cm.addWidget might also be what you want. addLineWidget moves below lines down
- * show-hint extension shows autocomplete hints, not what we want now but could be useful later
- */
-
-/*
-  Plan:
-    Change cursorActivity to mouse move
-    Find word start-end for mouse move
-    If it's over a new word (not the word it was over last):
-      Cancel any existing timeouts
-      Start a new timeout
-    If a timeout completes,
-      Create a tooltip for the corresponding word, put at the word's end position
-      
-
-*/
+export default initialize;
