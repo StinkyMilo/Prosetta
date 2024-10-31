@@ -300,16 +300,16 @@ macro_rules! get_state {
 }
 pub(crate) use get_state;
 
-macro_rules! only_debug {
-    ($expr:expr) => {
-        if cfg!(debug_assertions) {
-            format!("{:?}", $expr)
-        } else {
-            Default::default()
-        }
-    };
-}
-pub(crate) use only_debug;
+// macro_rules! only_debug {
+//     ($expr:expr) => {
+//         if cfg!(debug_assertions) {
+//             format!("{:?}", $expr)
+//         } else {
+//             Default::default()
+//         }
+//     };
+// }
+// pub(crate) use only_debug;
 
 /// add or remove commands based on flags
 #[derive(Default, Debug)]

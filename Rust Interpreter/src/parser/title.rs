@@ -61,9 +61,9 @@ impl ParseState for TitleState {
 
             MatchResult::Continue(0)
         } else {
-            let slice = find_newline(&word, 0).or_else(|| find_newline(&rest, 0));
+            let slice = find_newline(&rest, 0);
             if let Some(newline) = slice {
-                let offset = newline.pos - word.pos - 1;
+                let offset = newline.pos - rest.pos;
                 MatchResult::Continue(offset)
             // did not find another new line -- poem has ended -- will never match
             } else {
