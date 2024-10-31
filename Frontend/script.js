@@ -495,9 +495,6 @@ function setup_webworker() {
     let data = e.data.data;
     switch (command) {
       case "parsed":
-        if (editor.getValue() != data.text) {
-          break;
-        }
         jscode.innerHTML = data.js;
         let highlights = data.hl;
         editor.doc.getAllMarks().forEach(marker => marker.clear());

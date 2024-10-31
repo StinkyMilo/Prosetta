@@ -25,10 +25,8 @@ onmessage = async function(e) {
       }
       break;
     case "changed":
-      let parsedData = await new Promise((resolve) => {
-        resolve(parser.run_to_completion(data));
-      });
-      msg_main("parsed", { text: data, js: parsedData.get_javascript(), hl: convert_highlights(parsedData.get_highlights()) });
+      let parsedData = parser.run_to_completion(data);
+      msg_main("parsed", { js: parsedData.get_javascript(), hl: convert_highlights(parsedData.get_highlights()) });
       break;
   }
 }
