@@ -6,14 +6,12 @@ pub(crate) use parser_source::*;
 #[path = "parser_structs.rs"]
 pub(crate) mod parser_structs;
 pub(crate) use parser_structs::*;
-use rangemap::RangeSet;
-
-mod basic_func;
 
 mod alias;
 pub(crate) mod alias_data;
 mod append;
 mod assign;
+mod basic_func;
 mod call_func;
 mod color;
 mod delete;
@@ -51,18 +49,12 @@ pub(crate) mod multi_lit_num;
 mod num_literal;
 mod word_num;
 
-#[path = "testing/parsing_tests_simple.rs"]
-mod parsing_tests_simple;
-
-// #[path = "testing/parsing_tests_milo.rs"]
-// mod parsing_tests_milo;
-
-// #[path = "testing/parsing_tests_other.rs"]
-// mod parsing_tests_other;
-
-use std::{collections::HashMap, fmt::Debug, mem};
+#[path = "testing/mod.rs"]
+mod testing;
 
 use crate::commands::*;
+use rangemap::RangeSet;
+use std::{collections::HashMap, fmt::Debug, mem};
 
 use alias_data::AliasData;
 

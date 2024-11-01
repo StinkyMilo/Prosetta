@@ -8,6 +8,7 @@ pub mod test_lib {
     use crate::commands::{Expr, ExprArena};
 
     use crate::parser::{Parser, *};
+    use crate::writers::lisp_like_writer;
     use alias_data::AliasData;
     use std::collections::HashSet;
 
@@ -79,6 +80,10 @@ pub mod test_lib {
             }
         }
     }
+
+    pub fn get_lisp(data: &ParsedData) -> String {
+        lisp_like_writer::write(&data.exprs, &data.stat_starts)
+    }
 }
 
 // use crate::testing::test_lib::*;
@@ -108,3 +113,25 @@ macro_rules! assert_step {
 }
 
 pub(crate) use assert_step;
+
+macro_rules! run_parser {
+    ($input:expr) => {{
+        let text = $input.to_vec();
+        let mut parser = Parser::new(
+            ParserSource::from_string(text),
+            ParserFlags { title: false },
+        );
+        test_lib::run_to_completion(&mut parser);
+        parser.into_data()
+    }};
+}
+
+pub(crate) use run_parser;
+
+macro_rules! check_lisp {
+    ($data:expr,$result:expr) => {{
+        assert_eq!(test_lib::get_lisp(&$data), $result);
+    }};
+}
+
+pub(crate) use check_lisp;
