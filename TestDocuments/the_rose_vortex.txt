@@ -11,7 +11,7 @@ The water whipped at the boat,
 It is truly a miracle that they lived.
 
 [Comments
-    This was actually really easy! Syntax highlighting + word suggestions helped a lot.
+     This was actually really easy! Syntax highlighting + word suggestions helped a lot.
         Debugging sometimes took like 30 seconds, whereas before it would always take a couple minutes at least.
         Just bc syntax highlighting tells me when things aren't parsing immediately, and also immediately tells
         me when I accidentally triggered something I didn't want to.

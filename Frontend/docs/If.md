@@ -9,7 +9,7 @@ An if statement. If the condition (first argument) is true, execute all other ar
 ## Example
 <editor :code='`
 was var one.
-when par var one, pri "value is one"!
+when par var one: pri "value is one"!
 `' 
 :code-wordier="`
 'Was var one?'

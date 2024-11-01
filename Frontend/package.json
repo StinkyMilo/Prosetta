@@ -10,6 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "codemirror": "^5.65.18",
-    "express": "^4.21.0"
+    "docsify": "^4.13.1",
+    "express": "^4.21.0",
+    "vue": "^3.5.12"
   }
 }
