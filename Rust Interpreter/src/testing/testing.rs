@@ -64,6 +64,7 @@ pub mod test_lib {
     //         aliases,
     //     }
     // }
+
     pub fn assert_result(parser: &mut Parser) -> ParserResult {
         loop {
             let result = parser.step();
@@ -79,6 +80,13 @@ pub mod test_lib {
                 return result;
             }
         }
+    }
+
+    pub fn run_parser(input: Vec<u8>, title: bool) -> ParsedData<'static> {
+        let text = input.to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { title });
+        run_to_completion(&mut parser);
+        parser.into_data()
     }
 
     pub fn get_lisp(data: &ParsedData) -> String {
@@ -116,13 +124,10 @@ pub(crate) use assert_step;
 
 macro_rules! run_parser {
     ($input:expr) => {{
-        let text = $input.to_vec();
-        let mut parser = Parser::new(
-            ParserSource::from_string(text),
-            ParserFlags { title: false },
-        );
-        test_lib::run_to_completion(&mut parser);
-        parser.into_data()
+        $crate::testing::test_lib::run_parser($input.to_vec(), false)
+    }};
+    ($input:expr, $title:expr) => {{
+        $crate::testing::test_lib::run_parser($input.to_vec(), $title)
     }};
 }
 
@@ -130,7 +135,7 @@ pub(crate) use run_parser;
 
 macro_rules! check_lisp {
     ($data:expr,$result:expr) => {{
-        assert_eq!(test_lib::get_lisp(&$data), $result);
+        assert_eq!($crate::testing::test_lib::get_lisp(&$data), $result);
     }};
 }
 
