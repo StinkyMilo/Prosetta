@@ -21,6 +21,7 @@ mod else_stat;
 mod fill;
 mod find;
 mod foreach;
+mod frame;
 mod function;
 mod if_stat;
 mod index;
@@ -71,6 +72,7 @@ pub enum Import {
     List,
     Func,
     Graph,
+    Frame,
 }
 
 impl Import {
@@ -79,6 +81,7 @@ impl Import {
             Import::List => "List",
             Import::Func => "Func",
             Import::Graph => "Graph",
+            Import::Frame => "Frame",
         }
     }
     pub fn get_all() -> &'static [(Import, &'static [u8])] {
@@ -86,6 +89,7 @@ impl Import {
             (Import::List, b"list"),
             (Import::Func, b"func"),
             (Import::Graph, b"graph"),
+            (Import::Frame, b"fram"),
         ]
     }
 }

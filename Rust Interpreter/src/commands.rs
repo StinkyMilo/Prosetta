@@ -214,6 +214,9 @@ pub enum Expr {
         str_len: usize,
         end: End,
     },
+    Frame {
+        locs: Vec<usize>,
+    },
 }
 
 impl Expr {

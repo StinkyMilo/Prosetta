@@ -10,6 +10,7 @@ const BASE_EXPR_ALIASES: &[&'static [u8]] = &[
 
 const LIST_EXPR_ALIASES: &[&'static [u8]] = &[b"lis", b"fin", b"ind", b"cou"];
 const GRAPH_EXPR_ALIASES: &[&'static [u8]] = &[b"col"];
+const FRAME_EXPR_ALIASES: &[&'static [u8]] = &[b"fra"];
 
 const BASE_STAT_ALIASES: &[&'static [u8]] = &[b"was", b"pri", b"whe", b"whi", b"els", b"not"];
 
@@ -47,6 +48,7 @@ fn get_expr_state(alias: &'static [u8], index: usize) -> MatchResult {
             b"fin" => get_state!(find::FindState::new()),
             b"ind" => get_state!(index::IndexState::new()),
             b"cou" => get_state!(len::LengthState::new()),
+            b"fra" => get_state!(frame::FrameState::new()),
             _ => unreachable!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
         },
     )
@@ -176,7 +178,8 @@ impl AliasData {
         match import {
             Import::List => (LIST_EXPR_ALIASES, LIST_STAT_ALIASES),
             Import::Func => (&[], FUNC_STAT_ALIASES),
-            Import::Graph => (&GRAPH_EXPR_ALIASES, GRAPH_STAT_ALIASES),
+            Import::Graph => (GRAPH_EXPR_ALIASES, GRAPH_STAT_ALIASES),
+            Import::Frame => (FRAME_EXPR_ALIASES, &[]),
         }
     }
 }
