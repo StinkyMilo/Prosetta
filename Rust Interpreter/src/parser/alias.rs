@@ -175,7 +175,7 @@ impl NoneState {
 
         // if default continue
         if self.data.default_continue {
-            MatchResult::Continue
+            MatchResult::Continue(0)
         // else fail
         } else {
             MatchResult::Failed

@@ -34,6 +34,7 @@ mod operator;
 mod replace;
 pub(crate) mod string_lit;
 mod stroke;
+mod title;
 mod var;
 mod while_stat;
 
@@ -61,10 +62,67 @@ mod parsing_tests_simple;
 
 use std::{collections::HashMap, fmt::Debug, mem};
 
-use crate::{commands::*, writers::lisp_like_writer};
+use crate::commands::*;
 
 use alias_data::AliasData;
 
+#[derive(Debug, PartialEq, Clone, Copy, Hash, Eq)]
+pub enum Import {
+    List,
+    Func,
+    Graph,
+}
+
+impl Import {
+    pub fn get_name(&self) -> &'static str {
+        match self {
+            Import::List => "List",
+            Import::Func => "Func",
+            Import::Graph => "Graph",
+        }
+    }
+    pub fn get_all() -> &'static [(Import, &'static [u8])] {
+        &[
+            (Import::List, b"list"),
+            (Import::Func, b"func"),
+            (Import::Graph, b"graph"),
+        ]
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub struct Title {
+    pub title: Vec<u8>,
+    // the imports: (name, position, length)
+    pub authors: Vec<(Vec<u8>, usize, usize)>,
+    // the imports: (type, position, length)
+    pub imports: Vec<(Import, usize, u8)>,
+    // the sepatators: (position, length)
+    pub delim: Vec<(usize, u8)>,
+    // the start of "by"
+    pub by_start: usize,
+}
+impl Title {
+    pub fn new() -> Self {
+        Self {
+            title: Vec::new(),
+            authors: Vec::new(),
+            imports: Vec::new(),
+            delim: Vec::new(),
+            by_start: usize::MAX,
+        }
+    }
+}
+// impl Title{
+//     pub fn empty()->Self{
+//         Self {
+//             title: b"No Title".to_vec(),
+//             authors: vec![(b"No Author".to_vec()],
+//             imports: Vec::new(),
+//             delim: Vec::new(),
+//         }
+//     }
+// }
 ///The data that is currently parsed
 #[derive(Debug)]
 pub struct ParsedData<'a> {
@@ -74,12 +132,12 @@ pub struct ParsedData<'a> {
     pub stat_starts: Vec<usize>,
     ///the set of current varibles
     pub symbols: SymbolSet,
-    //the set of current functions
-    // pub funcs: FuncSet,
     /// the ignored values
     pub nots: IgnoreSet,
     ///the parserSource that is used
     pub source: ParserSource<'a>,
+    // ///the title and authors
+    // pub title: Option<Title>,
 }
 
 #[derive(Debug)]
@@ -104,26 +162,40 @@ pub struct Parser<'a> {
     stat_indexes: Vec<usize>,
     /// the hash map of ranges of failed exprs
     cached_fails: HashMap<&'static str, RangeSet<usize>>,
+    ///does the parser need to parse a title
+    parse_title: bool,
 }
 
 impl<'a> Parser<'a> {
     ///make a new parser with a source and command flags
     pub fn new(source: ParserSource<'a>, flags: ParserFlags) -> Self {
+        // let title = (!flags.title).then(|| Title {
+        //     title: b"No Title".to_vec(),
+        //     author: vec![b"No Author".to_vec()],
+        //     imports:
+        // });
+        let aliases = if flags.title {
+            AliasData::none()
+        } else {
+            AliasData::all()
+        };
+
         Parser {
             data: ParsedData {
                 exprs: ExprArena { vec: Vec::new() },
                 stat_starts: Vec::new(),
                 symbols: SymbolSet::new(),
-                // funcs: FuncSet::new(),
                 nots: IgnoreSet::new(),
                 source,
+                // title,
             },
+            parse_title: flags.title,
             stack: Vec::new(),
             last_state: None,
             pos: 0,
             parsing_line: false,
             last_result: LastMatchResult::None,
-            aliases: AliasData::new(flags),
+            aliases,
             repeat_count: 0,
             stat_indexes: Vec::new(),
             cached_fails: HashMap::new(),
@@ -306,7 +378,7 @@ impl<'a> Parser<'a> {
         let new_locs = env.locs.take();
 
         // reached end of line - upgrade result to failed
-        if word.len() == 0 && matches!(result, MatchResult::Continue) {
+        if word.len() == 0 && matches!(result, MatchResult::Continue(0)) {
             result = MatchResult::Failed;
         }
 
@@ -318,7 +390,7 @@ impl<'a> Parser<'a> {
                 self.continue_with_func(index, state, new_locs)
             }
             // continue with me
-            MatchResult::Continue => self.continue_func(rest.pos),
+            MatchResult::Continue(index) => self.continue_func(rest.pos + index),
             // I failed, go back on stack with fail
             MatchResult::Failed => self.failed_func(),
         }
@@ -358,6 +430,7 @@ impl<'a> Parser<'a> {
         // failed final stat - couldn't parse anything on line
         if self.stack.is_empty() {
             self.parsing_line = false;
+            self.parse_title = false;
             self.data.stat_starts.pop();
             ParserResult::FailedLine
         } else {
@@ -412,7 +485,7 @@ impl<'a> Parser<'a> {
         let expr_index = state.expr_index;
         if state.state.get_type() == StateType::Stat {
             // add self
-            self.stat_indexes.push(state.expr_index);
+            self.stat_indexes.push(expr_index);
             // stats can change parse ablility -- reset cached fails
             self.cached_fails = HashMap::new();
         }
@@ -420,8 +493,16 @@ impl<'a> Parser<'a> {
 
         // matched final stat
         if self.stack.is_empty() {
+            if self.parse_title {
+                if let Expr::Title { data } = &self.data.exprs[expr_index] {
+                    self.aliases = AliasData::new(&mut data.imports.iter().map(|e| &e.0))
+                } else {
+                    unreachable!()
+                };
+            }
+            self.parse_title = false;
             // setup next
-            self.add_new_nonestat(index);
+            self.add_new_start_state(index);
             ParserResult::MatchedLine
         } else {
             if closed {
@@ -463,7 +544,7 @@ impl<'a> Parser<'a> {
         if let Some(data) = data {
             let found_data = trim_ascii_whitespace(data).len() > 0;
             if found_data {
-                self.add_new_nonestat(0);
+                self.add_new_start_state(0);
                 self.parsing_line = true;
             }
             found_data
@@ -472,7 +553,14 @@ impl<'a> Parser<'a> {
         }
     }
     ///setup a noneStat on the stack
-    fn add_new_nonestat(&mut self, new_index: usize) {
+    fn add_new_start_state(&mut self, new_index: usize) {
+        // if need to parse title -- put it on stack
+        let state = if self.parse_title {
+            get_state!(title::TitleState::new())
+        } else {
+            get_state!(alias::NoneState::new_stat_cont())
+        };
+
         // push match stat on first step of line
         let expr_index = self.data.exprs.vec.len();
 
@@ -482,8 +570,9 @@ impl<'a> Parser<'a> {
             expr_index,
             first_parse: new_index,
             last_parse: new_index,
-            state: Box::new(alias::NoneState::new_stat_cont()),
+            state,
         });
+
         self.data.stat_starts.push(expr_index);
         self.last_result = LastMatchResult::None;
         self.cached_fails = HashMap::new();

@@ -25,7 +25,7 @@ impl ParseState for LitStrState {
                     str_end: usize::MAX
                 };
                 self.current_str_start=word.pos + env.global_index + 1;
-                MatchResult::Continue
+                MatchResult::Continue(0)
             } else {
                 if let Expr::LitString { str, str_end, .. } = env.expr{
                     //Add current str
@@ -52,7 +52,7 @@ impl ParseState for LitStrState {
                         str.push(VarOrStr::Var(var));
                         self.current_str_start = rest.pos;
                     }
-                    MatchResult::Continue
+                    MatchResult::Continue(0)
                 }else{
                     unreachable!()
                 }

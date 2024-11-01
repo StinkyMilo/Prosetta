@@ -1,13 +1,24 @@
+use std::collections::HashSet;
+
 use super::*;
 
-const BASE_EXPR_ALIASES: [&'static [u8]; 20] = [
-    b"int", b"tim", b"add", b"sub", b"lit", b"ide", b"mod", b"log", b"exp", b"les", b"mor", b"als",
-    b"oth", b"par", b"inv", b"col", b"fin", b"ind", b"lis", b"cou",
+const BASE_EXPR_ALIASES: &[&'static [u8]] = &[
+    b"int", b"lit", // number makers
+    b"add", b"sub", b"tim", b"ide", b"mod", b"log", b"exp", // number operators
+    b"les", b"mor", b"als", b"oth", b"par", b"inv", // boolean operators
 ];
 
-const STAT_ALIASES: [&'static [u8]; 21] = [
-    b"arc", b"lin", b"was", b"rec", b"pri", b"whe", b"whi", b"els", b"sto", b"fil", b"mov", b"pen",
-    b"tur", b"fun", b"ret", b"app", b"del", b"rep", b"fre", b"not", b"bez"
+const LIST_EXPR_ALIASES: &[&'static [u8]] = &[b"lis", b"fin", b"ind", b"cou"];
+const GRAPH_EXPR_ALIASES: &[&'static [u8]] = &[b"col"];
+
+const BASE_STAT_ALIASES: &[&'static [u8]] = &[b"was", b"pri", b"whe", b"whi", b"els", b"not"];
+
+const LIST_STAT_ALIASES: &[&'static [u8]] = &[b"fre", b"del", b"app", b"rep"];
+const FUNC_STAT_ALIASES: &[&'static [u8]] = &[b"fun", b"ret"];
+const GRAPH_STAT_ALIASES: &[&'static [u8]] = &[
+    b"arc", b"rec", //shapes
+    b"mov", b"tur", b"lin", b"bez", //turtle
+    b"sto", b"fil", b"pen", // shape modifiers
 ];
 
 ///match alias to expr
@@ -32,9 +43,9 @@ fn get_expr_state(alias: &'static [u8], index: usize) -> MatchResult {
             b"lit" => get_state!(multi_lit_num::MultiLitNumState::new()),
             b"int" => get_state!(word_num::WordNumState::new()),
             b"col" => get_state!(color::ColorState::new()),
+            b"lis" => get_state!(list::ListState::new()),
             b"fin" => get_state!(find::FindState::new()),
             b"ind" => get_state!(index::IndexState::new()),
-            b"lis" => get_state!(list::ListState::new()),
             b"cou" => get_state!(len::LengthState::new()),
             _ => unreachable!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
         },
@@ -133,14 +144,39 @@ impl AliasData {
 }
 
 impl AliasData {
-    pub fn new(_flags: ParserFlags) -> Self {
-        let expr_vec = Vec::from(BASE_EXPR_ALIASES);
+    pub fn new(imports: &mut dyn Iterator<Item = &Import>) -> Self {
+        let mut added = HashSet::new();
+        let mut expr_vec = Vec::from(BASE_EXPR_ALIASES);
+        let mut stat_vec = Vec::from(BASE_STAT_ALIASES);
 
-        let stat_vec = Vec::from(STAT_ALIASES);
+        for import in imports {
+            if !added.contains(import) {
+                added.insert(*import);
+                let (exprs_aliases, stat_aliases) = Self::get_aliases(*import);
+                expr_vec.extend_from_slice(&exprs_aliases);
+                stat_vec.extend_from_slice(&stat_aliases);
+            }
+        }
 
         Self {
             expr: expr_vec,
             stat: stat_vec,
+        }
+    }
+
+    pub fn all() -> Self {
+        Self::new(&mut Import::get_all().into_iter().map(|e| &e.0))
+    }
+
+    pub fn none() -> Self {
+        Self::new(&mut std::iter::empty())
+    }
+
+    fn get_aliases(import: Import) -> (&'static [&'static [u8]], &'static [&'static [u8]]) {
+        match import {
+            Import::List => (LIST_EXPR_ALIASES, LIST_STAT_ALIASES),
+            Import::Func => (&[], FUNC_STAT_ALIASES),
+            Import::Graph => (&GRAPH_EXPR_ALIASES, GRAPH_STAT_ALIASES),
         }
     }
 }

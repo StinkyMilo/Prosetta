@@ -11,26 +11,26 @@ use super::{alias_data::AliasData, Expr};
 #[path = "testing/parsing_tests_word_funcs.rs"]
 mod parsing_tests_word_funcs;
 
-fn try_get_val<'a>(
+pub fn try_get_best_val<'a>(
     name: &[u8],
-    iter: &mut dyn Iterator<Item = &'a Vec<u8>>,
+    iter: &mut dyn Iterator<Item = &'a [u8]>,
     pred: &dyn Fn(&[u8]) -> bool,
-) -> Option<(u8, &'a Vec<u8>)> {
+) -> Option<(u8, &'a [u8], usize)> {
     let mut max_var_length = 0u8;
-    let mut var_data: Option<(u8, &Vec<u8>)> = None;
-    for str in iter {
+    let mut var_data: Option<(u8, &[u8], usize)> = None;
+    for (index, str) in iter.enumerate() {
         let is_longer = str.len() as u8 >= max_var_length;
         // if var could be in word
         if is_longer && name.len() >= str.len() && (pred)(str) {
             // if found
-            if let Some(index) = name.find(str) {
-                let is_better = var_data.as_ref().map_or(true, |&(old_index, _)| {
-                    is_longer || (index as u8) < old_index
+            if let Some(str_index) = name.find(str) {
+                let is_better = var_data.as_ref().map_or(true, |&(old_index, _, _)| {
+                    is_longer || (str_index as u8) < old_index
                 });
 
                 if is_better {
                     max_var_length = str.len() as u8;
-                    var_data = Some((index as u8, &str));
+                    var_data = Some((str_index as u8, str, index));
                 }
             }
         }
@@ -66,7 +66,7 @@ fn convert_skip_indexes(skip_indexes: &mut Vec<u8>, var_start: u8, var_len: u8) 
 
 fn try_get_from_iter<'a>(
     word: &Slice,
-    iter: &mut dyn Iterator<Item = &'a Vec<u8>>,
+    iter: &mut dyn Iterator<Item = &'a [u8]>,
     global_index: usize,
     pred: &dyn Fn(&[u8]) -> bool,
 ) -> Option<SubStrData> {
@@ -75,9 +75,9 @@ fn try_get_from_iter<'a>(
     }
     // remove ' and make lowercase
     let (name, mut skip_indexes) = get_var_name_and_skips(word.str);
-    let var_data = try_get_val(&name, iter, pred);
+    let var_data = try_get_best_val(&name, iter, pred);
 
-    if let Some((var_start, name)) = var_data {
+    if let Some((var_start, name, _)) = var_data {
         let start = convert_skip_indexes(&mut skip_indexes, var_start, name.len() as u8);
 
         Some(SubStrData {
@@ -134,15 +134,21 @@ impl SymbolSet {
     ///returns (index in word, varible name)
     ///
     pub fn try_get_var(&self, word: &Slice, global_index: usize) -> Option<SubStrData> {
-        try_get_from_iter(word, &mut self.set.keys(), global_index, &|name| {
-            matches!(self.set.get(name), Some(Symbol::Var))
-        })
+        try_get_from_iter(
+            word,
+            &mut self.set.keys().map(|e| e.as_slice()),
+            global_index,
+            &|name| matches!(self.set.get(name), Some(Symbol::Var)),
+        )
     }
 
     pub fn try_get_func(&self, word: &Slice, global_index: usize) -> Option<SubStrData> {
-        try_get_from_iter(word, &mut self.set.keys(), global_index, &|name| {
-            matches!(self.set.get(name), Some(Symbol::Func(..)))
-        })
+        try_get_from_iter(
+            word,
+            &mut self.set.keys().map(|e| e.as_slice()),
+            global_index,
+            &|name| matches!(self.set.get(name), Some(Symbol::Func(..))),
+        )
     }
 }
 impl Debug for SymbolSet {
@@ -176,9 +182,10 @@ impl IgnoreSet {
         }
         // remove ' and make lowercase
         let (name, mut skip_indexes) = get_var_name_and_skips(word.str);
-        let var_data = try_get_val(&name, &mut self.set.iter(), &|_| true);
+        let var_data =
+            try_get_best_val(&name, &mut self.set.iter().map(|e| e.as_slice()), &|_| true);
 
-        if let Some((var_start, name)) = var_data {
+        if let Some((var_start, name, _)) = var_data {
             let start = convert_skip_indexes(&mut skip_indexes, var_start, name.len() as u8);
 
             Some(SubStrData {
@@ -293,21 +300,21 @@ macro_rules! get_state {
 }
 pub(crate) use get_state;
 
-macro_rules! only_debug {
-    ($expr:expr) => {
-        if cfg!(debug_assertions) {
-            format!("{:?}", $expr)
-        } else {
-            Default::default()
-        }
-    };
-}
-pub(crate) use only_debug;
+// macro_rules! only_debug {
+//     ($expr:expr) => {
+//         if cfg!(debug_assertions) {
+//             format!("{:?}", $expr)
+//         } else {
+//             Default::default()
+//         }
+//     };
+// }
+// pub(crate) use only_debug;
 
 /// add or remove commands based on flags
 #[derive(Default, Debug)]
 pub struct ParserFlags {
-    pub not: bool,
+    pub title: bool,
 }
 
 #[derive(PartialEq, Eq, Debug)]
@@ -368,8 +375,8 @@ pub enum MatchResult {
     Matched(usize, bool),
     /// returned to add a child onto the stack with an index and the state to continue with
     ContinueWith(usize, Box<dyn ParseState>),
-    /// returned to give the same state the next word
-    Continue,
+    /// returned to give the same state with the offset (usually 0)
+    Continue(usize),
     /// returned to go to the parent state with a failure
     Failed,
 }
@@ -432,8 +439,6 @@ impl ParserResult {
 pub struct Environment<'a> {
     ///The set of current varibles
     pub symbols: &'a mut SymbolSet,
-    ///The set of current functions
-    // pub funcs: &'a mut FuncSet,
     ///The set of current ignored values
     pub nots: &'a mut IgnoreSet,
     ///The list of expressions
@@ -456,17 +461,6 @@ pub struct Environment<'a> {
     pub aliases: &'a AliasData,
     pub full_text: &'a [u8],
 }
-
-// impl<'a> Environment<'a> {
-//     pub fn add_var_layer(&mut self) {
-//         self.vars.add_layer();
-//         self.funcs.add_layer();
-//     }
-//     pub fn remove_var_layer(&mut self) {
-//         self.vars.remove_layer();
-//         self.funcs.remove_layer();
-//     }
-// }
 
 ///a slice of the input text
 #[derive(PartialEq)]
@@ -521,7 +515,7 @@ fn is_valid_close_char(char: u8) -> bool {
 }
 
 ///the chars that are returned single but are not closes
-const NON_CLOSE_CHARS: &[u8] = b"\"";
+const NON_CLOSE_CHARS: &[u8] = b"\"&";
 ///shoudl the char be made into a 1 len slice
 pub fn is_non_close_but_still_single(char: u8) -> bool {
     NON_CLOSE_CHARS.contains(&char)
@@ -743,6 +737,27 @@ pub fn try_get_symbol_word(word: &Slice, global_index: usize) -> Option<SubStrDa
                 skip_indexes,
             })
         }
+    } else {
+        None
+    }
+}
+///get a slice that starts at the next \n
+pub fn find_newline<'a>(slice: &'a Slice<'a>, mut start: usize) -> Option<Slice<'_>> {
+    while start < slice.len() {
+        let char = slice.str[start];
+        if char == b'\n' {
+            break;
+        } else {
+            start += 1;
+        }
+    }
+
+    if start < slice.len() {
+        let end = start;
+        Some(Slice {
+            str: &slice.str[start..end],
+            pos: slice.pos + start,
+        })
     } else {
         None
     }

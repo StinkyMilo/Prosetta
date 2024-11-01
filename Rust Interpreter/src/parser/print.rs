@@ -61,7 +61,7 @@ impl ParseState for PrintState {
                 *single_word = None;
             }else if self.count == 1 {
                 self.count+=1;
-                return MatchResult::Continue;
+                return MatchResult::Continue(0);
             }else{
                 *single_word = None;
             }
@@ -72,7 +72,7 @@ impl ParseState for PrintState {
             }else if child_index.is_some(){
                 MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr_cont()))
             }else{
-                MatchResult::Continue
+                MatchResult::Continue(0)
             }
         } else {
             unreachable!()

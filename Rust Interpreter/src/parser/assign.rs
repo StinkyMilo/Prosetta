@@ -33,7 +33,7 @@ impl ParseState for AssignState {
             // setup child state
             MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
         } else {
-            MatchResult::Continue
+            MatchResult::Continue(0)
         }
     }
 

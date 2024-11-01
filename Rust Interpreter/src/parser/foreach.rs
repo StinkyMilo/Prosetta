@@ -36,7 +36,7 @@ impl ParseState for ForEachState {
                 MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat_cont()))
             }
         } else {
-            MatchResult::Continue
+            MatchResult::Continue(0)
         }
     }
 
@@ -75,7 +75,7 @@ impl ParseState for ForEachState {
                     MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat()))
                     // failed - pass word
                 } else {
-                    MatchResult::Continue
+                    MatchResult::Continue(0)
                 }
             }
         } else {

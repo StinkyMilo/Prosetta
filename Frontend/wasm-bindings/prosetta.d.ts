@@ -1,54 +1,38 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
-* @returns {number}
-*/
+ * @returns {number}
+ */
 export function get_heap_size(): number;
-/**
-*/
 export class Highlight {
   free(): void;
-/**
-*/
   color: (string)[];
-/**
-*/
   index: number;
-/**
-*/
   length: number;
-/**
-*/
   line: number;
 }
-/**
-*/
 export class ParserRunner {
   free(): void;
-/**
-*/
   constructor();
-/**
-* @param {string} source
-* @returns {ParserRunnerData}
-*/
+  /**
+   * @param {string} source
+   * @returns {ParserRunnerData}
+   */
   run_to_completion(source: string): ParserRunnerData;
 }
-/**
-*/
 export class ParserRunnerData {
   free(): void;
-/**
-* @returns {string}
-*/
+  /**
+   * @returns {string}
+   */
   get_javascript(): string;
-/**
-* @returns {string}
-*/
+  /**
+   * @returns {string}
+   */
   get_html(): string;
-/**
-* @returns {(Highlight)[]}
-*/
+  /**
+   * @returns {(Highlight)[]}
+   */
   get_highlights(): (Highlight)[];
 }
 
@@ -56,14 +40,6 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly get_heap_size: () => number;
-  readonly __wbg_parserrunner_free: (a: number, b: number) => void;
-  readonly __wbg_parserrunnerdata_free: (a: number, b: number) => void;
-  readonly parserrunner_new: () => number;
-  readonly parserrunner_run_to_completion: (a: number, b: number, c: number) => number;
-  readonly parserrunnerdata_get_javascript: (a: number, b: number) => void;
-  readonly parserrunnerdata_get_html: (a: number, b: number) => void;
-  readonly parserrunnerdata_get_highlights: (a: number, b: number) => void;
   readonly __wbg_highlight_free: (a: number, b: number) => void;
   readonly __wbg_get_highlight_line: (a: number) => number;
   readonly __wbg_set_highlight_line: (a: number, b: number) => void;
@@ -73,6 +49,14 @@ export interface InitOutput {
   readonly __wbg_set_highlight_length: (a: number, b: number) => void;
   readonly __wbg_get_highlight_color: (a: number, b: number) => void;
   readonly __wbg_set_highlight_color: (a: number, b: number, c: number) => void;
+  readonly get_heap_size: () => number;
+  readonly __wbg_parserrunner_free: (a: number, b: number) => void;
+  readonly __wbg_parserrunnerdata_free: (a: number, b: number) => void;
+  readonly parserrunner_new: () => number;
+  readonly parserrunner_run_to_completion: (a: number, b: number, c: number) => number;
+  readonly parserrunnerdata_get_javascript: (a: number, b: number) => void;
+  readonly parserrunnerdata_get_html: (a: number, b: number) => void;
+  readonly parserrunnerdata_get_highlights: (a: number, b: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;

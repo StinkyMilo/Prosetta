@@ -184,13 +184,6 @@ function takeObject(idx) {
     dropObject(idx);
     return ret;
 }
-/**
-* @returns {number}
-*/
-export function get_heap_size() {
-    const ret = wasm.get_heap_size();
-    return ret >>> 0;
-}
 
 function _assertNum(n) {
     if (typeof(n) !== 'number') throw new Error(`expected a number argument, found ${typeof(n)}`);
@@ -231,12 +224,18 @@ function logError(f, args) {
         throw e;
     }
 }
+/**
+ * @returns {number}
+ */
+export function get_heap_size() {
+    const ret = wasm.get_heap_size();
+    return ret >>> 0;
+}
 
 const HighlightFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_highlight_free(ptr >>> 0, 1));
-/**
-*/
+
 export class Highlight {
 
     constructor() {
@@ -263,8 +262,8 @@ export class Highlight {
         wasm.__wbg_highlight_free(ptr, 0);
     }
     /**
-    * @returns {number}
-    */
+     * @returns {number}
+     */
     get line() {
         if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
         _assertNum(this.__wbg_ptr);
@@ -272,8 +271,8 @@ export class Highlight {
         return ret >>> 0;
     }
     /**
-    * @param {number} arg0
-    */
+     * @param {number} arg0
+     */
     set line(arg0) {
         if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
         _assertNum(this.__wbg_ptr);
@@ -281,8 +280,8 @@ export class Highlight {
         wasm.__wbg_set_highlight_line(this.__wbg_ptr, arg0);
     }
     /**
-    * @returns {number}
-    */
+     * @returns {number}
+     */
     get index() {
         if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
         _assertNum(this.__wbg_ptr);
@@ -290,8 +289,8 @@ export class Highlight {
         return ret >>> 0;
     }
     /**
-    * @param {number} arg0
-    */
+     * @param {number} arg0
+     */
     set index(arg0) {
         if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
         _assertNum(this.__wbg_ptr);
@@ -299,8 +298,8 @@ export class Highlight {
         wasm.__wbg_set_highlight_index(this.__wbg_ptr, arg0);
     }
     /**
-    * @returns {number}
-    */
+     * @returns {number}
+     */
     get length() {
         if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
         _assertNum(this.__wbg_ptr);
@@ -308,8 +307,8 @@ export class Highlight {
         return ret >>> 0;
     }
     /**
-    * @param {number} arg0
-    */
+     * @param {number} arg0
+     */
     set length(arg0) {
         if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
         _assertNum(this.__wbg_ptr);
@@ -317,8 +316,8 @@ export class Highlight {
         wasm.__wbg_set_highlight_length(this.__wbg_ptr, arg0);
     }
     /**
-    * @returns {(string)[]}
-    */
+     * @returns {(string)[]}
+     */
     get color() {
         try {
             if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
@@ -335,8 +334,8 @@ export class Highlight {
         }
     }
     /**
-    * @param {(string)[]} arg0
-    */
+     * @param {(string)[]} arg0
+     */
     set color(arg0) {
         if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
         _assertNum(this.__wbg_ptr);
@@ -349,8 +348,7 @@ export class Highlight {
 const ParserRunnerFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_parserrunner_free(ptr >>> 0, 1));
-/**
-*/
+
 export class ParserRunner {
 
     __destroy_into_raw() {
@@ -364,8 +362,6 @@ export class ParserRunner {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_parserrunner_free(ptr, 0);
     }
-    /**
-    */
     constructor() {
         const ret = wasm.parserrunner_new();
         this.__wbg_ptr = ret >>> 0;
@@ -373,9 +369,9 @@ export class ParserRunner {
         return this;
     }
     /**
-    * @param {string} source
-    * @returns {ParserRunnerData}
-    */
+     * @param {string} source
+     * @returns {ParserRunnerData}
+     */
     run_to_completion(source) {
         if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
         _assertNum(this.__wbg_ptr);
@@ -389,8 +385,7 @@ export class ParserRunner {
 const ParserRunnerDataFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_parserrunnerdata_free(ptr >>> 0, 1));
-/**
-*/
+
 export class ParserRunnerData {
 
     constructor() {
@@ -417,8 +412,8 @@ export class ParserRunnerData {
         wasm.__wbg_parserrunnerdata_free(ptr, 0);
     }
     /**
-    * @returns {string}
-    */
+     * @returns {string}
+     */
     get_javascript() {
         let deferred1_0;
         let deferred1_1;
@@ -438,8 +433,8 @@ export class ParserRunnerData {
         }
     }
     /**
-    * @returns {string}
-    */
+     * @returns {string}
+     */
     get_html() {
         let deferred1_0;
         let deferred1_1;
@@ -459,8 +454,8 @@ export class ParserRunnerData {
         }
     }
     /**
-    * @returns {(Highlight)[]}
-    */
+     * @returns {(Highlight)[]}
+     */
     get_highlights() {
         try {
             if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
@@ -486,7 +481,7 @@ async function __wbg_load(module, imports) {
 
             } catch (e) {
                 if (module.headers.get('Content-Type') != 'application/wasm') {
-                    console.warn("`WebAssembly.instantiateStreaming` failed because your server does not serve wasm with `application/wasm` MIME type. Falling back to `WebAssembly.instantiate` which is slower. Original error:\n", e);
+                    console.warn("`WebAssembly.instantiateStreaming` failed because your server does not serve Wasm with `application/wasm` MIME type. Falling back to `WebAssembly.instantiate` which is slower. Original error:\n", e);
 
                 } else {
                     throw e;
@@ -564,10 +559,13 @@ function initSync(module) {
     if (wasm !== undefined) return wasm;
 
 
-    if (typeof module !== 'undefined' && Object.getPrototypeOf(module) === Object.prototype)
-    ({module} = module)
-    else
-    console.warn('using deprecated parameters for `initSync()`; pass a single object instead')
+    if (typeof module !== 'undefined') {
+        if (Object.getPrototypeOf(module) === Object.prototype) {
+            ({module} = module)
+        } else {
+            console.warn('using deprecated parameters for `initSync()`; pass a single object instead')
+        }
+    }
 
     const imports = __wbg_get_imports();
 
@@ -586,10 +584,13 @@ async function __wbg_init(module_or_path) {
     if (wasm !== undefined) return wasm;
 
 
-    if (typeof module_or_path !== 'undefined' && Object.getPrototypeOf(module_or_path) === Object.prototype)
-    ({module_or_path} = module_or_path)
-    else
-    console.warn('using deprecated parameters for the initialization function; pass a single object instead')
+    if (typeof module_or_path !== 'undefined') {
+        if (Object.getPrototypeOf(module_or_path) === Object.prototype) {
+            ({module_or_path} = module_or_path)
+        } else {
+            console.warn('using deprecated parameters for the initialization function; pass a single object instead')
+        }
+    }
 
     if (typeof module_or_path === 'undefined') {
         module_or_path = new URL('prosetta_bg.wasm', import.meta.url);

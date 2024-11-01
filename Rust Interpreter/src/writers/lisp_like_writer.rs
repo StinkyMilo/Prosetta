@@ -58,6 +58,26 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
     match &exprs[index] {
         Expr::NoneStat => "(todo stat)".to_string(),
         Expr::NoneExpr => "(todo expr)".to_string(),
+        Expr::Title { data } => {
+            let author_str = data.authors.iter().fold(String::new(), |str, author| {
+                format!(
+                    "{str} \"{}\"@{}$${}",
+                    String::from_utf8_lossy(&author.0),
+                    author.1,
+                    author.2
+                )
+            });
+
+            let imports_str = data.imports.iter().fold(String::new(), |str, import| {
+                format!("{str} {}@{}$${}", import.0.get_name(), import.1, import.2)
+            });
+
+            format!(
+                "(title \"{}\" (authors{author_str})@{} (imports{imports_str}))",
+                String::from_utf8_lossy(&data.title),
+                data.by_start
+            )
+        }
         Expr::Assign {
             locs,
             var,

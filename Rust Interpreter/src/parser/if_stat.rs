@@ -61,7 +61,7 @@ impl ParseState for IfState {
                     MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat()))
                     // failed - pass word
                 } else {
-                    MatchResult::Continue
+                    MatchResult::Continue(0)
                 }
             }
         } else {

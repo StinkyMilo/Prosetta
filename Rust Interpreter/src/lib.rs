@@ -20,8 +20,8 @@ use crate::writers::syntax_renderers::{
     html_renderer::HTMLRenderer,
     line_renderer::{Highlight, LineRenderer},
 };
-use std::alloc;
 use cap::Cap;
+use std::alloc;
 
 // // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // // allocator.
@@ -59,7 +59,7 @@ impl ParserRunner {
     pub fn run_to_completion(&mut self, source: &str) -> ParserRunnerData {
         let mut parser = Parser::new(
             ParserSource::from_string(source.as_bytes().to_vec()),
-            ParserFlags::default(),
+            ParserFlags { title: true },
         );
 
         loop {

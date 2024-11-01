@@ -1,4 +1,7 @@
-use crate::{commands::*, parser::multi_lit_num::VarOrInt, parser::string_lit::VarOrStr};
+use crate::{
+    commands::*,
+    parser::{multi_lit_num::VarOrInt, string_lit::VarOrStr},
+};
 
 #[allow(dead_code)]
 pub fn write(exprs: &ExprArena, line_starts: &Vec<usize>) -> String {
@@ -23,6 +26,19 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
     match &exprs[index] {
         Expr::NoneStat => "(todo stat)".to_string(),
         Expr::NoneExpr => "(todo expr)".to_string(),
+        Expr::Title { data } => {
+            let author_str = data
+                .authors
+                .iter()
+                .map(|name| String::from_utf8_lossy(&name.0))
+                .collect::<Vec<_>>()
+                .join(", ");
+            format!(
+                "`{}`;\n\"By {}\";\n",
+                String::from_utf8_lossy(&data.title),
+                author_str
+            )
+        }
         Expr::Assign {
             var,
             value_index,
