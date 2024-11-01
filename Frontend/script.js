@@ -1,4 +1,5 @@
 import { getAliasTriggered, wordsForAliases } from './wordsForAliases.js';
+import { Import } from './wasm-bindings/prosetta.js';
 
 var jscode, sourcecode, ctx, cnsl, canvas;
 var x = 0, y = 0, rotation = 0;
@@ -7,14 +8,12 @@ var has_drawn_shape = false;
 var last_shape = "none";
 var worker;
 var editor;
+var imports = [];
+var frameInterval;
+var _frame = 0;
 
 function init_canvas() {
-  sourcecode = document.getElementById("code");
-  jscode = document.getElementById("js");
-  canvas = document.getElementById("outputcanvas");
-  ctx = canvas.getContext('2d');
-  cnsl = document.getElementById("console");
-
+  cnsl.innerText = "";
   canvas.width = canvas.width;
   has_drawn_shape = false;
   last_shape = "none";
@@ -287,21 +286,21 @@ function get_color(...args) {
 }
 
 function runCode() {
-  if (has_run) {
-    print_console();
-    print_console("Welcome to Prosetta!");
-    print_console("---");
-    print_console();
-  }
-  has_run = true;
   init_canvas();
+  print_console();
+  print_console("Welcome to Prosetta!");
+  print_console("---");
+  print_console();
+  if (has_run) {
+    has_run = true;
+  }
   try {
     eval(jscode.value);
     end_shape();
   } catch (error) {
     print_console(error);
   }
-  cnsl.scrollTop = cnsl.scrollHeight;
+  // cnsl.scrollTop = cnsl.scrollHeight;
 }
 
 function openTab(event, tab) {
@@ -329,6 +328,11 @@ function updateCode() {
 }
 
 async function initialize(startingCode) {
+  sourcecode = document.getElementById("code");
+  jscode = document.getElementById("js");
+  canvas = document.getElementById("outputcanvas");
+  ctx = canvas.getContext('2d');
+  cnsl = document.getElementById("console");
   let tabs = document.getElementsByClassName("tabBtn tabDefault");
   tabs[0].click();
 
@@ -342,9 +346,6 @@ async function initialize(startingCode) {
   return setup_editor(startingCode);
 }
 
-window.runCode = runCode;
-window.updateCode = updateCode;
-window.openTab = openTab;
 
 function msg_worker(command, data) {
   worker.postMessage({ command: command, data: data });
@@ -460,7 +461,9 @@ function setup_editor(startingCode) {
     }, 500);
   }
 
-  editor.on("change", (cm, change) => { updateCode(); });
+  editor.on("change", (cm, change) => {
+    updateCode();
+  });
   editor.setValue(startingCode);
   return editor;
   /**
@@ -495,6 +498,7 @@ function setup_webworker() {
     let data = e.data.data;
     switch (command) {
       case "parsed":
+        imports = data.imports;
         jscode.innerHTML = data.js;
         let highlights = data.hl;
         editor.doc.getAllMarks().forEach(marker => marker.clear());
@@ -505,9 +509,30 @@ function setup_webworker() {
             { className: hl.color.at(-1) }
           );
         }
+        pause();
+        _frame = 0;
+        runCode();
+        play();
         break;
     }
   };
 }
 
+function has_import(imp) {
+  return imports.indexOf(imp) >= 0;
+}
+
+function play() {
+  pause();
+  if (has_import(Import.Frame)) {
+    frameInterval = setInterval(() => { _frame++; runCode(); }, 1000 / 30);
+  }
+}
+function pause() {
+  clearInterval(frameInterval);
+}
+
+window.pause = pause;
+window.play = play;
+window.openTab = openTab;
 export default initialize;
