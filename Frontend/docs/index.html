@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Document</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="description" content="Description">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
-  <script src="//cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+  <link rel="stylesheet" href="../node_modules/docsify/lib/themes/vue.css">
+  <script src="../node_modules/vue/dist/vue.global.prod.js"></script>
   <link rel="stylesheet" href="../node_modules/codemirror/lib/codemirror.css">
   <script src="../node_modules/codemirror/lib/codemirror.js"></script>
   <script src="../node_modules/codemirror/mode/javascript/javascript.js"></script>
-  <!-- <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/external-script.min.js"></script> -->
   <link rel="stylesheet" href="../style.css">
   <link rel="stylesheet" href="../color.css">
 </head>
+
 <body>
   <div id="app"></div>
   <script type="module">
@@ -23,11 +24,11 @@
     window.$docsify = {
       name: '',
       repo: '',
-      loadSidebar:true,
-      vueComponents:{
-        'editor':{
+      loadSidebar: true,
+      vueComponents: {
+        'editor': {
           'template':
-          `
+            `
             <button class="changeModeBtn" @click="switchMode()" v-show="codeWordier != null">Mode: {{mode}}</button>
             <div id="tabGroup">
                 <button class="tabBtn tabDefault" onclick="openTab(event, 'code')">Code</button>
@@ -48,44 +49,45 @@
             Mode is 'minimal' or 'wordier'
             If codeWordier is null, don't show the toggle
           */
-          props:['code','code-wordier','output-method'],
-          setup(props){
-            console.log("PROPS",props);
+          props: ['code', 'code-wordier', 'output-method'],
+          setup(props) {
+            console.log("PROPS", props);
           },
           data() {
             return {
-              code:this.code,
-              codeWordier:this.codeWordier,
-              outputMethod:this.outputMethod,
-              mode:'minimal',
-              switchMode:()=>{
-                if(this.mode=='wordier'){
+              code: this.code,
+              codeWordier: this.codeWordier,
+              outputMethod: this.outputMethod,
+              mode: 'minimal',
+              switchMode: () => {
+                if (this.mode == 'wordier') {
                   editor.setValue(this.code.substring(1));
                   runCode();
-                  this.mode='minimal';
-                }else{
+                  this.mode = 'minimal';
+                } else {
                   editor.setValue(this.codeWordier.substring(1));
                   runCode();
-                  this.mode='wordier';
+                  this.mode = 'wordier';
                 }
               }
             };
           },
-          mounted: async function(){
+          mounted: async function () {
             editor = await initialize(this.code.substring(1));
             runCode();
           }
         }
       },
-      toc:{
+      toc: {
         tocMaxLevel: 5,
         target: 'h1, h2, h3, h4, h5, h6',
-        ignoreHeaders: ['Arguments','Example']
+        ignoreHeaders: ['Arguments', 'Example']
       }
     }
-    
+
   </script>
   <!-- Docsify v4 -->
-  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  <script src="../node_modules/docsify/lib/docsify.js"></script>
 </body>
+
 </html>
