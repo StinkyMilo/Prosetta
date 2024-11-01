@@ -67,6 +67,11 @@ use crate::commands::*;
 
 use alias_data::AliasData;
 
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
+#[allow(dead_code)]
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, PartialEq, Clone, Copy, Hash, Eq)]
 pub enum Import {
     List,
@@ -140,8 +145,8 @@ pub struct ParsedData<'a> {
     pub nots: IgnoreSet,
     ///the parserSource that is used
     pub source: ParserSource<'a>,
-    // ///the title and authors
-    // pub title: Option<Title>,
+    /// the imports
+    pub imports: Vec<Import>,
 }
 
 #[derive(Debug)]
@@ -190,8 +195,8 @@ impl<'a> Parser<'a> {
                 stat_starts: Vec::new(),
                 symbols: SymbolSet::new(),
                 nots: IgnoreSet::new(),
+                imports: Vec::new(),
                 source,
-                // title,
             },
             parse_title: flags.title,
             stack: Vec::new(),
@@ -499,7 +504,9 @@ impl<'a> Parser<'a> {
         if self.stack.is_empty() {
             if self.parse_title {
                 if let Expr::Title { data } = &self.data.exprs[expr_index] {
-                    self.aliases = AliasData::new(&mut data.imports.iter().map(|e| &e.0))
+                    let imports = data.imports.iter().map(|e| e.0).collect::<Vec<_>>();
+                    self.aliases = AliasData::new(&mut imports.iter());
+                    self.data.imports = imports;
                 } else {
                     unreachable!()
                 };

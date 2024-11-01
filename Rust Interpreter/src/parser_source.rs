@@ -173,12 +173,6 @@ impl<'a> ParserSource<'a> {
                 buf.push(b'\n');
                 return !has_input;
             }
-            //     } else {
-            //         has_first_empty = true;
-            //     }
-            // } else {
-            //     has_first_empty = false;
-            // }
 
             has_input = true;
             if buf.len() == 0 {

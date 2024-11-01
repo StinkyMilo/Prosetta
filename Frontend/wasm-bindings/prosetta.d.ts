@@ -4,6 +4,12 @@
  * @returns {number}
  */
 export function get_heap_size(): number;
+export enum Import {
+  List = 0,
+  Func = 1,
+  Graph = 2,
+  Frame = 3,
+}
 export class Highlight {
   free(): void;
   color: (string)[];
@@ -34,6 +40,10 @@ export class ParserRunnerData {
    * @returns {(Highlight)[]}
    */
   get_highlights(): (Highlight)[];
+  /**
+   * @returns {any[]}
+   */
+  get_imports(): any[];
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -57,6 +67,7 @@ export interface InitOutput {
   readonly parserrunnerdata_get_javascript: (a: number, b: number) => void;
   readonly parserrunnerdata_get_html: (a: number, b: number) => void;
   readonly parserrunnerdata_get_highlights: (a: number, b: number) => void;
+  readonly parserrunnerdata_get_imports: (a: number, b: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;

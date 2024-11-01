@@ -12,7 +12,7 @@ mod parser;
 mod writers;
 
 use crate::parser::{ParsedData, ParserResult};
-use parser::ParserSource;
+use parser::{ParserSource,Import};
 
 use crate::writers::javascript_writer;
 use crate::writers::syntax_lint::SyntaxLinter;
@@ -90,6 +90,9 @@ impl ParserRunnerData {
         let mut lint = SyntaxLinter::<LineRenderer>::new();
         lint.write(&self.data.exprs, &self.data.stat_starts, iter);
         lint.into_data()
+    }
+    pub fn get_imports(&self) -> Vec<Import> {
+        self.data.imports.clone()
     }
 }
 
