@@ -120,9 +120,12 @@ impl TitleState {
         }
     }
     fn add_imports(&mut self, name: &[u8], index: usize) {
+        let lower_name = name.to_ascii_lowercase();
         let imports = Import::get_all();
         if let Some((offset, _, imp_index)) =
-            parser_structs::try_get_best_val(name, &mut imports.iter().map(|e| e.1), &|_| true)
+            parser_structs::try_get_best_val(&lower_name, &mut imports.iter().map(|e| e.1), &|_| {
+                true
+            })
         {
             self.data.imports.push((
                 imports[imp_index].0,

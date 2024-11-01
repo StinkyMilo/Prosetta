@@ -24,7 +24,7 @@ cfg-if = "1.0.0"
 nannou = { version = "0.19.0", optional = true }
 quickscope = "0.2.0"
 rangemap = "1.5.1"
-wasm-bindgen = { version = "0.2.93", optional = true }
+wasm-bindgen = { version = "0.2.95", optional = true }
 #wasm-pack = { version = "0.13.0", optional = true }
 # getrandom = { version = "0.2", features = ["js"], optional=true} 
 #wee_alloc = { version = "0.4.5", optional = true }
