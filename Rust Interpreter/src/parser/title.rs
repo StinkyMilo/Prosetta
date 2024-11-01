@@ -14,6 +14,10 @@ impl ParseState for TitleState {
             // names cannot be more than 255
             if word.len() > 255 {
                 return MatchResult::Continue(0);
+            } else if word.len() == 0 {
+                let title = mem::replace(&mut self.data, Title::new());
+                *env.expr = Expr::Title { data: title };
+                return MatchResult::Matched(0, false);
             }
             let separator = Self::is_separator(word.str);
             // is name
