@@ -95,7 +95,6 @@ function draw_line() {
         ctx.moveTo(x, y);
       }
       move_distance(arguments[0]);
-      console.log(x, y, arguments[0], rotation);
       ctx.lineTo(x, y);
       break;
     case 2:
@@ -295,7 +294,7 @@ function runCode() {
     has_run = true;
   }
   try {
-    eval(jscode.value);
+    eval(jscode.innerText);
     end_shape();
   } catch (error) {
     print_console(error);
@@ -331,6 +330,7 @@ async function initialize(startingCode) {
   sourcecode = document.getElementById("code");
   jscode = document.getElementById("js");
   canvas = document.getElementById("outputcanvas");
+  jscode.innerText = "";
   ctx = canvas.getContext('2d');
   cnsl = document.getElementById("console");
   let tabs = document.getElementsByClassName("tabBtn tabDefault");
@@ -452,7 +452,6 @@ function setup_editor(startingCode) {
     if (alias == null) {
       return;
     }
-    console.log(alias);
     displayTimeout = setTimeout(() => {
       clearWidget();
       activeWidget = getNewTooltip(alias);
@@ -499,7 +498,7 @@ function setup_webworker() {
     switch (command) {
       case "parsed":
         imports = data.imports;
-        jscode.innerHTML = data.js;
+        jscode.innerText = data.js;
         let highlights = data.hl;
         editor.doc.getAllMarks().forEach(marker => marker.clear());
         for (let hl of highlights) {
