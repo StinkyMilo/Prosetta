@@ -10,7 +10,7 @@ crate-type = ["cdylib", "rlib"]
 
 [features]
 # wasm = ["dep:wasm-bindgen", "dep:wasm-pack", "dep:getrandom", "dep:wee_alloc"]
-wasm = ["dep:wasm-bindgen"]
+wasm = ["dep:wasm-bindgen", "dep:cap"]
 runner = []
 image = ["runner", "dep:nannou"]
 no-cache = []
@@ -19,13 +19,11 @@ speed = []
 
 [dependencies]
 bstr = "1.10.0"
-cap = "0.1.2"
+cap = { version = "0.1.2", optional = true }
 cfg-if = "1.0.0"
 nannou = { version = "0.19.0", optional = true }
 quickscope = "0.2.0"
 rangemap = "1.5.1"
-serde = "1.0.213"
-serde-wasm-bindgen = "0.6.5"
 wasm-bindgen = { version = "0.2.93", optional = true }
 #wasm-pack = { version = "0.13.0", optional = true }
 # getrandom = { version = "0.2", features = ["js"], optional=true} 

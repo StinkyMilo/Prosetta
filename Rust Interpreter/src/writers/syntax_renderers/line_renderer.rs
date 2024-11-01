@@ -7,6 +7,7 @@ pub struct LineRenderer {
     curr_index: usize,
     old_color: Vec<(TermColor, bool)>,
     new_color: Vec<(TermColor, bool)>,
+    force: bool,
 }
 
 impl Default for LineRenderer {
@@ -18,16 +19,16 @@ impl Default for LineRenderer {
             new_color: color,
             curr_line: 0,
             curr_index: 0,
+            force: false,
         }
     }
 }
 
-use serde::{Deserialize, Serialize};
 #[cfg(feature = "wasm")]
 use wasm_bindgen::prelude::*;
 #[allow(dead_code)]
 #[cfg_attr(feature = "wasm", wasm_bindgen(getter_with_clone))]
-#[derive(PartialEq, Eq, Clone, Debug, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Clone, Debug)]
 pub struct Highlight {
     pub line: usize,
     pub index: usize,
@@ -58,6 +59,7 @@ impl Renderer for LineRenderer {
             if !first {
                 self.curr_line += 1;
                 self.curr_index = 0;
+                self.force = true;
             }
             self.change_or_add(line);
             first = false;
@@ -80,7 +82,7 @@ impl Renderer for LineRenderer {
 
     fn add_with_mult(&mut self, text: &[u8], colors: Vec<(TermColor, bool)>) {
         self.new_color = colors;
-        self.change_or_add(text);
+        self.add(text);
     }
 
     fn push_with(&mut self, char: u8, color: (TermColor, bool)) {
@@ -104,12 +106,13 @@ impl LineRenderer {
         // if color changed to base, nothing is needed
         if self.new_color != vec![BASE_COLOR] {
             // colors are same -- add to last
-            if self.old_color == self.new_color {
+            if self.old_color == self.new_color && !self.force {
                 // should always be safe due to the not BASE_COLOR check
                 let highlight = self.vec.last_mut().unwrap();
                 highlight.length += str.len();
             // colors have changed
             } else {
+                self.force = false;
                 self.vec.push(Highlight {
                     line: self.curr_line,
                     index: self.curr_index,
