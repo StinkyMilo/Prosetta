@@ -18,6 +18,22 @@
 
 <body>
   <div id="app"></div>
+  <script>const observeUrlChange = () => {
+      let oldHref = document.location.href;
+      const body = document.querySelector('body');
+      const observer = new MutationObserver(mutations => {
+        if (oldHref !== document.location.href) {
+          oldHref = document.location.href;
+          console.log("new page", oldHref);
+          if (!oldHref.includes("?id=")) {
+            window.scrollTo(0, 0);
+          }
+        }
+      });
+      observer.observe(body, {childList: true, subtree: true});
+    };
+    window.onload = observeUrlChange;
+  </script>
   <script type="module">
     import initialize from "../script.js";
     let editor;
