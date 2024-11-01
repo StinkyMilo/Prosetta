@@ -78,7 +78,7 @@ impl Import {
         match self {
             Import::List => "List",
             Import::Func => "Func",
-            Import::Graph => "Func",
+            Import::Graph => "Graph",
         }
     }
     pub fn get_all() -> &'static [(Import, &'static [u8])] {
