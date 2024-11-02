@@ -353,6 +353,7 @@ impl<'a> Parser<'a> {
             global_index: self.pos,
             aliases: &self.aliases,
             full_text: line,
+            trigger_word_data: &mut Vec::new()
         };
 
         let last_result = mem::replace(&mut self.last_result, LastMatchResult::None);

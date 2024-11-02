@@ -48,7 +48,7 @@ fn main() {
     args.sort();
 
     let parser_flags = ParserFlags {
-        title: true, //args.binary_search(&"not".to_string()).is_ok(),
+        title: false, //args.binary_search(&"not".to_string()).is_ok(),
     };
 
     let vis_flags: RunnerFlags = RunnerFlags {
@@ -57,6 +57,7 @@ fn main() {
         whole_program: true,
         linted: true,
         line_rendered: true,
+        word_trigger: true
     };
 
     run_parser(

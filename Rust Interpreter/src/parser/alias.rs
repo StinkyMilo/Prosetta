@@ -13,6 +13,12 @@ enum MatchState {
     FindAliases,
 }
 
+pub struct WordTrigger{
+    word_start:usize,
+    word_end:usize,
+    alias_trigger:Vec<u8>
+}
+
 /// used for both NoneStat and NoneExpr
 /// finds next command
 #[derive(Debug)]
@@ -169,7 +175,8 @@ impl NoneState {
             // try match
             while self.matched != 0 {
                 self.matched -= 1;
-                return self.find_best_match(env, &aliases, offset, rest.pos);
+                let matched_value = self.find_best_match(word, env, &aliases, offset, rest.pos);
+                return matched_value;
             }
         }
 
@@ -188,6 +195,7 @@ impl NoneState {
     ///3. then on least total location value
     fn find_best_match(
         &mut self,
+        word: &Slice,
         env: &mut Environment,
         aliases: &AliasNames,
         offset: usize,
@@ -219,6 +227,11 @@ impl NoneState {
         for index in env.locs.as_mut().unwrap() {
             *index += env.global_index;
         }
+        env.trigger_word_data.push(WordTrigger{
+            word_start: word.pos,
+            word_end: word.pos+word.len(),
+            alias_trigger: aliases[min_index as usize].to_vec(),
+        });
         //set up stack
         (self.data.func)(
             aliases[min_index as usize],
