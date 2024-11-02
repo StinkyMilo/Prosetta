@@ -23,7 +23,10 @@
   <div id="codespace">
     <div class="tabContent noScroll" id="code"></div>
     <textarea style="display: none;" readonly="true" class="tabContent" id="js">JavaScript</textarea>
-    <canvas id="outputcanvas" width="400px" height="400px" />
+    <div id="stack">
+      <canvas id="outputcanvas" width="400px" height="400px"></canvas>
+      <canvas id="outputcanvas2" style="visibility: hidden;" width="400px" height="400px"></canvas>
+    </div>
   </div>
   <button onclick="play()">⏵</button>
   <button onclick="pause()">⏸</button>

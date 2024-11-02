@@ -13,9 +13,9 @@ onmessage = async function(e) {
     case "initialize":
       const wasm = await import('./wasm-bindings/prosetta.js');
       let wasm_instance = await wasm.default();
-      setInterval(() =>
-        console.log("wasm is using",
-          wasm_instance.memory.buffer.byteLength, "total and ", wasm.get_heap_size(), " on heap"), 1000);
+      // setInterval(() =>
+      //   console.log("wasm is using",
+      //     wasm_instance.memory.buffer.byteLength, "total and ", wasm.get_heap_size(), " on heap"), 1000);
       parser = new wasm.ParserRunner();
       has_initialized = true;
       while (preinit_queue.length > 0) {

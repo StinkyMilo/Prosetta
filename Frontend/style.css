@@ -1,4 +1,9 @@
-#outputcanvas {
+div {
+  position: relative;
+}
+
+div>canvas {
+  position: absolute;
   background: white;
   margin-left: 10px;
   border-color: slategray;
@@ -18,7 +23,7 @@
   border-width: 1px;
 }
 
-.noScroll{
+.noScroll {
   overflow: hidden;
 }
 
@@ -50,7 +55,7 @@
 #console {
   margin-top: 10px;
   overflow: scroll;
-  height: 100px;
+  height: 300px;
   font-family: var(--mono-font);
   background: black;
   color: white;

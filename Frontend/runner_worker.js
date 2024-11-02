@@ -3,7 +3,15 @@ onmessage = async function(e) {
   let data = e.data.data;
   switch (command) {
     case "run":
+      try {
+        var _frame = data.frame;
+        eval(data.code);
+        end_shape();
+      } catch (error) {
+        print_console(error);
+      }
       eval(data.code)
+      postMessage({ command: "finished" });
       break;
   }
 }
@@ -66,6 +74,10 @@ function log_base() {
 
 function get_color() {
   send_function("get_color", ...arguments);
+}
+
+function end_shape() {
+  send_function("end_shape", ...arguments);
 }
 
 function send_function(name, args) {

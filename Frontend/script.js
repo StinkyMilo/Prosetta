@@ -1,30 +1,34 @@
 import { getAliasTriggered, wordsForAliases } from './wordsForAliases.js';
 import { Import } from './wasm-bindings/prosetta.js';
 
-var jscode, sourcecode, ctx, cnsl, canvas;
+var jscode, sourcecode, cnsl, curr_ctx, curr_canvas, displayed_ctx, displayed_canvas;
 var x = 0, y = 0, rotation = 0;
-var has_run = false;
 var has_drawn_shape = false;
 var last_shape = "none";
 var language_worker, runner_worker;
 var editor;
 var imports = [];
 var frameInterval;
-var _frame = 0;
+var curr_frame = 0;
+var latest_frame = 0;
+var frame_queued = false;
+var last_frame_timestamp = Date.now();
+var target_fps = 30;
+var is_canceled = false;
 
 function init_canvas() {
   cnsl.innerText = "";
-  canvas.width = canvas.width;
+  curr_canvas.width = curr_canvas.width;
   has_drawn_shape = false;
   last_shape = "none";
   reset_rotation();
   _move_to(0, 0);
-  ctx.moveTo(x, y);
+  curr_ctx.moveTo(x, y);
   set_stroke("black");
   set_fill("transparent");
-  ctx.lineCap = "round";
-  ctx.lineJoin = "round";
-  ctx.lineWidth = 1;
+  curr_ctx.lineCap = "round";
+  curr_ctx.lineJoin = "round";
+  curr_ctx.lineWidth = 1;
 }
 
 function print_console() {
@@ -40,14 +44,14 @@ function end_shape() {
   if (last_shape == "none" || last_shape == "move") {
     return;
   }
-  ctx.fill();
-  ctx.stroke();
+  curr_ctx.fill();
+  curr_ctx.stroke();
   last_shape = "none";
 }
 
 function start_shape() {
   end_shape();
-  ctx.beginPath();
+  curr_ctx.beginPath();
 }
 
 function lerp(a, b, t) {
@@ -71,7 +75,7 @@ function bezier_point(t, points) {
 function draw_bezier(...xy) {
   if (last_shape != "line") {
     start_shape();
-    ctx.moveTo(x, y);
+    curr_ctx.moveTo(x, y);
   }
   let points = [{ x: x, y: y }];
   for (let i = 0; i < xy.length; i += 2) {
@@ -80,10 +84,10 @@ function draw_bezier(...xy) {
   }
   for (let t = 0; t < 1; t += 0.05) {
     let point = bezier_point(t, points)
-    ctx.lineTo(point.x, point.y);
+    curr_ctx.lineTo(point.x, point.y);
   }
   let point = bezier_point(1, points)
-  ctx.lineTo(point.x, point.y);
+  curr_ctx.lineTo(point.x, point.y);
   last_shape = "line";
 }
 
@@ -92,32 +96,32 @@ function draw_line() {
     case 1:
       if (last_shape != "line") {
         start_shape();
-        ctx.moveTo(x, y);
+        curr_ctx.moveTo(x, y);
       }
       move_distance(arguments[0]);
-      ctx.lineTo(x, y);
+      curr_ctx.lineTo(x, y);
       break;
     case 2:
       if (last_shape != "line") {
         start_shape();
-        ctx.moveTo(x, y);
+        curr_ctx.moveTo(x, y);
       }
       move_delta(arguments[0], arguments[1]);
-      ctx.lineTo(x, y);
+      curr_ctx.lineTo(x, y);
       break;
     case 3:
       start_shape();
       _move_to(arguments[0], arguments[1]);
-      ctx.moveTo(x, y);
+      curr_ctx.moveTo(x, y);
       move_distance(arguments[2]);
-      ctx.lineTo(x, y);
+      curr_ctx.lineTo(x, y);
       break;
     case 4:
       start_shape();
       _move_to(arguments[0], arguments[1]);
-      ctx.moveTo(x, y);
+      curr_ctx.moveTo(x, y);
       _move_to(arguments[2], arguments[3]);
-      ctx.lineTo(x, y);
+      curr_ctx.lineTo(x, y);
       break;
 
   }
@@ -200,11 +204,11 @@ function draw_rect() {
   let [x2, y2] = rotate_point(x, y, rad, x + width / 2, y - height / 2);
   let [x3, y3] = rotate_point(x, y, rad, x + width / 2, y + height / 2);
   let [x4, y4] = rotate_point(x, y, rad, x - width / 2, y + height / 2);
-  ctx.moveTo(x1, y1);
-  ctx.lineTo(x2, y2);
-  ctx.lineTo(x3, y3);
-  ctx.lineTo(x4, y4);
-  ctx.closePath();
+  curr_ctx.moveTo(x1, y1);
+  curr_ctx.lineTo(x2, y2);
+  curr_ctx.lineTo(x3, y3);
+  curr_ctx.lineTo(x4, y4);
+  curr_ctx.closePath();
   last_shape = "rect";
 }
 
@@ -231,17 +235,17 @@ function draw_ellipse() {
       break;
   }
   start_shape();
-  ctx.ellipse(x, y, width / 2, height / 2, -rotation_radians(), 0, 2 * Math.PI);
-  ctx.closePath();
+  curr_ctx.ellipse(x, y, width / 2, height / 2, -rotation_radians(), 0, 2 * Math.PI);
+  curr_ctx.closePath();
   last_shape = "ellipse";
 }
 
 function set_stroke(...color) {
-  ctx.strokeStyle = conv_color(...color);
+  curr_ctx.strokeStyle = conv_color(...color);
 }
 
 function set_fill(...color) {
-  ctx.fillStyle = conv_color(...color);
+  curr_ctx.fillStyle = conv_color(...color);
 }
 
 function conv_color(...color) {
@@ -257,7 +261,7 @@ function conv_color(...color) {
 }
 
 function set_line_width(width) {
-  ctx.lineWidth = width;
+  curr_ctx.lineWidth = width;
 }
 
 function get_concat_value(...args) {
@@ -290,15 +294,7 @@ function runCode() {
   print_console("Welcome to Prosetta!");
   print_console("---");
   print_console();
-  if (has_run) {
-    has_run = true;
-  }
-  try {
-    eval(jscode.innerText);
-    end_shape();
-  } catch (error) {
-    print_console(error);
-  }
+  runner_worker.postMessage({ command: "run", data: { code: jscode.innerText, frame: curr_frame } });
   // cnsl.scrollTop = cnsl.scrollHeight;
 }
 
@@ -323,15 +319,19 @@ function updateCode() {
   if (editor == null) {
     return;
   }
+  is_canceled = false;
+  last_frame_timestamp = Date.now();
   msg_worker("changed", editor.getValue());
 }
 
 async function initialize(startingCode) {
   sourcecode = document.getElementById("code");
   jscode = document.getElementById("js");
-  canvas = document.getElementById("outputcanvas");
+  curr_canvas = document.getElementById("outputcanvas");
+  displayed_canvas = document.getElementById("outputcanvas2");
+  curr_ctx = curr_canvas.getContext('2d');
+  displayed_ctx = displayed_canvas.getContext('2d');
   jscode.innerText = "";
-  ctx = canvas.getContext('2d');
   cnsl = document.getElementById("console");
   let tabs = document.getElementsByClassName("tabBtn tabDefault");
   tabs[0].click();
@@ -491,6 +491,7 @@ function setup_editor(startingCode) {
 }
 
 function setup_webworker() {
+  setup_runner();
   language_worker = new Worker("language_worker.js");
   language_worker.onmessage = e => {
     let command = e.data.command;
@@ -509,17 +510,16 @@ function setup_webworker() {
           );
         }
         pause();
-        _frame = 0;
+        curr_frame = 0;
         runCode();
         play();
         break;
     }
   };
-  setup_runner();
 }
 
 function setup_runner() {
-  runner_worker.terminate();
+  runner_worker?.terminate();
   runner_worker = new Worker("runner_worker.js");
   let function_dict = {
     "print_console": print_console,
@@ -537,6 +537,7 @@ function setup_runner() {
     "get_concat_value": get_concat_value,
     "log_base": log_base,
     "get_color": get_color,
+    "end_shape": end_shape,
   };
   runner_worker.onmessage = e => {
     let command = e.data.command;
@@ -544,6 +545,12 @@ function setup_runner() {
     switch (command) {
       case "function":
         function_dict[data.name](data.args);
+        break;
+      case "finished":
+        print_console("fps:", Math.round(1000 / (Date.now() - last_frame_timestamp)));
+        last_frame_timestamp = Date.now();
+        latest_frame = curr_frame;
+        swap_canvases();
         break;
     }
   };
@@ -556,11 +563,47 @@ function has_import(imp) {
 function play() {
   pause();
   if (has_import(Import.Frame)) {
-    frameInterval = setInterval(() => { _frame++; runCode(); }, 1000 / 30);
+    last_frame_timestamp = Date.now();
+    frameInterval = setInterval(draw_frame);
   }
 }
+
 function pause() {
   clearInterval(frameInterval);
+}
+
+function draw_frame() {
+  if (is_canceled) {
+    return;
+  }
+  let now = Date.now();
+  if (latest_frame == curr_frame && (now - last_frame_timestamp) > 1000 / target_fps) {
+    frame_queued = false;
+  }
+  if (frame_queued) {
+    if ((now - last_frame_timestamp) > (10 * 1000 / target_fps)) {
+      is_canceled = true;
+      print_console("Long-running code detected, terminating.");
+      print_console("Code ran for", now - last_frame_timestamp, "millis.");
+      setup_runner();
+    }
+  }
+  else {
+    frame_queued = true;
+    curr_frame++;
+    runCode();
+  }
+}
+
+function swap_canvases() {
+  displayed_canvas.style.visibility = "hidden";
+  curr_canvas.style.visibility = "visible";
+  let temp_ctx = displayed_ctx;
+  let temp_canvas = displayed_canvas;
+  displayed_canvas = curr_canvas;
+  displayed_ctx = curr_ctx;
+  curr_ctx = temp_ctx;
+  curr_canvas = temp_canvas;
 }
 
 window.pause = pause;
