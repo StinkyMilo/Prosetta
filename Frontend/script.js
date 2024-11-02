@@ -6,7 +6,7 @@ var x = 0, y = 0, rotation = 0;
 var has_run = false;
 var has_drawn_shape = false;
 var last_shape = "none";
-var worker;
+var language_worker, runner_worker;
 var editor;
 var imports = [];
 var frameInterval;
@@ -337,7 +337,7 @@ async function initialize(startingCode) {
   tabs[0].click();
 
   setup_webworker();
-  worker.postMessage({ command: "initialize" });
+  language_worker.postMessage({ command: "initialize" });
   init_canvas();
   print_console("Welcome to Prosetta!");
   print_console("---");
@@ -348,7 +348,7 @@ async function initialize(startingCode) {
 
 
 function msg_worker(command, data) {
-  worker.postMessage({ command: command, data: data });
+  language_worker.postMessage({ command: command, data: data });
 }
 
 function setup_editor(startingCode) {
@@ -491,8 +491,8 @@ function setup_editor(startingCode) {
 }
 
 function setup_webworker() {
-  worker = new Worker("language_worker.js");
-  worker.onmessage = e => {
+  language_worker = new Worker("language_worker.js");
+  language_worker.onmessage = e => {
     let command = e.data.command;
     let data = e.data.data;
     switch (command) {
@@ -512,6 +512,38 @@ function setup_webworker() {
         _frame = 0;
         runCode();
         play();
+        break;
+    }
+  };
+  setup_runner();
+}
+
+function setup_runner() {
+  runner_worker.terminate();
+  runner_worker = new Worker("runner_worker.js");
+  let function_dict = {
+    "print_console": print_console,
+    "bezier_point": bezier_point,
+    "draw_bezier": draw_bezier,
+    "draw_line": draw_line,
+    "move_to": move_to,
+    "rotate_delta": rotate_delta,
+    "reset_rotation": reset_rotation,
+    "draw_rect": draw_rect,
+    "draw_ellipse": draw_ellipse,
+    "set_stroke": set_stroke,
+    "set_fill": set_fill,
+    "set_line_width": set_line_width,
+    "get_concat_value": get_concat_value,
+    "log_base": log_base,
+    "get_color": get_color,
+  };
+  runner_worker.onmessage = e => {
+    let command = e.data.command;
+    let data = e.data.data;
+    switch (command) {
+      case "function":
+        function_dict[data.name](data.args);
         break;
     }
   };
@@ -535,3 +567,4 @@ window.pause = pause;
 window.play = play;
 window.openTab = openTab;
 export default initialize;
+
