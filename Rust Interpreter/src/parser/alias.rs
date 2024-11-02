@@ -13,6 +13,7 @@ enum MatchState {
     FindAliases,
 }
 
+#[derive(Debug, PartialEq)]
 pub struct WordTrigger{
     word_start:usize,
     word_end:usize,
