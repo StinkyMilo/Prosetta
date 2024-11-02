@@ -544,7 +544,9 @@ function setup_runner() {
     let data = e.data.data;
     switch (command) {
       case "function":
-        function_dict[data.name](data.args);
+        for (let funcCall of data) {
+          function_dict[funcCall.name](funcCall.args);
+        }
         break;
       case "finished":
         print_console("fps:", Math.round(1000 / (Date.now() - last_frame_timestamp)));
