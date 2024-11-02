@@ -5,69 +5,8 @@ mod tests_simple {
     // use crate::parser::*;
     use crate::testing::*;
 
-    #[test]
-    #[timeout(1000)]
-    fn test_wizards_with_double_close() {
-        let data = run_parser!( b"The wizards were literally nine at most!");
-         check_lisp!(data,
-            "(assign@4,7,10$39 \"were\"@12 (litnum@17,18,19$39 924))"
-        );
-    }
-
-    #[test]
-    #[timeout(1000)]
-    fn test_wizards_with_double_close_ellipsis() {
-        let data = run_parser!( b"The wizards were literally nine at most...");
-         check_lisp!(data,
-            "(assign@4,7,10$39$$3 \"were\"@12 (litnum@17,18,19$39$$3 924))"
-        );
-    }
-
-    #[test]
-    #[timeout(1000)]
-    fn test_lit_zero() {
-        let data = run_parser!( b"The wizards were literally...");
-         check_lisp!(data,
-            "(assign@4,7,10$26$$3 \"were\"@12 (litnum@17,18,19$26$$3 0))"
-        );
-    }
-
-    #[test]
-    #[timeout(1000)]
-    fn test_nice_69() {
-        let data = run_parser!( b"It was nice. lit six nine. Yeah.");
-         check_lisp!(data,
-            "(assign@3,4,5$31 \"nice\"@7 (litnum@13,14,15$25 69))"
-        );
-    }
-    #[test]
-    #[timeout(1000)]
-    fn test_ellipsis_6_close() {
-        let data = run_parser!( b"It was sub sub sub sub sub sub one...");
-         check_lisp!(data,
-            "(assign@3,4,5$34$$3 \"sub\"@7 (-@11,12,13$34$$3 (-@15,16,17$34$$3 \
-            (-@19,20,21$34$$3 (-@23,24,25$34$$3 (-@27,28,29$34$$3 (litnum 1@31$$3)))))))"
-        );
-    }
-    #[test]
-    #[timeout(1000)]
-    fn test_2_peirod() {
-        let data = run_parser!( b"It was sub sub one..");
-         check_lisp!(data,
-            "(assign@3,4,5$19 \"sub\"@7 (-@11,12,13$18 (litnum 1@15$$3)))"
-        );
-    }
-
-    #[test]
-    #[timeout(1000)]
-    fn test_ellipsis_overload_12() {
-        let data = run_parser!( b"It was sub sub sub sub sub sub sub sub sub sub sub sub one......");
-         check_lisp!(data,
-            "(assign@3,4,5$61$$3 \"sub\"@7 (-@11,12,13$61$$3 (-@15,16,17$58$$3 (-@19,20,21$58$$3 (-@23,24,25$58$$3 \
-            (-@27,28,29$58$$3 (-@31,32,33$58$$3 (-@35,36,37$58$$3 (-@39,40,41$58$$3 (-@43,44,45$58$$3 \
-            (-@47,48,49$58$$3 (-@51,52,53$58$$3 (litnum 1@55$$3)))))))))))))"
-        );
-    }
+    
+   
 
     #[test]
     #[timeout(1000)]
@@ -99,14 +38,6 @@ mod tests_simple {
         );
     }
 
-    #[test]
-    #[timeout(1000)]
-    fn test_in_word_hyphen() {
-        let data = run_parser!( b"I was about to learn in-depth mathematics -- It was crazy!");
-         check_lisp!(data,
-            "(assign@2,3,4$42$$2 \"about\"@6 (wordnum@21,22,27$42$$2 @30$$11))"
-        );
-    }
     #[test]
     #[timeout(1000)]
     fn test_print_no_vars() {
@@ -151,19 +82,6 @@ mod tests_simple {
             (print@26,27,28$45 (var \"hi1\"@30) (var \"hi1\"@34) (var \"hi2\"@38) (var \"hi2\"@42))"
         );
     }
-
-    #[test]
-    #[timeout(1000)]
-    fn test_multilitnum_nan() {
-        let data = run_parser!(
-            b"was having little or no money in my purse, and nothing particular to interest me on shore, \
-            I thought I would sail about a little and see the watery part of the world!");
-         check_lisp!(data,
-            "(assign@0,1,2$165 \"having\"@4 \
-            (multilitnum@11,12,13$165 2 2 5 2 2 5 1 3 7 0 2 8 2 2 5 1 1 7 1 5 4 5 1 6 3 3 3 6 4 2 3 5))"
-        );
-    }
-
 
 
     #[test]

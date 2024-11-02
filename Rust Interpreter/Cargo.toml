@@ -15,6 +15,7 @@ runner = []
 image = ["runner", "dep:nannou"]
 no-cache = []
 speed = []
+no-title = []
 
 
 [dependencies]
