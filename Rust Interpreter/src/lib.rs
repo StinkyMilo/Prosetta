@@ -91,6 +91,9 @@ impl ParserRunnerData {
         lint.write(&self.data.exprs, &self.data.stat_starts, iter);
         lint.into_data()
     }
+    pub fn get_triggers(&self) -> Vec<String> {
+        
+    }
 }
 
 //wasm-pack build . -F wasm
