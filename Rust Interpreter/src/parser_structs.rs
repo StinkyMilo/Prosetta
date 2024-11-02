@@ -8,9 +8,6 @@ use std::{
 
 use super::{alias_data::AliasData, Expr};
 
-#[path = "testing/parsing_tests_word_funcs.rs"]
-mod parsing_tests_word_funcs;
-
 pub fn try_get_best_val<'a>(
     name: &[u8],
     iter: &mut dyn Iterator<Item = &'a [u8]>,

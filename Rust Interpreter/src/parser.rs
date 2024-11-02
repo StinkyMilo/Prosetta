@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 #[path = "parser_source.rs"]
 pub(crate) mod parser_source;
+use bstr::ByteSlice;
 pub(crate) use parser_source::*;
 // other stucts
 #[path = "parser_structs.rs"]
@@ -534,7 +535,7 @@ impl<'a> Parser<'a> {
         self.pos += line.len();
         let data = self.data.source.new_line();
         if let Some(data) = data {
-            let found_data = trim_ascii_whitespace(data).len() > 0;
+            let found_data = data.trim().len() > 0;
             if found_data {
                 self.add_new_start_state(0);
                 self.parsing_line = true;
@@ -571,12 +572,12 @@ impl<'a> Parser<'a> {
     }
 }
 
-/// https://stackoverflow.com/questions/31101915/how-to-implement-trim-for-vecu8
-pub fn trim_ascii_whitespace(x: &[u8]) -> &[u8] {
-    let from = match x.iter().position(|x| !x.is_ascii_whitespace()) {
-        Some(i) => i,
-        None => return &x[0..0],
-    };
-    let to = x.iter().rposition(|x| !x.is_ascii_whitespace()).unwrap();
-    &x[from..=to]
-}
+// /// https://stackoverflow.com/questions/31101915/how-to-implement-trim-for-vecu8
+// pub fn trim_ascii_whitespace(x: &[u8]) -> &[u8] {
+//     let from = match x.iter().position(|x| !x.is_ascii_whitespace()) {
+//         Some(i) => i,
+//         None => return &x[0..0],
+//     };
+//     let to = x.iter().rposition(|x| !x.is_ascii_whitespace()).unwrap();
+//     &x[from..=to]
+// }
