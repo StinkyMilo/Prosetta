@@ -118847,21 +118847,3 @@ export const aliases = [
     "cou",
     "bez"
 ];
-
-export function getAliasTriggered(word){
-    let progress = [];
-    for(let i = 0; i < aliases.length; i++){
-        progress.push({alias:aliases[i],progress:0});
-    }
-    for(let i = 0; i < word.length; i++){
-        for(let j = 0; j < progress.length; j++){
-            if(progress[j].alias[progress[j].progress] == word[i]){
-                progress[j].progress++;
-                if(progress[j].progress >= progress[j].alias.length){
-                    return progress[j].alias;
-                }
-            }
-        }
-    }
-    return null;
-}

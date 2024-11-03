@@ -1,4 +1,4 @@
-import { getAliasTriggered, wordsForAliases } from './wordsForAliases.js';
+import { wordsForAliases } from './wordsForAliases.js';
 
 var jscode, sourcecode, ctx, cnsl, canvas;
 var x = 0, y = 0, rotation = 0;
@@ -7,6 +7,7 @@ var has_drawn_shape = false;
 var last_shape = "none";
 var worker;
 var editor;
+let tooltips = [];
 
 function init_canvas() {
   sourcecode = document.getElementById("code");
@@ -447,7 +448,14 @@ function setup_editor(startingCode) {
       clearTimeout(displayTimeout);
       displayTimeout = null;
     }
-    let alias = getAliasTriggered(word);
+    let alias = null;
+    let txtInd = editor.indexFromPos(textPos);
+    for(let i = 0; i < tooltips.length; i++){
+      if(tooltips[i].start <= txtInd && txtInd <= tooltips[i].end){
+        alias = tooltips[i].alias;
+        break;
+      }
+    }
     if (alias == null) {
       return;
     }
@@ -505,6 +513,8 @@ function setup_webworker() {
             { className: hl.color.at(-1) }
           );
         }
+        console.log(data.wordTriggers);
+        tooltips = JSON.parse(data.wordTriggers);
         break;
     }
   };

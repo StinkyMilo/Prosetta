@@ -229,8 +229,8 @@ impl NoneState {
             *index += env.global_index;
         }
         env.trigger_word_data.push(WordTrigger{
-            word_start: word.pos,
-            word_end: word.pos+word.len(),
+            word_start: word.pos + env.global_index,
+            word_end: word.pos + env.global_index + word.len(),
             alias_trigger: aliases[min_index as usize].to_vec(),
         });
         //set up stack
