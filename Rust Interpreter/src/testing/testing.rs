@@ -11,6 +11,7 @@ pub mod test_lib {
     use crate::writers::lisp_like_writer;
     use alias_data::AliasData;
     use std::collections::HashSet;
+    use std::hint;
 
     pub fn assert_step_inner(
         parser: &mut Parser,
@@ -83,7 +84,7 @@ pub mod test_lib {
     }
 
     pub fn run_parser(input: Vec<u8>, title: bool) -> ParsedData<'static> {
-        let text = input.to_vec();
+        let text = hint::black_box(input).to_vec();
         let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { title });
         run_to_completion(&mut parser);
         parser.into_data()
@@ -136,6 +137,14 @@ pub(crate) use run_parser;
 macro_rules! check_lisp {
     ($data:expr,$result:expr) => {{
         assert_eq!($crate::testing::test_lib::get_lisp(&$data), $result);
+    }};
+    ($data:expr,$result:expr,$error:expr) => {{
+        assert_eq!(
+            $crate::testing::test_lib::get_lisp(&$data),
+            $result,
+            "{}",
+            $error
+        );
     }};
 }
 

@@ -47,6 +47,42 @@ mod tests_lit_int {
 
     #[test]
     #[timeout(1000)]
+    fn test_double_else() {
+        let data = run_parser!(b"whe one pri good.. els els pri bad...");
+        check_lisp!(data,
+            "(if@0,1,2$17 (litnum 1@4$$3) then:\n  \
+            (print@8,9,10$16 \"good\"@12)\n)\n\
+            (else@19,20,21$34$$3\n  (print@27,28,29$34$$3 \"bad\"@31)\n)"
+        );
+    }
+
+    #[test]
+    #[timeout(1000)]
+    fn test_double_else_last() {
+        let data = run_parser!(b"whe one pri good.. els pri bad. els...");
+        check_lisp!(data,
+            "(if@0,1,2$17 (litnum 1@4$$3) then:\n  \
+            (print@8,9,10$16 \"good\"@12)\n)\n\
+            (else@19,20,21$35$$3\n  (print@23,24,25$30 \"bad\"@27)\n)"
+        );
+    }
+
+    #[test]
+    #[timeout(1000)]
+    fn test_if_else_simple() {
+        let data = run_parser!(b"whe one pri one. pri two.. els pri three. pri four..");
+        check_lisp!(
+            data,
+            "(if@0,1,2$25 (litnum 1@4$$3) then:\n  \
+            (print@8,9,10$15 (litnum 1@12$$3))\n  \
+            (print@17,18,19$24 (litnum 2@21$$3))\n)\n\
+            (else@27,28,29$51\n  \
+            (print@31,32,33$40 (litnum 3@35$$5))\n  \
+            (print@42,43,44$50 (litnum 4@46$$4))\n)"
+        );
+    }
+    #[test]
+    #[timeout(1000)]
     fn test_if_inside_fail() {
         let data = run_parser!(b"whe one pri one. els. whe one els. pri two..");
         check_lisp!(
@@ -55,15 +91,6 @@ mod tests_lit_int {
             (print@8,9,10$15 (litnum 1@12$$3))\n)\n\
             (if@22,23,24$43 (litnum 1@26$$3) then:\n  \
             (print@35,36,37$42 (litnum 2@39$$3))\n)"
-        );
-    }
-
-    #[test]
-    #[timeout(1000)]
-    fn test_double_else() {
-        let data = run_parser!(b"whe one pri good.. els els pri bad...");
-        check_lisp!(data,
-            "(if@0,1,2$17 (litnum 1@4$$3) then:\n  (print@8,9,10$16 \"good\"@12)\n)\n(else@19,20,21$34$$3\n  (print@27,28,29$34$$3 \"bad\"@31)\n)"
         );
     }
 }
