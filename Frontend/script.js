@@ -374,6 +374,10 @@ function setup_editor(startingCode) {
       let wordElement = document.createElement("p");
       wordElement.innerHTML = words[i];
       widget.appendChild(wordElement);
+      wordElement.onclick = ()=>{
+        editor.replaceRange(words[i],currentWordStart,currentWordEnd);
+        currentWordEnd = {line: currentWordStart.line, ch: currentWordStart.ch + words[i].length};
+      };
     }
     return widget;
   }
@@ -382,6 +386,8 @@ function setup_editor(startingCode) {
   let lastWordPos = { line: -1, ch: -1 };
   let displayTimeout;
   let removeTimeout;
+  let currentWordStart;
+  let currentWordEnd;
 
   function clearWidget() {
     // removeWithFadeout(activeWidget);
@@ -462,6 +468,8 @@ function setup_editor(startingCode) {
     console.log(alias);
     displayTimeout = setTimeout(() => {
       clearWidget();
+      currentWordStart = wordPos.anchor;
+      currentWordEnd = wordPos.head;
       activeWidget = getNewTooltip(alias);
       lastWordPos = midPos;
       editor.addWidget(midPos, activeWidget);
