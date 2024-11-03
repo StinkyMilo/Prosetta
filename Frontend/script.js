@@ -367,7 +367,9 @@ function setup_editor(startingCode) {
     let widget = document.createElement("div");
     widget.className = "tooltip";
     let header = document.createElement("h1");
-    header.innerHTML = alias;
+    let u = document.createElement("u");
+    header.appendChild(u);
+    u.innerHTML = alias;
     widget.appendChild(header);
     let words = wordsForAliases[alias];
     for (let i = 0; i < words.length; i++) {
