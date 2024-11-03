@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 #[path = "parser_source.rs"]
 pub(crate) mod parser_source;
-use alias::WordTrigger;
+use alias::WordTriggerArena;
 pub(crate) use parser_source::*;
 // other stucts
 #[path = "parser_structs.rs"]
@@ -141,7 +141,7 @@ pub struct ParsedData<'a> {
     // pub title: Option<Title>,
     
     /// The global start and end of alias data
-    pub trigger_word_data: Vec<WordTrigger>
+    pub trigger_word_data: WordTriggerArena
 }
 
 #[derive(Debug)]
@@ -191,7 +191,7 @@ impl<'a> Parser<'a> {
                 symbols: SymbolSet::new(),
                 nots: IgnoreSet::new(),
                 source,
-                trigger_word_data: Vec::new()
+                trigger_word_data: WordTriggerArena::new()
                 // title,
             },
             parse_title: flags.title,

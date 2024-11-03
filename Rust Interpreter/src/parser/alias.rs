@@ -14,10 +14,38 @@ enum MatchState {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct WordTrigger{
+pub struct WordTrigger {
     pub word_start: usize,
     pub word_end: usize,
-    pub alias_trigger: Vec<u8>
+    pub alias_trigger: Vec<u8>,
+}
+
+#[derive(Debug)]
+pub struct WordTriggerArena {
+    pub word_triggers: Vec<WordTrigger>,
+    start_positions: HashMap<usize, usize>,
+}
+
+impl WordTriggerArena {
+    pub fn add_val(&mut self, word_start: usize, word_end: usize, alias_trigger: Vec<u8>) {
+        let trigger_insert = WordTrigger {
+            word_start: word_start,
+            word_end: word_end,
+            alias_trigger: alias_trigger,
+        };
+        if let Some(val) = self.start_positions.get(&word_start) {
+            self.word_triggers[*val] = trigger_insert;
+        } else {
+            self.start_positions.insert(word_start, self.word_triggers.len());
+            self.word_triggers.push(trigger_insert);
+        }
+    }
+    pub fn new() -> WordTriggerArena{
+        WordTriggerArena{
+            word_triggers: Vec::new(),
+            start_positions: HashMap::new()
+        }
+    }
 }
 
 /// used for both NoneStat and NoneExpr
@@ -128,7 +156,7 @@ impl NoneState {
         let (new_state, ret) = match self.next_match_state {
             MatchState::StringLit => (
                 MatchState::Var,
-                MatchResult::ContinueWith(word.pos, get_state!(string_lit::LitStrState::new()))
+                MatchResult::ContinueWith(word.pos, get_state!(string_lit::LitStrState::new())),
             ),
             // is word a varible
             MatchState::Var => (
@@ -138,7 +166,10 @@ impl NoneState {
             // is word a function
             MatchState::FunctionCallExpr => (
                 MatchState::Num,
-                MatchResult::ContinueWith(word.pos, get_state!(call_func::FunctionCallState::new()))
+                MatchResult::ContinueWith(
+                    word.pos,
+                    get_state!(call_func::FunctionCallState::new()),
+                ),
             ),
             // is word a literal number
             MatchState::Num => (
@@ -155,9 +186,12 @@ impl NoneState {
             ),
             MatchState::FunctionCallStat => (
                 MatchState::FindAliases,
-                MatchResult::ContinueWith(word.pos, get_state!(call_func::FunctionCallState::new()))
+                MatchResult::ContinueWith(
+                    word.pos,
+                    get_state!(call_func::FunctionCallState::new()),
+                ),
             ),
-            
+
             // else check aliases
             MatchState::FindAliases => (MatchState::FindAliases, self.match_alias(env, word, rest)),
         };
@@ -228,11 +262,11 @@ impl NoneState {
         for index in env.locs.as_mut().unwrap() {
             *index += env.global_index;
         }
-        env.trigger_word_data.push(WordTrigger{
-            word_start: word.pos + env.global_index,
-            word_end: word.pos + env.global_index + word.len(),
-            alias_trigger: aliases[min_index as usize].to_vec(),
-        });
+        env.trigger_word_data.add_val(
+            word.pos + env.global_index,
+            word.pos + env.global_index + word.len(),
+            aliases[min_index as usize].to_vec(),
+        );
         //set up stack
         (self.data.func)(
             aliases[min_index as usize],

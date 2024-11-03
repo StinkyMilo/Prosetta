@@ -115,6 +115,13 @@ function getDataViewMemory0() {
     }
     return cachedDataViewMemory0;
 }
+/**
+ * @returns {number}
+ */
+export function get_heap_size() {
+    const ret = wasm.get_heap_size();
+    return ret >>> 0;
+}
 
 function getArrayJsValueFromWasm0(ptr, len) {
     ptr = ptr >>> 0;
@@ -134,13 +141,6 @@ function passArrayJsValueToWasm0(array, malloc) {
     }
     WASM_VECTOR_LEN = array.length;
     return ptr;
-}
-/**
- * @returns {number}
- */
-export function get_heap_size() {
-    const ret = wasm.get_heap_size();
-    return ret >>> 0;
 }
 
 const HighlightFinalization = (typeof FinalizationRegistry === 'undefined')

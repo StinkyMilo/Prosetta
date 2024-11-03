@@ -93,7 +93,7 @@ impl ParserRunnerData {
         lint.into_data()
     }
     pub fn get_triggers(&self) -> String {
-        word_trigger_writer::write(&self.data.trigger_word_data)
+        word_trigger_writer::write(&self.data.trigger_word_data.word_triggers)
     }
 }
 

@@ -80,7 +80,7 @@ pub fn run_after(data: ParsedData, parser_flags: RunnerFlags) {
     if parser_flags.word_trigger {
         println!(
             "   Alias Triggers:\n{}",
-            word_trigger_writer::write(&data.trigger_word_data)
+            word_trigger_writer::write(&data.trigger_word_data.word_triggers)
         )
     }
 }
