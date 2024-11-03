@@ -15,9 +15,9 @@ enum MatchState {
 
 #[derive(Debug, PartialEq)]
 pub struct WordTrigger{
-    word_start:usize,
-    word_end:usize,
-    alias_trigger:Vec<u8>
+    pub word_start: usize,
+    pub word_end: usize,
+    pub alias_trigger: Vec<u8>
 }
 
 /// used for both NoneStat and NoneExpr

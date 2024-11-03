@@ -11,7 +11,7 @@ use rangemap::RangeSet;
 
 mod basic_func;
 
-mod alias;
+pub(crate) mod alias;
 pub(crate) mod alias_data;
 mod append;
 mod assign;
@@ -358,7 +358,7 @@ impl<'a> Parser<'a> {
             global_index: self.pos,
             aliases: &self.aliases,
             full_text: line,
-            trigger_word_data: &mut Vec::new()
+            trigger_word_data: &mut self.data.trigger_word_data
         };
 
         let last_result = mem::replace(&mut self.last_result, LastMatchResult::None);
