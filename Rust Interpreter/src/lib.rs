@@ -12,15 +12,15 @@ mod parser;
 mod writers;
 
 use crate::parser::{ParsedData, ParserResult};
-use parser::ParserSource;
+use parser::{Import, ParserSource};
 
 use crate::writers::javascript_writer;
-use crate::writers::word_trigger_writer;
 use crate::writers::syntax_lint::SyntaxLinter;
 use crate::writers::syntax_renderers::{
     html_renderer::HTMLRenderer,
     line_renderer::{Highlight, LineRenderer},
 };
+use crate::writers::word_trigger_writer;
 use cap::Cap;
 use std::alloc;
 
@@ -91,6 +91,9 @@ impl ParserRunnerData {
         let mut lint = SyntaxLinter::<LineRenderer>::new();
         lint.write(&self.data.exprs, &self.data.stat_starts, iter);
         lint.into_data()
+    }
+    pub fn get_imports(&self) -> Vec<Import> {
+        self.data.imports.clone()
     }
     pub fn get_triggers(&self) -> String {
         word_trigger_writer::write(&self.data.trigger_word_data.word_triggers)

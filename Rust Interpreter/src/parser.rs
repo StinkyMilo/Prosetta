@@ -21,6 +21,7 @@ mod else_stat;
 mod fill;
 mod find;
 mod foreach;
+mod frame;
 mod function;
 mod if_stat;
 mod index;
@@ -60,11 +61,17 @@ use std::{collections::HashMap, fmt::Debug, mem};
 
 use alias_data::AliasData;
 
+#[cfg(feature = "wasm")]
+use wasm_bindgen::prelude::*;
+
+#[allow(dead_code)]
+#[cfg_attr(feature = "wasm", wasm_bindgen)]
 #[derive(Debug, PartialEq, Clone, Copy, Hash, Eq)]
 pub enum Import {
     List,
     Func,
     Graph,
+    Frame,
 }
 
 impl Import {
@@ -73,6 +80,7 @@ impl Import {
             Import::List => "List",
             Import::Func => "Func",
             Import::Graph => "Graph",
+            Import::Frame => "Frame",
         }
     }
     pub fn get_all() -> &'static [(Import, &'static [u8])] {
@@ -80,6 +88,7 @@ impl Import {
             (Import::List, b"list"),
             (Import::Func, b"func"),
             (Import::Graph, b"graph"),
+            (Import::Frame, b"fram"),
         ]
     }
 }
@@ -130,11 +139,10 @@ pub struct ParsedData<'a> {
     pub nots: IgnoreSet,
     ///the parserSource that is used
     pub source: ParserSource<'a>,
-    // ///the title and authors
-    // pub title: Option<Title>,
-    
+    /// the imports
+    pub imports: Vec<Import>,
     /// The global start and end of alias data
-    pub trigger_word_data: WordTriggerArena
+    pub trigger_word_data: WordTriggerArena,
 }
 
 #[derive(Debug)]
@@ -183,9 +191,9 @@ impl<'a> Parser<'a> {
                 stat_starts: Vec::new(),
                 symbols: SymbolSet::new(),
                 nots: IgnoreSet::new(),
+                imports: Vec::new(),
                 source,
-                trigger_word_data: WordTriggerArena::new()
-                // title,
+                trigger_word_data: WordTriggerArena::new(),
             },
             parse_title: flags.title,
             stack: Vec::new(),
@@ -351,7 +359,7 @@ impl<'a> Parser<'a> {
             global_index: self.pos,
             aliases: &self.aliases,
             full_text: line,
-            trigger_word_data: &mut self.data.trigger_word_data
+            trigger_word_data: &mut self.data.trigger_word_data,
         };
 
         let last_result = mem::replace(&mut self.last_result, LastMatchResult::None);
@@ -494,7 +502,9 @@ impl<'a> Parser<'a> {
         if self.stack.is_empty() {
             if self.parse_title {
                 if let Expr::Title { data } = &self.data.exprs[expr_index] {
-                    self.aliases = AliasData::new(&mut data.imports.iter().map(|e| &e.0))
+                    let imports = data.imports.iter().map(|e| e.0).collect::<Vec<_>>();
+                    self.aliases = AliasData::new(&mut imports.iter());
+                    self.data.imports = imports;
                 } else {
                     unreachable!()
                 };

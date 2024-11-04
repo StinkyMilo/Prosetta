@@ -1,7 +1,6 @@
 var has_initialized = false;
 var preinit_queue = [];
 var parser;
-var count = 0;
 
 onmessage = async function(e) {
   let command = e.data.command;
@@ -10,14 +9,13 @@ onmessage = async function(e) {
     preinit_queue.push(e);
     return;
   }
-  console.log(++count);
   switch (command) {
     case "initialize":
       const wasm = await import('./wasm-bindings/prosetta.js');
       let wasm_instance = await wasm.default();
-      setInterval(() =>
-        console.log("wasm is using",
-          wasm_instance.memory.buffer.byteLength, "total and ", wasm.get_heap_size(), " on heap"), 1000);
+      // setInterval(() =>
+      //   console.log("wasm is using",
+      //     wasm_instance.memory.buffer.byteLength, "total and ", wasm.get_heap_size(), " on heap"), 1000);
       parser = new wasm.ParserRunner();
       has_initialized = true;
       while (preinit_queue.length > 0) {
@@ -26,7 +24,7 @@ onmessage = async function(e) {
       break;
     case "changed":
       let parsedData = parser.run_to_completion(data);
-      msg_main("parsed", { js: parsedData.get_javascript(), hl: convert_highlights(parsedData.get_highlights()), wordTriggers: parsedData.get_triggers() });
+      msg_main("parsed", { js: parsedData.get_javascript(), hl: convert_highlights(parsedData.get_highlights()), wordTriggers: parsedData.get_triggers(), imports: parsedData.get_imports() });
       break;
   }
 }

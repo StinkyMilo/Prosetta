@@ -8,7 +8,7 @@
   <script type="module">
     import initialize from './script.js';
     document.addEventListener("DOMContentLoaded", () => {
-      initialize("Draw a rectangle around my thirty fifty dollar bills!");
+      initialize("Title\nBy Me, Frame, Graph.\n\nwas frame ide fra 5!\nwhi mor frame 20!\nwas frame sub frame 20...\ntur ide tim frame frame. 2!\nrec tim frame frame!");
     });
   </script>
   <link rel="stylesheet" href="./style.css">
@@ -22,11 +22,14 @@
   </div>
   <div id="codespace">
     <div class="tabContent noScroll" id="code"></div>
-    <div style="display: none;" readonly="true" class="tabContent" id="syntax">Syntax</div>
-    <textarea style="display: none;" readonly="true" class="tabContent" id="js">JavaScript</textarea>
-    <canvas id="outputcanvas" width="400px" height="400px" />
+    <div style="display: none;" readonly="true" class="tabContent" id="js">JavaScript</div>
+    <div id="stack">
+      <canvas id="outputcanvas" width="400px" height="400px"></canvas>
+      <canvas id="outputcanvas2" style="visibility: hidden;" width="400px" height="400px"></canvas>
+    </div>
   </div>
-  <button onclick="runCode()">Run</button>
+  <button onclick="play()">⏵</button>
+  <button onclick="pause()">⏸</button>
   <div id="console" />
 </body>
 

@@ -494,6 +494,9 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_as(source, *str_len, STRING_COLOR);
                 self.add_end(source, *end, stack_index);
             }
+            Expr::Frame { locs } => {
+                self.write_locs(source, locs, stack_index);
+            }
             Expr::NoneExpr | Expr::NoneStat => {}
         };
     }

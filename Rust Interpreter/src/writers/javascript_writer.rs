@@ -468,6 +468,9 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
         Expr::Not { .. } => {
             format!("")
         }
+        Expr::Frame { .. } => {
+            format!("_frame")
+        }
     }
 }
 

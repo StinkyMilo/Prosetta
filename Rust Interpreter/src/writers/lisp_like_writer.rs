@@ -442,6 +442,9 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 String::from_utf8_lossy(word)
             )
         }
+        Expr::Frame { locs } => {
+            format!("(frame{})", join_locs(locs, None))
+        }
     }
 }
 
