@@ -17,7 +17,7 @@ pub fn write(exprs: &ExprArena, line_starts: &Vec<usize>) -> String {
 fn get_indent(indent: &usize) -> String {
     let mut str = "".to_string();
     for _ in 0..*indent {
-        str += "\t"
+        str += "  "
     }
     str
 }
