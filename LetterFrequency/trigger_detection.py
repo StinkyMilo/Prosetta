@@ -118,7 +118,8 @@ aliases = [
     "ret",
     "fin",
     "cou",
-    "bez"
+    "bez",
+    "fra"
 ]
 
 if __name__ == "__main__":
