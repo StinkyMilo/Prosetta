@@ -126,10 +126,10 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
             str_len,
             end,
         } => format!(
-            "(wordnum{} @{}$${})",
+            "(wordnum{} {}@{})",
             join_locs(locs, Some(*end)),
-            *str_start,
             *str_len,
+            *str_start,
         ),
         Expr::Operator {
             locs,

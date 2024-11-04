@@ -17,9 +17,13 @@ impl ParseState for ElseState {
             });
 
             if let Some(index) = if_index {
-                if !env.parents.into_iter().any(|state| {
-                    matches!(env.before.get(state.expr_index), Some(Expr::Else { .. }))
-                }) {
+                if !env
+                    .parents
+                    .into_iter()
+                    .rev()
+                    .take_while(|state| state.expr_index > index)
+                    .any(|state| state.state.get_type() == StateType::Stat)
+                {
                     *env.expr = Expr::Else {
                         locs: env.locs.take().unwrap_or_default(),
                         indexes: Vec::new(),

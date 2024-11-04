@@ -8,8 +8,10 @@ pub mod test_lib {
     use crate::commands::{Expr, ExprArena};
 
     use crate::parser::{Parser, *};
+    use crate::writers::lisp_like_writer;
     use alias_data::AliasData;
     use std::collections::HashSet;
+    use std::hint;
 
     pub fn assert_step_inner(
         parser: &mut Parser,
@@ -63,6 +65,7 @@ pub mod test_lib {
     //         aliases,
     //     }
     // }
+
     pub fn assert_result(parser: &mut Parser) -> ParserResult {
         loop {
             let result = parser.step();
@@ -78,6 +81,17 @@ pub mod test_lib {
                 return result;
             }
         }
+    }
+
+    pub fn run_parser(input: Vec<u8>, title: bool) -> ParsedData<'static> {
+        let text = hint::black_box(input).to_vec();
+        let mut parser = Parser::new(ParserSource::from_string(text), ParserFlags { title });
+        run_to_completion(&mut parser);
+        parser.into_data()
+    }
+
+    pub fn get_lisp(data: &ParsedData) -> String {
+        lisp_like_writer::write(&data.exprs, &data.stat_starts)
     }
 }
 
@@ -108,3 +122,30 @@ macro_rules! assert_step {
 }
 
 pub(crate) use assert_step;
+
+macro_rules! run_parser {
+    ($input:expr) => {{
+        $crate::testing::test_lib::run_parser($input.to_vec(), false)
+    }};
+    ($input:expr, $title:expr) => {{
+        $crate::testing::test_lib::run_parser($input.to_vec(), $title)
+    }};
+}
+
+pub(crate) use run_parser;
+
+macro_rules! check_lisp {
+    ($data:expr,$result:expr) => {{
+        assert_eq!($crate::testing::test_lib::get_lisp(&$data), $result);
+    }};
+    ($data:expr,$result:expr,$error:expr) => {{
+        assert_eq!(
+            $crate::testing::test_lib::get_lisp(&$data),
+            $result,
+            "{}",
+            $error
+        );
+    }};
+}
+
+pub(crate) use check_lisp;

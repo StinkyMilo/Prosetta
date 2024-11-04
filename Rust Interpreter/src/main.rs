@@ -20,12 +20,8 @@ mod writers;
 use parser::ParserSource;
 use parser_runner::{run_parser, RunnerFlags};
 
-// struct Test;
-// trait Test2 {}
-
-// impl Test2 for Test {}
-
 fn main() {
+    // test_incorrect_colors();
     // let t = Test;
     // let ta: Box<dyn Any> = Box::new(Test);
     // let ta2: Box<dyn Test2> = Box::new(Test);
@@ -48,7 +44,7 @@ fn main() {
     args.sort();
 
     let parser_flags = ParserFlags {
-        title: true, //args.binary_search(&"not".to_string()).is_ok(),
+        title: !cfg!(feature = "no-title"), //args.binary_search(&"not".to_string()).is_ok(),
     };
 
     let vis_flags: RunnerFlags = RunnerFlags {
