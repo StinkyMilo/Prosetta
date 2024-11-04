@@ -1,20 +1,19 @@
 #![allow(dead_code)]
 #[path = "parser_source.rs"]
 pub(crate) mod parser_source;
+use bstr::ByteSlice;
 use alias::WordTriggerArena;
 pub(crate) use parser_source::*;
 // other stucts
 #[path = "parser_structs.rs"]
 pub(crate) mod parser_structs;
 pub(crate) use parser_structs::*;
-use rangemap::RangeSet;
-
-mod basic_func;
 
 pub(crate) mod alias;
 pub(crate) mod alias_data;
 mod append;
 mod assign;
+mod basic_func;
 mod call_func;
 mod color;
 mod delete;
@@ -52,18 +51,12 @@ pub(crate) mod multi_lit_num;
 mod num_literal;
 mod word_num;
 
-#[path = "testing/parsing_tests_simple.rs"]
-mod parsing_tests_simple;
-
-// #[path = "testing/parsing_tests_milo.rs"]
-// mod parsing_tests_milo;
-
-// #[path = "testing/parsing_tests_other.rs"]
-// mod parsing_tests_other;
-
-use std::{collections::HashMap, fmt::Debug, mem};
+#[path = "testing/mod.rs"]
+mod testing;
 
 use crate::commands::*;
+use rangemap::RangeSet;
+use std::{collections::HashMap, fmt::Debug, mem};
 
 use alias_data::AliasData;
 
@@ -548,7 +541,7 @@ impl<'a> Parser<'a> {
         self.pos += line.len();
         let data = self.data.source.new_line();
         if let Some(data) = data {
-            let found_data = trim_ascii_whitespace(data).len() > 0;
+            let found_data = data.trim().len() > 0;
             if found_data {
                 self.add_new_start_state(0);
                 self.parsing_line = true;
@@ -583,14 +576,4 @@ impl<'a> Parser<'a> {
         self.last_result = LastMatchResult::None;
         self.cached_fails = HashMap::new();
     }
-}
-
-/// https://stackoverflow.com/questions/31101915/how-to-implement-trim-for-vecu8
-pub fn trim_ascii_whitespace(x: &[u8]) -> &[u8] {
-    let from = match x.iter().position(|x| !x.is_ascii_whitespace()) {
-        Some(i) => i,
-        None => return &x[0..0],
-    };
-    let to = x.iter().rposition(|x| !x.is_ascii_whitespace()).unwrap();
-    &x[from..=to]
 }
