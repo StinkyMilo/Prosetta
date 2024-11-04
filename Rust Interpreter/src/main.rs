@@ -1,7 +1,6 @@
 #![cfg(not(feature = "wasm"))]
 
 use std::{
-    collections::HashSet,
     io::{self, Read},
     mem,
 };
@@ -18,43 +17,8 @@ mod commands;
 mod parser;
 mod writers;
 
-use bstr::ByteSlice;
-use itertools::Itertools;
 use parser::ParserSource;
 use parser_runner::{run_parser, RunnerFlags};
-
-// struct Test;
-// trait Test2 {}
-
-// impl Test2 for Test {}
-// const COLOR_STR: &[u8] = include_bytes!("testing/colors.txt");
-
-// fn test_incorrect_colors() {
-//     let mut correct = HashSet::new();
-//     let mut words = HashSet::new();
-//     for line in COLOR_STR.lines() {
-//         correct.insert(line.replace(b" ", b""));
-//         for word in COLOR_STR.split_str(b" ") {
-//             words.insert(word);
-//         }
-//     }
-//     let perms = (1..=5)
-//         .into_iter()
-//         .flat_map(|num| words.iter().permutations(num));
-//     let perms_vec = perms.clone().count();
-//     println!("length: {}", perms_vec);
-//     for (index, color) in perms.enumerate() {
-//         let no_spaces = color
-//             .iter()
-//             .flat_map(|str| str.into_iter().cloned())
-//             .collect::<Vec<_>>();
-//         if correct.contains(&no_spaces) {
-//             println!("{}:{}", index, std::str::from_utf8(&no_spaces).unwrap())
-//         } else if index % 1000000 == 0 {
-//             println!("t{}:{}", index, std::str::from_utf8(color).unwrap())
-//         }
-//     }
-// }
 
 fn main() {
     // test_incorrect_colors();
