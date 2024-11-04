@@ -53,6 +53,7 @@ fn main() {
         whole_program: true,
         linted: true,
         line_rendered: true,
+        word_trigger: true
     };
 
     run_parser(

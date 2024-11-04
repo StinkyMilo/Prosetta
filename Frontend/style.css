@@ -81,19 +81,30 @@ body {
 
 .tooltip {
   position: absolute;
-  background-color: rgb(201, 210, 210);
+  background-color: darkslategrey;
   color: rgb(0, 0, 0);
-  width: 10vw;
-  height: 8vw;
+  width: 12vw;
+  height: 10vw;
   border: 1px solid black;
   border-radius: 0.5vw;
   box-shadow: 2px 4px 8px 2px rgba(0, 0, 0, 0.5);
-  animation: fadeInAnimation ease 0.25s;
+  animation: fadeInAnimation ease 0.2s;
   animation-iteration-count: 1;
   animation-fill-mode: forwards;
   overflow-y: scroll;
   overflow-x: hidden;
   z-index: 2;
+}
+
+.tooltip > p {
+  color: white;
+  margin-left:10px;
+  cursor: pointer
+}
+
+.tooltip > h1{
+  color: white;
+  margin-top: 1px;
 }
 
 @keyframes fadeInAnimation {

@@ -2,13 +2,14 @@
 #[path = "parser_source.rs"]
 pub(crate) mod parser_source;
 use bstr::ByteSlice;
+use alias::WordTriggerArena;
 pub(crate) use parser_source::*;
 // other stucts
 #[path = "parser_structs.rs"]
 pub(crate) mod parser_structs;
 pub(crate) use parser_structs::*;
 
-mod alias;
+pub(crate) mod alias;
 pub(crate) mod alias_data;
 mod append;
 mod assign;
@@ -131,6 +132,9 @@ pub struct ParsedData<'a> {
     pub source: ParserSource<'a>,
     // ///the title and authors
     // pub title: Option<Title>,
+    
+    /// The global start and end of alias data
+    pub trigger_word_data: WordTriggerArena
 }
 
 #[derive(Debug)]
@@ -180,6 +184,7 @@ impl<'a> Parser<'a> {
                 symbols: SymbolSet::new(),
                 nots: IgnoreSet::new(),
                 source,
+                trigger_word_data: WordTriggerArena::new()
                 // title,
             },
             parse_title: flags.title,
@@ -346,6 +351,7 @@ impl<'a> Parser<'a> {
             global_index: self.pos,
             aliases: &self.aliases,
             full_text: line,
+            trigger_word_data: &mut self.data.trigger_word_data
         };
 
         let last_result = mem::replace(&mut self.last_result, LastMatchResult::None);
