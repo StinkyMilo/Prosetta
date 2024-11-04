@@ -9,7 +9,7 @@ use crate::{
     writers::{
         javascript_writer, lisp_like_writer,
         syntax_lint::SyntaxLinter,
-        syntax_renderers::{line_renderer::LineRenderer, wind_renderer::WindowsRenderer},
+        syntax_renderers::{line_renderer::LineRenderer, wind_renderer::WindowsRenderer}, word_trigger_writer,
     },
 };
 
@@ -21,6 +21,7 @@ pub struct RunnerFlags {
     pub whole_program: bool,
     pub linted: bool,
     pub line_rendered: bool,
+    pub word_trigger: bool
 }
 
 pub fn run_state(state: ParserResult, parser: &Parser, parser_flags: RunnerFlags, step_count: u64) {
@@ -75,6 +76,12 @@ pub fn run_after(data: ParsedData, parser_flags: RunnerFlags) {
         let mut lint = SyntaxLinter::<LineRenderer>::new();
         lint.write(&data.exprs, &data.stat_starts, iter);
         println!("   line renderered:\n{:?}", lint.into_data());
+    }
+    if parser_flags.word_trigger {
+        println!(
+            "   Alias Triggers:\n{}",
+            word_trigger_writer::write(&data.trigger_word_data.word_triggers)
+        )
     }
 }
 

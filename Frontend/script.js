@@ -1,4 +1,4 @@
-import { getAliasTriggered, wordsForAliases } from './wordsForAliases.js';
+import { wordsForAliases } from './wordsForAliases.js';
 import { Import } from './wasm-bindings/prosetta.js';
 
 var jscode, sourcecode, cnsl, curr_ctx, curr_canvas, displayed_ctx, displayed_canvas;
@@ -7,6 +7,7 @@ var has_drawn_shape = false;
 var last_shape = "none";
 var language_worker, runner_worker;
 var editor;
+let tooltips = [];
 var imports = [];
 var frameInterval;
 var curr_frame = 0;
@@ -364,13 +365,19 @@ function setup_editor(startingCode) {
     let widget = document.createElement("div");
     widget.className = "tooltip";
     let header = document.createElement("h1");
-    header.innerHTML = alias;
+    let u = document.createElement("u");
+    header.appendChild(u);
+    u.innerHTML = alias;
     widget.appendChild(header);
     let words = wordsForAliases[alias];
     for (let i = 0; i < words.length; i++) {
       let wordElement = document.createElement("p");
       wordElement.innerHTML = words[i];
       widget.appendChild(wordElement);
+      wordElement.onclick = () => {
+        editor.replaceRange(words[i], currentWordStart, currentWordEnd);
+        currentWordEnd = { line: currentWordStart.line, ch: currentWordStart.ch + words[i].length };
+      };
     }
     return widget;
   }
@@ -379,6 +386,8 @@ function setup_editor(startingCode) {
   let lastWordPos = { line: -1, ch: -1 };
   let displayTimeout;
   let removeTimeout;
+  let currentWordStart;
+  let currentWordEnd;
 
   function clearWidget() {
     // removeWithFadeout(activeWidget);
@@ -445,12 +454,21 @@ function setup_editor(startingCode) {
       clearTimeout(displayTimeout);
       displayTimeout = null;
     }
-    let alias = getAliasTriggered(word);
+    let alias = null;
+    let txtInd = editor.indexFromPos(textPos);
+    for (let i = 0; i < tooltips.length; i++) {
+      if (tooltips[i].start <= txtInd && txtInd <= tooltips[i].end) {
+        alias = tooltips[i].alias;
+        break;
+      }
+    }
     if (alias == null) {
       return;
     }
     displayTimeout = setTimeout(() => {
       clearWidget();
+      currentWordStart = wordPos.anchor;
+      currentWordEnd = wordPos.head;
       activeWidget = getNewTooltip(alias);
       lastWordPos = midPos;
       editor.addWidget(midPos, activeWidget);
@@ -497,6 +515,7 @@ function setup_webworker() {
         setup_runner();
         imports = data.imports;
         jscode.innerText = data.js;
+        tooltips = JSON.parse(data.wordTriggers);
         let highlights = data.hl;
         editor.doc.getAllMarks().forEach(marker => marker.clear());
         for (let hl of highlights) {
