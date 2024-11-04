@@ -26,7 +26,7 @@ onmessage = async function(e) {
       break;
     case "changed":
       let parsedData = parser.run_to_completion(data);
-      msg_main("parsed", { js: parsedData.get_javascript(), hl: convert_highlights(parsedData.get_highlights()) });
+      msg_main("parsed", { js: parsedData.get_javascript(), hl: convert_highlights(parsedData.get_highlights()), wordTriggers: parsedData.get_triggers() });
       break;
   }
 }

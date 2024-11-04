@@ -6,7 +6,7 @@ use std::{
     usize,
 };
 
-use super::{alias_data::AliasData, Expr};
+use super::{alias::WordTriggerArena, alias_data::AliasData, Expr};
 
 #[path = "testing/parsing_tests_word_funcs.rs"]
 mod parsing_tests_word_funcs;
@@ -459,7 +459,10 @@ pub struct Environment<'a> {
     pub global_index: usize,
     /// reference to static AliasData
     pub aliases: &'a AliasData,
+    /// full text of the poem
     pub full_text: &'a [u8],
+    /// The global start and end of alias data
+    pub trigger_word_data: &'a mut WordTriggerArena
 }
 
 ///a slice of the input text
