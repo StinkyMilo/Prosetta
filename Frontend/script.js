@@ -561,7 +561,7 @@ function setup_runner() {
     switch (command) {
       case "function":
         for (let funcCall of data) {
-          function_dict[funcCall.name](funcCall.args);
+          function_dict[funcCall.name](...funcCall.args);
         }
         break;
       case "finished":
