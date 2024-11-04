@@ -50,6 +50,7 @@ div>canvas {
 
 #js {
   font-family: var(--mono-font);
+  text-wrap: nowrap;
 }
 
 #console {

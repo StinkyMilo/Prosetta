@@ -11,10 +11,8 @@ var imports = [];
 var frameInterval;
 var curr_frame = 0;
 var latest_frame = 0;
-var frame_queued = false;
 var last_frame_timestamp = Date.now();
 var target_fps = 30;
-var is_canceled = false;
 
 function init_canvas() {
   cnsl.innerText = "";
@@ -319,7 +317,6 @@ function updateCode() {
   if (editor == null) {
     return;
   }
-  is_canceled = false;
   last_frame_timestamp = Date.now();
   msg_worker("changed", editor.getValue());
 }
@@ -491,13 +488,13 @@ function setup_editor(startingCode) {
 }
 
 function setup_webworker() {
-  setup_runner();
   language_worker = new Worker("language_worker.js");
   language_worker.onmessage = e => {
     let command = e.data.command;
     let data = e.data.data;
     switch (command) {
       case "parsed":
+        setup_runner();
         imports = data.imports;
         jscode.innerText = data.js;
         let highlights = data.hl;
@@ -575,23 +572,8 @@ function pause() {
 }
 
 function draw_frame() {
-  if (is_canceled) {
-    return;
-  }
   let now = Date.now();
   if (latest_frame == curr_frame && (now - last_frame_timestamp) > 1000 / target_fps) {
-    frame_queued = false;
-  }
-  if (frame_queued) {
-    if ((now - last_frame_timestamp) > (10 * 1000 / target_fps)) {
-      is_canceled = true;
-      print_console("Long-running code detected, terminating.");
-      print_console("Code ran for", now - last_frame_timestamp, "millis.");
-      setup_runner();
-    }
-  }
-  else {
-    frame_queued = true;
     curr_frame++;
     runCode();
   }
