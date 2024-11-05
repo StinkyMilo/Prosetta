@@ -12,7 +12,6 @@ onmessage = async function(e) {
       } catch (error) {
         print_console(error);
       }
-      eval(data.code)
       postMessage({ command: "function", data: functions });
       postMessage({ command: "finished" });
       break;
