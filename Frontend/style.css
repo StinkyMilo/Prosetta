@@ -51,6 +51,7 @@ div>canvas {
 #js {
   font-family: var(--mono-font);
   text-wrap: nowrap;
+  margin-top: 0;
 }
 
 #console {

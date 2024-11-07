@@ -35,9 +35,48 @@ The Ending
 by Milo Jacobs and Gilbert Graphton.
 ```
 
+### Library
+The graphics library imports the following aliases:
+- [Arc - Circle](Circle.md)
+- [Bez - Bezier](Bezier.md)
+- [Col - Color](Color.md)
+- [Fil - Fill Color](Fill.md)
+- [Lin - Line](Line.md)
+- [Mov - Move To](MoveTo.md)
+- [Pen - Line Width](LineWidth.md)
+- [Rec - Rectangle](Rectangle.md)
+- [Sto - Stroke Color](Stroke.md)
+- [Tur - Rotate](Rotate.md)
+
 
 ## Fram - Animation
+Any author with the substring _fram_ in their name will import the graphics library.
+
+Additionally, importing this enables animation as a whole. See [Frame](Frame.md).
+
+### Example
+```
+The Picture
+by Flynn Duniho and Sir Framingham the Mighty.
+```
+
+### Library
+The graphics library imports the following aliases:
+- [fra - Frame](Frame.md)
+
 
 ## List - Lists
+Any author with the word _list_ in their name will import the lists library.
+
+### Example
+```
+The Picture
+by Nate Westfall, John Listings, and Spiders Georg.
+```
+
+### Library
+The graphics library imports the following aliases:
+- [fra - Frame](Frame.md)
+
 
 ## Func - Functions
