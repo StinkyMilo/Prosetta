@@ -341,7 +341,8 @@ async function initialize(startingCode) {
   print_console("---");
   print_console();
   updateCode();
-  return setup_editor(startingCode);
+  let editor = setup_editor(startingCode);
+  return editor;
 }
 
 
