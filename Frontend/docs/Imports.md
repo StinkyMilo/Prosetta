@@ -1,6 +1,6 @@
 # Imports
 
-To prevent accidental triggering of aliases, Prosetta requires you to _import_ libraries of aliases. Some aliases are imported by default, while some are parts of a library. Aliases are generally organized by library in these docs, but to be fully sure you should check the documentation of each alias to determine which library it is from.
+To prevent accidental triggering of aliases, Prosetta requires you to _import_ libraries of aliases. Some aliases are imported by default, while some are parts of a library. Aliases are generally organized by library in these docs, but to be fully sure you should check the documentation's example of each alias to determine which library it is from.
 
 Poems written in Prosetta all have a title and can have any number of authors. The first author can be anything you want, but we recommend writing your own name! The _second_ author and beyond are used for importing libraries. Libraries are [substrings](Glossary.md#substring-matching) within author names. Libraries and examples are shown below.
 
@@ -80,3 +80,15 @@ The graphics library imports the following aliases:
 
 
 ## Func - Functions
+Any author with the substring _func_ in their name will import the functions library.
+
+### Example
+```
+The Rat Sandwich
+by Steve and John Perfunctory.
+```
+
+### Library
+The functions library imports the following aliases
+- [fun - Function](Function.md)
+- [ret - Return](Return.md)
