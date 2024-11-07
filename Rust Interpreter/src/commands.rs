@@ -217,6 +217,11 @@ pub enum Expr {
     Frame {
         locs: Vec<usize>,
     },
+    Comment {
+        start: usize,
+        end: usize,
+        comment: Vec<u8>
+    }
 }
 
 impl Expr {

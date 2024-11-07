@@ -515,7 +515,7 @@ fn is_valid_close_char(char: u8) -> bool {
 }
 
 ///the chars that are returned single but are not closes
-const NON_CLOSE_CHARS: &[u8] = b"\"&";
+const NON_CLOSE_CHARS: &[u8] = b"\"&[]";
 ///shoudl the char be made into a 1 len slice
 pub fn is_non_close_but_still_single(char: u8) -> bool {
     NON_CLOSE_CHARS.contains(&char)

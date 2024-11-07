@@ -16,6 +16,7 @@ mod assign;
 mod basic_func;
 mod call_func;
 mod color;
+mod comment;
 mod delete;
 mod else_stat;
 mod fill;

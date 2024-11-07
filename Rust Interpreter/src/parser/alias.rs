@@ -11,6 +11,7 @@ enum MatchState {
     FunctionCallExpr,
     FunctionCallStat,
     FindAliases,
+    Comment
 }
 
 #[derive(Debug, PartialEq)]
@@ -125,7 +126,7 @@ impl NoneState {
             MatchState::StringLit
         } else {
             //Statement
-            MatchState::FunctionCallStat
+            MatchState::Comment
         }
     }
     pub fn new_stat() -> Self {
@@ -184,6 +185,15 @@ impl NoneState {
                 MatchState::FindAliases,
                 MatchResult::ContinueWith(word.pos, get_state!(litcolor::LiteralColorState::new())),
             ),
+
+            MatchState::Comment => (
+                MatchState::FunctionCallStat,
+                MatchResult::ContinueWith(
+                    word.pos,
+                    get_state!(comment::CommentState::new())
+                )
+            ),
+
             MatchState::FunctionCallStat => (
                 MatchState::FindAliases,
                 MatchResult::ContinueWith(

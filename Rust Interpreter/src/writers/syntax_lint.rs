@@ -21,6 +21,7 @@ const STRING_COLOR: (TermColor, bool) = (TermColor::Black, true);
 
 const VAR_COLOR: (TermColor, bool) = (TermColor::Cyan, true);
 const NUM_COLOR: (TermColor, bool) = (TermColor::Green, true);
+const COMMENT_COLOR: (TermColor, bool) = (TermColor::Black, true);
 
 pub struct SyntaxLinter<T: Renderer> {
     /// the renderer
@@ -496,6 +497,10 @@ impl<T: Renderer> SyntaxLinter<T> {
             }
             Expr::Frame { locs } => {
                 self.write_locs(source, locs, stack_index);
+            }
+            Expr::Comment { start, end, .. } => {
+                self.write_up_to(source, *start);
+                self.write_as(source, end - start + 1, COMMENT_COLOR);
             }
             Expr::NoneExpr | Expr::NoneStat => {}
         };

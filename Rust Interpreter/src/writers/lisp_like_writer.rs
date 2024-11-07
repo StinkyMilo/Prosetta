@@ -444,6 +444,9 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
         }
         Expr::Frame { locs } => {
             format!("(frame{})", join_locs(locs, None))
+        },
+        Expr::Comment { start, end, comment } => {
+            format!("(comment@{}$${} \"{}\")",start,end,String::from_utf8_lossy(comment))
         }
     }
 }
