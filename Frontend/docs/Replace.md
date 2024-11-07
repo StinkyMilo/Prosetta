@@ -15,7 +15,7 @@ rep list 1 1.
 pri list.
 `"
 :code-wordier="`
-Rectangle Example
+Replace Example
 by Milo Jacobs and Miss Listerine\n
 Was list listing 1, 2, and 3?
 Replace the list 1 to 1.

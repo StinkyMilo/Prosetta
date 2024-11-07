@@ -8,7 +8,7 @@ A for each loop. Takes a word to be assigned each value in a list sequentially, 
 ## Example
 <editor :code='`
 Foreach Example
-by Milo Jacobs\n
+by Milo Jacobs and Miss Listerine\n
 was value lis 1 2 3..
 fre that value
 	pri that.
@@ -16,7 +16,7 @@ fre that value
 `' 
 :code-wordier="`
 Foreach Example
-by Milo Jacobs\n
+by Milo Jacobs and Miss Listerine\n
 was value a list of 1 2 3?
 freedom that i crave, the value of Pride that I share!
 `"

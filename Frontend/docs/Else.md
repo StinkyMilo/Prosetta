@@ -20,7 +20,7 @@ Else Example
 by Milo Jacobs\n
 'Was var two?'
 When I compared var to one, it was awesome.
-I printed &quot value is one&quot!
-else, I printed &quot value is two&quot!
+I printed &quot;value is one&quot;!
+else, I printed &quot;value is two&quot;!
 `"
 output-method='console'></editor>
