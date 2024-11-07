@@ -506,7 +506,7 @@ function setup_editor(startingCode) {
 }
 
 function setup_webworker() {
-  language_worker = new Worker("language_worker.js");
+  language_worker = new Worker(new URL("./language_worker.js",import.meta.url));
   language_worker.onmessage = e => {
     let command = e.data.command;
     let data = e.data.data;
@@ -536,7 +536,7 @@ function setup_webworker() {
 
 function setup_runner() {
   runner_worker?.terminate();
-  runner_worker = new Worker("runner_worker.js");
+  runner_worker = new Worker(new URL("./runner_worker.js",import.meta.url));
   let function_dict = {
     "print_console": print_console,
     "bezier_point": bezier_point,
