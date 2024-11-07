@@ -56,7 +56,8 @@ impl ParseState for LitStrState {
                         self.current_str_end = word.pos + env.global_index;
                         if self.current_str_end > self.current_str_start {
                             str.push(VarOrStr::Str(
-                                env.full_text[self.current_str_start..self.current_str_end]
+                                env.full_text[self.current_str_start - env.global_index
+                                    ..self.current_str_end - env.global_index]
                                     .to_vec(),
                             ));
                         }
