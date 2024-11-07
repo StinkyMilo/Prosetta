@@ -2,21 +2,54 @@ use std::collections::HashSet;
 
 use super::*;
 
-const BASE_EXPR_ALIASES: &[&'static [u8]] = &[
-    b"int", b"lit", // number makers
-    b"add", b"sub", b"tim", b"ide", b"mod", b"log", b"exp", // number operators
-    b"les", b"mor", b"als", b"oth", b"par", b"inv", // boolean operators
+type StatTrigger = &'static [u8];
+type ExprTrigger = (StatTrigger, Types);
+
+macro_rules! make_expr {
+    ( $type:expr, $( $str:expr ),* ) => {
+        {
+            $(
+                ($type,$str)
+            )*
+        }
+    };
+}
+
+const BASE_EXPR_ALIASES: &[ExprTrigger] = &[
+    // number makers
+    (b"int", Types::Number),
+    (b"lit", Types::Number),
+    // number operators
+    (b"add", Types::Number),
+    (b"sub", Types::Number),
+    (b"tim", Types::Number),
+    (b"ide", Types::Number),
+    (b"mod", Types::Number),
+    (b"log", Types::Number),
+    (b"exp", Types::Number),
+    // boolean operators
+    (b"les", Types::Bool),
+    (b"mor", Types::Bool),
+    (b"als", Types::Bool),
+    (b"oth", Types::Bool),
+    (b"par", Types::Bool),
+    (b"inv", Types::Bool),
 ];
 
-const LIST_EXPR_ALIASES: &[&'static [u8]] = &[b"lis", b"fin", b"ind", b"cou"];
-const GRAPH_EXPR_ALIASES: &[&'static [u8]] = &[b"col"];
-const FRAME_EXPR_ALIASES: &[&'static [u8]] = &[b"fra"];
+const LIST_EXPR_ALIASES: &[ExprTrigger] = &[
+    (b"lis", Types::List),
+    (b"fin", Types::Any),
+    (b"ind", Types::Any),
+    (b"cou", Types::Number),
+];
+const GRAPH_EXPR_ALIASES: &[ExprTrigger] = &[(b"col", Types::Color)];
+const FRAME_EXPR_ALIASES: &[ExprTrigger] = &[(b"fra", Types::Number)];
 
-const BASE_STAT_ALIASES: &[&'static [u8]] = &[b"was", b"pri", b"whe", b"whi", b"els", b"not"];
+const BASE_STAT_ALIASES: &[StatTrigger] = &[b"was", b"pri", b"whe", b"whi", b"els", b"not"];
 
-const LIST_STAT_ALIASES: &[&'static [u8]] = &[b"fre", b"del", b"app", b"rep"];
-const FUNC_STAT_ALIASES: &[&'static [u8]] = &[b"fun", b"ret"];
-const GRAPH_STAT_ALIASES: &[&'static [u8]] = &[
+const LIST_STAT_ALIASES: &[StatTrigger] = &[b"fre", b"del", b"app", b"rep"];
+const FUNC_STAT_ALIASES: &[StatTrigger] = &[b"fun", b"ret"];
+const GRAPH_STAT_ALIASES: &[StatTrigger] = &[
     b"arc", b"rec", //shapes
     b"mov", b"tur", b"lin", b"bez", //turtle
     b"sto", b"fil", b"pen", // shape modifiers
@@ -84,8 +117,6 @@ fn get_stat_state(alias: &'static [u8], index: usize) -> MatchResult {
         },
     )
 }
-///A vector of alias strings
-pub type AliasNames = Vec<&'static [u8]>;
 ///function to get alias strings from AliasData
 type AliasSelector = fn(&AliasData) -> &AliasNames;
 ///fn to get the continueWith state with the corresponding string
@@ -108,8 +139,8 @@ pub struct StaticAliasData {
 ///holds lists of all alias strings
 #[derive(Debug)]
 pub struct AliasData {
-    pub expr: AliasNames,
-    pub stat: AliasNames,
+    pub expr: Vec<ExprTrigger>,
+    pub stat: Vec<StatTrigger>,
 }
 
 ///static alias data

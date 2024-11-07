@@ -36,14 +36,15 @@ impl WordTriggerArena {
         if let Some(val) = self.start_positions.get(&word_start) {
             self.word_triggers[*val] = trigger_insert;
         } else {
-            self.start_positions.insert(word_start, self.word_triggers.len());
+            self.start_positions
+                .insert(word_start, self.word_triggers.len());
             self.word_triggers.push(trigger_insert);
         }
     }
-    pub fn new() -> WordTriggerArena{
-        WordTriggerArena{
+    pub fn new() -> WordTriggerArena {
+        WordTriggerArena {
             word_triggers: Vec::new(),
-            start_positions: HashMap::new()
+            start_positions: HashMap::new(),
         }
     }
 }
@@ -54,6 +55,8 @@ impl WordTriggerArena {
 pub struct NoneState {
     ///a reference to the static data of the aliases
     data: &'static StaticAliasData,
+    ///The type looked for
+    types: Types,
     ///the progress of each alias
     progress: Vec<u8>,
     ///the already parsed locs (the locations of alias characters)
@@ -103,9 +106,10 @@ impl ParseState for NoneState {
 }
 
 impl NoneState {
-    fn new(data: &'static StaticAliasData) -> Self {
+    fn new(data: &'static StaticAliasData, types: Types) -> Self {
         Self {
             data,
+            types,
             progress: Vec::new(),
             locs: Vec::new(),
             offset: 0,
@@ -129,16 +133,16 @@ impl NoneState {
         }
     }
     pub fn new_stat() -> Self {
-        Self::new(&AliasData::STAT)
+        Self::new(&AliasData::STAT, Types::Any)
     }
     pub fn new_stat_cont() -> Self {
-        Self::new(&AliasData::STAT_CONT)
+        Self::new(&AliasData::STAT_CONT, Types::Any)
     }
-    pub fn new_expr() -> Self {
-        Self::new(&AliasData::EXPR)
+    pub fn new_expr(types: Types) -> Self {
+        Self::new(&AliasData::EXPR, types)
     }
-    pub fn new_expr_cont() -> Self {
-        Self::new(&AliasData::EXPR_CONT)
+    pub fn new_expr_cont(types: Types) -> Self {
+        Self::new(&AliasData::EXPR_CONT, types)
     }
 }
 

@@ -11,27 +11,31 @@ impl BasicState for ListState {
         "List"
     }
 
-    fn get_type(&self) -> StateType {
+    fn get_state_type(&self) -> StateType {
         StateType::Expr
     }
 
-    fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool { 
+    fn get_child_type(&self) -> Types {
+        Types::Any
+    }
+
+    fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {
         let ret = self.count == 0;
         if ret {
             *expr = Expr::List {
                 locs,
                 indexes: Vec::new(),
-                end: End::none()
+                end: End::none(),
             }
         }
         ret
     }
 
     fn add_child(&mut self, expr: &mut Expr, index: usize) {
-        if let Expr::List {indexes, ..} = expr {
+        if let Expr::List { indexes, .. } = expr {
             indexes.push(index);
             self.count += 1;
-        }else{
+        } else {
             unreachable!()
         }
     }
@@ -41,17 +45,16 @@ impl BasicState for ListState {
     }
 
     fn set_end(&mut self, expr: &mut Expr, index: End) {
-        if let Expr::List {end, ..} = expr {
+        if let Expr::List { end, .. } = expr {
             *end = index;
         } else {
             unreachable!()
         }
     }
-
 }
 
 impl ListState {
-    pub fn new () -> Self {
-        Self {count: 0}
+    pub fn new() -> Self {
+        Self { count: 0 }
     }
 }

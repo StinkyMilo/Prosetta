@@ -13,8 +13,12 @@ impl BasicState for ReturnState {
         "Return"
     }
 
-    fn get_type(&self) -> StateType {
+    fn get_state_type(&self) -> StateType {
         StateType::Stat
+    }
+
+    fn get_child_type(&self) -> Types {
+        Types::Number
     }
 
     fn can_happen(&self, env: &mut Environment) -> bool {

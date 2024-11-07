@@ -459,7 +459,7 @@ pub struct Environment<'a> {
     /// full text of the poem
     pub full_text: &'a [u8],
     /// The global start and end of alias data
-    pub trigger_word_data: &'a mut WordTriggerArena
+    pub trigger_word_data: &'a mut WordTriggerArena,
 }
 
 ///a slice of the input text

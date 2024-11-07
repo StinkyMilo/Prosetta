@@ -18,7 +18,7 @@ impl ParseState for IfState {
             };
             env.symbols.add_layer();
             // setup child state
-            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont()))
+            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont(Types::Booly)))
         } else if self.has_stat {
             MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
         } else {

@@ -29,7 +29,10 @@ impl ParseState for ForEachState {
                 } else {
                     unreachable!()
                 }
-                MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
+                MatchResult::ContinueWith(
+                    rest.pos,
+                    Box::new(alias::NoneState::new_expr_cont(Types::List)),
+                )
             } else if self.has_stat {
                 MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
             } else {

@@ -4,6 +4,22 @@ use crate::parser::multi_lit_num::VarOrInt;
 use crate::parser::string_lit::VarOrStr;
 use crate::parser::{End, SubStrData, Title};
 
+use bitflags::bitflags;
+
+bitflags! {
+    #[derive(Debug)]
+    pub struct Types: u32 {
+        const Void =   0;
+        const Number = 0b1;
+        const Bool =   0b10;
+        const Booly =  0b11;
+        const String = 0b100;
+        const Color =  0b1000;
+        const List =   0b10000;
+        const Any =    0b11111;
+    }
+}
+
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum OperatorType {
     Add,

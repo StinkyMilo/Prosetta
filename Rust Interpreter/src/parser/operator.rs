@@ -12,8 +12,8 @@ impl BasicState for OperatorState {
     fn get_name(&self) -> &'static str {
         match self.fn_type {
             OperatorType::Add => "Add",
-            OperatorType::Mult => "Mult",
             OperatorType::Sub => "Sub",
+            OperatorType::Mult => "Mult",
             OperatorType::Div => "Div",
             OperatorType::Mod => "Mod",
             OperatorType::Exp => "Exp",
@@ -27,8 +27,23 @@ impl BasicState for OperatorState {
         }
     }
 
-    fn get_type(&self) -> StateType {
+    fn get_state_type(&self) -> StateType {
         StateType::Expr
+    }
+
+    fn get_child_type(&self) -> Types {
+        match self.fn_type {
+            OperatorType::Add
+            | OperatorType::Sub
+            | OperatorType::Mult
+            | OperatorType::Div
+            | OperatorType::Mod
+            | OperatorType::Exp
+            | OperatorType::Log => Types::Number,
+            OperatorType::LessThan | OperatorType::GreaterThan => Types::Number,
+            OperatorType::And | OperatorType::Or | OperatorType::Not => Types::Number | Types::Bool,
+            OperatorType::Equals => Types::Any,
+        }
     }
 
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {

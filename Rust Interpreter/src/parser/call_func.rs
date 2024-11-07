@@ -35,7 +35,10 @@ impl ParseState for FunctionCallState {
             if arg_count == 0 {
                 MatchResult::Matched(end.index, true)
             } else {
-                MatchResult::ContinueWith(rest.pos, get_state!(alias::NoneState::new_expr_cont()))
+                MatchResult::ContinueWith(
+                    rest.pos,
+                    get_state!(alias::NoneState::new_expr_cont(Types::Any)),
+                )
             }
         } else {
             // did not find function
@@ -73,7 +76,7 @@ impl ParseState for FunctionCallState {
                     if child_index.is_some() {
                         MatchResult::ContinueWith(
                             word.pos,
-                            get_state!(alias::NoneState::new_expr_cont()),
+                            get_state!(alias::NoneState::new_expr_cont(Types::Any)),
                         )
                     } else {
                         MatchResult::Failed

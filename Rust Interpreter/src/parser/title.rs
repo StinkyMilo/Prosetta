@@ -17,7 +17,7 @@ impl ParseState for TitleState {
             } else if word.len() == 0 {
                 let title = mem::replace(&mut self.data, Title::new());
                 *env.expr = Expr::Title { data: title };
-                return MatchResult::Matched(0, false);
+                return MatchResult::Matched(word.pos, false);
             }
             let separator = Self::is_separator(word.str);
             // is name

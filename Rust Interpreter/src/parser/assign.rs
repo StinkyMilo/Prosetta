@@ -31,7 +31,7 @@ impl ParseState for AssignState {
                 unreachable!()
             }
             // setup child state
-            MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
+            MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont(Types::Any)))
         } else {
             MatchResult::Continue(0)
         }

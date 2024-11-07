@@ -8,6 +8,7 @@ pub trait BasicState {
     fn can_happen(&self, _env: &mut Environment) -> bool {
         true
     }
+
     /// get the name
     fn get_name(&self) -> &'static str;
 
@@ -23,7 +24,9 @@ pub trait BasicState {
     /// set end to index
     fn set_end(&mut self, expr: &mut Expr, index: End);
 
-    fn get_type(&self) -> StateType;
+    fn get_state_type(&self) -> StateType;
+
+    fn get_child_type(&self) -> Types;
 }
 
 impl<T: BasicState + Debug> ParseState for T {
@@ -35,6 +38,13 @@ impl<T: BasicState + Debug> ParseState for T {
             if is_first {
                 let can_close = self.can_close();
                 match can_close {
+                    CloseType::Unable => {
+                        // cont - has required arguments
+                        MatchResult::ContinueWith(
+                            word.pos,
+                            get_state!(alias::NoneState::new_expr_cont(self.get_child_type())),
+                        )
+                    }
                     CloseType::Able => {
                         if is_mandatory_close(word) {
                             self.set_end(env.expr, End::from_slice(&word, env.global_index));
@@ -43,7 +53,7 @@ impl<T: BasicState + Debug> ParseState for T {
                         } else {
                             MatchResult::ContinueWith(
                                 word.pos,
-                                get_state!(alias::NoneState::new_expr_cont()),
+                                get_state!(alias::NoneState::new_expr(self.get_child_type())),
                             )
                         }
                     }
@@ -59,17 +69,13 @@ impl<T: BasicState + Debug> ParseState for T {
                             }
                         }
                     }
-                    CloseType::Unable => {
-                        // cont - has required arguments
-                        MatchResult::ContinueWith(
-                            word.pos,
-                            get_state!(alias::NoneState::new_expr_cont()),
-                        )
-                    }
                 }
             } else {
                 // not cont - may have more arguments but may not - need to find close if there
-                MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr()))
+                MatchResult::ContinueWith(
+                    word.pos,
+                    get_state!(alias::NoneState::new_expr(self.get_child_type())),
+                )
             }
         }
     }
@@ -93,7 +99,7 @@ impl<T: BasicState + Debug> ParseState for T {
                     // continue again
                     MatchResult::ContinueWith(
                         word.pos,
-                        get_state!(alias::NoneState::new_expr_cont()),
+                        get_state!(alias::NoneState::new_expr_cont(self.get_child_type())),
                     )
                 } else {
                     // exprcont failed on the entire rest of string - I will never match
@@ -107,7 +113,10 @@ impl<T: BasicState + Debug> ParseState for T {
                     MatchResult::Matched(word.pos, true)
                     // succeeded - continue again with noncont expr
                 } else if child_index.is_some() {
-                    MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr()))
+                    MatchResult::ContinueWith(
+                        word.pos,
+                        get_state!(alias::NoneState::new_expr(self.get_child_type())),
+                    )
                     // failed - pass word
                 } else {
                     MatchResult::Continue(0)
@@ -133,6 +142,6 @@ impl<T: BasicState + Debug> ParseState for T {
     }
 
     fn get_type(&self) -> StateType {
-        <Self as BasicState>::get_type(&self)
+        <Self as BasicState>::get_state_type(&self)
     }
 }

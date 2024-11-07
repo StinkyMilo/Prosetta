@@ -13,8 +13,12 @@ impl BasicState for RotateState {
         "Rotate"
     }
 
-    fn get_type(&self) -> StateType {
+    fn get_state_type(&self) -> StateType {
         StateType::Stat
+    }
+    
+    fn get_child_type(&self) -> Types {
+        Types::Number
     }
 
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {
