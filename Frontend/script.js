@@ -323,6 +323,7 @@ function updateCode() {
 }
 
 async function initialize(startingCode) {
+  language_worker?.terminate();
   sourcecode = document.getElementById("code");
   jscode = document.getElementById("js");
   curr_canvas = document.getElementById("outputcanvas");
@@ -340,7 +341,6 @@ async function initialize(startingCode) {
   print_console("Welcome to Prosetta!");
   print_console("---");
   print_console();
-  updateCode();
   let editor = setup_editor(startingCode);
   return editor;
 }
@@ -507,7 +507,7 @@ function setup_editor(startingCode) {
 }
 
 function setup_webworker() {
-  language_worker = new Worker(new URL("./language_worker.js",import.meta.url));
+  language_worker = new Worker(new URL("./language_worker.js", import.meta.url));
   language_worker.onmessage = e => {
     let command = e.data.command;
     let data = e.data.data;
@@ -537,7 +537,7 @@ function setup_webworker() {
 
 function setup_runner() {
   runner_worker?.terminate();
-  runner_worker = new Worker(new URL("./runner_worker.js",import.meta.url));
+  runner_worker = new Worker(new URL("./runner_worker.js", import.meta.url));
   let function_dict = {
     "print_console": print_console,
     "bezier_point": bezier_point,
@@ -560,13 +560,13 @@ function setup_runner() {
     let command = e.data.command;
     let data = e.data.data;
     switch (command) {
-      case "function":
+      case "finished":
         for (let funcCall of data) {
           function_dict[funcCall.name](...funcCall.args);
         }
-        break;
-      case "finished":
-        print_console("fps:", Math.round(1000 / (Date.now() - last_frame_timestamp)));
+        if (has_import(Import.Frame)) {
+          print_console("fps:", Math.round(1000 / (Date.now() - last_frame_timestamp)));
+        }
         last_frame_timestamp = Date.now();
         latest_frame = curr_frame;
         swap_canvases();
