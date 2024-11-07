@@ -8,10 +8,14 @@ Modulo operator. Given two arguments, returns the remainder when dividing one by
 
 ## Example
 <editor :code='`
+Modulo Example
+by Milo Jacobs\n
 was number 2.
 whe par mod number 2. 0. pri number..
 `' 
 :code-wordier="`
+Modulo Example
+by Milo Jacobs\n
 Was number 2?
 When you compare modulo number and 2, do we get 0? If so, print number!
 `"

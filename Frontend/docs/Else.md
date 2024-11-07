@@ -9,11 +9,15 @@ An else statement. It must immediately follow an if and contain at least one sta
 ## Example
 
 <editor :code='`
+Else Example
+by Milo Jacobs\n
 was var two.
 when par var one. pri "value is one"!
 else print "value is two"!
 `' 
 :code-wordier="`
+Else Example
+by Milo Jacobs\n
 'Was var two?'
 When I compared var to one, it was awesome.
 I printed &quot value is one&quot!

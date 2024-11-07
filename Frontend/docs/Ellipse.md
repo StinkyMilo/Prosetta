@@ -23,11 +23,15 @@ Draws an ellipse centered at the turtle's position with a width and a height. Th
 ## Example
 
 <editor :code='`
+Ellipse Example
+by Milo Jacobs and Sarah Regraph\n
 mov 30 30.
 arc 50.
 arc -30 -30 50 70.
 `' 
 :code-wordier="`
+Ellipse Example
+by Milo Jacobs and Sarah Regraph\n
 Move thirty to thirty!
 The arch is fifty years old!
 March sub thirty. Then sub thirty. Fifty then seventy!

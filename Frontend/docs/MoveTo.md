@@ -18,11 +18,15 @@ length (number)
 ## Example
 
 <editor :code="`
+Move To Example
+by Milo Jacobs and John Graphics\n
 arc 50.
 mov 100 100.
 arc 50.
 `" 
 :code-wordier="`
+Move To Example
+by Milo Jacobs and John Graphics\n
 March 50 feet!
 Move 100 meters and 100 meters again!
 March 50 more feet!

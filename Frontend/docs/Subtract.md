@@ -12,10 +12,14 @@ Subtraction operator. Subtracts one number from another, then returns the new va
 
 ## Example
 <editor :code='`
+Subtract Example
+by Milo Jacobs\n
 was the sub 2 1..
 pri the.
 `' 
 :code-wordier="`
+Subtract Example
+by Milo Jacobs\n
 Was the subway sandwich two for one deal any good?
 The prices of the sandwiches couldn't be better!
 `"

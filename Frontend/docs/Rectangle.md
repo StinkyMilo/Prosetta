@@ -23,9 +23,13 @@ Draws a rectangle centered at the turtle's current coordinates. Turtle rotation 
 ## Example
 
 <editor :code='`
+Rectangle Example
+by Milo Jacobs and John Graphics\n
 rec 30 50.
 `' 
 :code-wordier="`
+Rectangle Example
+by Milo Jacobs and John Graphics\n
 Draw a rectangle around my thirty fifty dollar bills!
 `"
 output-method='canvas'></editor>
