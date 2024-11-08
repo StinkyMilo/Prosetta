@@ -5,37 +5,45 @@ use super::*;
 #[derive(Debug, PartialEq)]
 pub enum VarOrStr {
     Var(SubStrData),
-    Str(Vec<u8>)
+    Str(Vec<u8>),
 }
 #[derive(Debug)]
-pub struct LitStrState {first: bool, current_str_start: usize, current_str_end: usize}
+pub struct LitStrState {
+    first: bool,
+    current_str_start: usize,
+    current_str_end: usize,
+}
 
 impl ParseState for LitStrState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         // let g = 0;
         // black_box(&g);
         // println!("G{}", g);
-        
-        if word.len() == 1 && word.str[0] == b'"'{
+
+        if word.len() == 1 && word.str[0] == b'"' {
             if self.first {
-                self.first=false;
+                self.first = false;
                 *env.expr = Expr::LitString {
                     str_start: word.pos + env.global_index,
-                    str:Vec::new(),
-                    str_end: usize::MAX
+                    str: Vec::new(),
+                    str_end: usize::MAX,
                 };
-                self.current_str_start=word.pos + env.global_index + 1;
+                self.current_str_start = word.pos + env.global_index + 1;
                 MatchResult::Continue(0)
             } else {
-                if let Expr::LitString { str, str_end, .. } = env.expr{
+                if let Expr::LitString { str, str_end, .. } = env.expr {
                     //Add current str
                     self.current_str_end = word.pos + env.global_index;
                     if self.current_str_end > self.current_str_start {
-                        str.push(VarOrStr::Str(env.full_text[self.current_str_start..self.current_str_end].to_vec()));
+                        str.push(VarOrStr::Str(
+                            env.full_text[self.current_str_start - env.global_index
+                                ..self.current_str_end - env.global_index]
+                                .to_vec(),
+                        ));
                     }
                     *str_end = self.current_str_end;
                     MatchResult::Matched(rest.pos, false)
-                }else{
+                } else {
                     unreachable!()
                 }
             }
@@ -43,17 +51,21 @@ impl ParseState for LitStrState {
             if self.first {
                 MatchResult::Failed
             } else {
-                if let Expr::LitString { str, .. } = env.expr{
-                    if let Some(var) = env.symbols.try_get_var(word, env.global_index){
+                if let Expr::LitString { str, .. } = env.expr {
+                    if let Some(var) = env.symbols.try_get_var(word, env.global_index) {
                         self.current_str_end = word.pos + env.global_index;
                         if self.current_str_end > self.current_str_start {
-                            str.push(VarOrStr::Str(env.full_text[self.current_str_start..self.current_str_end].to_vec()));
+                            str.push(VarOrStr::Str(
+                                env.full_text[self.current_str_start - env.global_index
+                                    ..self.current_str_end - env.global_index]
+                                    .to_vec(),
+                            ));
                         }
                         str.push(VarOrStr::Var(var));
                         self.current_str_start = rest.pos;
                     }
                     MatchResult::Continue(0)
-                }else{
+                } else {
                     unreachable!()
                 }
             }
@@ -82,7 +94,11 @@ impl ParseState for LitStrState {
 
 impl LitStrState {
     pub fn new() -> Self {
-        Self {first: true, current_str_start: usize::MAX, current_str_end: usize::MAX}
+        Self {
+            first: true,
+            current_str_start: usize::MAX,
+            current_str_end: usize::MAX,
+        }
     }
 }
 
