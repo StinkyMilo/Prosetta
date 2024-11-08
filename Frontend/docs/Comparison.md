@@ -8,10 +8,14 @@ Comparison operator. Compares two values to see if they are the same. Has a very
 
 ## Example
 <editor :code="`
+Comparison Example
+by Milo Jacobs\n
 whe par seven sub eight 1..
 pri yeah..
 `"
 :code-wordier="`
+Comparison Example
+by Milo Jacobs\n
 When you compare seven and subtract from eight 1 --
 Print yeah!
 `" output-method='console'></editor>

@@ -23,9 +23,13 @@ Draws a line without ending the current shape. The relative-coordinate overrides
 ## Example
 
 <editor :code="`
+Line Example
+by Milo Jacobs and John Graphton\n
 lin 10 10.
 `" 
 :code-wordier="`
+Line Example
+by Milo Jacobs and John Graphton\n
 Line up at ten past ten!
 `"
 output-method='canvas'></editor>

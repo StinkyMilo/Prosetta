@@ -8,12 +8,16 @@ A while loop. If the condition (first argument) is true, all other arguments (st
 
 ## Example
 <editor :code='`
+While Example
+by Milo Jacobs\n
 was var one.
 while les var 10:
 pri var.
 was var add var one...
 `' 
 :code-wordier="`
+While Example
+by Milo Jacobs\n
 Was var one?
 While it was less, that var, than 10:
 I print the var.

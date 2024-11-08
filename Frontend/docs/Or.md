@@ -8,10 +8,14 @@ Boolean or operator, which takes at least two arguments. If any provided argumen
 
 ## Example
 <editor :code="`
+Or Example
+by Milo Jacobs\n
 whe oth par two 2. par seven six...
 pri yeah..
 `"
 :code-wordier="`
+Or Example
+by Milo Jacobs\n
 When you otherwise compare two and 2: compare seven and six...
 Print yeah!
 `" output-method='console'></editor>

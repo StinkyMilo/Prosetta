@@ -8,6 +8,15 @@
   <meta name="description" content="Description">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="../node_modules/docsify/lib/themes/vue.css">
+  <style>
+    .content {
+      left: 200px;
+    }
+
+    .tabContent {
+      max-width: 50%;
+    }
+  </style>
   <script src="../node_modules/vue/dist/vue.global.prod.js"></script>
   <link rel="stylesheet" href="../node_modules/codemirror/lib/codemirror.css">
   <script src="../node_modules/codemirror/lib/codemirror.js"></script>
@@ -51,13 +60,15 @@
                 <button class="tabBtn" onclick="openTab(event, 'js')">JS</button>
             </div>
             <div id="codespace">
-                <div class="tabContent noScroll" id="code" onkeyup="updateCode()"></div>
+                <div class="tabContent noScroll" id="code"></div>
                 <div style="display: none;" readonly="true" class="tabContent" id="syntax">Syntax</div>
-                <textarea style="display: none;" readonly="true" class="tabContent" id="js">JavaScript</textarea>
-                <canvas id="outputcanvas" width="400px" height="400px" v-show="outputMethod=='canvas'" />
+                <pre style="display: none;" readonly="true" class="tabContent" id="js">JavaScript</pre>
+                <div id="stack">
+                  <canvas id="outputcanvas" width="400px" height="400px" v-show="outputMethod=='canvas'" />
+                  <canvas id="outputcanvas2" style="visibility: hidden;" width="400px" height="400px" v-show="outputMethod=='canvas'"></canvas>
+                </div>
                 <div id="console" style="width: 400px; height: 400px; margin-top: 0;" v-show="outputMethod=='console'"/>
             </div>
-            <button onclick="runCode()">Run</button>
           `,
           /*
             Code is the program string
@@ -78,11 +89,9 @@
               switchMode: () => {
                 if (this.mode == 'wordier') {
                   editor.setValue(this.code.substring(1));
-                  runCode();
                   this.mode = 'minimal';
                 } else {
                   editor.setValue(this.codeWordier.substring(1));
-                  runCode();
                   this.mode = 'wordier';
                 }
               }
@@ -90,7 +99,6 @@
           },
           mounted: async function () {
             editor = await initialize(this.code.substring(1));
-            runCode();
           }
         }
       },

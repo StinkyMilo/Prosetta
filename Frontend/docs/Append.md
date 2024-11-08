@@ -14,11 +14,15 @@ Add an item to a list. By default, this appends to the end of the list, but an o
 
 ## Example
 <editor :code='`
+Append Example
+by Milo Jacobs and Miss Listerine\n
 was list lis 1 2 3..
 app list four.
 pri list.
 `' 
 :code-wordier="`
+Append Example
+by Milo Jacobs and Miss Listerine\n
 Was list listing 1, 2, and 3?
 Append a list four times.
 Then print the list.

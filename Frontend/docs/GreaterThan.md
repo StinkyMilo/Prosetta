@@ -8,12 +8,16 @@ Boolean greater than operator. Takes two number arguments and returns true if th
 
 ## Example
 <editor :code="`
+Greater Than Example
+by Milo Jacobs\n
 was var twenty.
 while mor var 10.
 pri var.
 was var sub var one...
 `"
 :code-wordier="`
+Greater Than Example
+by Milo Jacobs\n
 Was var one-score?
 While it was more, that var, than 10,
 I print the var.
