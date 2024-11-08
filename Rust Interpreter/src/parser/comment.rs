@@ -14,7 +14,7 @@ impl ParseState for CommentState {
             if let Some(close) = rest.str.find("]"){
                 *env.expr = Expr::Comment {
                     start: word.pos + env.global_index,
-                    comment:rest.str[0..close-1].to_vec(),
+                    comment:rest.str[0..close].to_vec(),
                     end: close + rest.pos + env.global_index
                 };
                 MatchResult::Matched(rest.pos + close, false)
