@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use super::*;
 use alias_data::*;
 
@@ -49,6 +51,11 @@ impl WordTriggerArena {
     }
 }
 
+///does type1 contain all types from type2
+fn is_valid_type(type_from: Types, type_to: Types) -> bool {
+    type_from.contains(type_to)
+}
+
 /// used for both NoneStat and NoneExpr
 /// finds next command
 #[derive(Debug)]
@@ -57,6 +64,8 @@ pub struct NoneState {
     data: &'static StaticAliasData,
     ///The type looked for
     types: Types,
+    ///the alias looked for
+    aliases: Option<Vec<&'static [u8]>>,
     ///the progress of each alias
     progress: Vec<u8>,
     ///the already parsed locs (the locations of alias characters)
@@ -71,7 +80,18 @@ pub struct NoneState {
 
 impl ParseState for NoneState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
-        let aliases = (self.data.aliases)(env.aliases);
+        if self.data.is_expr {
+            let vec = env
+                .aliases
+                .expr
+                .iter()
+                .filter_map(|alias| is_valid_type(self.types, alias.1).then(|| alias.0))
+                .collect::<Vec<_>>();
+
+            self.aliases = Some(vec);
+        }
+
+        let aliases = self.aliases.as_ref().unwrap_or(&env.aliases.stat);
         debug_assert!(aliases.len() < u16::MAX as usize);
 
         // reset on new word
@@ -110,6 +130,7 @@ impl NoneState {
         Self {
             data,
             types,
+            aliases: None,
             progress: Vec::new(),
             locs: Vec::new(),
             offset: 0,
@@ -205,7 +226,7 @@ impl NoneState {
 
     ///matches buildin functions based on self.data
     fn match_alias(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
-        let aliases = (self.data.aliases)(env.aliases);
+        let aliases = self.aliases.as_ref().unwrap_or(&env.aliases.stat);
 
         // run until end of word
         for offset in self.offset..word.len() {
@@ -227,6 +248,7 @@ impl NoneState {
             MatchResult::Failed
         }
     }
+    
     ///finds the bast match of the ones to have just matched
     ///Done by:
     ///1. Implicitly the first to match
@@ -236,7 +258,7 @@ impl NoneState {
         &mut self,
         word: &Slice,
         env: &mut Environment,
-        aliases: &AliasNames,
+        aliases: &[StatTrigger],
         offset: usize,
         rest: usize,
     ) -> MatchResult {
@@ -280,7 +302,7 @@ impl NoneState {
     }
 
     ///match current letter at offset to all aliases
-    fn match_letters(&mut self, aliases: &AliasNames, word: &Slice<'_>, offset: usize) {
+    fn match_letters(&mut self, aliases: &[&'static [u8]], word: &Slice<'_>, offset: usize) {
         // does letter match any commands
         for i in 0..aliases.len() {
             // does letter match

@@ -2,38 +2,43 @@ use std::collections::HashSet;
 
 use super::*;
 
-type StatTrigger = &'static [u8];
-type ExprTrigger = (StatTrigger, Types);
+pub type StatTrigger = &'static [u8];
+pub type ExprTrigger = (StatTrigger, Types);
 
 macro_rules! make_expr {
     ( $type:expr, $( $str:expr ),* ) => {
         {
             $(
-                ($type,$str)
+                ($type,$str),
             )*
         }
     };
 }
 
+#[test]
+pub fn test() {
+    let s: &[StatTrigger] = &[
+        make_expr!(Types::Number, b"int", b"lit"),
+        make_expr!(Types::Number, b"int", b"list"),
+    ];
+}
+
 const BASE_EXPR_ALIASES: &[ExprTrigger] = &[
     // number makers
-    (b"int", Types::Number),
-    (b"lit", Types::Number),
+    make_expr!(Types::Number, b"int", b"lit"),
     // number operators
-    (b"add", Types::Number),
-    (b"sub", Types::Number),
-    (b"tim", Types::Number),
-    (b"ide", Types::Number),
-    (b"mod", Types::Number),
-    (b"log", Types::Number),
-    (b"exp", Types::Number),
+    make_expr!(
+        Types::Number,
+        b"add",
+        b"sub",
+        b"tim",
+        b"ide",
+        b"mod",
+        b"log",
+        b"exp"
+    ),
     // boolean operators
-    (b"les", Types::Bool),
-    (b"mor", Types::Bool),
-    (b"als", Types::Bool),
-    (b"oth", Types::Bool),
-    (b"par", Types::Bool),
-    (b"inv", Types::Bool),
+    make_expr!(Types::Bool, b"les", b"mor", b"als", b"oth", b"par", b"inv"),
 ];
 
 const LIST_EXPR_ALIASES: &[ExprTrigger] = &[
@@ -118,14 +123,12 @@ fn get_stat_state(alias: &'static [u8], index: usize) -> MatchResult {
     )
 }
 ///function to get alias strings from AliasData
-type AliasSelector = fn(&AliasData) -> &AliasNames;
+type AliasSelector = fn(&AliasData) -> &[StatTrigger];
 ///fn to get the continueWith state with the corresponding string
 type AliasToState = fn(alias: &'static [u8], index: usize) -> MatchResult;
 ///static alias
 #[derive(Debug)]
 pub struct StaticAliasData {
-    ///function to get alias strings from AliasData
-    pub aliases: AliasSelector,
     ///function to get the matching continueWith state
     pub func: AliasToState,
     ///is this a expr alias data
@@ -146,14 +149,12 @@ pub struct AliasData {
 ///static alias data
 impl AliasData {
     pub const EXPR: StaticAliasData = StaticAliasData {
-        aliases: |data| &data.expr,
         func: get_expr_state,
         is_expr: true,
         default_continue: false,
         state_name: "NoneExpr",
     };
     pub const EXPR_CONT: StaticAliasData = StaticAliasData {
-        aliases: |data| &data.expr,
         func: get_expr_state,
         is_expr: true,
         default_continue: true,
@@ -161,14 +162,12 @@ impl AliasData {
     };
 
     pub const STAT: StaticAliasData = StaticAliasData {
-        aliases: |data| &data.stat,
         func: get_stat_state,
         is_expr: false,
         default_continue: false,
         state_name: "NoneStat",
     };
     pub const STAT_CONT: StaticAliasData = StaticAliasData {
-        aliases: |data| &data.stat,
         func: get_stat_state,
         is_expr: false,
         default_continue: true,
@@ -205,7 +204,7 @@ impl AliasData {
         Self::new(&mut std::iter::empty())
     }
 
-    fn get_aliases(import: Import) -> (&'static [&'static [u8]], &'static [&'static [u8]]) {
+    fn get_aliases(import: Import) -> (&'static [ExprTrigger], &'static [StatTrigger]) {
         match import {
             Import::List => (LIST_EXPR_ALIASES, LIST_STAT_ALIASES),
             Import::Func => (&[], FUNC_STAT_ALIASES),

@@ -7,7 +7,7 @@ use crate::parser::{End, SubStrData, Title};
 use bitflags::bitflags;
 
 bitflags! {
-    #[derive(Debug)]
+    #[derive(Debug,Clone,Copy)]
     pub struct Types: u32 {
         const Void =   0;
         const Number = 0b1;
