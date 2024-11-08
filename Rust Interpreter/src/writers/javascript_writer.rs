@@ -472,7 +472,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
             format!("_frame")
         },
         Expr::Comment { comment, .. } => {
-            format!("/* {} */",String::from_utf8_lossy(comment))
+            format!("/* {} */",str::replace(&String::from_utf8_lossy(comment),"*/","* /"))
         }
     }
 }
