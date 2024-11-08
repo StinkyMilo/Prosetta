@@ -52,8 +52,20 @@ impl WordTriggerArena {
 }
 
 ///does type1 contain all types from type2
-fn is_valid_type(type_from: Types, type_to: Types) -> bool {
-    type_from.contains(type_to)
+fn is_valid_type(type_wants: Types, type_has: Types) -> bool {
+    type_wants.contains(type_has)
+}
+
+#[derive(Debug)]
+struct AliasFinder {
+    ///the progress of each alias
+    progress: Vec<u8>,
+    ///the already parsed locs (the locations of alias characters)
+    locs: Vec<Option<Vec<usize>>>,
+    ///the offset into the word
+    offset: usize,
+    ///the number of currently matched aliases
+    matched: u16,
 }
 
 /// used for both NoneStat and NoneExpr
@@ -66,36 +78,31 @@ pub struct NoneState {
     types: Types,
     ///the alias looked for
     aliases: Option<Vec<&'static [u8]>>,
-    ///the progress of each alias
-    progress: Vec<u8>,
-    ///the already parsed locs (the locations of alias characters)
-    locs: Vec<Option<Vec<usize>>>,
-    ///the offset into the word
-    offset: usize,
-    ///the number of currently matched aliases
-    matched: u16,
     ///the next state of the state machine
     next_match_state: MatchState,
+    //alias finders
+    alias_finder: AliasFinder,
 }
 
 impl ParseState for NoneState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
-        if self.data.is_expr {
+        let length = if self.data.is_expr {
             let vec = env
                 .aliases
                 .expr
                 .iter()
                 .filter_map(|alias| is_valid_type(self.types, alias.1).then(|| alias.0))
                 .collect::<Vec<_>>();
-
+            let length = vec.len();
             self.aliases = Some(vec);
-        }
+            length
+        } else {
+            env.aliases.stat.len()
+        };
 
-        let aliases = self.aliases.as_ref().unwrap_or(&env.aliases.stat);
-        debug_assert!(aliases.len() < u16::MAX as usize);
-
+        debug_assert!(length < u16::MAX as usize);
         // reset on new word
-        self.reset(aliases.len());
+        self.reset(length);
 
         self.run_match_state(env, word, rest)
     }
@@ -125,25 +132,35 @@ impl ParseState for NoneState {
     }
 }
 
+impl AliasFinder {
+    fn new(length: usize) -> Self {
+        Self {
+            progress: vec![0u8; length],
+            locs: vec![Some(Vec::new()); length],
+            offset: 0,
+            matched: 0,
+        }
+    }
+}
+
 impl NoneState {
     fn new(data: &'static StaticAliasData, types: Types) -> Self {
         Self {
             data,
             types,
             aliases: None,
-            progress: Vec::new(),
-            locs: Vec::new(),
-            offset: 0,
-            matched: 0,
             next_match_state: MatchState::FindAliases,
+            alias_finder: AliasFinder {
+                progress: Vec::new(),
+                locs: Vec::new(),
+                offset: 0,
+                matched: 0,
+            },
         }
     }
     ///reset state back to defaults for a new word
     fn reset(&mut self, length: usize) {
-        self.progress = vec![0u8; length];
-        self.locs = vec![Some(Vec::new()); length];
-        self.offset = 0;
-        self.matched = 0;
+        self.alias_finder = AliasFinder::new(length);
         // if expr need to check if var or num
         self.next_match_state = if self.data.is_expr {
             //Expression
@@ -178,90 +195,133 @@ impl NoneState {
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult {
-        let (new_state, ret) = match self.next_match_state {
-            MatchState::StringLit => (
-                MatchState::Var,
-                MatchResult::ContinueWith(word.pos, get_state!(string_lit::LitStrState::new())),
-            ),
-            // is word a varible
-            MatchState::Var => (
-                MatchState::FunctionCallExpr,
-                MatchResult::ContinueWith(word.pos, get_state!(var::VarState::new())),
-            ),
-            // is word a function
-            MatchState::FunctionCallExpr => (
-                MatchState::Num,
-                MatchResult::ContinueWith(
-                    word.pos,
-                    get_state!(call_func::FunctionCallState::new()),
+        let mut ret = None;
+        while ret.is_none() {
+            (self.next_match_state, ret) = match self.next_match_state {
+                MatchState::StringLit => (
+                    MatchState::Var,
+                    is_valid_type(self.types, Types::String).then(|| {
+                        MatchResult::ContinueWith(
+                            word.pos,
+                            get_state!(string_lit::LitStrState::new()),
+                        )
+                    }),
                 ),
-            ),
-            // is word a literal number
-            MatchState::Num => (
-                MatchState::Color,
-                MatchResult::ContinueWith(
-                    word.pos,
-                    get_state!(num_literal::LiteralNumState::new()),
+                // is word a varible
+                MatchState::Var => (
+                    MatchState::FunctionCallExpr,
+                    // var is any
+                    Some(MatchResult::ContinueWith(
+                        word.pos,
+                        get_state!(var::VarState::new()),
+                    )),
                 ),
-            ),
-            // is word a color
-            MatchState::Color => (
-                MatchState::FindAliases,
-                MatchResult::ContinueWith(word.pos, get_state!(litcolor::LiteralColorState::new())),
-            ),
-            MatchState::FunctionCallStat => (
-                MatchState::FindAliases,
-                MatchResult::ContinueWith(
-                    word.pos,
-                    get_state!(call_func::FunctionCallState::new()),
+                // is word a function
+                MatchState::FunctionCallExpr => (
+                    MatchState::Num,
+                    // func is any
+                    Some(MatchResult::ContinueWith(
+                        word.pos,
+                        get_state!(call_func::FunctionCallState::new()),
+                    )),
                 ),
-            ),
+                // is word a literal number
+                MatchState::Num => (
+                    MatchState::Color,
+                    is_valid_type(self.types, Types::Number).then(|| {
+                        MatchResult::ContinueWith(
+                            word.pos,
+                            get_state!(num_literal::LiteralNumState::new()),
+                        )
+                    }),
+                ),
+                // is word a color
+                MatchState::Color => (
+                    MatchState::FindAliases,
+                    is_valid_type(self.types, Types::Color).then(|| {
+                        MatchResult::ContinueWith(
+                            word.pos,
+                            get_state!(litcolor::LiteralColorState::new()),
+                        )
+                    }),
+                ),
+                MatchState::FunctionCallStat => (
+                    MatchState::FindAliases,
+                    Some(MatchResult::ContinueWith(
+                        word.pos,
+                        get_state!(call_func::FunctionCallState::new()),
+                    )),
+                ),
 
-            // else check aliases
-            MatchState::FindAliases => (MatchState::FindAliases, self.match_alias(env, word, rest)),
-        };
-        self.next_match_state = new_state;
-        ret
+                // else check aliases
+                MatchState::FindAliases => (
+                    MatchState::FindAliases,
+                    Some(self.match_alias(env, word, rest)),
+                ),
+            };
+        }
+        ret.unwrap()
     }
 
     ///matches buildin functions based on self.data
     fn match_alias(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
         let aliases = self.aliases.as_ref().unwrap_or(&env.aliases.stat);
 
-        // run until end of word
-        for offset in self.offset..word.len() {
-            self.match_letters(&aliases, word, offset);
-
-            // try match
-            while self.matched != 0 {
-                self.matched -= 1;
-                let matched_value = self.find_best_match(word, env, &aliases, offset, rest.pos);
-                return matched_value;
+        if let Some((alias, locs)) = self.alias_finder.run(aliases, word) {
+            env.locs = locs;
+            for index in env.locs.as_mut().unwrap() {
+                *index += env.global_index;
             }
-        }
 
+            env.trigger_word_data.add_val(
+                word.pos + env.global_index,
+                word.pos + env.global_index + word.len(),
+                alias.to_vec(),
+            );
+            //set up stack
+            (self.data.func)(
+                alias, rest.pos,
+                // move locs out of state without copy
+            )
+        }
         // if default continue
-        if self.data.default_continue {
+        else if self.data.default_continue {
             MatchResult::Continue(0)
         // else fail
         } else {
             MatchResult::Failed
         }
     }
-    
+}
+
+impl AliasFinder {
+    fn run(
+        &mut self,
+        aliases: &[StatTrigger],
+        word: &Slice,
+    ) -> Option<(StatTrigger, Option<Vec<usize>>)> {
+        // run until end of word
+        while self.offset < word.len() {
+            self.match_letters(&aliases, word);
+
+            // try match
+            while self.matched != 0 {
+                self.matched -= 1;
+                let alias_index = self.find_best_match(aliases);
+                let locs = self.locs[alias_index as usize].take();
+                return Some((aliases[alias_index as usize], locs));
+            }
+            self.offset += 1;
+        }
+        return None;
+    }
+
     ///finds the bast match of the ones to have just matched
     ///Done by:
     ///1. Implicitly the first to match
     ///2. least length between first and last letter
     ///3. then on least total location value
-    fn find_best_match(
-        &mut self,
-        word: &Slice,
-        env: &mut Environment,
-        aliases: &[StatTrigger],
-        offset: usize,
-        rest: usize,
-    ) -> MatchResult {
+    fn find_best_match(&mut self, aliases: &[StatTrigger]) -> u16 {
         let mut min_size = usize::MAX;
         let mut min_locations = usize::MAX;
         let mut min_index = u16::MAX;
@@ -283,35 +343,21 @@ impl NoneState {
                 }
             }
         }
-        self.offset = offset;
-        env.locs = self.locs[min_index as usize].take();
-        for index in env.locs.as_mut().unwrap() {
-            *index += env.global_index;
-        }
-        env.trigger_word_data.add_val(
-            word.pos + env.global_index,
-            word.pos + env.global_index + word.len(),
-            aliases[min_index as usize].to_vec(),
-        );
-        //set up stack
-        (self.data.func)(
-            aliases[min_index as usize],
-            rest,
-            // move locs out of state without copy
-        )
+        return min_index;
     }
 
     ///match current letter at offset to all aliases
-    fn match_letters(&mut self, aliases: &[&'static [u8]], word: &Slice<'_>, offset: usize) {
+    fn match_letters(&mut self, aliases: &[&'static [u8]], word: &Slice<'_>) {
         // does letter match any commands
         for i in 0..aliases.len() {
             // does letter match
             if self.progress[i] < aliases[i].len() as u8
-                && word.str[offset].to_ascii_lowercase() == aliases[i][self.progress[i] as usize]
+                && word.str[self.offset].to_ascii_lowercase()
+                    == aliases[i][self.progress[i] as usize]
             {
                 self.progress[i] += 1;
                 // add locations to locations (locs)
-                self.locs[i].as_mut().unwrap().push(word.pos + offset);
+                self.locs[i].as_mut().unwrap().push(word.pos + self.offset);
                 if self.progress[i] == aliases[i].len() as u8 {
                     self.matched += 1;
                 }

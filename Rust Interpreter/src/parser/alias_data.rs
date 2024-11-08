@@ -5,40 +5,25 @@ use super::*;
 pub type StatTrigger = &'static [u8];
 pub type ExprTrigger = (StatTrigger, Types);
 
-macro_rules! make_expr {
-    ( $type:expr, $( $str:expr ),* ) => {
-        {
-            $(
-                ($type,$str),
-            )*
-        }
-    };
-}
-
-#[test]
-pub fn test() {
-    let s: &[StatTrigger] = &[
-        make_expr!(Types::Number, b"int", b"lit"),
-        make_expr!(Types::Number, b"int", b"list"),
-    ];
-}
-
 const BASE_EXPR_ALIASES: &[ExprTrigger] = &[
     // number makers
-    make_expr!(Types::Number, b"int", b"lit"),
+    (b"int", Types::Number),
+    (b"lit", Types::Number),
     // number operators
-    make_expr!(
-        Types::Number,
-        b"add",
-        b"sub",
-        b"tim",
-        b"ide",
-        b"mod",
-        b"log",
-        b"exp"
-    ),
+    (b"add", Types::Number),
+    (b"sub", Types::Number),
+    (b"tim", Types::Number),
+    (b"ide", Types::Number),
+    (b"mod", Types::Number),
+    (b"log", Types::Number),
+    (b"exp", Types::Number),
     // boolean operators
-    make_expr!(Types::Bool, b"les", b"mor", b"als", b"oth", b"par", b"inv"),
+    (b"les", Types::Bool),
+    (b"mor", Types::Bool),
+    (b"als", Types::Bool),
+    (b"oth", Types::Bool),
+    (b"par", Types::Bool),
+    (b"inv", Types::Bool),
 ];
 
 const LIST_EXPR_ALIASES: &[ExprTrigger] = &[
