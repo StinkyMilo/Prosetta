@@ -459,6 +459,7 @@ impl<'a> Parser<'a> {
 
         ParserResult::Continue
     }
+    
     ///this function is called if the step coninues with
     fn continue_with_func(
         &mut self,
