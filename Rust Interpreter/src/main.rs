@@ -14,25 +14,36 @@ mod testing;
 mod parser_runner;
 
 mod commands;
+mod docs_lib;
 mod parser;
 mod writers;
 
+use docs_lib::gen_output;
 use parser::ParserSource;
 use parser_runner::{run_parser, RunnerFlags};
 
 fn main() {
-    // test_incorrect_colors();
-    // let t = Test;
-    // let ta: Box<dyn Any> = Box::new(Test);
-    // let ta2: Box<dyn Test2> = Box::new(Test);
-    // println!("{:?}", t.type_id());
-    // println!("{:?}", ta.type_id());
-    // println!("{:?}", (*ta).type_id());
-    // println!("{:?}", ta2.type_id());
-    // println!("{:?}", (*(&*ta2 as &dyn Any)).type_id());
-    //playground::print_test();
-    //return;
+    if cfg!(feature = "gen-doc-output") {
+        use std::fs;
+        println!("Generating JS output...");
+        let paths = fs::read_dir("../Frontend/docs").unwrap();
 
+        for p in paths {
+            match p {
+                Ok(v) => {
+                    let path = v.path();
+                    // We're only using ASCII so I think this is fine
+                    let path_str = path.display().to_string();
+
+                    if path.is_file() && path_str.ends_with(".md") {
+                        gen_output(&path_str);
+                    }
+                }
+                Err(e) => println!("{}", e),
+            }
+        }
+        return;
+    }
     println!("size of parser: {}", mem::size_of::<Parser>());
 
     let mut args: Vec<String> = std::env::args().skip(1).collect();
@@ -53,7 +64,7 @@ fn main() {
         whole_program: true,
         linted: true,
         line_rendered: true,
-        word_trigger: true
+        word_trigger: true,
     };
 
     run_parser(
@@ -113,84 +124,3 @@ static MILO_POEM_2: [&[u8]; 1] = [b"
     was name les int marioooo. int luigi.!
     was name2 mor int marioooo. int luigi.!
     "];
-
-// while !matches!(
-//     result,
-//     ParserResult::NoInput | ParserResult::MatchedLine(_) | ParserResult::FailedLine(_)
-// ) {
-//     result = parser.step();
-// }
-// //print!("{:?},", result);
-// print!(
-//     "{}",
-//     linq_like_writer::write(&parser.exprs, &parser.stat_starts)
-// );
-// std::io::stdout().flush().unwrap();
-
-// println!(
-//     "name of eq: {}",
-//     format!("{:#?}",(&commands::Expr::Eq {
-//         locs: vec![0, 1],
-//         name_start: 7,
-//         name: "inch".as_bytes().to_vec(),
-//         value_index: 1
-//     }))
-// );
-//let mut buf= Vec::new();
-//testing::test_ast1();
-// let mut input =io::stdin().lock();
-//let stats = parser_state::parse(&mut input);
-//println!("{}",processing_writer::write(&stats))
-//let s:String = Default::default();
-
-//parser.vars.insert("inch".as_bytes().to_vec());
-//crate::testing::add_vars!(parser, "inch", "miles", "furlongs", "longer");
-//let mut result = parser.step();
-
-// loop {
-//     match parser.step() {
-//         ParserResult::MatchedLine => print(&parser),
-//         ParserResult::FailedLine => println!("   parse failed"),
-//         ParserResult::NoInput => break,
-//         _ => {}
-//     }
-// }
-
-// loop {
-//     match parser.step() {
-//         ParserResult::NoInput => break,
-//         state => println!(
-//             "assert_step!(parser, {:?}, \"{}\", \"{}\");",
-//             state,
-//             parser.get_state(),
-//             std::str::from_utf8(parser.get_word()).unwrap()
-//         ),
-//     }
-// }
-
-// let data = parser.into_data();
-// let iter = data.source.get_iter();
-// println!(
-//     "    text input:\n\"{}\"",
-//     std::str::from_utf8(iter.cloned().collect::<Vec<_>>().as_slice()).unwrap()
-// );
-// let iter = data.source.get_iter();
-// //input.seek(SeekFrom::Start);
-// //println!();
-// //println!("== {:?}", parser.exprs.vec);
-// println!(
-//     "   whole program:\n{}",
-//     linq_like_writer::write(&data.exprs, &data.stat_starts)
-// );
-// let mut lint = writers::syntax_lint::SyntaxLinter::<
-//     writers::syntax_renderers::wind_renderer::WindowsRenderer,
-// >::new();
-// lint.write(&data.exprs, &data.stat_starts, iter);
-// println!(
-//     "   linted:\n{}",
-//     std::str::from_utf8(&lint.into_string()).unwrap()
-// );
-// println!(
-//     "   java program:\n{}",
-//     processing_writer::write(&parser.exprs, &parser.stat_starts)
-// );

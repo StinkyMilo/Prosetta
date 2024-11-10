@@ -13,6 +13,7 @@ wasm = ["dep:wasm-bindgen", "dep:cap"]
 no-cache = []
 speed = []
 no-title = []
+gen-doc-output = []
 
 
 [dependencies]

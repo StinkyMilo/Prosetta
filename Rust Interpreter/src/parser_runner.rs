@@ -9,7 +9,8 @@ use crate::{
     writers::{
         javascript_writer, lisp_like_writer,
         syntax_lint::SyntaxLinter,
-        syntax_renderers::{line_renderer::LineRenderer, wind_renderer::WindowsRenderer}, word_trigger_writer,
+        syntax_renderers::{line_renderer::LineRenderer, wind_renderer::WindowsRenderer},
+        word_trigger_writer,
     },
 };
 
@@ -21,7 +22,7 @@ pub struct RunnerFlags {
     pub whole_program: bool,
     pub linted: bool,
     pub line_rendered: bool,
-    pub word_trigger: bool
+    pub word_trigger: bool,
 }
 
 pub fn run_state(state: ParserResult, parser: &Parser, parser_flags: RunnerFlags, step_count: u64) {
@@ -86,10 +87,22 @@ pub fn run_after(data: ParsedData, parser_flags: RunnerFlags) {
 }
 
 pub fn run_parser(parser_flags: ParserFlags, vis_flags: RunnerFlags, source: ParserSource) {
-    // println!("Input text to be parsed:");
+    let start = SystemTime::now();
+    let data = get_parsed_data(parser_flags, vis_flags, source);
+    let steps = data.steps;
+    run_after(data, vis_flags);
+    let end = SystemTime::now();
+    let duration = end.duration_since(start).unwrap();
+    println!("took {} seconds with {} steps", duration.as_secs(), steps);
+}
+
+pub fn get_parsed_data(
+    parser_flags: ParserFlags,
+    vis_flags: RunnerFlags,
+    source: ParserSource,
+) -> ParsedData {
     let mut parser = Parser::new(source, parser_flags);
     let mut step_count = 0;
-    let start = SystemTime::now();
     loop {
         match parser.step() {
             ParserResult::NoInput => break,
@@ -97,15 +110,7 @@ pub fn run_parser(parser_flags: ParserFlags, vis_flags: RunnerFlags, source: Par
         }
         step_count += 1;
     }
-    let end = SystemTime::now();
-    let duration = end.duration_since(start).unwrap();
-    println!(
-        "took {} seconds with {} steps",
-        duration.as_secs(),
-        step_count
-    );
-
-    let data = parser.into_data();
-
-    run_after(data, vis_flags);
+    let mut data = parser.into_data();
+    data.steps = step_count;
+    data
 }
