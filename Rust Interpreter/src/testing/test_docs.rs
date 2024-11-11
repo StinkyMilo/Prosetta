@@ -1,9 +1,9 @@
 #[cfg(test)]
 mod test_docs {
     use crate::docs_lib::get_code;
+    use crate::parser::testing::testing::test_lib::get_js;
     use crate::parser::{ParserFlags, ParserSource};
     use crate::parser_runner::{get_parsed_data, RunnerFlags};
-    use crate::{parser::testing::testing::test_lib::get_js, testing::*};
     use ntest::timeout;
     use std::fs;
 
