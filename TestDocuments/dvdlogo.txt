@@ -6,11 +6,12 @@ It's fun to watch a cool film.
     It wards off foul moods to treat yourself to a great film!
     When you party moderately hard, 
 			get a great video to subject yourself to.
-            It'll be a great treat for the whole office. film. 2.. 0.
-    	ret sub off 200..
-    .
-	ret sub 200 off..
-.
+            It'll be a great treat for the whole office. 
+            	A film. Two films? Amazing literature ---
+    	Great, sublime, officially better 
+        than two-hundred live bees ---
+	There are credits, subtitles, 
+    and two-hundred offially-supported languages!!
 
 rec 0 0 400 400.
 fil black.
