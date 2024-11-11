@@ -10,5 +10,7 @@ mod test_lit_int;
 mod test_numbers;
 mod test_operators;
 mod test_print;
+mod test_colors;
+mod test_foreach;
 
 mod testing;
