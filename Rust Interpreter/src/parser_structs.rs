@@ -201,67 +201,6 @@ impl Debug for IgnoreSet {
         f.debug_struct("IgnoreSet").finish()
     }
 }
-
-// pub struct FuncSet {
-//     /// set with <name, arg_count>
-//     set: ScopeMap<Vec<u8>, usize>,
-// }
-
-// impl FuncSet {
-//     pub fn new() -> Self {
-//         Self {
-//             set: ScopeMap::new(),
-//         }
-//     }
-//     pub fn insert(&mut self, name: Vec<u8>, arg_count: usize) {
-//         self.set.define(name, arg_count);
-//     }
-//     pub fn add_layer(&mut self) {
-//         self.set.push_layer();
-//     }
-//     pub fn remove_layer(&mut self) {
-//         self.set.pop_layer();
-//     }
-//     pub fn contains(&self, name: Vec<u8>) -> bool {
-//         self.set.contains_key(&name)
-//     }
-//     pub fn try_get_func(&self, word: &Slice, global_index: usize) -> Option<SubStrData> {
-//         if word.len() > 255 {
-//             return None;
-//         }
-//         // remove ' and make lowercase
-//         let (name, mut skip_indexes) = get_var_name_and_skips(word.str);
-//         let var_data = try_get_val(&name, &mut self.set.keys());
-
-//         if let Some((var_start, name)) = var_data {
-//             let start = convert_skip_indexes(&mut skip_indexes, var_start, name.len() as u8);
-
-//             Some(SubStrData {
-//                 start: global_index + word.pos + start as usize,
-//                 name: name.to_vec(),
-//                 skip_indexes,
-//             })
-//         } else {
-//             None
-//         }
-//     }
-
-//     pub fn get_arg_count(&self, name: &[u8]) -> Option<&usize> {
-//         self.set.get(name)
-//     }
-// pub fn inc_arg_count(&mut self, name: &[u8]) {
-//     if let Some(val) = self.set.get(name) {
-//         //Increment in above scope.
-//         self.set.define(name.to_vec(), val + 1);
-//     }
-// }
-// }
-
-// impl Debug for FuncSet {
-//     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-//         f.debug_struct("FuncSet").finish()
-//     }
-// }
 #[derive(PartialEq, Debug)]
 pub struct SubStrData {
     pub name: Vec<u8>,
@@ -459,7 +398,7 @@ pub struct Environment<'a> {
     /// full text of the poem
     pub full_text: &'a [u8],
     /// The global start and end of alias data
-    pub trigger_word_data: &'a mut WordTriggerArena
+    pub trigger_word_data: &'a mut WordTriggerArena,
 }
 
 ///a slice of the input text
@@ -533,53 +472,32 @@ pub fn is_mandatory_close(slice: &Slice) -> bool {
     cd.close_length != 0 && !cd.only_forced
 }
 
-///get the next valid word and the rest of the string as decided by is_valid_word_char()
-///returns (word,rest)
-pub fn get_next_word<'a>(slice: &Slice<'a>, mut start: usize) -> (Slice<'a>, Slice<'a>) {
-    // find start of word
-    start = start.min(slice.len());
-    while start < slice.len() && !is_valid_word_char(slice.str[start]) {
-        start += 1;
-    }
-
-    // find end of word
-    let mut end = start;
-    while end < slice.len() && is_valid_word_char(slice.str[end]) {
-        end += 1;
-    }
-
-    (
-        Slice {
-            str: &slice.str[start..end],
-            pos: slice.pos + start,
-        },
-        Slice {
-            str: &slice.str[end..],
-            pos: slice.pos + end,
-        },
-    )
-}
 pub struct CloseData {
     pub close_count: u8,
     pub close_length: u8,
     pub only_forced: bool,
 }
+
+fn is_word_stopper(line: &[u8]) -> bool {
+    line.len() >= 2 && &line[..2] == b"--"
+}
+
 /// gets the number of times the characters at line[index] should be repeated and the offset after
 /// returns (repeat_count,offset)
 pub fn get_close_data(line: &[u8]) -> CloseData {
-    if line.len() >= 3 && line[..3] == b"..."[..] {
+    if line.len() >= 3 && &line[..3] == b"..." {
         CloseData {
             close_count: 10,
             close_length: 3,
             only_forced: false,
         }
-    } else if line.len() >= 3 && line[..3] == b"---"[..] {
+    } else if line.len() >= 3 && &line[..3] == b"---" {
         CloseData {
             close_count: 3,
             close_length: 3,
             only_forced: false,
         }
-    } else if line.len() >= 2 && line[..2] == b"--"[..] {
+    } else if is_word_stopper(line) {
         CloseData {
             close_count: 2,
             close_length: 2,
@@ -638,7 +556,10 @@ pub fn get_next_slice<'a>(slice: &Slice<'a>, mut start: usize) -> (Slice<'a>, Sl
     } else if end < slice.len() && is_non_close_but_still_single(slice.str[start]) {
         end += 1;
     } else {
-        while end < slice.len() && is_valid_word_char(slice.str[end]) {
+        while end < slice.len()
+            && is_valid_word_char(slice.str[end])
+            && !is_word_stopper(&slice.str[end..])
+        {
             end += 1;
         }
     }
@@ -706,11 +627,17 @@ pub fn find_close<'a>(slice: &'a Slice<'a>, start: usize) -> Option<Slice<'_>> {
     find_close_slice(slice, start).map(|s| s.1)
 }
 
+const INVALID_SYMBOL_CHARS: &[u8] = b"\'-";
+///is char a valid char in a symbol
+fn is_symbol_char(char: u8) -> bool {
+    !INVALID_SYMBOL_CHARS.contains(&char)
+}
+
 pub fn get_var_name_and_skips(word: &[u8]) -> (Vec<u8>, Vec<u8>) {
     let mut name = Vec::new();
     let mut skips = Vec::new();
     for j in 0..word.len() {
-        if word[j] == b'\'' {
+        if !is_symbol_char(word[j]) {
             skips.push(j as u8);
         } else {
             name.push(word[j].to_ascii_lowercase());

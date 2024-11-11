@@ -32,4 +32,11 @@ mod tests_assign_var {
             (-@47,48,49$58$$3 (-@51,52,53$58$$3 (litnum 1@55$$3)))))))))))))"
         );
     }
+
+    #[test]
+    #[timeout(1000)]
+    fn test_dashes() {
+        let data = run_parser!(b"was tu-tu twelve hi---hi");
+        check_lisp!(data, "(assign@0,1,2$19$$3 \"tutu\"@4|2 (litnum 12@10$$6))");
+    }
 }
