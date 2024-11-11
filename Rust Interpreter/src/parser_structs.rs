@@ -309,7 +309,7 @@ pub(crate) use get_state;
 // pub(crate) use only_debug;
 
 /// add or remove commands based on flags
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct ParserFlags {
     pub title: bool,
 }

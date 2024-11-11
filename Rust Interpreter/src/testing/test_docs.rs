@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod test_docs {
-    use crate::docs_lib::get_code;
+    use crate::docs_lib::get_editor_property;
     use crate::parser::testing::testing::test_lib::get_js;
     use crate::parser::{ParserFlags, ParserSource};
     use crate::parser_runner::{get_parsed_data, RunnerFlags};
@@ -31,24 +31,39 @@ mod test_docs {
     }
 
     fn test_file(path: &str) -> () {
+        let parser_flags = ParserFlags { title: true };
+        let runner_flags = RunnerFlags {
+            assert_steps: false,
+            input: false,
+            whole_program: false,
+            linted: false,
+            line_rendered: false,
+            word_trigger: false,
+        };
         let contents = fs::read_to_string(path).expect("File not found");
-        match get_code(&contents) {
+        match get_editor_property(&contents, ":code") {
             Some(code) => {
                 let data = get_parsed_data(
-                    ParserFlags { title: true },
-                    RunnerFlags {
-                        assert_steps: false,
-                        input: false,
-                        whole_program: true,
-                        line_rendered: false,
-                        linted: false,
-                        word_trigger: false,
-                    },
+                    parser_flags.clone(),
+                    runner_flags.clone(),
                     ParserSource::from_string(code.as_bytes().to_vec()),
                 );
                 let output_path = format!("{}_exp.js", &path[..path.len() - 3]);
                 let expected_output = fs::read_to_string(output_path).expect("File not found");
                 assert_eq!(expected_output, get_js(&data));
+            }
+            None => (),
+        }
+        match get_editor_property(&contents, ":code-wordier") {
+            Some(code) => {
+                let data = get_parsed_data(
+                    parser_flags.clone(),
+                    runner_flags.clone(),
+                    ParserSource::from_string(code.as_bytes().to_vec()),
+                );
+                let output_path = format!("{}_exp.js", &path[..path.len() - 3]);
+                let expected_output = fs::read_to_string(output_path).expect("File not found");
+                assert_eq!(expected_output, get_js(&data), "For file path {}", path);
             }
             None => (),
         }
