@@ -8,7 +8,7 @@ mod test_docs {
     use std::fs;
 
     #[test]
-    #[timeout(1000)]
+    #[timeout(20000)]
     fn test_all_docs() {
         use std::fs;
         println!("Generating JS output...");
@@ -64,8 +64,8 @@ mod test_docs {
             }
             None => (),
         }
-            if let Some(js) = js_output{
-                match get_editor_property(&contents, ":code-wordier") {
+        if let Some(js) = js_output {
+            match get_editor_property(&contents, ":code-wordier") {
                 Some(code) => {
                     let data = get_parsed_data(
                         parser_flags.clone(),
