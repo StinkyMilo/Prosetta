@@ -8,7 +8,7 @@ pub mod test_lib {
     use crate::commands::{Expr, ExprArena};
 
     use crate::parser::{Parser, *};
-    use crate::writers::lisp_like_writer;
+    use crate::writers::{javascript_writer, lisp_like_writer};
     use alias_data::AliasData;
     use std::collections::HashSet;
     use std::hint;
@@ -92,6 +92,10 @@ pub mod test_lib {
 
     pub fn get_lisp(data: &ParsedData) -> String {
         lisp_like_writer::write(&data.exprs, &data.stat_starts)
+    }
+
+    pub fn get_js(data: &ParsedData) -> String {
+        javascript_writer::write(&data.exprs, &data.stat_starts)
     }
 }
 

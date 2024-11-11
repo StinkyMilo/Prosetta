@@ -1,8 +1,8 @@
 #![allow(dead_code)]
 #[path = "parser_source.rs"]
 pub(crate) mod parser_source;
-use bstr::ByteSlice;
 use alias::WordTriggerArena;
+use bstr::ByteSlice;
 pub(crate) use parser_source::*;
 // other stucts
 #[path = "parser_structs.rs"]
@@ -144,6 +144,8 @@ pub struct ParsedData<'a> {
     pub imports: Vec<Import>,
     /// The global start and end of alias data
     pub trigger_word_data: WordTriggerArena,
+    /// The number of steps taken to parse
+    pub steps: u64,
 }
 
 #[derive(Debug)]
@@ -195,6 +197,7 @@ impl<'a> Parser<'a> {
                 imports: Vec::new(),
                 source,
                 trigger_word_data: WordTriggerArena::new(),
+                steps: 1,
             },
             parse_title: flags.title,
             stack: Vec::new(),
