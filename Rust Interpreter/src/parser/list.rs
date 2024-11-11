@@ -11,8 +11,8 @@ impl BasicState for ListState {
         "List"
     }
 
-    fn get_state_type(&self) -> StateType {
-        StateType::Expr
+    fn get_state_return(&self) -> ReturnType {
+        ReturnType::List
     }
 
     fn get_child_type(&self) -> Types {

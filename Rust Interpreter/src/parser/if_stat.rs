@@ -18,7 +18,10 @@ impl ParseState for IfState {
             };
             env.symbols.add_layer();
             // setup child state
-            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_expr_cont(Types::Booly)))
+            MatchResult::ContinueWith(
+                word.pos,
+                Box::new(alias::NoneState::new_expr_cont(Types::Booly)),
+            )
         } else if self.has_stat {
             MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
         } else {
@@ -55,7 +58,7 @@ impl ParseState for IfState {
                 if self.has_stat && is_mandatory_close(word) {
                     *end = End::from_slice(&word, env.global_index);
                     env.symbols.remove_layer();
-                    MatchResult::Matched(word.pos, true)
+                    MatchResult::Matched(word.pos, ReturnType::Void, true)
                     // succeeded - continue again with noncont stat
                 } else if child_index.is_some() {
                     MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat()))

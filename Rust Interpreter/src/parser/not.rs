@@ -21,7 +21,7 @@ impl ParseState for NotState {
                     end: End::from_slice(&close.0, env.global_index),
                 };
                 env.nots.insert(word.str.to_ascii_lowercase());
-                MatchResult::Matched(close.0.pos, true)
+                MatchResult::Matched(close.0.pos, ReturnType::Void, true)
             } else {
                 // did not find close - fail
                 MatchResult::Failed

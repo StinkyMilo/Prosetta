@@ -24,7 +24,7 @@ pub trait BasicState {
     /// set end to index
     fn set_end(&mut self, expr: &mut Expr, index: End);
 
-    fn get_state_type(&self) -> StateType;
+    fn get_state_return(&self) -> ReturnType;
 
     fn get_child_type(&self) -> Types;
 }
@@ -48,7 +48,7 @@ impl<T: BasicState + Debug> ParseState for T {
                     CloseType::Able => {
                         if is_mandatory_close(word) {
                             self.set_end(env.expr, End::from_slice(&word, env.global_index));
-                            MatchResult::Matched(word.pos, true)
+                            MatchResult::Matched(word.pos, self.get_state_return(), true)
                             // succeeded - continue again with noncont expr
                         } else {
                             MatchResult::ContinueWith(
@@ -65,7 +65,7 @@ impl<T: BasicState + Debug> ParseState for T {
                             None => MatchResult::Failed,
                             Some(slice) => {
                                 self.set_end(env.expr, End::from_slice(&slice.0, env.global_index));
-                                MatchResult::Matched(slice.0.pos, true)
+                                MatchResult::Matched(slice.0.pos, self.get_state_return(), true)
                             }
                         }
                     }
@@ -110,7 +110,7 @@ impl<T: BasicState + Debug> ParseState for T {
                 // I can close so I close
                 if is_mandatory_close(word) {
                     self.set_end(env.expr, End::from_slice(&word, env.global_index));
-                    MatchResult::Matched(word.pos, true)
+                    MatchResult::Matched(word.pos, self.get_state_return(), true)
                     // succeeded - continue again with noncont expr
                 } else if child_index.is_some() {
                     MatchResult::ContinueWith(
@@ -130,7 +130,7 @@ impl<T: BasicState + Debug> ParseState for T {
                     None => MatchResult::Failed,
                     Some(slice) => {
                         self.set_end(env.expr, End::from_slice(&slice.0, env.global_index));
-                        MatchResult::Matched(slice.0.pos, true)
+                        MatchResult::Matched(slice.0.pos, self.get_state_return(), true)
                     }
                 }
             }
@@ -142,6 +142,9 @@ impl<T: BasicState + Debug> ParseState for T {
     }
 
     fn get_type(&self) -> StateType {
-        <Self as BasicState>::get_state_type(&self)
+        match self.get_state_return() {
+            ReturnType::Void => StateType::Stat,
+            _ => StateType::Expr,
+        }
     }
 }

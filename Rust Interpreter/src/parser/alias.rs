@@ -116,7 +116,7 @@ impl ParseState for NoneState {
     ) -> MatchResult {
         if child_index.is_some() {
             // child matched successfully
-            MatchResult::Matched(word.pos, false)
+            MatchResult::Matched(word.pos, ReturnType::Void, false)
         } else {
             // child did not match - continue searching
             self.run_match_state(env, word, rest)
@@ -203,6 +203,7 @@ impl NoneState {
                     is_valid_type(self.types, Types::String).then(|| {
                         MatchResult::ContinueWith(
                             word.pos,
+
                             get_state!(string_lit::LitStrState::new()),
                         )
                     }),
@@ -268,6 +269,7 @@ impl NoneState {
         let aliases = self.aliases.as_ref().unwrap_or(&env.aliases.stat);
 
         if let Some((alias, locs)) = self.alias_finder.run(aliases, word) {
+
             env.locs = locs;
             for index in env.locs.as_mut().unwrap() {
                 *index += env.global_index;
@@ -279,9 +281,13 @@ impl NoneState {
                 alias.to_vec(),
             );
             //set up stack
-            (self.data.func)(
-                alias, rest.pos,
-                // move locs out of state without copy
+            let state = (self.data.func)(
+                alias
+            )
+            MatchResult::ContinueWith(
+                rest.pos,
+
+                state
             )
         }
         // if default continue

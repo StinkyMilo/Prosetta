@@ -6,7 +6,7 @@ use std::{
     usize,
 };
 
-use super::{alias::WordTriggerArena, alias_data::AliasData, Expr};
+use super::{alias::WordTriggerArena, alias_data::AliasData, Expr, ReturnType, Types};
 
 pub fn try_get_best_val<'a>(
     name: &[u8],
@@ -286,6 +286,7 @@ pub struct State {
     pub expr_index: usize,
     pub first_parse: usize,
     pub last_parse: usize,
+    pub types: Types,
     pub state: Box<dyn ParseState>,
 }
 
@@ -369,9 +370,9 @@ impl End {
 #[derive(Debug)]
 pub enum MatchResult {
     /// returned to go to the parent state with the index to now parse from and whether the state closed on it
-    Matched(usize, bool),
+    Matched(usize, ReturnType, bool),
     /// returned to add a child onto the stack with an index and the state to continue with
-    ContinueWith(usize, Box<dyn ParseState>),
+    ContinueWith(usize, Types, Box<dyn ParseState>),
     /// returned to give the same state with the offset (usually 0)
     Continue(usize),
     /// returned to go to the parent state with a failure

@@ -95,7 +95,7 @@ impl ParseState for FunctionState {
                 env.symbols.remove_layer();
                 env.symbols
                     .insert_func(func.name.to_owned(), self.args_count);
-                MatchResult::Matched(word.pos, true)
+                MatchResult::Matched(word.pos, ReturnType::Void, true)
                 // succeeded - continue again with noncont stat
             } else if child_index.is_some() {
                 MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat_cont()))

@@ -67,7 +67,7 @@ impl ParseState for ElseState {
                     *end = End::from_slice(&word, env.global_index);
                     *else_index = env.expr_index;
                     env.symbols.remove_layer();
-                    MatchResult::Matched(word.pos, true)
+                    MatchResult::Matched(word.pos, ReturnType::Void, true)
                     // succeeded - continue again with noncont stat
                 } else if child_index.is_some() {
                     MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat()))

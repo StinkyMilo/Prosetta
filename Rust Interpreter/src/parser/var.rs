@@ -7,7 +7,7 @@ impl ParseState for VarState {
         // is varible in scope
         if let Some(var) = env.symbols.try_get_var(&word, env.global_index) {
             *env.expr = Expr::Var { var };
-            MatchResult::Matched(rest.pos, false)
+            MatchResult::Matched(rest.pos, ReturnType::Any, false)
         } else {
             // future words could be varible names
             MatchResult::Failed

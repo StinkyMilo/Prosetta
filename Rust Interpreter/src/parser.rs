@@ -1,13 +1,16 @@
 #![allow(dead_code)]
 #[path = "parser_source.rs"]
 pub(crate) mod parser_source;
-use bstr::ByteSlice;
 use alias::WordTriggerArena;
+use bstr::ByteSlice;
 pub(crate) use parser_source::*;
 // other stucts
 #[path = "parser_structs.rs"]
 pub(crate) mod parser_structs;
 pub(crate) use parser_structs::*;
+#[path = "fail_map.rs"]
+pub(crate) mod fail_map;
+pub(crate) use fail_map::*;
 
 pub(crate) mod alias;
 pub(crate) mod alias_data;
@@ -116,16 +119,7 @@ impl Title {
         }
     }
 }
-// impl Title{
-//     pub fn empty()->Self{
-//         Self {
-//             title: b"No Title".to_vec(),
-//             authors: vec![(b"No Author".to_vec()],
-//             imports: Vec::new(),
-//             delim: Vec::new(),
-//         }
-//     }
-// }
+
 ///The data that is currently parsed
 #[derive(Debug)]
 pub struct ParsedData<'a> {
@@ -166,7 +160,7 @@ pub struct Parser<'a> {
     /// the index of the last matched state
     stat_indexes: Vec<usize>,
     /// the hash map of ranges of failed exprs
-    cached_fails: HashMap<&'static str, RangeSet<usize>>,
+    cached_fails: FailMap,
     ///does the parser need to parse a title
     parse_title: bool,
 }
@@ -204,7 +198,7 @@ impl<'a> Parser<'a> {
             aliases,
             repeat_count: 0,
             stat_indexes: Vec::new(),
-            cached_fails: HashMap::new(),
+            cached_fails: FailMap::new(),
         }
     }
     ///get the last state
@@ -295,10 +289,7 @@ impl<'a> Parser<'a> {
 
         let id = frame.state.get_name();
         // does the failing range of the state include the current parsing location
-        let must_fail = self
-            .cached_fails
-            .get(id)
-            .is_some_and(|range| range.contains(&frame.last_parse));
+        let must_fail = self.cached_fails.contains(id, Types::Any, frame.last_parse);
 
         if must_fail && !cfg!(feature = "no-cache") {
             self.failed_func();
@@ -391,7 +382,7 @@ impl<'a> Parser<'a> {
 
         match result {
             // I matched - return to last expr on stack with success
-            MatchResult::Matched(index, bool) => self.matched_func(index, bool),
+            MatchResult::Matched(index, return_type, bool) => self.matched_func(index, bool),
             // continue parsing child
             MatchResult::ContinueWith(index, state) => {
                 self.continue_with_func(index, state, new_locs)
@@ -420,10 +411,7 @@ impl<'a> Parser<'a> {
         } else {
             //insert the range of parsed words into map
             let id = state.state.get_name();
-            self.cached_fails
-                .entry(id)
-                .or_insert(RangeSet::new())
-                .insert(state.first_parse..state.last_parse + 1);
+            self.cached_fails.insert(id, types, range);
         }
 
         let state_pos = state.expr_index;
@@ -459,7 +447,7 @@ impl<'a> Parser<'a> {
 
         ParserResult::Continue
     }
-    
+
     ///this function is called if the step coninues with
     fn continue_with_func(
         &mut self,

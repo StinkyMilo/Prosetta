@@ -7,7 +7,7 @@ use crate::parser::{End, SubStrData, Title};
 use bitflags::bitflags;
 
 bitflags! {
-    #[derive(Debug,Clone,Copy)]
+    #[derive(Debug,Clone,Copy,Hash,PartialEq,Eq)]
     pub struct Types: u32 {
         const Void =   0;
         const Number = 0b1;
@@ -18,6 +18,17 @@ bitflags! {
         const List =   0b10000;
         const Any =    0b11111;
     }
+}
+
+#[derive(Debug)]
+pub enum ReturnType {
+    Void,
+    Number,
+    Bool,
+    String,
+    Color,
+    List,
+    Any,
 }
 
 #[derive(PartialEq, Debug, Clone, Copy)]

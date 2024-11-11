@@ -39,7 +39,7 @@ impl ParseState for WordNumState {
                     *end = End::from_slice(&close.0, env.global_index);
                 }
 
-                MatchResult::Matched(close.0.pos, true)
+                MatchResult::Matched(close.0.pos, ReturnType::Number, true)
             } else {
                 // did not find close - fail
                 MatchResult::Failed

@@ -27,8 +27,19 @@ impl BasicState for OperatorState {
         }
     }
 
-    fn get_state_type(&self) -> StateType {
-        StateType::Expr
+    fn get_state_return(&self) -> ReturnType {
+        match self.fn_type {
+            OperatorType::Add
+            | OperatorType::Sub
+            | OperatorType::Mult
+            | OperatorType::Div
+            | OperatorType::Mod
+            | OperatorType::Exp
+            | OperatorType::Log => ReturnType::Number,
+            OperatorType::LessThan | OperatorType::GreaterThan => ReturnType::Bool,
+            OperatorType::And | OperatorType::Or | OperatorType::Not => ReturnType::Number,
+            OperatorType::Equals => ReturnType::Any,
+        }
     }
 
     fn get_child_type(&self) -> Types {

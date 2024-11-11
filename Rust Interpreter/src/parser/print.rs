@@ -39,7 +39,7 @@ impl ParseState for PrintState {
             if found_close {
                 // set end
                 *end = End::from_slice(&word, env.global_index);
-                MatchResult::Matched(word.pos, true)
+                MatchResult::Matched(word.pos, ReturnType::Void, true)
             } else {
                 //get first word for "pri hi."
                 if self.count == 0 {
@@ -80,7 +80,7 @@ impl ParseState for PrintState {
             self.count += 1;
             if is_mandatory_close(word) {
                 *end = End::from_slice(&word, env.global_index);
-                MatchResult::Matched(word.pos, true)
+                MatchResult::Matched(word.pos, ReturnType::Void, true)
             } else if child_index.is_some() {
                 MatchResult::ContinueWith(
                     word.pos,

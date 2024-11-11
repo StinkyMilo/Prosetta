@@ -72,7 +72,7 @@ impl ParseState for ForEachState {
                 if self.has_stat && is_close(word) {
                     *end = End::from_slice(&word, env.global_index);
                     env.symbols.remove_layer();
-                    MatchResult::Matched(word.pos, true)
+                    MatchResult::Matched(word.pos, ReturnType::Void, true)
                     // succeeded - continue again with noncont stat
                 } else if child_index.is_some() {
                     MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat()))

@@ -17,7 +17,7 @@ impl ParseState for TitleState {
             } else if word.len() == 0 {
                 let title = mem::replace(&mut self.data, Title::new());
                 *env.expr = Expr::Title { data: title };
-                return MatchResult::Matched(word.pos, false);
+                return MatchResult::Matched(word.pos, ReturnType::Void, false);
             }
             let separator = Self::is_separator(word.str);
             // is name
@@ -54,7 +54,7 @@ impl ParseState for TitleState {
                 self.data.delim.push((word.pos, separator.close_length));
                 let title = mem::replace(&mut self.data, Title::new());
                 *env.expr = Expr::Title { data: title };
-                MatchResult::Matched(word.pos, true)
+                MatchResult::Matched(word.pos, ReturnType::Void, true)
             }
         } else if word.len() >= 2 && word.str.to_ascii_lowercase() == b"by" {
             self.data

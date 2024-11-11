@@ -13,8 +13,8 @@ impl BasicState for FillState {
         "Fill"
     }
 
-    fn get_state_type(&self) -> StateType {
-        StateType::Stat
+    fn get_state_return(&self) -> ReturnType {
+        ReturnType::Void
     }
 
     fn get_child_type(&self) -> Types {

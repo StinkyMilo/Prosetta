@@ -33,7 +33,7 @@ impl ParseState for FunctionCallState {
 
             // match if args are 0
             if arg_count == 0 {
-                MatchResult::Matched(end.index, true)
+                MatchResult::Matched(end.index, ReturnType::Any, true)
             } else {
                 MatchResult::ContinueWith(
                     rest.pos,
@@ -69,7 +69,7 @@ impl ParseState for FunctionCallState {
                         None => MatchResult::Failed,
                         Some(slice) => {
                             *end = End::from_slice(&slice.0, env.global_index);
-                            MatchResult::Matched(slice.0.pos, true)
+                            MatchResult::Matched(slice.0.pos, ReturnType::Any, true)
                         }
                     };
                 } else {

@@ -11,8 +11,8 @@ impl BasicState for FindState {
         "Find"
     }
 
-    fn get_state_type(&self) -> StateType {
-        StateType::Expr
+    fn get_state_return(&self) -> ReturnType {
+        ReturnType::Number
     }
 
     fn get_child_type(&self) -> Types {

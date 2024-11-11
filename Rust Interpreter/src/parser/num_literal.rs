@@ -17,7 +17,7 @@ impl ParseState for LiteralNumState {
                 str_length: word.len(),
                 value,
             };
-            MatchResult::Matched(rest.pos, false)
+            MatchResult::Matched(rest.pos, ReturnType::Number, false)
         } else {
             // word is not a number
             MatchResult::Failed

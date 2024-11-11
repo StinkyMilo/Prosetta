@@ -11,8 +11,8 @@ impl BasicState for MoveToState {
         "MoveTo"
     }
 
-    fn get_state_type(&self) -> StateType {
-        StateType::Stat
+    fn get_state_return(&self) -> ReturnType {
+        ReturnType::List
     }
     
     fn get_child_type(&self) -> Types {

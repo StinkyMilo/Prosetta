@@ -13,8 +13,8 @@ impl BasicState for ColorState {
         "Color"
     }
 
-    fn get_state_type(&self) -> StateType {
-        StateType::Expr
+    fn get_state_return(&self) -> ReturnType {
+        ReturnType::Color
     }
 
     fn get_child_type(&self) -> Types {

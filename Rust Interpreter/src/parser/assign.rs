@@ -64,7 +64,7 @@ impl ParseState for AssignState {
                     } else {
                         unreachable!();
                     }
-                    MatchResult::Matched(slice.0.pos, true)
+                    MatchResult::Matched(slice.0.pos,ReturnType::Void,true)
                 }
             }
         } else {
