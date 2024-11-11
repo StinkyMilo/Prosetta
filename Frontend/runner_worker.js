@@ -65,16 +65,33 @@ function set_line_width() {
   queue_function("set_line_width", arguments);
 }
 
-function get_concat_value() {
-  queue_function("get_concat_value", arguments);
+function get_concat_value(...args) {
+  let total = 0;
+  let multiplier = 1;
+  for (let i = args.length - 1; i >= 0; i--) {
+    total += args[i] * multiplier;
+    multiplier *= 10;
+  }
+  return total;
 }
 
-function log_base() {
-  queue_function("log_base", arguments);
+function log_base(base, val = undefined) {
+  if (val == undefined) {
+    return Math.log(base);
+  }
+  return Math.log(val) / Math.log(base);
 }
 
-function get_color() {
-  queue_function("get_color", arguments);
+function get_color(...color) {
+  switch (color.length) {
+    case 1:
+      if (color[0] == 0) {
+        return "transparent";
+      }
+      return color[0];
+    case 3:
+      return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+  }
 }
 
 function end_shape() {
