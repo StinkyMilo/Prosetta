@@ -24,8 +24,6 @@ impl ParseState for ForEachState {
             if !self.has_list {
                 if let Expr::ForEach { var, .. } = env.expr {
                     *var = new_var;
-                    env.symbols.add_layer();
-                    env.symbols.insert_var(var.name.to_owned());
                 } else {
                     unreachable!()
                 }
@@ -47,12 +45,14 @@ impl ParseState for ForEachState {
         word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
-        if let Expr::ForEach { indexes, end, .. } = env.expr {
+        if let Expr::ForEach { indexes, end, var, .. } = env.expr {
             if !self.has_list {
                 //add child and find stats
                 if let Some(index) = child_index {
                     self.has_list = true;
                     indexes.push(index);
+                    env.symbols.add_layer();
+                    env.symbols.insert_var(var.name.to_owned());
                     MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat_cont()))
                 } else {
                     // if child match fail, I can never succeed
@@ -64,9 +64,11 @@ impl ParseState for ForEachState {
                     self.has_stat = true;
                     indexes.push(index);
                 }
-
-                // close if have close
-                if self.has_stat && is_close(word) {
+                if word.len() == 0 {
+                    env.symbols.remove_layer();
+                    MatchResult::Failed
+                }else if self.has_stat && is_close(word) {
+                    // close if have close
                     *end = End::from_slice(&word, env.global_index);
                     env.symbols.remove_layer();
                     MatchResult::Matched(word.pos, true)
