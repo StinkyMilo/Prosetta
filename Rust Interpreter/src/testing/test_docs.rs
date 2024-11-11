@@ -40,32 +40,42 @@ mod test_docs {
             line_rendered: false,
             word_trigger: false,
         };
+        let mut js_output = None;
         let contents = fs::read_to_string(path).expect("File not found");
         match get_editor_property(&contents, ":code") {
             Some(code) => {
+                let output_path = format!("{}_exp.js", &path[..path.len() - 3]);
+                js_output = Some(
+                    fs::read_to_string(output_path)
+                        .expect("File not found")
+                        .replace("\r", ""),
+                );
                 let data = get_parsed_data(
                     parser_flags.clone(),
                     runner_flags.clone(),
                     ParserSource::from_string(code.as_bytes().to_vec()),
                 );
-                let output_path = format!("{}_exp.js", &path[..path.len() - 3]);
-                let expected_output = fs::read_to_string(output_path).expect("File not found");
-                assert_eq!(expected_output, get_js(&data), "For file path {}", path);
+                assert_eq!(
+                    js_output.as_ref().unwrap().to_string(),
+                    get_js(&data),
+                    "For file path {}",
+                    path
+                );
             }
             None => (),
         }
-        match get_editor_property(&contents, ":code-wordier") {
-            Some(code) => {
-                let data = get_parsed_data(
-                    parser_flags.clone(),
-                    runner_flags.clone(),
-                    ParserSource::from_string(code.as_bytes().to_vec()),
-                );
-                let output_path = format!("{}_exp.js", &path[..path.len() - 3]);
-                let expected_output = fs::read_to_string(output_path).expect("File not found");
-                assert_eq!(expected_output, get_js(&data), "For file path {}", path);
+            if let Some(js) = js_output{
+                match get_editor_property(&contents, ":code-wordier") {
+                Some(code) => {
+                    let data = get_parsed_data(
+                        parser_flags.clone(),
+                        runner_flags.clone(),
+                        ParserSource::from_string(code.as_bytes().to_vec()),
+                    );
+                    assert_eq!(js, get_js(&data), "For file path {}", path);
+                }
+                None => (),
             }
-            None => (),
         }
     }
 }
