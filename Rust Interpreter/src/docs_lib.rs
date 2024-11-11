@@ -80,7 +80,12 @@ pub fn get_editor_property(contents: &str, prop: &str) -> Option<String> {
                 Some(e) => code_end = code_start + e,
             }
 
-            Some(xml[code_start..code_end].replace("\\n", "\n"))
+            Some(
+                xml[code_start..code_end]
+                    .replace("\\n", "\n")
+                    .replace("\r", "")
+                    .replace("&quot;", "\""),
+            )
         }
     }
 }

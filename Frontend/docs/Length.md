@@ -11,8 +11,8 @@ Get the length of a list or string literal.
 List Length Example
 by Milo Jacobs and John Listings\n
 was list lis 1 2 3..
-was result cou list..
-pri result.
+was the cou list..
+pri the.
 `' 
 :code-wordier="`
 List Length Example

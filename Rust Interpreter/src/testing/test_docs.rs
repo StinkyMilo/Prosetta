@@ -50,7 +50,7 @@ mod test_docs {
                 );
                 let output_path = format!("{}_exp.js", &path[..path.len() - 3]);
                 let expected_output = fs::read_to_string(output_path).expect("File not found");
-                assert_eq!(expected_output, get_js(&data));
+                assert_eq!(expected_output, get_js(&data), "For file path {}", path);
             }
             None => (),
         }
