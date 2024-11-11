@@ -13,7 +13,13 @@ It's fun to watch a cool film.
 	There are credits, subtitles, 
     and two-hundred offially-supported languages!!
 
-rec 0 0 400 400.
-fil black.
-rec watch 8 400. watch 6 400. 50 50.
+Have you seen 
+	'Wizards Cast Lightning Into Full-scale Hurricanes?'
+The director and cast of the movie were so good!
+Film is great, even without color 0 0 0!!
+rec watch 8 cast. watch 6 cast. 50.
 fil green.
+
+
+
+
