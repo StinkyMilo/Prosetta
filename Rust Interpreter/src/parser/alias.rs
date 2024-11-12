@@ -11,7 +11,7 @@ enum MatchState {
     FunctionCallExpr,
     FunctionCallStat,
     FindAliases,
-    Comment
+    Comment,
 }
 
 #[derive(Debug, PartialEq)]
@@ -37,14 +37,15 @@ impl WordTriggerArena {
         if let Some(val) = self.start_positions.get(&word_start) {
             self.word_triggers[*val] = trigger_insert;
         } else {
-            self.start_positions.insert(word_start, self.word_triggers.len());
+            self.start_positions
+                .insert(word_start, self.word_triggers.len());
             self.word_triggers.push(trigger_insert);
         }
     }
-    pub fn new() -> WordTriggerArena{
-        WordTriggerArena{
+    pub fn new() -> WordTriggerArena {
+        WordTriggerArena {
             word_triggers: Vec::new(),
-            start_positions: HashMap::new()
+            start_positions: HashMap::new(),
         }
     }
 }
@@ -154,6 +155,10 @@ impl NoneState {
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult {
+        // speed up -- no word
+        if word.len() == 0 {
+            return MatchResult::Failed;
+        }
         let (new_state, ret) = match self.next_match_state {
             MatchState::StringLit => (
                 MatchState::Var,
@@ -188,10 +193,7 @@ impl NoneState {
 
             MatchState::Comment => (
                 MatchState::FunctionCallStat,
-                MatchResult::ContinueWith(
-                    word.pos,
-                    get_state!(comment::CommentState::new())
-                )
+                MatchResult::ContinueWith(word.pos, get_state!(comment::CommentState::new())),
             ),
 
             MatchState::FunctionCallStat => (
