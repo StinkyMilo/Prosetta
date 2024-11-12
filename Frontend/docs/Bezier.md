@@ -9,6 +9,8 @@ Draws a bezier curve with any number of control points followed by an endpoint. 
 ## Example
 
 <editor :code="`
+Bezier Example
+by Milo Jacobs and John Graphton\n
 fil red.
 sto 0.
 mov 0 -100.

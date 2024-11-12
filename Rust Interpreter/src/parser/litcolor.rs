@@ -52,7 +52,7 @@ impl ParseState for LiteralColorState {
                                 .append(&mut word.str.to_owned().to_ascii_lowercase());
                             *value = self.wsf.to_owned();
                         } else {
-                            panic!("Expression is ending before it started!")
+                            unreachable!("Expression is ending before it started!")
                         }
                     } else {
                         unreachable!()

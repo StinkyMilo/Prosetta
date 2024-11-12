@@ -10,11 +10,15 @@ There are three ways the constructor interprets words as numbers. First, if the 
 
 ## Example
 <editor :code='`
+Lit Example
+by Milo Jacobs\n
 was var two.
 was then lit var thirteen revolution..
 pri then.
 `' 
 :code-wordier="`
+Lit Example
+by Milo Jacobs\n
 Was var two?
 If it was then literally var thirteen revolution!
 Print then!

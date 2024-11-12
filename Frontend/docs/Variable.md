@@ -8,10 +8,14 @@ Assigns a variable a given value. This works equally for initial assignment of a
 
 ## Example
 <editor :code="`
+Variable Example
+by Milo Jacobs\n
 was mario 0.
 pri mario.
 `"
 :code-wordier="`
+Variable Example
+by Milo Jacobs\n
 Was Mario zero years old?
 Print Mario! 
 `" output-method='console'></editor>

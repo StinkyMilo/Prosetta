@@ -8,11 +8,15 @@ Get the length of a list or string literal.
 
 ## Example
 <editor :code='`
+List Length Example
+by Milo Jacobs and John Listings\n
 was list lis 1 2 3..
-was result cou list..
-pri result.
+was the cou list..
+pri the.
 `' 
 :code-wordier="`
+List Length Example
+by Milo Jacobs and John Listings\n
 Was list listing 1, 2, and 3?
 Was the result the count of the list?
 Print the result.

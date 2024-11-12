@@ -8,11 +8,15 @@ Sets the value at a specified index in the list, replacing whatever is currently
 
 ## Example
 <editor :code="`
+Replace Example
+by Milo Jacobs and Miss Listerine\n
 was list lis 1 2 3..
 rep list 1 1.
 pri list.
 `"
 :code-wordier="`
+Replace Example
+by Milo Jacobs and Miss Listerine\n
 Was list listing 1, 2, and 3?
 Replace the list 1 to 1.
 Print the list.

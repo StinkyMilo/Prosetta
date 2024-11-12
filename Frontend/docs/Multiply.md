@@ -8,10 +8,14 @@ Multiplication operator. Multiplies two or more values and returns the new value
 
 ## Example
 <editor :code='`
+Multiply Example
+by Milo Jacobs\n
 was the tim two seven..
 pri the.
 `' 
 :code-wordier="`
+Multiply Example
+by Milo Jacobs\n
 Was the time two past seven?
 If so, print the time!
 `"

@@ -1,6 +1,7 @@
 - Language Overview
     - [Using the Language](README.md#using-the-language)
     - [The Alias System](README.md#the-alias-system)
+    - [Imports](Imports.md)
     - [Key Vocabulary](Glossary.md)
         - [Word](Glossary.md#Word)
         - [Statements and Expressions](Glossary.md#statements-vs-expressions)
@@ -18,13 +19,15 @@
     - [arc - Ellipse](Ellipse.md)
     - [bez - Bezier Curve](Bezier.md)
     - [col - Color Constructor](Color.md)
-    - [fil - Fill](Fil.md)
+    - [fil - Fill](Fill.md)
     - [lin - Line](Line.md)
     - [mov - Move To](MoveTo.md)
     - [pen - Line Width](LineWidth.md)
     - [rec - Rectangle](Rectangle.md)
     - [sto - Stroke](Stroke.md)
     - [tur - Rotate](Rotate.md)
+- Animation
+    - [fra - Frame](Frame.md)
 - Numbers and Math
     - [app - List Append](Append.md)
     - [cou - Length](Length.md)

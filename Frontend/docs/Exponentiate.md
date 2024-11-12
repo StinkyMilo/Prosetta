@@ -12,10 +12,14 @@ Exponentiation operator, equivalent to JavaScript's **. Unlike in other language
 
 ## Example
 <editor :code='`
+Exponentiate Example
+by Milo Jacobs\n
 was that exp 10 100..
 pri that.
 `' 
 :code-wordier="`
+Exponentiate Example
+by Milo Jacobs\n
 Was that an exponent of 10 to 100 okay?
 My pride says an ordinal like that is fine.
 `"

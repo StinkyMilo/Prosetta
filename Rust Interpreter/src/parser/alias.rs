@@ -13,6 +13,7 @@ enum MatchState {
     FunctionCallExpr,
     FunctionCallStat,
     FindAliases,
+    Comment,
 }
 
 #[derive(Debug, PartialEq)]
@@ -167,7 +168,7 @@ impl NoneState {
             MatchState::StringLit
         } else {
             //Statement
-            MatchState::FunctionCallStat
+            MatchState::Comment
         }
     }
     pub fn new_stat() -> Self {
@@ -185,6 +186,49 @@ impl NoneState {
 }
 
 impl NoneState {
+    fn get_new_state(state: MatchState) -> (MatchState, Option<Box<dyn ParseState>>) {
+        match other {
+            MatchState::StringLit => (
+                MatchState::Var,
+                is_valid_type(self.types, Types::String)
+                    .then(|| get_state!(string_lit::LitStrState::new())),
+            ),
+            // is word a varible
+            MatchState::Var => (
+                MatchState::FunctionCallExpr,
+                // var is any
+                Some(get_state!(var::VarState::new())),
+            ),
+            // is word a function
+            MatchState::FunctionCallExpr => (
+                MatchState::Num,
+                // func is any
+                Some(get_state!(call_func::FunctionCallState::new())),
+            ),
+            // is word a literal number
+            MatchState::Num => (
+                MatchState::Color,
+                is_valid_type(self.types, Types::Number)
+                    .then(|| get_state!(num_literal::LiteralNumState::new())),
+            ),
+            // is word a color
+            MatchState::Color => (
+                MatchState::FindAliases,
+                is_valid_type(self.types, Types::Color)
+                    .then(|| get_state!(litcolor::LiteralColorState::new())),
+            ),
+            MatchState::Comment => (
+                MatchState::FunctionCallStat,
+                Some(get_state!(comment::CommentState::new())),
+            ),
+            MatchState::FunctionCallStat => (
+                MatchState::FindAliases,
+                Some(get_state!(call_func::FunctionCallState::new())),
+            ),
+            MatchState::FindAliases => unreachable!(),
+        }
+    }
+
     ///matches based on MatchState
     ///Expr starts at Var, to check if it is a varible, then it checks if it is a number,
     ///then it tries to find aliases in the word
@@ -195,71 +239,22 @@ impl NoneState {
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult {
-        let mut ret = None;
+        let mut state = None;
         while ret.is_none() {
-            (self.next_match_state, ret) = match self.next_match_state {
-                MatchState::StringLit => (
-                    MatchState::Var,
-                    is_valid_type(self.types, Types::String).then(|| {
-                        MatchResult::ContinueWith(
-                            word.pos,
-
-                            get_state!(string_lit::LitStrState::new()),
-                        )
-                    }),
-                ),
-                // is word a varible
-                MatchState::Var => (
-                    MatchState::FunctionCallExpr,
-                    // var is any
-                    Some(MatchResult::ContinueWith(
-                        word.pos,
-                        get_state!(var::VarState::new()),
-                    )),
-                ),
-                // is word a function
-                MatchState::FunctionCallExpr => (
-                    MatchState::Num,
-                    // func is any
-                    Some(MatchResult::ContinueWith(
-                        word.pos,
-                        get_state!(call_func::FunctionCallState::new()),
-                    )),
-                ),
-                // is word a literal number
-                MatchState::Num => (
-                    MatchState::Color,
-                    is_valid_type(self.types, Types::Number).then(|| {
-                        MatchResult::ContinueWith(
-                            word.pos,
-                            get_state!(num_literal::LiteralNumState::new()),
-                        )
-                    }),
-                ),
-                // is word a color
-                MatchState::Color => (
-                    MatchState::FindAliases,
-                    is_valid_type(self.types, Types::Color).then(|| {
-                        MatchResult::ContinueWith(
-                            word.pos,
-                            get_state!(litcolor::LiteralColorState::new()),
-                        )
-                    }),
-                ),
-                MatchState::FunctionCallStat => (
-                    MatchState::FindAliases,
-                    Some(MatchResult::ContinueWith(
-                        word.pos,
-                        get_state!(call_func::FunctionCallState::new()),
-                    )),
-                ),
-
+            (self.next_match_state, state) = match self.next_match_state {
                 // else check aliases
                 MatchState::FindAliases => (
                     MatchState::FindAliases,
                     Some(self.match_alias(env, word, rest)),
                 ),
-            };
+                other => {
+                    let (match_state, state) = Self::get_new_state(other);
+                    (
+                        match_state,
+                        state.map(|state| MatchResult::ContinueWith(word.pos, self.types, state)),
+                    )
+                }
+            }
         }
         ret.unwrap()
     }
@@ -269,7 +264,6 @@ impl NoneState {
         let aliases = self.aliases.as_ref().unwrap_or(&env.aliases.stat);
 
         if let Some((alias, locs)) = self.alias_finder.run(aliases, word) {
-
             env.locs = locs;
             for index in env.locs.as_mut().unwrap() {
                 *index += env.global_index;
@@ -281,14 +275,8 @@ impl NoneState {
                 alias.to_vec(),
             );
             //set up stack
-            let state = (self.data.func)(
-                alias
-            )
-            MatchResult::ContinueWith(
-                rest.pos,
-
-                state
-            )
+            let state = (self.data.func)(alias);
+            MatchResult::ContinueWith(rest.pos, self.types, state)
         }
         // if default continue
         else if self.data.default_continue {

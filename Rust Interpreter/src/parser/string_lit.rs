@@ -16,10 +16,7 @@ pub struct LitStrState {
 
 impl ParseState for LitStrState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
-        // let g = 0;
-        // black_box(&g);
-        // println!("G{}", g);
-
+        // found ""
         if word.len() == 1 && word.str[0] == b'"' {
             if self.first {
                 self.first = false;
@@ -28,43 +25,44 @@ impl ParseState for LitStrState {
                     str: Vec::new(),
                     str_end: usize::MAX,
                 };
-                self.current_str_start = word.pos + env.global_index + 1;
+                self.current_str_start = word.pos + 1;
                 MatchResult::Continue(0)
+                // end string
             } else {
                 if let Expr::LitString { str, str_end, .. } = env.expr {
                     //Add current str
-                    self.current_str_end = word.pos + env.global_index;
+                    self.current_str_end = word.pos;
                     if self.current_str_end > self.current_str_start {
                         str.push(VarOrStr::Str(
                             env.full_text[self.current_str_start..self.current_str_end].to_vec(),
                         ));
                     }
-                    *str_end = self.current_str_end;
-                    MatchResult::Matched(rest.pos, ReturnType::String, false)
+                    *str_end = self.current_str_end + env.global_index;
+                    MatchResult::Matched(rest.pos, false)
                 } else {
                     unreachable!()
                 }
             }
+            // did not find " ever
+        } else if self.first {
+            MatchResult::Failed
+        // did not find "
         } else {
-            if self.first {
-                MatchResult::Failed
-            } else {
-                if let Expr::LitString { str, .. } = env.expr {
-                    if let Some(var) = env.symbols.try_get_var(word, env.global_index) {
-                        self.current_str_end = word.pos + env.global_index;
-                        if self.current_str_end > self.current_str_start {
-                            str.push(VarOrStr::Str(
-                                env.full_text[self.current_str_start..self.current_str_end]
-                                    .to_vec(),
-                            ));
-                        }
-                        str.push(VarOrStr::Var(var));
-                        self.current_str_start = rest.pos;
+            if let Expr::LitString { str, .. } = env.expr {
+                // find var
+                if let Some(var) = env.symbols.try_get_var(word, env.global_index) {
+                    self.current_str_end = word.pos;
+                    if self.current_str_end > self.current_str_start {
+                        str.push(VarOrStr::Str(
+                            env.full_text[self.current_str_start..self.current_str_end].to_vec(),
+                        ));
                     }
-                    MatchResult::Continue(0)
-                } else {
-                    unreachable!()
+                    str.push(VarOrStr::Var(var));
+                    self.current_str_start = rest.pos;
                 }
+                MatchResult::Continue(0)
+            } else {
+                unreachable!()
             }
         }
     }

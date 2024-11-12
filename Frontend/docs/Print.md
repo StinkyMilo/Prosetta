@@ -12,6 +12,8 @@ Prints a value to the console. Print can print any combination of variables and 
 
 ## Example
 <editor :code="`
+Print Example
+by Milo Jacobs\n
 pri fizzbuzz.
 was mario two.
 pri mario mario &quot\luigi&quot &quot\soup&quot.

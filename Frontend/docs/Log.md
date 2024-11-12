@@ -12,10 +12,14 @@ Log operator. If one argument is specified, returns log base e of that argument.
 
 ## Example
 <editor :code='`
+Log Example
+by Milo Jacobs\n
 was var log 10..
 pri var.
 `' 
 :code-wordier="`
+Log Example
+by Milo Jacobs\n
 Was var logical? Ten doctors agree!
 Print var.
 `"

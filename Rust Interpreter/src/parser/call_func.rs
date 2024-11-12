@@ -33,7 +33,7 @@ impl ParseState for FunctionCallState {
 
             // match if args are 0
             if arg_count == 0 {
-                MatchResult::Matched(end.index, ReturnType::Any, true)
+                MatchResult::Matched(end.index - env.global_index, ReturnType::Any, true)
             } else {
                 MatchResult::ContinueWith(
                     rest.pos,

@@ -184,6 +184,7 @@ function takeObject(idx) {
     dropObject(idx);
     return ret;
 }
+<<<<<<< HEAD
 /**
  * @returns {number}
  */
@@ -191,6 +192,8 @@ export function get_heap_size() {
     const ret = wasm.get_heap_size();
     return ret >>> 0;
 }
+=======
+>>>>>>> main
 
 function _assertNum(n) {
     if (typeof(n) !== 'number') throw new Error(`expected a number argument, found ${typeof(n)}`);

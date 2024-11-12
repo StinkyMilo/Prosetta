@@ -240,14 +240,14 @@ function draw_ellipse() {
 }
 
 function set_stroke(...color) {
-  curr_ctx.strokeStyle = conv_color(...color);
+  curr_ctx.strokeStyle = get_color(...color);
 }
 
 function set_fill(...color) {
-  curr_ctx.fillStyle = conv_color(...color);
+  curr_ctx.fillStyle = get_color(...color);
 }
 
-function conv_color(...color) {
+function get_color(...color) {
   switch (color.length) {
     case 1:
       if (color[0] == 0) {
@@ -263,29 +263,6 @@ function set_line_width(width) {
   curr_ctx.lineWidth = width;
 }
 
-function get_concat_value(...args) {
-  let total = 0;
-  let multiplier = 1;
-  for (let i = args.length - 1; i >= 0; i--) {
-    total += args[i] * multiplier;
-    multiplier *= 10;
-  }
-  return total;
-}
-
-function log_base(base, val = undefined) {
-  if (val == undefined) {
-    return Math.log(base);
-  }
-  return Math.log(val) / Math.log(base);
-}
-
-function get_color(...args) {
-  if (args.length == 1) {
-    return args[0];
-  }
-  return `rgb(${args[0]}, ${args[1]}, ${args[2]})`;
-}
 
 function runCode() {
   init_canvas();
@@ -323,6 +300,7 @@ function updateCode() {
 }
 
 async function initialize(startingCode) {
+  language_worker?.terminate();
   sourcecode = document.getElementById("code");
   jscode = document.getElementById("js");
   curr_canvas = document.getElementById("outputcanvas");
@@ -340,8 +318,8 @@ async function initialize(startingCode) {
   print_console("Welcome to Prosetta!");
   print_console("---");
   print_console();
-  updateCode();
-  return setup_editor(startingCode);
+  let editor = setup_editor(startingCode);
+  return editor;
 }
 
 
@@ -386,15 +364,14 @@ function setup_editor(startingCode) {
   let lastWordPos = { line: -1, ch: -1 };
   let displayTimeout;
   let removeTimeout;
-  let currentWordStart;
-  let currentWordEnd;
+  let currentWordStart = { line: -1, ch: -1 };
+  let currentWordEnd = { line: -1, ch: -1 };
 
   function clearWidget() {
     // removeWithFadeout(activeWidget);
     // console.log("REMOVING");
     activeWidget?.remove();
     activeWidget = null;
-    lastWordPos = { line: -1, ch: -1 };
     if (displayTimeout != null) {
       clearTimeout(displayTimeout);
       displayTimeout = null;
@@ -409,6 +386,7 @@ function setup_editor(startingCode) {
     element.style.animation = "";
     element.style.transition = "opacity 0.5s ease";
     element.style.opacity = 1;
+    lastWordPos = { line: -1, ch: -1 };
     console.log(element.style);
     setTimeout(() => {
       element.remove();
@@ -416,43 +394,16 @@ function setup_editor(startingCode) {
   }
 
   window.onmousemove = function(e) {
-    if (activeWidget != null && (e.target == activeWidget || activeWidget.contains(e.target))) {
-      if (removeTimeout != null) {
-        clearTimeout(removeTimeout);
-        removeTimeout = null;
-      }
-      return;
-    }
     let pos = { left: e.clientX, top: e.clientY + window.scrollY };
     let textPos = editor.coordsChar(pos);
     // console.log(pos,textPos);
     // console.log(editor.charCoords({ch:0,line:0}),pos);
-    if (textPos.outside) {
-      if (removeTimeout == null && activeWidget != null) {
-        removeTimeout = setTimeout(() => {
-          clearWidget();
-        }, 250);
-      }
-      return;
-    }
     let wordPos = editor.findWordAt(textPos);
-    let word = editor.getRange(wordPos.anchor, wordPos.head).toLowerCase();
     let midPos = { line: 0, ch: 0 };
     if (wordPos.head.line == wordPos.anchor.line) {
       midPos = { line: wordPos.head.line, ch: (wordPos.head.ch + wordPos.anchor.ch) / 2 };
     } else {
       midPos = wordPos.head;
-    }
-    if (word.match(/^\s*$/) || (midPos.line == lastWordPos.line && midPos.ch == lastWordPos.ch)) {
-      return;
-    }
-    if (removeTimeout != null) {
-      clearTimeout(removeTimeout);
-      removeTimeout = null;
-    }
-    if (displayTimeout != null) {
-      clearTimeout(displayTimeout);
-      displayTimeout = null;
     }
     let alias = null;
     let txtInd = editor.indexFromPos(textPos);
@@ -462,17 +413,95 @@ function setup_editor(startingCode) {
         break;
       }
     }
-    if (alias == null) {
-      return;
+    //Whether the cursor is outside the current word
+    let outsideCurrentWord = (
+      textPos.outside ||
+      (
+        (
+          textPos.line > currentWordEnd.line ||
+          (
+            textPos.line == currentWordEnd.line &&
+            textPos.ch > currentWordEnd.ch
+          )
+        ) ||
+        (
+          textPos.line < currentWordStart.line ||
+          (
+            textPos.line == currentWordStart.line &&
+            textPos.ch < currentWordStart.ch
+          )
+        )
+      )
+    );
+    let overWidget = (
+      activeWidget != null &&
+      (
+        e.target == activeWidget ||
+        activeWidget.contains(e.target)
+      )
+    );
+    //Conditions for cancelling removal of a current tooltip
+    if (
+      //There is a plan to remove the current widget
+      removeTimeout != null &&
+      //There is an active widget
+      activeWidget != null &&
+      //Cursor is now inside the word again
+      (
+        !outsideCurrentWord ||
+        overWidget
+      )
+    ) {
+      clearTimeout(removeTimeout);
+      removeTimeout = null;
     }
-    displayTimeout = setTimeout(() => {
-      clearWidget();
+    //Conditions for cancelling adding of a new tooltip
+    if (
+      //There is a plan to add a widget
+      displayTimeout != null &&
+      //Text pos is outside the bounds of that new widget
+      outsideCurrentWord
+    ) {
+      clearTimeout(displayTimeout);
+      displayTimeout = null;
+    }
+    //Conditions for removing current tooltip
+    if (
+      //There is a current widget that isn't already being removed
+      removeTimeout == null &&
+      activeWidget != null &&
+      (
+        outsideCurrentWord &&
+        //Cursor is not over the widget
+        !overWidget
+      )
+    ) {
+      removeTimeout = setTimeout(() => {
+        clearWidget();
+      }, 250);
+    }
+    //Conditions for adding a new tooltip
+    if (
+      //Not already trying to add one
+      displayTimeout == null &&
+      //Alias is found
+      alias != null &&
+      //Cursor is not over an existing widget
+      !overWidget
+    ) {
       currentWordStart = wordPos.anchor;
       currentWordEnd = wordPos.head;
-      activeWidget = getNewTooltip(alias);
-      lastWordPos = midPos;
-      editor.addWidget(midPos, activeWidget);
-    }, 500);
+      displayTimeout = setTimeout(() => {
+        clearWidget();
+        activeWidget = getNewTooltip(alias);
+        lastWordPos = midPos;
+        editor.addWidget(midPos, activeWidget);
+      }, 500);
+      if (removeTimeout != null) {
+        clearTimeout(removeTimeout);
+        removeTimeout = null;
+      }
+    }
   }
 
   editor.on("change", (cm, change) => {
@@ -506,7 +535,7 @@ function setup_editor(startingCode) {
 }
 
 function setup_webworker() {
-  language_worker = new Worker("language_worker.js");
+  language_worker = new Worker(new URL("./language_worker.js", import.meta.url));
   language_worker.onmessage = e => {
     let command = e.data.command;
     let data = e.data.data;
@@ -536,7 +565,7 @@ function setup_webworker() {
 
 function setup_runner() {
   runner_worker?.terminate();
-  runner_worker = new Worker("runner_worker.js");
+  runner_worker = new Worker(new URL("./runner_worker.js", import.meta.url));
   let function_dict = {
     "print_console": print_console,
     "bezier_point": bezier_point,
@@ -550,22 +579,19 @@ function setup_runner() {
     "set_stroke": set_stroke,
     "set_fill": set_fill,
     "set_line_width": set_line_width,
-    "get_concat_value": get_concat_value,
-    "log_base": log_base,
-    "get_color": get_color,
     "end_shape": end_shape,
   };
   runner_worker.onmessage = e => {
     let command = e.data.command;
     let data = e.data.data;
     switch (command) {
-      case "function":
+      case "finished":
         for (let funcCall of data) {
           function_dict[funcCall.name](...funcCall.args);
         }
-        break;
-      case "finished":
-        print_console("fps:", Math.round(1000 / (Date.now() - last_frame_timestamp)));
+        if (has_import(Import.Frame)) {
+          print_console("fps:", Math.round(1000 / (Date.now() - last_frame_timestamp)));
+        }
         last_frame_timestamp = Date.now();
         latest_frame = curr_frame;
         swap_canvases();

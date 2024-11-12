@@ -201,67 +201,6 @@ impl Debug for IgnoreSet {
         f.debug_struct("IgnoreSet").finish()
     }
 }
-
-// pub struct FuncSet {
-//     /// set with <name, arg_count>
-//     set: ScopeMap<Vec<u8>, usize>,
-// }
-
-// impl FuncSet {
-//     pub fn new() -> Self {
-//         Self {
-//             set: ScopeMap::new(),
-//         }
-//     }
-//     pub fn insert(&mut self, name: Vec<u8>, arg_count: usize) {
-//         self.set.define(name, arg_count);
-//     }
-//     pub fn add_layer(&mut self) {
-//         self.set.push_layer();
-//     }
-//     pub fn remove_layer(&mut self) {
-//         self.set.pop_layer();
-//     }
-//     pub fn contains(&self, name: Vec<u8>) -> bool {
-//         self.set.contains_key(&name)
-//     }
-//     pub fn try_get_func(&self, word: &Slice, global_index: usize) -> Option<SubStrData> {
-//         if word.len() > 255 {
-//             return None;
-//         }
-//         // remove ' and make lowercase
-//         let (name, mut skip_indexes) = get_var_name_and_skips(word.str);
-//         let var_data = try_get_val(&name, &mut self.set.keys());
-
-//         if let Some((var_start, name)) = var_data {
-//             let start = convert_skip_indexes(&mut skip_indexes, var_start, name.len() as u8);
-
-//             Some(SubStrData {
-//                 start: global_index + word.pos + start as usize,
-//                 name: name.to_vec(),
-//                 skip_indexes,
-//             })
-//         } else {
-//             None
-//         }
-//     }
-
-//     pub fn get_arg_count(&self, name: &[u8]) -> Option<&usize> {
-//         self.set.get(name)
-//     }
-// pub fn inc_arg_count(&mut self, name: &[u8]) {
-//     if let Some(val) = self.set.get(name) {
-//         //Increment in above scope.
-//         self.set.define(name.to_vec(), val + 1);
-//     }
-// }
-// }
-
-// impl Debug for FuncSet {
-//     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-//         f.debug_struct("FuncSet").finish()
-//     }
-// }
 #[derive(PartialEq, Debug)]
 pub struct SubStrData {
     pub name: Vec<u8>,
@@ -310,7 +249,7 @@ pub(crate) use get_state;
 // pub(crate) use only_debug;
 
 /// add or remove commands based on flags
-#[derive(Default, Debug)]
+#[derive(Default, Debug, Clone)]
 pub struct ParserFlags {
     pub title: bool,
 }
@@ -516,7 +455,7 @@ fn is_valid_close_char(char: u8) -> bool {
 }
 
 ///the chars that are returned single but are not closes
-const NON_CLOSE_CHARS: &[u8] = b"\"&";
+const NON_CLOSE_CHARS: &[u8] = b"\"&[]";
 ///shoudl the char be made into a 1 len slice
 pub fn is_non_close_but_still_single(char: u8) -> bool {
     NON_CLOSE_CHARS.contains(&char)
@@ -534,32 +473,6 @@ pub fn is_mandatory_close(slice: &Slice) -> bool {
     cd.close_length != 0 && !cd.only_forced
 }
 
-///get the next valid word and the rest of the string as decided by is_valid_word_char()
-///returns (word,rest)
-// pub fn get_next_word<'a>(slice: &Slice<'a>, mut start: usize) -> (Slice<'a>, Slice<'a>) {
-//     // find start of word
-//     start = start.min(slice.len());
-//     while start < slice.len() && !is_valid_word_char(slice.str[start]) {
-//         start += 1;
-//     }
-
-//     // find end of word
-//     let mut end = start;
-//     while end < slice.len() && is_valid_word_char(slice.str[end]) {
-//         end += 1;
-//     }
-
-//     (
-//         Slice {
-//             str: &slice.str[start..end],
-//             pos: slice.pos + start,
-//         },
-//         Slice {
-//             str: &slice.str[end..],
-//             pos: slice.pos + end,
-//         },
-//     )
-// }
 pub struct CloseData {
     pub close_count: u8,
     pub close_length: u8,

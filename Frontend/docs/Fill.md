@@ -9,10 +9,14 @@ Sets the fill color to a specified value and ends the current shape with the new
 ## Example
 
 <editor :code="`
+Fill Example
+by Milo Jacobs and John Graphton\n
 arc 50.
 fil red.
 `" 
 :code-wordier="`
+Fill Example
+by Milo Jacobs and John Graphton\n
 You must march fifty meters.
 Filthy red balloon for you.
 `"
