@@ -172,6 +172,8 @@ pub struct Parser<'a> {
     cached_fails: HashMap<&'static str, RangeSet<usize>>,
     ///does the parser need to parse a title
     parse_title: bool,
+    //has the parser skipped a non Noneexpr state cache fail
+    has_skipped_cache_fail: bool,
 }
 
 impl<'a> Parser<'a> {
@@ -209,6 +211,7 @@ impl<'a> Parser<'a> {
             repeat_count: 0,
             stat_indexes: Vec::new(),
             cached_fails: HashMap::new(),
+            has_skipped_cache_fail: false,
         }
     }
     ///get the last state
@@ -297,16 +300,29 @@ impl<'a> Parser<'a> {
         let (parents, frame_arr) = self.stack.split_at_mut(stack_index);
         let frame = &mut frame_arr[0];
 
-        let id = frame.state.get_name();
-        // does the failing range of the state include the current parsing location
-        let must_fail = self
-            .cached_fails
-            .get(id)
-            .is_some_and(|range| range.contains(&frame.last_parse));
+        // cache
+        if !cfg!(feature = "no-cache") {
+            // give states a one step buffer into fail territory:
+            // noneexprs should always fail
+            // states that just started always fail
+            if frame.state.get_type() == StateType::None
+                || matches!(self.last_result, LastMatchResult::New(..))
+                || self.has_skipped_cache_fail
+            {
+                let id = frame.state.get_name();
+                // does the failing range of the state include the current parsing location
+                let must_fail = self
+                    .cached_fails
+                    .get(id)
+                    .is_some_and(|range| range.contains(&frame.last_parse));
 
-        if must_fail && !cfg!(feature = "no-cache") {
-            self.failed_func();
-            return ParserResult::CachedFail;
+                if must_fail {
+                    self.failed_func();
+                    return ParserResult::CachedFail;
+                }
+            } else {
+                self.has_skipped_cache_fail = true;
+            }
         }
         // should always be in bounds
         // spilt at mut for borrow safety
@@ -424,6 +440,9 @@ impl<'a> Parser<'a> {
         } else {
             //insert the range of parsed words into map
             let id = state.state.get_name();
+            // if id=="ColorLit"{
+            //     println!("{:?}",state);
+            // }
             self.cached_fails
                 .entry(id)
                 .or_insert(RangeSet::new())
@@ -434,10 +453,10 @@ impl<'a> Parser<'a> {
         self.data.exprs.vec.truncate(state_pos);
         //let _test = format!("{:?}", state);
         self.repeat_count = 0;
-
         self.last_state = Some(state);
-
         self.last_result = LastMatchResult::Failed;
+        self.has_skipped_cache_fail = false;
+        
         // failed final stat - couldn't parse anything on line
         if self.stack.is_empty() {
             self.parsing_line = false;
@@ -471,7 +490,6 @@ impl<'a> Parser<'a> {
         locs: Option<Vec<usize>>,
     ) -> ParserResult {
         let mut expr_index = self.data.exprs.vec.len();
-        self.repeat_count = 0;
         // replace none exprs
         if self.data.exprs.vec.last().is_some_and(|e| e.is_none()) {
             self.data.exprs.vec.pop();
@@ -485,7 +503,9 @@ impl<'a> Parser<'a> {
             state,
         });
 
+        self.repeat_count = 0;
         self.last_result = LastMatchResult::New(locs);
+        self.has_skipped_cache_fail = false;
 
         ParserResult::ContinueWith
     }
@@ -501,6 +521,7 @@ impl<'a> Parser<'a> {
             self.cached_fails = HashMap::new();
         }
         self.last_state = Some(state);
+        self.has_skipped_cache_fail = false;
 
         // matched final stat
         if self.stack.is_empty() {
