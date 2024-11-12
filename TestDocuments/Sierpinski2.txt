@@ -1,0 +1,37 @@
+Title
+By Flynn Duniho, Func, and Graph.
+
+was seed 1.
+
+fun lerp start end.
+ret ide add start end. 2!.
+
+pen 1.
+
+was loop 0.
+was xpos 0.
+was ypos 0.
+was axpos 0.
+was aypos 200.
+was bxpos -173.
+was bypos -100.
+was cxpos 173.
+was cypos -100.
+
+whi les loop 20000.
+was loop add loop 1!
+was seed tim seed 1664525!
+was seed add seed 1013904223!
+was seed mod seed 4294967296!
+was choice mod seed 3!
+whe par choice 0.
+was xpos lerp xpos axpos!
+was ypos lerp ypos aypos!.
+whe par choice 1.
+was xpos lerp xpos bxpos!
+was ypos lerp ypos bypos!.
+whe par choice 2.
+was xpos lerp xpos cxpos!
+was ypos lerp ypos cypos!.
+mov xpos ypos.
+arc 1...
