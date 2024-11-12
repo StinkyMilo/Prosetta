@@ -224,7 +224,7 @@ impl<T: Renderer> SyntaxLinter<T> {
 
                     // write delim
                     if write_delim {
-                        self.write_up_to(source, index);
+                        self.write_up_to_as(source, index, VAR_COLOR);
                         self.write_as(source, length, LOC_COLOR[1]);
                         delims.next();
                     //write name

@@ -33,7 +33,7 @@ impl ParseState for FunctionCallState {
 
             // match if args are 0
             if arg_count == 0 {
-                MatchResult::Matched(end.index, true)
+                MatchResult::Matched(end.index - env.global_index, true)
             } else {
                 MatchResult::ContinueWith(rest.pos, get_state!(alias::NoneState::new_expr_cont()))
             }
