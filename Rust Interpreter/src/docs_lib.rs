@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, path::Path};
 
 use crate::{
     parser::{ParsedData, ParserFlags, ParserSource},
@@ -88,4 +88,19 @@ pub fn get_editor_property(contents: &str, prop: &str) -> Option<String> {
             )
         }
     }
+}
+
+pub fn gen_test(path: &String) -> String {
+    let p = Path::new(path);
+    format!(
+        "
+    #[test]
+    #[timeout(2000)]
+    fn test_{} () -> () {{
+        test_file(\"{}\");
+    }}
+",
+        p.file_stem().unwrap().to_str().unwrap().to_lowercase(),
+        path
+    )
 }
