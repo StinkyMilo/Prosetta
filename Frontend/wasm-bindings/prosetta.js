@@ -184,6 +184,13 @@ function takeObject(idx) {
     dropObject(idx);
     return ret;
 }
+/**
+ * @returns {number}
+ */
+export function get_heap_size() {
+    const ret = wasm.get_heap_size();
+    return ret >>> 0;
+}
 
 function _assertNum(n) {
     if (typeof(n) !== 'number') throw new Error(`expected a number argument, found ${typeof(n)}`);
@@ -223,13 +230,6 @@ function logError(f, args) {
         console.error("wasm-bindgen: imported JS function that was not marked as `catch` threw an error:", error);
         throw e;
     }
-}
-/**
- * @returns {number}
- */
-export function get_heap_size() {
-    const ret = wasm.get_heap_size();
-    return ret >>> 0;
 }
 
 export const Import = Object.freeze({ List:0,"0":"List",Func:1,"1":"Func",Graph:2,"2":"Graph",Frame:3,"3":"Frame", });

@@ -1,4 +1,4 @@
-import { wordsForAliases } from './wordsForAliases.js';
+import { allWords, wordsForAliases } from './wordsForAliases.js';
 import { Import } from './wasm-bindings/prosetta.js';
 
 var jscode, sourcecode, cnsl, curr_ctx, curr_canvas, displayed_ctx, displayed_canvas;
@@ -327,6 +327,18 @@ function msg_worker(command, data) {
   language_worker.postMessage({ command: command, data: data });
 }
 
+function getWordsOfLength(len){
+  return allWords.filter((word)=>{
+    return word.length == len;
+  });
+}
+
+function getWordsThatContain(substr){
+  return allWords.filter((word)=>{
+    return word.indexOf(substr.toLowerCase()) > -1;
+  });
+}
+
 function setup_editor(startingCode) {
   editor = CodeMirror(document.getElementById("code"), {
     value: "",
@@ -337,17 +349,26 @@ function setup_editor(startingCode) {
   /*
     Returns a node that contains the alternate word suggestions
   */
-  function getNewTooltip(alias) {
+  function getNewTooltip(tooltip) {
     //For now, don't use rust endpoints; just choose the first alias.
     //Later, we'll want to use the rust endpoints though
     let widget = document.createElement("div");
     widget.className = "tooltip";
     let header = document.createElement("h1");
     let u = document.createElement("u");
+    let words;
+    if(tooltip.type == "alias"){
+      words = wordsForAliases[tooltip.value];
+      u.innerHTML = "Words that trigger " + tooltip.value;
+    }else if(tooltip.type == "length"){
+      words = getWordsOfLength(tooltip.len);
+      u.innerHTML = "Words of length " + tooltip.len;
+    }else if(tooltip.type == "variable"){
+      words = getWordsThatContain(tooltip.name);
+      u.innerHTML = "Words that contain the variable " + tooltip.name;
+    }
     header.appendChild(u);
-    u.innerHTML = alias;
     widget.appendChild(header);
-    let words = wordsForAliases[alias];
     for (let i = 0; i < words.length; i++) {
       let wordElement = document.createElement("p");
       wordElement.innerHTML = words[i];
@@ -366,6 +387,8 @@ function setup_editor(startingCode) {
   let removeTimeout;
   let currentWordStart = { line: -1, ch: -1 };
   let currentWordEnd = { line: -1, ch: -1 };
+  let nextWordStart = {line: -1, ch: -1};
+  let nextWordEnd = {line: -1, ch: -1};
 
   function clearWidget() {
     // removeWithFadeout(activeWidget);
@@ -405,11 +428,11 @@ function setup_editor(startingCode) {
     } else {
       midPos = wordPos.head;
     }
-    let alias = null;
+    let thisTooltip = null;
     let txtInd = editor.indexFromPos(textPos);
     for (let i = 0; i < tooltips.length; i++) {
       if (tooltips[i].start <= txtInd && txtInd <= tooltips[i].end) {
-        alias = tooltips[i].alias;
+        thisTooltip = tooltips[i];
         break;
       }
     }
@@ -425,10 +448,10 @@ function setup_editor(startingCode) {
           )
         ) ||
         (
-          textPos.line < currentWordStart.line ||
+          textPos.line < nextWordStart.line ||
           (
-            textPos.line == currentWordStart.line &&
-            textPos.ch < currentWordStart.ch
+            textPos.line == nextWordStart.line &&
+            textPos.ch < nextWordStart.ch
           )
         )
       )
@@ -484,16 +507,18 @@ function setup_editor(startingCode) {
     if (
       //Not already trying to add one
       displayTimeout == null &&
-      //Alias is found
-      alias != null &&
+      //There is a tooltip here
+      thisTooltip != null &&
       //Cursor is not over an existing widget
       !overWidget
     ) {
-      currentWordStart = wordPos.anchor;
-      currentWordEnd = wordPos.head;
+      nextWordStart = wordPos.anchor;
+      nextWordEnd = wordPos.head;
       displayTimeout = setTimeout(() => {
+        currentWordStart = wordPos.anchor;
+        currentWordEnd = wordPos.head;
         clearWidget();
-        activeWidget = getNewTooltip(alias);
+        activeWidget = getNewTooltip(thisTooltip);
         lastWordPos = midPos;
         editor.addWidget(midPos, activeWidget);
       }, 500);
