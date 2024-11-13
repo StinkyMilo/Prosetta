@@ -28,7 +28,11 @@ impl ParseState for FunctionState {
         } else if let Expr::Function { func, args, .. } = env.expr {
             // if parsing stats in body
             if self.is_parsing_body {
-                MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_stat()))
+                MatchResult::ContinueWith(
+                    rest.pos,
+                    Types::Void,
+                    Box::new(alias::NoneState::new_stat()),
+                )
             // if doesn't yet have name
             } else if !self.has_name {
                 if let Some(func_data) = try_get_symbol_word(word, env.global_index) {
@@ -47,6 +51,7 @@ impl ParseState for FunctionState {
                         .insert_func(func.name.to_owned(), self.args_count);
                     return MatchResult::ContinueWith(
                         rest.pos,
+                        Types::Void,
                         Box::new(alias::NoneState::new_stat_cont()),
                     );
                     // if word can be a varible
@@ -98,7 +103,11 @@ impl ParseState for FunctionState {
                 MatchResult::Matched(word.pos, ReturnType::Void, true)
                 // succeeded - continue again with noncont stat
             } else if child_index.is_some() {
-                MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat_cont()))
+                MatchResult::ContinueWith(
+                    word.pos,
+                    Types::Void,
+                    get_state!(alias::NoneState::new_stat_cont()),
+                )
                 // failed - pass word
             } else {
                 MatchResult::Continue(0)

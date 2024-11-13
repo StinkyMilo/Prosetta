@@ -1,5 +1,4 @@
 use std::{
-    borrow::Borrow,
     cell::RefCell,
     collections::{HashMap, HashSet},
     rc::Rc,
@@ -14,7 +13,6 @@ pub struct FailMap {
     remaps: HashSet<(&'static str, Types)>,
     fails: HashMap<(&'static str, Types), Rc<RefCell<RangeSet<usize>>>>,
 }
-
 
 impl FailMap {
     pub fn new() -> Self {
@@ -36,6 +34,11 @@ impl FailMap {
         self.fails
             .get(&(alias, types))
             .is_some_and(|range| range.borrow_mut().contains(&location))
+    }
+    pub fn remove(&mut self, alias: &'static str) {
+        for flag in Types::all().iter() {
+            self.fails.remove(&(alias, flag));
+        }
     }
     pub fn clear(&mut self) {
         *self = Self::new();

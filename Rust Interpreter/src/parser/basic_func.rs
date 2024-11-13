@@ -42,7 +42,8 @@ impl<T: BasicState + Debug> ParseState for T {
                         // cont - has required arguments
                         MatchResult::ContinueWith(
                             word.pos,
-                            get_state!(alias::NoneState::new_expr_cont(self.get_child_type())),
+                            self.get_child_type(),
+                            get_state!(alias::NoneState::new_expr_cont()),
                         )
                     }
                     CloseType::Able => {
@@ -53,7 +54,8 @@ impl<T: BasicState + Debug> ParseState for T {
                         } else {
                             MatchResult::ContinueWith(
                                 word.pos,
-                                get_state!(alias::NoneState::new_expr(self.get_child_type())),
+                                self.get_child_type(),
+                                get_state!(alias::NoneState::new_expr()),
                             )
                         }
                     }
@@ -74,7 +76,8 @@ impl<T: BasicState + Debug> ParseState for T {
                 // not cont - may have more arguments but may not - need to find close if there
                 MatchResult::ContinueWith(
                     word.pos,
-                    get_state!(alias::NoneState::new_expr(self.get_child_type())),
+                    self.get_child_type(),
+                    get_state!(alias::NoneState::new_expr()),
                 )
             }
         }
@@ -99,7 +102,8 @@ impl<T: BasicState + Debug> ParseState for T {
                     // continue again
                     MatchResult::ContinueWith(
                         word.pos,
-                        get_state!(alias::NoneState::new_expr_cont(self.get_child_type())),
+                        self.get_child_type(),
+                        get_state!(alias::NoneState::new_expr_cont()),
                     )
                 } else {
                     // exprcont failed on the entire rest of string - I will never match
@@ -115,7 +119,8 @@ impl<T: BasicState + Debug> ParseState for T {
                 } else if child_index.is_some() {
                     MatchResult::ContinueWith(
                         word.pos,
-                        get_state!(alias::NoneState::new_expr(self.get_child_type())),
+                        self.get_child_type(),
+                        get_state!(alias::NoneState::new_expr()),
                     )
                     // failed - pass word
                 } else {

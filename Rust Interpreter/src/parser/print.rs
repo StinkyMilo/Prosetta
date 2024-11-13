@@ -47,7 +47,7 @@ impl ParseState for PrintState {
                     *single_word_start = word.pos;
                 }
                 self.count += 1;
-                MatchResult::ContinueWith(word.pos, get_state!(NoneState::new_expr(Types::Any)))
+                MatchResult::ContinueWith(word.pos, Types::Any, get_state!(NoneState::new_expr()))
             }
         } else {
             unreachable!()
@@ -84,7 +84,8 @@ impl ParseState for PrintState {
             } else if child_index.is_some() {
                 MatchResult::ContinueWith(
                     word.pos,
-                    get_state!(alias::NoneState::new_expr_cont(Types::Any)),
+                    Types::Any,
+                    get_state!(alias::NoneState::new_expr_cont()),
                 )
             } else {
                 MatchResult::Continue(0)

@@ -60,7 +60,6 @@ mod word_num;
 mod testing;
 
 use crate::commands::*;
-use rangemap::RangeSet;
 use std::{collections::HashMap, fmt::Debug, mem};
 
 use alias_data::AliasData;
@@ -373,6 +372,7 @@ impl<'a> Parser<'a> {
             aliases: &self.aliases,
             full_text: line,
             trigger_word_data: &mut self.data.trigger_word_data,
+            types: frame.types,
         };
 
         let last_result = mem::replace(&mut self.last_result, LastMatchResult::None);
@@ -433,7 +433,8 @@ impl<'a> Parser<'a> {
         } else {
             //insert the range of parsed words into map
             let id = state.state.get_name();
-            self.cached_fails.insert(id, state.types, range);
+            self.cached_fails
+                .insert(id, state.types, state.first_parse..state.last_parse);
         }
 
         let state_pos = state.expr_index;
@@ -508,7 +509,7 @@ impl<'a> Parser<'a> {
             // add self
             self.stat_indexes.push(expr_index);
             // stats can change parse ablility -- reset cached fails
-            self.cached_fails = HashMap::new();
+            self.cached_fails.clear();
         }
         self.last_state = Some(state);
         self.has_skipped_cache_fail = false;
@@ -600,6 +601,6 @@ impl<'a> Parser<'a> {
 
         self.data.stat_starts.push(expr_index);
         self.last_result = LastMatchResult::None;
-        self.cached_fails = HashMap::new();
+        self.cached_fails.clear();
     }
 }

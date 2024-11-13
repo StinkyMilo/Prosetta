@@ -29,12 +29,21 @@ impl ParseState for ForEachState {
                 }
                 MatchResult::ContinueWith(
                     rest.pos,
-                    Box::new(alias::NoneState::new_expr_cont(Types::List)),
+                    Types::List,
+                    Box::new(alias::NoneState::new_expr_cont()),
                 )
             } else if self.has_stat {
-                MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
+                MatchResult::ContinueWith(
+                    word.pos,
+                    Types::Void,
+                    Box::new(alias::NoneState::new_stat()),
+                )
             } else {
-                MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat_cont()))
+                MatchResult::ContinueWith(
+                    word.pos,
+                    Types::Void,
+                    Box::new(alias::NoneState::new_stat_cont()),
+                )
             }
         } else {
             MatchResult::Continue(0)
@@ -48,7 +57,10 @@ impl ParseState for ForEachState {
         word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
-        if let Expr::ForEach { indexes, end, var, .. } = env.expr {
+        if let Expr::ForEach {
+            indexes, end, var, ..
+        } = env.expr
+        {
             if !self.has_list {
                 //add child and find stats
                 if let Some(index) = child_index {
@@ -56,7 +68,11 @@ impl ParseState for ForEachState {
                     indexes.push(index);
                     env.symbols.add_layer();
                     env.symbols.insert_var(var.name.to_owned());
-                    MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat_cont()))
+                    MatchResult::ContinueWith(
+                        word.pos,
+                        Types::Void,
+                        Box::new(alias::NoneState::new_stat_cont()),
+                    )
                 } else {
                     // if child match fail, I can never succeed
                     MatchResult::Failed
@@ -70,14 +86,18 @@ impl ParseState for ForEachState {
                 if word.len() == 0 {
                     env.symbols.remove_layer();
                     MatchResult::Failed
-                }else if self.has_stat && is_close(word) {
+                } else if self.has_stat && is_close(word) {
                     // close if have close
                     *end = End::from_slice(&word, env.global_index);
                     env.symbols.remove_layer();
                     MatchResult::Matched(word.pos, ReturnType::Void, true)
                     // succeeded - continue again with noncont stat
                 } else if child_index.is_some() {
-                    MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat()))
+                    MatchResult::ContinueWith(
+                        word.pos,
+                        Types::Void,
+                        get_state!(alias::NoneState::new_stat()),
+                    )
                     // failed - pass word
                 } else {
                     MatchResult::Continue(0)

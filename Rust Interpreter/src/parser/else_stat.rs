@@ -40,10 +40,18 @@ impl ParseState for ElseState {
             MatchResult::Failed
         // non cont stat for seeing closes
         } else if self.has_stat {
-            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
+            MatchResult::ContinueWith(
+                word.pos,
+                Types::Void,
+                Box::new(alias::NoneState::new_stat()),
+            )
             // need a first stat - cont
         } else {
-            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat_cont()))
+            MatchResult::ContinueWith(
+                word.pos,
+                Types::Void,
+                Box::new(alias::NoneState::new_stat_cont()),
+            )
         }
     }
 
@@ -70,7 +78,11 @@ impl ParseState for ElseState {
                     MatchResult::Matched(word.pos, ReturnType::Void, true)
                     // succeeded - continue again with noncont stat
                 } else if child_index.is_some() {
-                    MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat()))
+                    MatchResult::ContinueWith(
+                        word.pos,
+                        Types::Void,
+                        get_state!(alias::NoneState::new_stat()),
+                    )
                     // failed - pass word
                 } else {
                     MatchResult::Continue(0)

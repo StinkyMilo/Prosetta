@@ -1,10 +1,8 @@
-use std::borrow::Cow;
-
 use super::*;
 use alias_data::*;
 
 ///the state of the matching state machine
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 enum MatchState {
     Var,
     Num,
@@ -75,8 +73,6 @@ struct AliasFinder {
 pub struct NoneState {
     ///a reference to the static data of the aliases
     data: &'static StaticAliasData,
-    ///The type looked for
-    types: Types,
     ///the alias looked for
     aliases: Option<Vec<&'static [u8]>>,
     ///the next state of the state machine
@@ -92,7 +88,7 @@ impl ParseState for NoneState {
                 .aliases
                 .expr
                 .iter()
-                .filter_map(|alias| is_valid_type(self.types, alias.1).then(|| alias.0))
+                .filter_map(|alias| is_valid_type(env.types, alias.1).then(|| alias.0))
                 .collect::<Vec<_>>();
             let length = vec.len();
             self.aliases = Some(vec);
@@ -145,10 +141,9 @@ impl AliasFinder {
 }
 
 impl NoneState {
-    fn new(data: &'static StaticAliasData, types: Types) -> Self {
+    fn new(data: &'static StaticAliasData) -> Self {
         Self {
             data,
-            types,
             aliases: None,
             next_match_state: MatchState::FindAliases,
             alias_finder: AliasFinder {
@@ -172,25 +167,28 @@ impl NoneState {
         }
     }
     pub fn new_stat() -> Self {
-        Self::new(&AliasData::STAT, Types::Any)
+        Self::new(&AliasData::STAT)
     }
     pub fn new_stat_cont() -> Self {
-        Self::new(&AliasData::STAT_CONT, Types::Any)
+        Self::new(&AliasData::STAT_CONT)
     }
-    pub fn new_expr(types: Types) -> Self {
-        Self::new(&AliasData::EXPR, types)
+    pub fn new_expr() -> Self {
+        Self::new(&AliasData::EXPR)
     }
-    pub fn new_expr_cont(types: Types) -> Self {
-        Self::new(&AliasData::EXPR_CONT, types)
+    pub fn new_expr_cont() -> Self {
+        Self::new(&AliasData::EXPR_CONT)
     }
 }
 
 impl NoneState {
-    fn get_new_state(state: MatchState) -> (MatchState, Option<Box<dyn ParseState>>) {
-        match other {
+    fn get_new_state(
+        state: &MatchState,
+        types: Types,
+    ) -> (MatchState, Option<Box<dyn ParseState>>) {
+        match state {
             MatchState::StringLit => (
                 MatchState::Var,
-                is_valid_type(self.types, Types::String)
+                is_valid_type(types, Types::String)
                     .then(|| get_state!(string_lit::LitStrState::new())),
             ),
             // is word a varible
@@ -208,13 +206,13 @@ impl NoneState {
             // is word a literal number
             MatchState::Num => (
                 MatchState::Color,
-                is_valid_type(self.types, Types::Number)
+                is_valid_type(types, Types::Number)
                     .then(|| get_state!(num_literal::LiteralNumState::new())),
             ),
             // is word a color
             MatchState::Color => (
                 MatchState::FindAliases,
-                is_valid_type(self.types, Types::Color)
+                is_valid_type(types, Types::Color)
                     .then(|| get_state!(litcolor::LiteralColorState::new())),
             ),
             MatchState::Comment => (
@@ -239,19 +237,19 @@ impl NoneState {
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult {
-        let mut state = None;
+        let mut ret = None;
         while ret.is_none() {
-            (self.next_match_state, state) = match self.next_match_state {
+            (self.next_match_state, ret) = match &self.next_match_state {
                 // else check aliases
                 MatchState::FindAliases => (
                     MatchState::FindAliases,
                     Some(self.match_alias(env, word, rest)),
                 ),
                 other => {
-                    let (match_state, state) = Self::get_new_state(other);
+                    let (match_state, state) = Self::get_new_state(other, env.types);
                     (
                         match_state,
-                        state.map(|state| MatchResult::ContinueWith(word.pos, self.types, state)),
+                        state.map(|state| MatchResult::ContinueWith(word.pos, env.types, state)),
                     )
                 }
             }
@@ -276,7 +274,7 @@ impl NoneState {
             );
             //set up stack
             let state = (self.data.func)(alias);
-            MatchResult::ContinueWith(rest.pos, self.types, state)
+            MatchResult::ContinueWith(rest.pos, env.types, state)
         }
         // if default continue
         else if self.data.default_continue {

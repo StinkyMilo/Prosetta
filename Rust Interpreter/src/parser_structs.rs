@@ -400,6 +400,8 @@ pub struct Environment<'a> {
     pub full_text: &'a [u8],
     /// The global start and end of alias data
     pub trigger_word_data: &'a mut WordTriggerArena,
+    ///types
+    pub types: Types,
 }
 
 ///a slice of the input text

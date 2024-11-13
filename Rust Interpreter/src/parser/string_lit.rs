@@ -38,7 +38,7 @@ impl ParseState for LitStrState {
                         ));
                     }
                     *str_end = self.current_str_end + env.global_index;
-                    MatchResult::Matched(rest.pos, false)
+                    MatchResult::Matched(rest.pos, ReturnType::String, false)
                 } else {
                     unreachable!()
                 }

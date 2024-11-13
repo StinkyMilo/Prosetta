@@ -17,12 +17,21 @@ impl ParseState for WhileState {
             // setup child state
             MatchResult::ContinueWith(
                 word.pos,
-                Box::new(alias::NoneState::new_expr_cont(Types::Booly)),
+                Types::Booly,
+                Box::new(alias::NoneState::new_expr_cont()),
             )
         } else if self.has_stat {
-            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat()))
+            MatchResult::ContinueWith(
+                word.pos,
+                Types::Void,
+                Box::new(alias::NoneState::new_stat()),
+            )
         } else {
-            MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat_cont()))
+            MatchResult::ContinueWith(
+                word.pos,
+                Types::Void,
+                Box::new(alias::NoneState::new_stat_cont()),
+            )
         }
     }
 
@@ -39,7 +48,11 @@ impl ParseState for WhileState {
                 if let Some(index) = child_index {
                     self.has_condition = true;
                     indexes.push(index);
-                    MatchResult::ContinueWith(word.pos, Box::new(alias::NoneState::new_stat_cont()))
+                    MatchResult::ContinueWith(
+                        word.pos,
+                        Types::Void,
+                        Box::new(alias::NoneState::new_stat_cont()),
+                    )
                 } else {
                     // if child match fail, I can never succeed
                     MatchResult::Failed
@@ -58,7 +71,11 @@ impl ParseState for WhileState {
                     MatchResult::Matched(word.pos, ReturnType::Void, true)
                     // succeeded - continue again with noncont stat
                 } else if child_index.is_some() {
-                    MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_stat()))
+                    MatchResult::ContinueWith(
+                        word.pos,
+                        Types::Void,
+                        get_state!(alias::NoneState::new_stat()),
+                    )
                     // failed - pass word
                 } else {
                     MatchResult::Continue(0)
