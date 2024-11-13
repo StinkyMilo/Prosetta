@@ -1,5 +1,7 @@
 use std::usize;
 
+use alias::WordTriggerType;
+
 use super::*;
 
 /// state for num
@@ -38,6 +40,11 @@ impl ParseState for WordNumState {
                     *str_len = word.len();
                     *end = End::from_slice(&close.0, env.global_index);
                 }
+                env.trigger_word_data.add_val(
+                    word.pos + env.global_index,
+                    word.pos + env.global_index + word.len(),
+                    WordTriggerType::Length(word.len())
+                );
 
                 MatchResult::Matched(close.0.pos, true)
             } else {

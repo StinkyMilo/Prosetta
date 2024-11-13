@@ -105,6 +105,7 @@ pub enum Expr {
         str_start: usize,
         locs: Vec<usize>,
         values: Vec<VarOrInt>,
+        value_positions: Vec<(usize, usize)>,
         single_value: Option<i64>,
         end: End,
     },

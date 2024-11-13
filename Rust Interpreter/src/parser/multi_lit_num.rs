@@ -1,4 +1,5 @@
 use super::*;
+use alias::WordTriggerType;
 use num_literal::get_number;
 
 #[derive(Debug, PartialEq)]
@@ -31,6 +32,7 @@ impl ParseState for MultiLitNumState {
                 end,
                 single_value,
                 values: Vec::new(),
+                value_positions: Vec::new()
             };
 
             if single_value.is_some() {
@@ -41,6 +43,7 @@ impl ParseState for MultiLitNumState {
             values,
             end,
             single_value,
+            value_positions,
             ..
         } = env.expr
         {
@@ -49,7 +52,22 @@ impl ParseState for MultiLitNumState {
                 if !self.any_vars {
                     *single_value = Self::get_final_value(values);
                 }
-
+                for (i, value) in values.iter().enumerate(){
+                    let pos = value_positions[i];
+                    if let VarOrInt::Var(substr) = value {
+                        env.trigger_word_data.add_val(
+                            pos.0,
+                            pos.1,
+                            WordTriggerType::Variable(substr.name.to_ascii_lowercase())
+                        );
+                    }else if let VarOrInt::Int(intval) = value {
+                        env.trigger_word_data.add_val(
+                            pos.0, 
+                            pos.1, 
+                            WordTriggerType::Length(usize::try_from(*intval).unwrap())
+                        );
+                    } 
+                }
                 MatchResult::Matched(word.pos, true)
             } else {
                 //let lower = word.str.to_ascii_lowercase();
@@ -61,6 +79,7 @@ impl ParseState for MultiLitNumState {
                 } else {
                     values.push(VarOrInt::Int((word.len() as i64) % 10));
                 }
+                value_positions.push((word.pos + env.global_index, word.pos + env.global_index + word.len()));
                 MatchResult::Continue(0)
             }
         } else {

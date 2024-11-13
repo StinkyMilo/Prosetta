@@ -15,10 +15,17 @@ enum MatchState {
 }
 
 #[derive(Debug, PartialEq)]
+pub enum WordTriggerType{
+    Alias(Vec<u8>),
+    Length(usize),
+    Variable(Vec<u8>)
+}
+
+#[derive(Debug, PartialEq)]
 pub struct WordTrigger {
     pub word_start: usize,
     pub word_end: usize,
-    pub alias_trigger: Vec<u8>,
+    pub trigger_data: WordTriggerType
 }
 
 #[derive(Debug)]
@@ -28,11 +35,11 @@ pub struct WordTriggerArena {
 }
 
 impl WordTriggerArena {
-    pub fn add_val(&mut self, word_start: usize, word_end: usize, alias_trigger: Vec<u8>) {
+    pub fn add_val(&mut self, word_start: usize, word_end: usize, trigger_data: WordTriggerType) {
         let trigger_insert = WordTrigger {
             word_start: word_start,
             word_end: word_end,
-            alias_trigger: alias_trigger,
+            trigger_data: trigger_data,
         };
         if let Some(val) = self.start_positions.get(&word_start) {
             self.word_triggers[*val] = trigger_insert;
@@ -277,7 +284,7 @@ impl NoneState {
         env.trigger_word_data.add_val(
             word.pos + env.global_index,
             word.pos + env.global_index + word.len(),
-            aliases[min_index as usize].to_vec(),
+            WordTriggerType::Alias(aliases[min_index as usize].to_vec()),
         );
         //set up stack
         (self.data.func)(
