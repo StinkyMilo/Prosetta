@@ -327,7 +327,12 @@ function msg_worker(command, data) {
   language_worker.postMessage({ command: command, data: data });
 }
 
-function getWordsOfLength(len){
+function getWordsOfLength(len,mod10){
+  if(mod10){
+    return allWords.filter((word)=>{
+      return word.length%10==len;
+    })
+  }
   return allWords.filter((word)=>{
     return word.length == len;
   });
@@ -361,8 +366,12 @@ function setup_editor(startingCode) {
       words = wordsForAliases[tooltip.value];
       u.innerHTML = "Words that trigger " + tooltip.value;
     }else if(tooltip.type == "length"){
-      words = getWordsOfLength(tooltip.len);
-      u.innerHTML = "Words of length " + tooltip.len;
+      words = getWordsOfLength(tooltip.len,tooltip.mod10);
+      if(tooltip.mod10){
+        u.innerHTML = "Words of length " + tooltip.len + ", " + (tooltip.len+10) + " etc.";
+      }else{
+        u.innerHTML = "Words of length " + tooltip.len;
+      }
     }else if(tooltip.type == "variable"){
       words = getWordsThatContain(tooltip.name);
       u.innerHTML = "Words that contain the variable " + tooltip.name;
@@ -570,6 +579,7 @@ function setup_webworker() {
         imports = data.imports;
         jscode.innerText = data.js;
         tooltips = JSON.parse(data.wordTriggers);
+        console.log(tooltips);
         let highlights = data.hl;
         editor.doc.getAllMarks().forEach(marker => marker.clear());
         for (let hl of highlights) {

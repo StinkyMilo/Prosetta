@@ -64,7 +64,7 @@ impl ParseState for MultiLitNumState {
                         env.trigger_word_data.add_val(
                             pos.0, 
                             pos.1, 
-                            WordTriggerType::Length(usize::try_from(*intval).unwrap())
+                            WordTriggerType::Length(usize::try_from(*intval).unwrap(), true)
                         );
                     } 
                 }

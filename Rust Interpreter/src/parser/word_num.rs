@@ -43,7 +43,7 @@ impl ParseState for WordNumState {
                 env.trigger_word_data.add_val(
                     word.pos + env.global_index,
                     word.pos + env.global_index + word.len(),
-                    WordTriggerType::Length(word.len())
+                    WordTriggerType::Length(word.len(), false)
                 );
 
                 MatchResult::Matched(close.0.pos, true)
