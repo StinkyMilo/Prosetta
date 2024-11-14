@@ -88,7 +88,7 @@ fn try_get_from_iter<'a>(
 }
 enum Symbol {
     ///symbol is a varible
-    Var,
+    Var(ReturnType),
     ///symbol is a function with a number of arguments
     Func(u8),
 }
@@ -102,9 +102,9 @@ impl SymbolSet {
             set: ScopeMap::new(),
         }
     }
-    pub fn insert_var(&mut self, mut name: Vec<u8>) {
+    pub fn insert_var(&mut self, mut name: Vec<u8>, return_type: ReturnType) {
         name.make_ascii_lowercase();
-        self.set.define(name, Symbol::Var);
+        self.set.define(name, Symbol::Var(return_type));
     }
     pub fn insert_func(&mut self, mut name: Vec<u8>, args: u8) {
         name.make_ascii_lowercase();
@@ -135,7 +135,7 @@ impl SymbolSet {
             word,
             &mut self.set.keys().map(|e| e.as_slice()),
             global_index,
-            &|name| matches!(self.set.get(name), Some(Symbol::Var)),
+            &|name| matches!(self.set.get(name), Some(Symbol::Var(..))),
         )
     }
 
@@ -272,7 +272,7 @@ pub trait ParseState: Debug {
     fn step_match(
         &mut self,
         env: &mut Environment,
-        child: Option<usize>,
+        child: Option<(usize, ReturnType)>,
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult;
@@ -326,7 +326,7 @@ pub enum MatchResult {
 pub enum LastMatchResult {
     None,
     New(Option<Vec<usize>>),
-    Matched(usize),
+    Matched(usize, ReturnType),
     Failed,
     Continue,
 }

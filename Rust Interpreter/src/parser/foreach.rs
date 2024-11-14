@@ -53,7 +53,7 @@ impl ParseState for ForEachState {
     fn step_match(
         &mut self,
         env: &mut Environment,
-        child_index: Option<usize>,
+        child_index: Option<(usize, ReturnType)>,
         word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
@@ -63,11 +63,11 @@ impl ParseState for ForEachState {
         {
             if !self.has_list {
                 //add child and find stats
-                if let Some(index) = child_index {
+                if let Some((index, _)) = child_index {
                     self.has_list = true;
                     indexes.push(index);
                     env.symbols.add_layer();
-                    env.symbols.insert_var(var.name.to_owned());
+                    env.symbols.insert_var(var.name.to_owned(), ReturnType::Any);
                     MatchResult::ContinueWith(
                         word.pos,
                         Types::Void,
@@ -79,7 +79,7 @@ impl ParseState for ForEachState {
                 }
             } else {
                 //and stat child
-                if let Some(index) = child_index {
+                if let Some((index,_)) = child_index {
                     self.has_stat = true;
                     indexes.push(index);
                 }

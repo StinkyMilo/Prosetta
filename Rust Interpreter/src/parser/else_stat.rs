@@ -58,14 +58,14 @@ impl ParseState for ElseState {
     fn step_match(
         &mut self,
         env: &mut Environment,
-        child_index: Option<usize>,
+        child_index: Option<(usize, ReturnType)>,
         word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
         self.first = false;
         if let Expr::If { else_index, .. } = &mut env.before[self.if_index] {
             if let Expr::Else { end, indexes, .. } = env.expr {
-                if let Some(index) = child_index {
+                if let Some((index, _)) = child_index {
                     self.has_stat = true;
                     indexes.push(index);
                 }

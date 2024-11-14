@@ -29,7 +29,7 @@ impl ParseState for CommentState {
     fn step_match(
         &mut self,
         _env: &mut Environment,
-        _child_index: Option<usize>,
+        _child_index: Option<(usize, ReturnType)>,
         _word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {

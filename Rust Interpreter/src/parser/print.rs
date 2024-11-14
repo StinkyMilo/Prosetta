@@ -57,7 +57,7 @@ impl ParseState for PrintState {
     fn step_match(
         &mut self,
         env: &mut Environment,
-        child_index: Option<usize>,
+        child_index: Option<(usize, ReturnType)>,
         word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
@@ -68,7 +68,7 @@ impl ParseState for PrintState {
             ..
         } = env.expr
         {
-            if let Some(index) = child_index {
+            if let Some((index, _)) = child_index {
                 indexes.push(index);
                 *single_word = None;
             } else if self.count == 1 {

@@ -70,7 +70,7 @@ impl BasicState for OperatorState {
         ret
     }
 
-    fn add_child(&mut self, expr: &mut Expr, index: usize) {
+    fn add_child(&mut self, expr: &mut Expr, index: usize, _: ReturnType) {
         if let Expr::Operator { indexes, .. } = expr {
             indexes.push(index);
             self.count += 1;

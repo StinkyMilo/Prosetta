@@ -107,13 +107,13 @@ impl ParseState for NoneState {
     fn step_match(
         &mut self,
         env: &mut Environment,
-        child_index: Option<usize>,
+        child_index: Option<(usize, ReturnType)>,
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult {
-        if child_index.is_some() {
+        if let Some((_, return_type)) = child_index {
             // child matched successfully
-            MatchResult::Matched(word.pos, ReturnType::Void, false)
+            MatchResult::Matched(word.pos, return_type, false)
         } else {
             // child did not match - continue searching
             self.run_match_state(env, word, rest)

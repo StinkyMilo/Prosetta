@@ -20,7 +20,7 @@ bitflags! {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum ReturnType {
     Void,
     Number,
@@ -247,8 +247,8 @@ pub enum Expr {
     Comment {
         start: usize,
         end: usize,
-        comment: Vec<u8>
-    }
+        comment: Vec<u8>,
+    },
 }
 
 impl Expr {

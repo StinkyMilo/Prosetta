@@ -93,7 +93,7 @@ impl ParseState for LiteralColorState {
     fn step_match(
         &mut self,
         _env: &mut Environment,
-        _child: Option<usize>,
+        _child: Option<(usize, ReturnType)>,
         _word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {

@@ -58,7 +58,8 @@ impl ParseState for FunctionState {
                 } else if let Some(arg_data) = try_get_symbol_word(word, env.global_index) {
                     // funtion can only have 255 arguments
                     if self.args_count != 255 && !env.symbols.contains(&arg_data.name) {
-                        env.symbols.insert_var(arg_data.name.to_owned());
+                        env.symbols
+                            .insert_var(arg_data.name.to_owned(), ReturnType::Void);
                         args.push(arg_data);
                         self.args_count += 1;
                     }
@@ -77,7 +78,7 @@ impl ParseState for FunctionState {
     fn step_match(
         &mut self,
         env: &mut Environment,
-        child_index: Option<usize>,
+        child_index: Option<(usize, ReturnType)>,
         word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
@@ -90,7 +91,7 @@ impl ParseState for FunctionState {
         } = env.expr
         {
             //and stat child
-            if let Some(index) = child_index {
+            if let Some((index, _)) = child_index {
                 indexes.push(index);
             }
 

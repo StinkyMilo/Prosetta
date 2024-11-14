@@ -33,7 +33,7 @@ impl BasicState for LengthState {
         ret
     }
 
-    fn add_child(&mut self, expr: &mut Expr, idx: usize) {
+    fn add_child(&mut self, expr: &mut Expr, idx: usize, _: ReturnType) {
         if let Expr::Length { index, .. } = expr {
             *index = idx;
             self.count += 1;

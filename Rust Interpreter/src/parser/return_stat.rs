@@ -42,7 +42,7 @@ impl BasicState for ReturnState {
         ret
     }
 
-    fn add_child(&mut self, expr: &mut Expr, idx: usize) {
+    fn add_child(&mut self, expr: &mut Expr, idx: usize, _: ReturnType) {
         if let Expr::Return { index, .. } = expr {
             *index = Some(idx);
             self.count += 1;

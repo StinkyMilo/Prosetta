@@ -41,14 +41,14 @@ impl ParseState for IfState {
     fn step_match(
         &mut self,
         env: &mut Environment,
-        child_index: Option<usize>,
+        child_index: Option<(usize, ReturnType)>,
         word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
         if let Expr::If { indexes, end, .. } = env.expr {
             if !self.has_condition {
                 //add child and find stats
-                if let Some(index) = child_index {
+                if let Some((index,_)) = child_index {
                     self.has_condition = true;
                     indexes.push(index);
                     MatchResult::ContinueWith(
@@ -62,7 +62,7 @@ impl ParseState for IfState {
                 }
             } else {
                 //and stat child
-                if let Some(index) = child_index {
+                if let Some((index,_)) = child_index {
                     self.has_stat = true;
                     indexes.push(index);
                 }

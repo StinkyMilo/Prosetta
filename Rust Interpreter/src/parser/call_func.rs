@@ -50,7 +50,7 @@ impl ParseState for FunctionCallState {
     fn step_match(
         &mut self,
         env: &mut Environment,
-        child_index: Option<usize>,
+        child_index: Option<(usize, ReturnType)>,
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult {
@@ -58,7 +58,7 @@ impl ParseState for FunctionCallState {
             func, indexes, end, ..
         } = env.expr
         {
-            if let Some(index) = child_index {
+            if let Some((index,_)) = child_index {
                 indexes.push(index);
                 self.count += 1;
             }

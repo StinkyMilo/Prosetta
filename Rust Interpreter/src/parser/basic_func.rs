@@ -16,7 +16,7 @@ pub trait BasicState {
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool;
 
     /// add children at index to self
-    fn add_child(&mut self, expr: &mut Expr, index: usize);
+    fn add_child(&mut self, expr: &mut Expr, index: usize, return_type: ReturnType);
 
     /// can I be closed
     fn can_close(&self) -> CloseType;
@@ -86,12 +86,12 @@ impl<T: BasicState + Debug> ParseState for T {
     fn step_match(
         &mut self,
         env: &mut Environment,
-        child_index: Option<usize>,
+        child_index: Option<(usize, ReturnType)>,
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult {
-        if let Some(index) = child_index {
-            self.add_child(env.expr, index);
+        if let Some((index, return_type)) = child_index {
+            self.add_child(env.expr, index, return_type);
         }
 
         let can_close = self.can_close();
