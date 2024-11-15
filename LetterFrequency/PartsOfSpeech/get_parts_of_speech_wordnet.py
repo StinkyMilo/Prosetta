@@ -15,6 +15,46 @@ word_sets = {
     "verb":set(get_words("SpeechWordnet/data.verb"))
 }
 
+part_sources = {
+    "noun":[
+        "nouns/mostly-nouns.txt",
+        "nouns/mostly-nouns-ment.txt",
+        "nouns/mostly-plural-nouns.txt"
+    ],
+    "verb":[
+        "verbs/mostly-verbs-infinitive.txt",
+        "verbs/mostly-verbs-past-tense.txt",
+        "verbs/mostly-verbs-present-tense.txt",
+        "verbs/transitive-past-tense.txt",
+        "verbs/transitive-present-tense.txt"
+    ],
+    "adjective":[
+        "other-categories/mostly-adjectives.txt",
+    ],
+    "adverb":[
+        "other-categories/ly-adverbs.txt",
+        "other-categories/mostly-adverbs.txt"
+    ],
+    "other":[
+        "other-categories/mostly-conjunctions.txt",
+        "other-categories/mostly-interjections.txt",
+        "other-categories/mostly-prepositions.txt"
+    ]
+}
+
+def flatten(ls):
+    output = []
+    for ls2 in ls:
+        for item in ls2:
+            output.append(item)
+    return output
+
+word_sets_backup = {i:set(flatten([open("PartOfSpeechList/"+j,"r").read().split("\n") for j in part_sources[i]])) for i in part_sources}
+
+for i in word_sets_backup:
+    if i == "other":
+        continue
+    word_sets[i] = word_sets[i].union(word_sets_backup[i])
 
 word_dict = {}
 
@@ -30,4 +70,4 @@ for word in all_words:
         print("Found",word)
         word_dict[word] = pos
 
-open("parts_of_speech_wordnet.json","w").write(json.dumps(word_dict))
+open("parts_of_speech_wordnet.json","w").write(json.dumps(word_dict,indent=4))

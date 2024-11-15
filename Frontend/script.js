@@ -1,4 +1,4 @@
-import { allWords, wordsForAliases } from './wordsForAliases.js';
+import { allWords, wordsForAliases, partsOfSpeech } from './wordsForAliases.js';
 import { Import } from './wasm-bindings/prosetta.js';
 
 var jscode, sourcecode, cnsl, curr_ctx, curr_canvas, displayed_ctx, displayed_canvas;
@@ -362,6 +362,7 @@ function setup_editor(startingCode) {
     let header = document.createElement("h1");
     let u = document.createElement("u");
     let words;
+    let options = ["noun","verb","adjective"]
     if(tooltip.type == "alias"){
       words = wordsForAliases[tooltip.value];
       u.innerHTML = "Words that trigger " + tooltip.value;
