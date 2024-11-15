@@ -30,9 +30,13 @@ It is truly a miracle that they lived.
 </head>
 
 <body>
-  <div id="tabGroup">
-    <button class="tabBtn tabDefault" onclick="openTab(event, 'code')">Code</button>
-    <button class="tabBtn" onclick="openTab(event, 'js')">JS</button>
+  <div id="output-toggle-container">
+    Canvas
+    <label class="switch">
+      <input id="output-toggle" type="checkbox" onchange="update_output();">
+      <span class="slider"></span>
+    </label>
+    JavaScript
   </div>
   <div id="codespace">
     <div class="tabContent noScroll" id="code"></div>

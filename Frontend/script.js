@@ -1,7 +1,7 @@
 import { allWords, wordsForAliases } from './wordsForAliases.js';
 import { Import } from './wasm-bindings/prosetta.js';
 
-var jscode, sourcecode, cnsl, curr_ctx, curr_canvas, displayed_ctx, displayed_canvas, toggle_icon, toggle_btn;
+var jscode, sourcecode, cnsl, curr_ctx, stack, curr_canvas, displayed_ctx, displayed_canvas, toggle_icon, toggle_btn;
 var x = 0, y = 0, rotation = 0;
 var has_drawn_shape = false;
 var last_shape = "none";
@@ -14,6 +14,7 @@ var curr_frame = 0;
 var latest_frame = 0;
 var last_frame_timestamp = Date.now();
 var target_fps = 30;
+var was_playing = true;
 
 function init_canvas() {
   cnsl.innerText = "";
@@ -274,23 +275,6 @@ function runCode() {
   // cnsl.scrollTop = cnsl.scrollHeight;
 }
 
-function openTab(event, tab) {
-  let tabContents = document.getElementsByClassName("tabContent");
-  for (let i = 0; i < tabContents.length; i++) {
-    if (tabContents[i].id == tab) {
-      tabContents[i].style.display = "block";
-    }
-    else {
-      tabContents[i].style.display = "none";
-    }
-  }
-  let tabs = document.getElementsByClassName("tabBtn");
-  for (let i = 0; i < tabs.length; i++) {
-    tabs[i].className = tabs[i].className.replace(" active", "");
-  }
-  event.currentTarget.className += " active";
-}
-
 function updateCode() {
   if (editor == null) {
     return;
@@ -303,6 +287,7 @@ async function initialize(startingCode) {
   language_worker?.terminate();
   sourcecode = document.getElementById("code");
   jscode = document.getElementById("js");
+  stack = document.getElementById("stack");
   curr_canvas = document.getElementById("outputcanvas");
   displayed_canvas = document.getElementById("outputcanvas2");
   curr_ctx = curr_canvas.getContext('2d');
@@ -311,8 +296,6 @@ async function initialize(startingCode) {
   toggle_icon = toggle_btn.children[0];
   jscode.innerText = "";
   cnsl = document.getElementById("console");
-  let tabs = document.getElementsByClassName("tabBtn tabDefault");
-  tabs[0].click();
 
   setup_webworker();
   language_worker.postMessage({ command: "initialize" });
@@ -687,8 +670,24 @@ function swap_canvases() {
   curr_canvas = temp_canvas;
 }
 
+function update_output() {
+  let checkbox = document.getElementById("output-toggle");
+  if (checkbox.checked) {
+    stack.style.display = "none";
+    jscode.style.display = "block";
+    was_playing = !!frameInterval;
+    pause();
+  } else {
+    stack.style.display = "block";
+    jscode.style.display = "none";
+    if (was_playing) {
+      play();
+    }
+  }
+}
+
 window.reset = reset;
 window.toggle = toggle;
-window.openTab = openTab;
+window.update_output = update_output;
 export default initialize;
 

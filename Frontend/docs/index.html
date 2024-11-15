@@ -55,9 +55,13 @@
           'template':
             `
             <button class="changeModeBtn" @click="switchMode()" v-show="codeWordier != null">Mode: {{mode}}</button>
-            <div id="tabGroup">
-                <button class="tabBtn tabDefault" onclick="openTab(event, 'code')">Code</button>
-                <button class="tabBtn" onclick="openTab(event, 'js')">JS</button>
+            <div>
+              Canvas
+              <label class="switch">
+                <input id="output-toggle" type="checkbox" onchange="update_output();">
+                <span class="slider"></span>
+              </label>
+              JavaScript
             </div>
             <div id="codespace">
                 <div class="tabContent noScroll" id="code"></div>
@@ -66,8 +70,8 @@
                 <div id="stack">
                   <canvas id="outputcanvas" width="400px" height="400px" v-show="outputMethod=='canvas'" />
                   <canvas id="outputcanvas2" style="visibility: hidden;" width="400px" height="400px" v-show="outputMethod=='canvas'"></canvas>
+                  <div id="console" style="width: 400px; height: 400px; margin-top: 0;" v-show="outputMethod=='console'"/>
                 </div>
-                <div id="console" style="width: 400px; height: 400px; margin-top: 0;" v-show="outputMethod=='console'"/>
             </div>
             <div id="controls">
               <button id="reset" onclick="reset()"><img src="icons/reset.svg"></img></button>
