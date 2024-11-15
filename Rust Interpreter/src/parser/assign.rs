@@ -31,7 +31,11 @@ impl ParseState for AssignState {
                 unreachable!()
             }
             // setup child state
-            MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
+            MatchResult::ContinueWith(
+                rest.pos,
+                Types::Any,
+                Box::new(alias::NoneState::new_expr_cont()),
+            )
         } else {
             MatchResult::Continue(0)
         }
@@ -40,11 +44,11 @@ impl ParseState for AssignState {
     fn step_match(
         &mut self,
         env: &mut Environment,
-        child_index: Option<usize>,
+        child_index: Option<(usize, ReturnType)>,
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult {
-        if let Some(index) = child_index {
+        if let Some((index, return_type)) = child_index {
             // find ending close
             let close = find_close_slice(&word, 0).or_else(|| find_close_slice(&rest, 0));
             match close {
@@ -60,11 +64,11 @@ impl ParseState for AssignState {
                     {
                         *value_index = index;
                         *end = End::from_slice(&slice.0, env.global_index);
-                        env.symbols.insert_var(var.name.to_owned());
+                        env.symbols.insert_var(var.name.to_owned(), return_type);
                     } else {
                         unreachable!();
                     }
-                    MatchResult::Matched(slice.0.pos, true)
+                    MatchResult::Matched(slice.0.pos, ReturnType::Void, true)
                 }
             }
         } else {

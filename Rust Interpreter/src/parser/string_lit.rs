@@ -38,7 +38,7 @@ impl ParseState for LitStrState {
                         ));
                     }
                     *str_end = self.current_str_end + env.global_index;
-                    MatchResult::Matched(rest.pos, false)
+                    MatchResult::Matched(rest.pos, ReturnType::String, false)
                 } else {
                     unreachable!()
                 }
@@ -70,7 +70,7 @@ impl ParseState for LitStrState {
     fn step_match(
         &mut self,
         _env: &mut Environment,
-        _child_index: Option<usize>,
+        _child_index: Option<(usize, ReturnType)>,
         _word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {

@@ -8,6 +8,7 @@ pub trait BasicState {
     fn can_happen(&self, _env: &mut Environment) -> bool {
         true
     }
+
     /// get the name
     fn get_name(&self) -> &'static str;
 
@@ -15,7 +16,7 @@ pub trait BasicState {
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool;
 
     /// add children at index to self
-    fn add_child(&mut self, expr: &mut Expr, index: usize);
+    fn add_child(&mut self, expr: &mut Expr, index: usize, return_type: ReturnType);
 
     /// can I be closed
     fn can_close(&self) -> CloseType;
@@ -23,7 +24,9 @@ pub trait BasicState {
     /// set end to index
     fn set_end(&mut self, expr: &mut Expr, index: End);
 
-    fn get_type(&self) -> StateType;
+    fn get_state_return(&self) -> ReturnType;
+
+    fn get_child_type(&self) -> Types;
 }
 
 impl<T: BasicState + Debug> ParseState for T {
@@ -35,15 +38,24 @@ impl<T: BasicState + Debug> ParseState for T {
             if is_first {
                 let can_close = self.can_close();
                 match can_close {
+                    CloseType::Unable => {
+                        // cont - has required arguments
+                        MatchResult::ContinueWith(
+                            word.pos,
+                            self.get_child_type(),
+                            get_state!(alias::NoneState::new_expr_cont()),
+                        )
+                    }
                     CloseType::Able => {
                         if is_mandatory_close(word) {
                             self.set_end(env.expr, End::from_slice(&word, env.global_index));
-                            MatchResult::Matched(word.pos, true)
+                            MatchResult::Matched(word.pos, self.get_state_return(), true)
                             // succeeded - continue again with noncont expr
                         } else {
                             MatchResult::ContinueWith(
                                 word.pos,
-                                get_state!(alias::NoneState::new_expr_cont()),
+                                self.get_child_type(),
+                                get_state!(alias::NoneState::new_expr()),
                             )
                         }
                     }
@@ -55,21 +67,18 @@ impl<T: BasicState + Debug> ParseState for T {
                             None => MatchResult::Failed,
                             Some(slice) => {
                                 self.set_end(env.expr, End::from_slice(&slice.0, env.global_index));
-                                MatchResult::Matched(slice.0.pos, true)
+                                MatchResult::Matched(slice.0.pos, self.get_state_return(), true)
                             }
                         }
-                    }
-                    CloseType::Unable => {
-                        // cont - has required arguments
-                        MatchResult::ContinueWith(
-                            word.pos,
-                            get_state!(alias::NoneState::new_expr_cont()),
-                        )
                     }
                 }
             } else {
                 // not cont - may have more arguments but may not - need to find close if there
-                MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr()))
+                MatchResult::ContinueWith(
+                    word.pos,
+                    self.get_child_type(),
+                    get_state!(alias::NoneState::new_expr()),
+                )
             }
         }
     }
@@ -77,12 +86,12 @@ impl<T: BasicState + Debug> ParseState for T {
     fn step_match(
         &mut self,
         env: &mut Environment,
-        child_index: Option<usize>,
+        child_index: Option<(usize, ReturnType)>,
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult {
-        if let Some(index) = child_index {
-            self.add_child(env.expr, index);
+        if let Some((index, return_type)) = child_index {
+            self.add_child(env.expr, index, return_type);
         }
 
         let can_close = self.can_close();
@@ -93,6 +102,7 @@ impl<T: BasicState + Debug> ParseState for T {
                     // continue again
                     MatchResult::ContinueWith(
                         word.pos,
+                        self.get_child_type(),
                         get_state!(alias::NoneState::new_expr_cont()),
                     )
                 } else {
@@ -104,10 +114,14 @@ impl<T: BasicState + Debug> ParseState for T {
                 // I can close so I close
                 if is_mandatory_close(word) {
                     self.set_end(env.expr, End::from_slice(&word, env.global_index));
-                    MatchResult::Matched(word.pos, true)
+                    MatchResult::Matched(word.pos, self.get_state_return(), true)
                     // succeeded - continue again with noncont expr
                 } else if child_index.is_some() {
-                    MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr()))
+                    MatchResult::ContinueWith(
+                        word.pos,
+                        self.get_child_type(),
+                        get_state!(alias::NoneState::new_expr()),
+                    )
                     // failed - pass word
                 } else {
                     MatchResult::Continue(0)
@@ -121,7 +135,7 @@ impl<T: BasicState + Debug> ParseState for T {
                     None => MatchResult::Failed,
                     Some(slice) => {
                         self.set_end(env.expr, End::from_slice(&slice.0, env.global_index));
-                        MatchResult::Matched(slice.0.pos, true)
+                        MatchResult::Matched(slice.0.pos, self.get_state_return(), true)
                     }
                 }
             }
@@ -133,6 +147,9 @@ impl<T: BasicState + Debug> ParseState for T {
     }
 
     fn get_type(&self) -> StateType {
-        <Self as BasicState>::get_type(&self)
+        match self.get_state_return() {
+            ReturnType::Void => StateType::Stat,
+            _ => StateType::Expr,
+        }
     }
 }

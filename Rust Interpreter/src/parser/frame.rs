@@ -7,13 +7,13 @@ impl ParseState for FrameState {
         *env.expr = Expr::Frame {
             locs: env.locs.take().unwrap_or_default(),
         };
-        MatchResult::Matched(word.pos, false)
+        MatchResult::Matched(word.pos, ReturnType::Number, false)
     }
 
     fn step_match(
         &mut self,
         _env: &mut Environment,
-        _child_index: Option<usize>,
+        _child_index: Option<(usize, ReturnType)>,
         _word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {

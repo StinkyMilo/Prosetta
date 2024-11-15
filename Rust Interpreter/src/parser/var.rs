@@ -14,7 +14,7 @@ impl ParseState for VarState {
                 WordTriggerType::Variable(var.name.to_ascii_lowercase())
             );
             *env.expr = Expr::Var { var };
-            MatchResult::Matched(rest.pos, false)
+            MatchResult::Matched(rest.pos, ReturnType::Any, false)
         } else {
             // future words could be varible names
             MatchResult::Failed
@@ -24,7 +24,7 @@ impl ParseState for VarState {
     fn step_match(
         &mut self,
         _env: &mut Environment,
-        _child_index: Option<usize>,
+        _child_index: Option<(usize, ReturnType)>,
         _word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {

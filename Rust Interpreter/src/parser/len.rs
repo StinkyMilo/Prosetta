@@ -13,8 +13,12 @@ impl BasicState for LengthState {
         "Length"
     }
 
-    fn get_type(&self) -> StateType {
-        StateType::Expr
+    fn get_state_return(&self) -> ReturnType {
+        ReturnType::Number
+    }
+
+    fn get_child_type(&self) -> Types {
+        Types::List
     }
 
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {
@@ -29,7 +33,7 @@ impl BasicState for LengthState {
         ret
     }
 
-    fn add_child(&mut self, expr: &mut Expr, idx: usize) {
+    fn add_child(&mut self, expr: &mut Expr, idx: usize, _: ReturnType) {
         if let Expr::Length { index, .. } = expr {
             *index = idx;
             self.count += 1;

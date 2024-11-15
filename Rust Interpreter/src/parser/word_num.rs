@@ -46,7 +46,7 @@ impl ParseState for WordNumState {
                     WordTriggerType::Length(word.len(), false)
                 );
 
-                MatchResult::Matched(close.0.pos, true)
+                MatchResult::Matched(close.0.pos, ReturnType::Number, true)
             } else {
                 // did not find close - fail
                 MatchResult::Failed
@@ -57,7 +57,7 @@ impl ParseState for WordNumState {
     fn step_match(
         &mut self,
         _env: &mut Environment,
-        _child_index: Option<usize>,
+        _child_index: Option<(usize, ReturnType)>,
         _word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {

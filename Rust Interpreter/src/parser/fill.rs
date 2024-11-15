@@ -6,6 +6,7 @@ use basic_func::BasicState;
 
 pub struct FillState {
     count: u8,
+    got_color: bool,
 }
 
 impl BasicState for FillState {
@@ -13,8 +14,15 @@ impl BasicState for FillState {
         "Fill"
     }
 
-    fn get_type(&self) -> StateType {
-        StateType::Stat
+    fn get_state_return(&self) -> ReturnType {
+        ReturnType::Void
+    }
+
+    fn get_child_type(&self) -> Types {
+        match self.count {
+            0 => Types::Color | Types::Number,
+            _ => Types::Number,
+        }
     }
 
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {
@@ -29,7 +37,10 @@ impl BasicState for FillState {
         ret
     }
 
-    fn add_child(&mut self, expr: &mut Expr, index: usize) {
+    fn add_child(&mut self, expr: &mut Expr, index: usize, return_type: ReturnType) {
+        if return_type == ReturnType::Color {
+            self.got_color = true;
+        }
         if let Expr::Fill { indexes, .. } = expr {
             indexes[self.count as usize] = index;
             self.count += 1;
@@ -39,9 +50,14 @@ impl BasicState for FillState {
     }
 
     fn can_close(&self) -> CloseType {
+        let can_at_1 = if self.got_color {
+            CloseType::Force
+        } else {
+            CloseType::Able
+        };
         match self.count {
             0 => CloseType::Unable,
-            1 => CloseType::Able,
+            1 => can_at_1,
             2 => CloseType::Unable,
             3 => CloseType::Force,
             _ => unreachable!(),
@@ -59,6 +75,9 @@ impl BasicState for FillState {
 
 impl FillState {
     pub fn new() -> Self {
-        Self { count: 0 }
+        Self {
+            count: 0,
+            got_color: false,
+        }
     }
 }

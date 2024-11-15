@@ -1,0 +1,1 @@
+cargo tarpaulin --features no-doc-tests --out html

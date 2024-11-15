@@ -13,8 +13,12 @@ impl BasicState for LineWidthState {
         "Line Width"
     }
 
-    fn get_type(&self) -> StateType {
-        StateType::Stat
+    fn get_state_return(&self) -> ReturnType {
+        ReturnType::Void
+    }
+
+    fn get_child_type(&self) -> Types {
+        Types::Number
     }
 
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {
@@ -29,7 +33,7 @@ impl BasicState for LineWidthState {
         ret
     }
 
-    fn add_child(&mut self, expr: &mut Expr, index: usize) {
+    fn add_child(&mut self, expr: &mut Expr, index: usize, _: ReturnType) {
         if let Expr::LineWidth { child_index, .. } = expr {
             *child_index = index;
             self.count += 1;

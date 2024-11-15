@@ -17,7 +17,7 @@ impl ParseState for LiteralColorState {
                         str_length: word.len(),
                         value: word.str.to_owned(),
                     };
-                    MatchResult::Matched(rest.pos, false)
+                    MatchResult::Matched(rest.pos, ReturnType::Color, false)
                 }
                 LitColorFoundResult::CouldFind => {
                     *env.expr = Expr::LitCol {
@@ -57,7 +57,7 @@ impl ParseState for LiteralColorState {
                     } else {
                         unreachable!()
                     }
-                    MatchResult::Matched(rest.pos, false)
+                    MatchResult::Matched(rest.pos, ReturnType::Color, false)
                 }
                 //Last word could have had more color words after it but didn't.
                 LitColorFoundResult::FoundOnLast => {
@@ -76,7 +76,7 @@ impl ParseState for LiteralColorState {
                     } else {
                         unreachable!()
                     }
-                    MatchResult::Matched(word.pos, false)
+                    MatchResult::Matched(word.pos, ReturnType::Color, false)
                 }
                 //Beginning of a color name, keep searching
                 LitColorFoundResult::CouldFind => {
@@ -93,7 +93,7 @@ impl ParseState for LiteralColorState {
     fn step_match(
         &mut self,
         _env: &mut Environment,
-        _child: Option<usize>,
+        _child: Option<(usize, ReturnType)>,
         _word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {

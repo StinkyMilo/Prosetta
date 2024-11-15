@@ -11,8 +11,12 @@ impl BasicState for MoveToState {
         "MoveTo"
     }
 
-    fn get_type(&self) -> StateType {
-        StateType::Stat
+    fn get_state_return(&self) -> ReturnType {
+        ReturnType::List
+    }
+
+    fn get_child_type(&self) -> Types {
+        Types::Number
     }
 
     fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {
@@ -27,7 +31,7 @@ impl BasicState for MoveToState {
         ret
     }
 
-    fn add_child(&mut self, expr: &mut Expr, index: usize) {
+    fn add_child(&mut self, expr: &mut Expr, index: usize, _: ReturnType) {
         if let Expr::MoveTo { indexes, .. } = expr {
             indexes[self.count as usize] = index;
             self.count += 1;

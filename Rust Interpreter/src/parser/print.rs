@@ -5,7 +5,7 @@ use super::*;
 #[derive(Debug)]
 
 pub struct PrintState {
-    count: usize
+    count: usize,
 }
 
 impl ParseState for PrintState {
@@ -29,21 +29,27 @@ impl ParseState for PrintState {
             };
         }
 
-        if let Expr::Print { single_word, end, single_word_start, .. } = env.expr {
+        if let Expr::Print {
+            single_word,
+            end,
+            single_word_start,
+            ..
+        } = env.expr
+        {
             if found_close {
                 // set end
                 *end = End::from_slice(&word, env.global_index);
-                MatchResult::Matched(word.pos, true)
+                MatchResult::Matched(word.pos, ReturnType::Void, true)
             } else {
                 //get first word for "pri hi."
                 if self.count == 0 {
-                   *single_word = Some(word.str.to_vec());
-                   *single_word_start = word.pos;
+                    *single_word = Some(word.str.to_vec());
+                    *single_word_start = word.pos;
                 }
                 self.count += 1;
-                MatchResult::ContinueWith(word.pos, get_state!(NoneState::new_expr()))
+                MatchResult::ContinueWith(word.pos, Types::Any, get_state!(NoneState::new_expr()))
             }
-        }else{
+        } else {
             unreachable!()
         }
     }
@@ -51,27 +57,37 @@ impl ParseState for PrintState {
     fn step_match(
         &mut self,
         env: &mut Environment,
-        child_index: Option<usize>,
+        child_index: Option<(usize, ReturnType)>,
         word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
-        if let Expr::Print { indexes, end, single_word, .. } = env.expr {
-            if let Some(index) = child_index {
+        if let Expr::Print {
+            indexes,
+            end,
+            single_word,
+            ..
+        } = env.expr
+        {
+            if let Some((index, _)) = child_index {
                 indexes.push(index);
                 *single_word = None;
-            }else if self.count == 1 {
-                self.count+=1;
+            } else if self.count == 1 {
+                self.count += 1;
                 return MatchResult::Continue(0);
-            }else{
+            } else {
                 *single_word = None;
             }
-            self.count+=1;
-            if is_mandatory_close(word){
+            self.count += 1;
+            if is_mandatory_close(word) {
                 *end = End::from_slice(&word, env.global_index);
-                MatchResult::Matched(word.pos, true)
-            }else if child_index.is_some(){
-                MatchResult::ContinueWith(word.pos, get_state!(alias::NoneState::new_expr_cont()))
-            }else{
+                MatchResult::Matched(word.pos, ReturnType::Void, true)
+            } else if child_index.is_some() {
+                MatchResult::ContinueWith(
+                    word.pos,
+                    Types::Any,
+                    get_state!(alias::NoneState::new_expr_cont()),
+                )
+            } else {
                 MatchResult::Continue(0)
             }
         } else {
@@ -90,8 +106,6 @@ impl ParseState for PrintState {
 
 impl PrintState {
     pub fn new() -> Self {
-        Self {
-            count: 0
-        }
+        Self { count: 0 }
     }
 }
