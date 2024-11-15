@@ -53,7 +53,7 @@ impl BasicState for FillState {
         let can_at_1 = if self.got_color {
             CloseType::Force
         } else {
-            CloseType::Unable
+            CloseType::Able
         };
         match self.count {
             0 => CloseType::Unable,
