@@ -36,7 +36,7 @@ fn test_varible_substrings() {
 }
 
 #[test]
-// #[timeout(1000)]
+#[timeout(1000)]
 fn test_assign_no_end() {
     let data = run_parser!(b"was cat one. was car two");
     check_lisp!(data, "(assign@0,1,2$11 \"cat\"@4 (litnum 1@8$$3))");
