@@ -21,5 +21,5 @@ fn test_triple_newline() {
 #[timeout(1000)]
 fn test_not() {
     let data = run_parser!(b"not two. was two two twelve two twenty-two twenty-three...");
-    check_lisp!(data, "(assign@0,1,2$14 \"twelve\"@4 (litnum 2@11$$3))\n(assign@18,19,20$32 mut \"twelve\"@22 (litnum 2@29$$3))");
+    check_lisp!(data, "(not@0,1,2$7 @4$$3 \"two\")\n(assign@9,10,11$55$$3 \"twelve\"@21 (litnum 23@43$$12))");
 }
