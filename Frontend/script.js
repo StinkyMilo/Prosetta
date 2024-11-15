@@ -1,7 +1,7 @@
 import { allWords, wordsForAliases } from './wordsForAliases.js';
 import { Import } from './wasm-bindings/prosetta.js';
 
-var jscode, sourcecode, cnsl, curr_ctx, curr_canvas, displayed_ctx, displayed_canvas;
+var jscode, sourcecode, cnsl, curr_ctx, curr_canvas, displayed_ctx, displayed_canvas, toggle_icon, toggle_btn;
 var x = 0, y = 0, rotation = 0;
 var has_drawn_shape = false;
 var last_shape = "none";
@@ -307,6 +307,8 @@ async function initialize(startingCode) {
   displayed_canvas = document.getElementById("outputcanvas2");
   curr_ctx = curr_canvas.getContext('2d');
   displayed_ctx = displayed_canvas.getContext('2d');
+  toggle_btn = document.getElementById("toggle-play");
+  toggle_icon = toggle_btn.children[0];
   jscode.innerText = "";
   cnsl = document.getElementById("console");
   let tabs = document.getElementsByClassName("tabBtn tabDefault");
@@ -327,19 +329,19 @@ function msg_worker(command, data) {
   language_worker.postMessage({ command: command, data: data });
 }
 
-function getWordsOfLength(len,mod10){
-  if(mod10){
-    return allWords.filter((word)=>{
-      return word.length%10==len;
+function getWordsOfLength(len, mod10) {
+  if (mod10) {
+    return allWords.filter((word) => {
+      return word.length % 10 == len;
     })
   }
-  return allWords.filter((word)=>{
+  return allWords.filter((word) => {
     return word.length == len;
   });
 }
 
-function getWordsThatContain(substr){
-  return allWords.filter((word)=>{
+function getWordsThatContain(substr) {
+  return allWords.filter((word) => {
     return word.indexOf(substr.toLowerCase()) > -1;
   });
 }
@@ -362,17 +364,17 @@ function setup_editor(startingCode) {
     let header = document.createElement("h1");
     let u = document.createElement("u");
     let words;
-    if(tooltip.type == "alias"){
+    if (tooltip.type == "alias") {
       words = wordsForAliases[tooltip.value];
       u.innerHTML = "Words that trigger " + tooltip.value;
-    }else if(tooltip.type == "length"){
-      words = getWordsOfLength(tooltip.len,tooltip.mod10);
-      if(tooltip.mod10){
-        u.innerHTML = "Words of length " + tooltip.len + ", " + (tooltip.len+10) + " etc.";
-      }else{
+    } else if (tooltip.type == "length") {
+      words = getWordsOfLength(tooltip.len, tooltip.mod10);
+      if (tooltip.mod10) {
+        u.innerHTML = "Words of length " + tooltip.len + ", " + (tooltip.len + 10) + " etc.";
+      } else {
         u.innerHTML = "Words of length " + tooltip.len;
       }
-    }else if(tooltip.type == "variable"){
+    } else if (tooltip.type == "variable") {
       words = getWordsThatContain(tooltip.name);
       u.innerHTML = "Words that contain the variable " + tooltip.name;
     }
@@ -396,8 +398,8 @@ function setup_editor(startingCode) {
   let removeTimeout;
   let currentWordStart = { line: -1, ch: -1 };
   let currentWordEnd = { line: -1, ch: -1 };
-  let nextWordStart = {line: -1, ch: -1};
-  let nextWordEnd = {line: -1, ch: -1};
+  let nextWordStart = { line: -1, ch: -1 };
+  let nextWordEnd = { line: -1, ch: -1 };
 
   function clearWidget() {
     // removeWithFadeout(activeWidget);
@@ -639,9 +641,18 @@ function has_import(imp) {
   return imports.indexOf(imp) >= 0;
 }
 
+function toggle() {
+  if (frameInterval) {
+    pause();
+  } else {
+    play();
+  }
+}
 function play() {
   pause();
+  toggle_icon.src = "icons/pause.svg";
   if (has_import(Import.Frame)) {
+    toggle_btn.style.display = "block"
     last_frame_timestamp = Date.now();
     frameInterval = setInterval(draw_frame);
   }
@@ -649,6 +660,12 @@ function play() {
 
 function pause() {
   clearInterval(frameInterval);
+  frameInterval = null;
+  toggle_icon.src = "icons/play.svg";
+}
+
+function reset() {
+  initialize(editor.getValue());
 }
 
 function draw_frame() {
@@ -670,8 +687,8 @@ function swap_canvases() {
   curr_canvas = temp_canvas;
 }
 
-window.pause = pause;
-window.play = play;
+window.reset = reset;
+window.toggle = toggle;
 window.openTab = openTab;
 export default initialize;
 

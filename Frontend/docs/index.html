@@ -69,6 +69,10 @@
                 </div>
                 <div id="console" style="width: 400px; height: 400px; margin-top: 0;" v-show="outputMethod=='console'"/>
             </div>
+            <div id="controls">
+              <button id="reset" onclick="reset()"><img src="icons/reset.svg"></img></button>
+              <button id="toggle-play" style="display: none;" onclick="toggle()"><img></img></button>
+            </div>
           `,
           /*
             Code is the program string

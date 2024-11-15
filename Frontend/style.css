@@ -11,6 +11,24 @@ div>canvas {
   border-style: solid;
 }
 
+#reset,
+#toggle-play {
+  margin-left: 2px;
+  margin-right: 2px;
+  width: 25px;
+  height: 25px;
+}
+
+#reset img,
+#toggle-play img {
+  width: 100%;
+  height: 100%;
+}
+
+#controls {
+  display: flex;
+}
+
 .tabContent {
   box-sizing: border-box;
   width: 533px;
@@ -103,14 +121,14 @@ body {
   z-index: 2;
 }
 
-.tooltip > p {
+.tooltip>p {
   color: white;
-  margin-left:10px;
+  margin-left: 10px;
   font-size: 10px;
   cursor: pointer
 }
 
-.tooltip > h1{
+.tooltip>h1 {
   color: white;
   font-size: 16px;
   margin-top: 1px;

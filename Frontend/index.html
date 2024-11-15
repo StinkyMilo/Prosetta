@@ -42,8 +42,10 @@ It is truly a miracle that they lived.
       <canvas id="outputcanvas2" style="visibility: hidden;" width="400px" height="400px"></canvas>
     </div>
   </div>
-  <button onclick="play()">⏵</button>
-  <button onclick="pause()">⏸</button>
+  <div id="controls">
+    <button id="reset" onclick="reset()"><img src="icons/reset.svg"></img></button>
+    <button id="toggle-play" style="display: none;" onclick="toggle()"><img></img></button>
+  </div>
   <div id="console" />
 </body>
 
