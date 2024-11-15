@@ -81,4 +81,14 @@ fn test_stroke_width() {
     );
 }
 
-
+#[test]
+#[timeout(1000)]
+fn test_var_fill_stroke() {
+    let data = run_parser!(b"was mario col 2 2 2..\nsto mario.\nfil mario.");
+    check_lisp!(
+        data,
+        "(assign@0,1,2$20 \"mario\"@4 (color@10,11,12$19 (litnum 2@14$$1) (litnum 2@16$$1) (litnum 2@18$$1)))\n\
+        (stroke@22,23,24$31 (var \"mario\"@26))\n\
+        (fill@33,34,35$42 (var \"mario\"@37))"
+    );
+}
