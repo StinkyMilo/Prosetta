@@ -39,7 +39,7 @@ impl ParseState for WordNumState {
                     *end = End::from_slice(&close.0, env.global_index);
                 }
 
-                MatchResult::Matched(close.0.pos, true)
+                MatchResult::Matched(close.0.pos, ReturnType::Number, true)
             } else {
                 // did not find close - fail
                 MatchResult::Failed
@@ -50,7 +50,7 @@ impl ParseState for WordNumState {
     fn step_match(
         &mut self,
         _env: &mut Environment,
-        _child_index: Option<usize>,
+        _child_index: Option<(usize, ReturnType)>,
         _word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {

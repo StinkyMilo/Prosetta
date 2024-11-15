@@ -13,8 +13,12 @@ impl BasicState for ReturnState {
         "Return"
     }
 
-    fn get_type(&self) -> StateType {
-        StateType::Stat
+    fn get_state_return(&self) -> ReturnType {
+        ReturnType::Void
+    }
+
+    fn get_child_type(&self) -> Types {
+        Types::Number
     }
 
     fn can_happen(&self, env: &mut Environment) -> bool {
@@ -38,7 +42,7 @@ impl BasicState for ReturnState {
         ret
     }
 
-    fn add_child(&mut self, expr: &mut Expr, idx: usize) {
+    fn add_child(&mut self, expr: &mut Expr, idx: usize, _: ReturnType) {
         if let Expr::Return { index, .. } = expr {
             *index = Some(idx);
             self.count += 1;

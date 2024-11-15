@@ -357,6 +357,6 @@ pub fn get_color_word(word_so_far: &[u8], word: &[u8]) -> LitColorFoundResult {
             b"green" => LitColorFoundResult::Found,
             _ => LitColorFoundResult::FoundOnLast
         }
-        _ => LitColorFoundResult::Failed
+        _ => unreachable!()
     }
 }

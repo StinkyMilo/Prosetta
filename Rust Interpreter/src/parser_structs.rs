@@ -6,7 +6,7 @@ use std::{
     usize,
 };
 
-use super::{alias::WordTriggerArena, alias_data::AliasData, Expr};
+use super::{alias::WordTriggerArena, alias_data::AliasData, Expr, ReturnType, Types};
 
 pub fn try_get_best_val<'a>(
     name: &[u8],
@@ -88,7 +88,7 @@ fn try_get_from_iter<'a>(
 }
 enum Symbol {
     ///symbol is a varible
-    Var,
+    Var(ReturnType),
     ///symbol is a function with a number of arguments
     Func(u8),
 }
@@ -102,9 +102,9 @@ impl SymbolSet {
             set: ScopeMap::new(),
         }
     }
-    pub fn insert_var(&mut self, mut name: Vec<u8>) {
+    pub fn insert_var(&mut self, mut name: Vec<u8>, return_type: ReturnType) {
         name.make_ascii_lowercase();
-        self.set.define(name, Symbol::Var);
+        self.set.define(name, Symbol::Var(return_type));
     }
     pub fn insert_func(&mut self, mut name: Vec<u8>, args: u8) {
         name.make_ascii_lowercase();
@@ -135,7 +135,7 @@ impl SymbolSet {
             word,
             &mut self.set.keys().map(|e| e.as_slice()),
             global_index,
-            &|name| matches!(self.set.get(name), Some(Symbol::Var)),
+            &|name| matches!(self.set.get(name), Some(Symbol::Var(..))),
         )
     }
 
@@ -225,6 +225,7 @@ pub struct State {
     pub expr_index: usize,
     pub first_parse: usize,
     pub last_parse: usize,
+    pub types: Types,
     pub state: Box<dyn ParseState>,
 }
 
@@ -271,7 +272,7 @@ pub trait ParseState: Debug {
     fn step_match(
         &mut self,
         env: &mut Environment,
-        child: Option<usize>,
+        child: Option<(usize, ReturnType)>,
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult;
@@ -308,9 +309,9 @@ impl End {
 #[derive(Debug)]
 pub enum MatchResult {
     /// returned to go to the parent state with the index to now parse from and whether the state closed on it
-    Matched(usize, bool),
+    Matched(usize, ReturnType, bool),
     /// returned to add a child onto the stack with an index and the state to continue with
-    ContinueWith(usize, Box<dyn ParseState>),
+    ContinueWith(usize, Types, Box<dyn ParseState>),
     /// returned to give the same state with the offset (usually 0)
     Continue(usize),
     /// returned to go to the parent state with a failure
@@ -325,7 +326,7 @@ pub enum MatchResult {
 pub enum LastMatchResult {
     None,
     New(Option<Vec<usize>>),
-    Matched(usize),
+    Matched(usize, ReturnType),
     Failed,
     Continue,
 }
@@ -399,6 +400,8 @@ pub struct Environment<'a> {
     pub full_text: &'a [u8],
     /// The global start and end of alias data
     pub trigger_word_data: &'a mut WordTriggerArena,
+    ///types
+    pub types: Types,
 }
 
 ///a slice of the input text

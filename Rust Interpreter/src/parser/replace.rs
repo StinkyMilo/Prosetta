@@ -11,27 +11,36 @@ impl BasicState for ReplaceState {
         "Replace"
     }
 
-    fn get_type(&self) -> StateType {
-        StateType::Stat
+    fn get_state_return(&self) -> ReturnType {
+        ReturnType::Void
     }
 
-    fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool { 
+    fn get_child_type(&self) -> Types {
+        match self.count {
+            0 => Types::List,
+            1 => Types::Number,
+            2 => Types::Any,
+            _ => unreachable!(),
+        }
+    }
+
+    fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {
         let ret = self.count == 0;
         if ret {
             *expr = Expr::Replace {
                 locs,
                 indexes: [usize::MAX; 3],
-                end: End::none()
+                end: End::none(),
             }
         }
         ret
     }
 
-    fn add_child(&mut self, expr: &mut Expr, index: usize) {
-        if let Expr::Replace {indexes, ..} = expr {
+    fn add_child(&mut self, expr: &mut Expr, index: usize, _: ReturnType) {
+        if let Expr::Replace { indexes, .. } = expr {
             indexes[self.count as usize] = index;
-            self.count+=1;
-        }else{
+            self.count += 1;
+        } else {
             unreachable!()
         }
     }
@@ -40,22 +49,21 @@ impl BasicState for ReplaceState {
         match self.count {
             0..=2 => CloseType::Unable,
             3 => CloseType::Force,
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
     fn set_end(&mut self, expr: &mut Expr, index: End) {
-        if let Expr::Replace {end, ..} = expr {
+        if let Expr::Replace { end, .. } = expr {
             *end = index;
         } else {
             unreachable!()
         }
     }
-
 }
 
 impl ReplaceState {
-    pub fn new () -> Self {
-        Self {count: 0}
+    pub fn new() -> Self {
+        Self { count: 0 }
     }
 }

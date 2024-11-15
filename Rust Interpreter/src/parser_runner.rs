@@ -53,25 +53,6 @@ pub fn run_after(data: ParsedData, parser_flags: RunnerFlags) {
     //         std::str::from_utf8(iter.cloned().collect::<Vec<_>>().as_slice()).unwrap()
     //     );
     // }
-    if parser_flags.whole_program {
-        println!(
-            "   whole program:\n{}",
-            lisp_like_writer::write(&data.exprs, &data.stat_starts)
-        );
-        println!(
-            "   JavaScript output:\n{}",
-            javascript_writer::write(&data.exprs, &data.stat_starts)
-        );
-    }
-    if parser_flags.linted {
-        let iter = data.source.get_iter();
-        let mut lint = SyntaxLinter::<WindowsRenderer>::new();
-        lint.write(&data.exprs, &data.stat_starts, iter);
-        println!(
-            "   linted:\n{}",
-            std::str::from_utf8(&lint.into_data()).unwrap()
-        );
-    }
     if parser_flags.line_rendered {
         let iter = data.source.get_iter();
         let mut lint = SyntaxLinter::<LineRenderer>::new();
@@ -83,6 +64,25 @@ pub fn run_after(data: ParsedData, parser_flags: RunnerFlags) {
             "   Alias Triggers:\n{}",
             word_trigger_writer::write(&data.trigger_word_data.word_triggers)
         )
+    }
+    if parser_flags.whole_program {
+        println!(
+            "   whole program:\n{}",
+            lisp_like_writer::write(&data.exprs, &data.stat_starts)
+        );
+    }
+    if parser_flags.linted {
+        let iter = data.source.get_iter();
+        let mut lint = SyntaxLinter::<WindowsRenderer>::new();
+        lint.write(&data.exprs, &data.stat_starts, iter);
+        println!(
+            "   linted:\n{}",
+            std::str::from_utf8(&lint.into_data()).unwrap()
+        );
+        println!(
+            "   JavaScript output:\n{}",
+            javascript_writer::write(&data.exprs, &data.stat_starts)
+        );
     }
 }
 

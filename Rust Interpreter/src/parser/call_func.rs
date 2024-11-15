@@ -33,9 +33,13 @@ impl ParseState for FunctionCallState {
 
             // match if args are 0
             if arg_count == 0 {
-                MatchResult::Matched(end.index - env.global_index, true)
+                MatchResult::Matched(end.index - env.global_index, ReturnType::Any, true)
             } else {
-                MatchResult::ContinueWith(rest.pos, get_state!(alias::NoneState::new_expr_cont()))
+                MatchResult::ContinueWith(
+                    rest.pos,
+                    Types::Any,
+                    get_state!(alias::NoneState::new_expr_cont()),
+                )
             }
         } else {
             // did not find function
@@ -46,7 +50,7 @@ impl ParseState for FunctionCallState {
     fn step_match(
         &mut self,
         env: &mut Environment,
-        child_index: Option<usize>,
+        child_index: Option<(usize, ReturnType)>,
         word: &Slice,
         rest: &Slice,
     ) -> MatchResult {
@@ -54,7 +58,7 @@ impl ParseState for FunctionCallState {
             func, indexes, end, ..
         } = env.expr
         {
-            if let Some(index) = child_index {
+            if let Some((index,_)) = child_index {
                 indexes.push(index);
                 self.count += 1;
             }
@@ -66,13 +70,14 @@ impl ParseState for FunctionCallState {
                         None => MatchResult::Failed,
                         Some(slice) => {
                             *end = End::from_slice(&slice.0, env.global_index);
-                            MatchResult::Matched(slice.0.pos, true)
+                            MatchResult::Matched(slice.0.pos, ReturnType::Any, true)
                         }
                     };
                 } else {
                     if child_index.is_some() {
                         MatchResult::ContinueWith(
                             word.pos,
+                            Types::Any,
                             get_state!(alias::NoneState::new_expr_cont()),
                         )
                     } else {

@@ -1,25 +1,52 @@
-#[cfg(test)]
-mod test_colors {
-    use std::collections::HashSet;
+#![cfg(test)]
 
-    use crate::{parser::foreach, testing::*};
-    use bstr::ByteSlice;
-    use itertools::Itertools;
-    use ntest::timeout;
+use crate::testing::*;
+use bstr::ByteSlice;
+use itertools::Itertools;
+use ntest::timeout;
 
-    const COLOR_STR: &[u8] = include_bytes!("colors.txt");
+const COLOR_STR: &[u8] = include_bytes!("colors.txt");
 
+#[test]
+#[timeout(1000)]
+fn test_correct_colors_separate() {
+    for line in COLOR_STR.lines() {
+        let mut str = b"was mario ".to_vec();
+        str.extend_from_slice(line);
+        str.push(b'.');
+        let no_spaces = line.replace(b" ", b"");
 
-    #[test]
-    #[timeout(1000)]
-    fn test_correct_colors_separate() {
-        for line in COLOR_STR.lines() {
+        let length = line.len();
+        let data = run_parser!(&str);
+        check_lisp!(
+            data,
+            format!(
+                "(assign@0,1,2${} \"mario\"@4 (litcol {}@10$${}))",
+                length + 10,
+                std::str::from_utf8(&no_spaces).unwrap(),
+                length
+            ),
+            format!("testing: {}", std::str::from_utf8(line).unwrap())
+        );
+    }
+}
+
+#[test]
+#[timeout(1000)]
+fn test_correct_colors_together() {
+    for line in COLOR_STR.lines() {
+        let spaces = line.find_iter(b" ").powerset();
+        for curr_spaces in spaces {
             let mut str = b"was mario ".to_vec();
-            str.extend_from_slice(line);
+            let mut curr_color = line.to_vec();
+            for space in curr_spaces.into_iter().rev() {
+                curr_color.remove(space);
+            }
+            str.extend_from_slice(&curr_color);
             str.push(b'.');
             let no_spaces = line.replace(b" ", b"");
 
-            let length = line.len();
+            let length = curr_color.len();
             let data = run_parser!(&str);
             check_lisp!(
                 data,
@@ -29,39 +56,8 @@ mod test_colors {
                     std::str::from_utf8(&no_spaces).unwrap(),
                     length
                 ),
-                format!("testing: {}", std::str::from_utf8(line).unwrap())
+                format!("testing: {}", std::str::from_utf8(&curr_color).unwrap())
             );
-        }
-    }
-
-    #[test]
-    #[timeout(1000)]
-    fn test_correct_colors_together() {
-        for line in COLOR_STR.lines() {
-            let spaces = line.find_iter(b" ").powerset();
-            for curr_spaces in spaces {
-                let mut str = b"was mario ".to_vec();
-                let mut curr_color = line.to_vec();
-                for space in curr_spaces.into_iter().rev() {
-                    curr_color.remove(space);
-                }
-                str.extend_from_slice(&curr_color);
-                str.push(b'.');
-                let no_spaces = line.replace(b" ", b"");
-
-                let length = curr_color.len();
-                let data = run_parser!(&str);
-                check_lisp!(
-                    data,
-                    format!(
-                        "(assign@0,1,2${} \"mario\"@4 (litcol {}@10$${}))",
-                        length + 10,
-                        std::str::from_utf8(&no_spaces).unwrap(),
-                        length
-                    ),
-                    format!("testing: {}", std::str::from_utf8(&curr_color).unwrap())
-                );
-            }
         }
     }
 }

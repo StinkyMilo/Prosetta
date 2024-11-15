@@ -34,7 +34,7 @@ impl ParseState for MultiLitNumState {
             };
 
             if single_value.is_some() {
-                return MatchResult::Matched(word.pos, true);
+                return MatchResult::Matched(word.pos, ReturnType::Number, true);
             }
         }
         if let Expr::MultiLitNum {
@@ -50,7 +50,7 @@ impl ParseState for MultiLitNumState {
                     *single_value = Self::get_final_value(values);
                 }
 
-                MatchResult::Matched(word.pos, true)
+                MatchResult::Matched(word.pos, ReturnType::Number, true)
             } else {
                 //let lower = word.str.to_ascii_lowercase();
                 if let Some(var) = env.symbols.try_get_var(word, env.global_index) {
@@ -71,7 +71,7 @@ impl ParseState for MultiLitNumState {
     fn step_match(
         &mut self,
         _env: &mut Environment,
-        _child_index: Option<usize>,
+        _child_index: Option<(usize, ReturnType)>,
         _word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
