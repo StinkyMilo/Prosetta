@@ -47,6 +47,12 @@ pub enum OperatorType {
     Equals,
     Not,
 }
+#[derive(PartialEq, Debug, Clone, Copy)]
+pub enum TrigType {
+    Sin,
+    Cos,
+    Tan,
+}
 
 #[derive(PartialEq, Debug)]
 pub enum Expr {
@@ -249,6 +255,17 @@ pub enum Expr {
         start: usize,
         end: usize,
         comment: Vec<u8>,
+    },
+    Trig {
+        locs: Vec<usize>,
+        func_type: TrigType,
+        index: usize,
+        end: End,
+    },
+    Rand {
+        locs: Vec<usize>,
+        indexes: [usize; 2],
+        end: End,
     },
 }
 

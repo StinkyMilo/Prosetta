@@ -444,9 +444,42 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
         }
         Expr::Frame { locs } => {
             format!("(frame{})", join_locs(locs, None))
-        },
-        Expr::Comment { start, end, comment } => {
-            format!("(comment@{}$${} \"{}\")",start,end,String::from_utf8_lossy(comment))
+        }
+        Expr::Comment {
+            start,
+            end,
+            comment,
+        } => {
+            format!(
+                "(comment@{}$${} \"{}\")",
+                start,
+                end,
+                String::from_utf8_lossy(comment)
+            )
+        }
+        Expr::Trig {
+            locs,
+            func_type,
+            index,
+            end,
+        } => {
+            let name = match func_type {
+                TrigType::Sin => "sin",
+                TrigType::Cos => "cos",
+                TrigType::Tan => "tan",
+            };
+            format!(
+                "({name}{} {})",
+                join_locs(locs, Some(*end)),
+                write_expr(exprs, *index, 0)
+            )
+        }
+        Expr::Rand { locs, indexes, end } => {
+            format!(
+                "(rand{}{})",
+                join_locs(locs, Some(*end)),
+                write_exprs(exprs, indexes)
+            )
         }
     }
 }

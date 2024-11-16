@@ -17,7 +17,9 @@ pub(crate) mod alias_data;
 mod append;
 mod assign;
 mod basic_func;
+mod bezier;
 mod call_func;
+mod circle;
 mod color;
 mod comment;
 mod delete;
@@ -30,30 +32,28 @@ mod function;
 mod if_stat;
 mod index;
 mod len;
+mod line;
+mod line_width;
 mod list;
 mod litcolor;
 mod litcolor_data;
 mod move_to;
+pub(crate) mod multi_lit_num;
 mod not;
+mod num_literal;
 mod operator;
+mod print;
+mod rand;
+mod rect;
 mod replace;
+mod return_stat;
+mod rotate;
 pub(crate) mod string_lit;
 mod stroke;
 mod title;
+mod trig;
 mod var;
 mod while_stat;
-
-mod bezier;
-mod circle;
-mod line;
-mod print;
-mod rect;
-mod return_stat;
-mod rotate;
-
-mod line_width;
-pub(crate) mod multi_lit_num;
-mod num_literal;
 mod word_num;
 
 #[path = "testing/mod.rs"]
@@ -75,6 +75,8 @@ pub enum Import {
     Func,
     Graph,
     Frame,
+    Trig,
+    Rand,
 }
 
 impl Import {
@@ -84,6 +86,8 @@ impl Import {
             Import::Func => "Func",
             Import::Graph => "Graph",
             Import::Frame => "Frame",
+            Import::Trig => "Trig",
+            Import::Rand => "Rand",
         }
     }
     pub fn get_all() -> &'static [(Import, &'static [u8])] {
@@ -92,6 +96,8 @@ impl Import {
             (Import::Func, b"func"),
             (Import::Graph, b"graph"),
             (Import::Frame, b"fram"),
+            (Import::Trig, b"trig"),
+            (Import::Rand, b"rand"),
         ]
     }
 }
