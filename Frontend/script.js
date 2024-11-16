@@ -275,7 +275,11 @@ function runCode() {
 }
 
 function openTab(event, tab) {
-  let tabContents = document.getElementsByClassName("tabContent");
+  openTabGeneric("tabContent","tabBtn",event,tab);
+}
+
+function openTabGeneric(contentClassName, buttonClassName, event, tab){
+  let tabContents = document.getElementsByClassName(contentClassName);
   for (let i = 0; i < tabContents.length; i++) {
     if (tabContents[i].id == tab) {
       tabContents[i].style.display = "block";
@@ -284,7 +288,7 @@ function openTab(event, tab) {
       tabContents[i].style.display = "none";
     }
   }
-  let tabs = document.getElementsByClassName("tabBtn");
+  let tabs = document.getElementsByClassName(buttonClassName);
   for (let i = 0; i < tabs.length; i++) {
     tabs[i].className = tabs[i].className.replace(" active", "");
   }
@@ -351,6 +355,7 @@ function setup_editor(startingCode) {
   });
   editor.setSize("100%", "100%");
 
+  const PARTS_OF_SPEECH = ["noun","verb","adjective","adverb","other"];
   /*
     Returns a node that contains the alternate word suggestions
   */
@@ -362,7 +367,6 @@ function setup_editor(startingCode) {
     let header = document.createElement("h1");
     let u = document.createElement("u");
     let words;
-    let options = ["noun","verb","adjective"]
     if(tooltip.type == "alias"){
       words = wordsForAliases[tooltip.value];
       u.innerHTML = "Words that trigger " + tooltip.value;
@@ -377,16 +381,47 @@ function setup_editor(startingCode) {
       words = getWordsThatContain(tooltip.name);
       u.innerHTML = "Words that contain the variable " + tooltip.name;
     }
+    let buttonContainer = document.createElement("div");
+    buttonContainer.className = "posTabGroup";
+    let tabContainer = document.createElement("div");
+    let tabContents = {};
+    for(let i = 0; i < PARTS_OF_SPEECH.length; i++){
+      let pos = PARTS_OF_SPEECH[i];
+      let posTabButton = document.createElement("button");
+      let posTabContent = document.createElement("div");
+      posTabContent.id = pos;
+      posTabButton.innerHTML = pos;
+      posTabButton.className = "posTabBtn";
+      if(i == 0){
+        posTabButton.className += " active";
+        posTabContent.style.display = "block";
+      }else{
+        posTabContent.style.display = "none";
+      }
+      posTabContent.className = "posTabContent";
+      posTabButton.onclick = (e)=>{
+        console.log("Button clicked");
+        openTabGeneric("posTabContent","posTabBtn",e,pos);
+      }
+      buttonContainer.appendChild(posTabButton);
+      tabContainer.appendChild(posTabContent);
+      tabContents[pos] = posTabContent;
+    }
     header.appendChild(u);
     widget.appendChild(header);
+    widget.appendChild(buttonContainer);
+    widget.appendChild(tabContainer);
     for (let i = 0; i < words.length; i++) {
-      let wordElement = document.createElement("p");
-      wordElement.innerHTML = words[i];
-      widget.appendChild(wordElement);
-      wordElement.onclick = () => {
-        editor.replaceRange(words[i], currentWordStart, currentWordEnd);
-        currentWordEnd = { line: currentWordStart.line, ch: currentWordStart.ch + words[i].length };
-      };
+      let matchingPos = partsOfSpeech[words[i]];
+      for(let j = 0; j < matchingPos.length; j++){
+        let wordElement = document.createElement("div");
+        wordElement.innerHTML = words[i];
+        wordElement.onclick = () => {
+          editor.replaceRange(words[i], currentWordStart, currentWordEnd);
+          currentWordEnd = { line: currentWordStart.line, ch: currentWordStart.ch + words[i].length };
+        };
+        tabContents[matchingPos[j]].appendChild(wordElement);
+      }
     }
     return widget;
   }
