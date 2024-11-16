@@ -40,11 +40,11 @@
     - [was - Variable Assign](Variable.md)
 - Boolean Operators
     - [als - And](And.md)
-    - [inv - Boolean Not](Not.md)
+    - [inv - Not](Not.md)
     - [les - Less Than](LessThan.md)
     - [mor - Greater Than](GreaterThan.md)
     - [oth - Or](Or.md)
-    - [par - Comparison](Comparison.md)
+    - [par - Equals](Comparison.md)
 - Other Language Features
     - [Punctuation](Punctuation.md)
     - [Literals](Literals.md)

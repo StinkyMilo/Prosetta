@@ -1,6 +1,6 @@
-# Par - Comparison
+# Par - Equals
 
-Comparison operator. Compares two values to see if they are the same. Has a very liberal definition of "the same" which can include values of different types (e.g. 1 and "1" are considered the same). This is equivalent to JavaScript's == operator.
+Equals (or Com*par*ison) operator. Compares two values to see if they are the same. Has a very liberal definition of "the same" which can include values of different types (e.g. 1 and "1" are considered the same). This is equivalent to JavaScript's == operator.
 
 ## Arguments
 
