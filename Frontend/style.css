@@ -54,16 +54,16 @@ div>canvas {
 
 .posTabContent {
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
   color: white;
-  font-size: 10px;
+  font-size: 12px;
   cursor: pointer
 }
 
 .posTabContent > div {
-  flex: 1 1 calc(33.33% - 10px);
   width: 33.33%;
-  padding: 10px;
+  padding: 5px;
 }
 
 .tabBtn {

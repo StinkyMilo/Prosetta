@@ -275,14 +275,14 @@ function runCode() {
 }
 
 function openTab(event, tab) {
-  openTabGeneric("tabContent","tabBtn",event,tab);
+  openTabGeneric("tabContent","tabBtn",event,tab, "block");
 }
 
-function openTabGeneric(contentClassName, buttonClassName, event, tab){
+function openTabGeneric(contentClassName, buttonClassName, event, tab, defaultDisplay){
   let tabContents = document.getElementsByClassName(contentClassName);
   for (let i = 0; i < tabContents.length; i++) {
     if (tabContents[i].id == tab) {
-      tabContents[i].style.display = "block";
+      tabContents[i].style.display = defaultDisplay;
     }
     else {
       tabContents[i].style.display = "none";
@@ -394,14 +394,14 @@ function setup_editor(startingCode) {
       posTabButton.className = "posTabBtn";
       if(i == 0){
         posTabButton.className += " active";
-        posTabContent.style.display = "block";
+        posTabContent.style.display = "flex";
       }else{
         posTabContent.style.display = "none";
       }
       posTabContent.className = "posTabContent";
       posTabButton.onclick = (e)=>{
         console.log("Button clicked");
-        openTabGeneric("posTabContent","posTabBtn",e,pos);
+        openTabGeneric("posTabContent","posTabBtn",e,pos,"flex");
       }
       buttonContainer.appendChild(posTabButton);
       tabContainer.appendChild(posTabContent);
