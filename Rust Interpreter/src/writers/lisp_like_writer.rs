@@ -478,12 +478,18 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
             format!(
                 "(rand{}{})",
                 join_locs(locs, Some(*end)),
-                write_exprs(exprs, indexes)
+                write_start_space(write_exprs(exprs, indexes))
             )
         }
     }
 }
-
+fn write_start_space(str: String) -> String {
+    if str.len() == 0 {
+        "".into()
+    } else {
+        " ".to_string() + &str
+    }
+}
 fn write_exprs(exprs: &ExprArena, indexes: &[usize]) -> String {
     write_mult_exprs(exprs, indexes, b' ', 0)
 }

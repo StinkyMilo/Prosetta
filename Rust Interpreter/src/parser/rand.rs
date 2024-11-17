@@ -33,7 +33,7 @@ impl BasicState for RandState {
     }
 
     fn add_child(&mut self, expr: &mut Expr, index: usize, _: ReturnType) {
-        if let Expr::Line { indexes, .. } = expr {
+        if let Expr::Rand { indexes, .. } = expr {
             indexes[self.count as usize] = index;
             self.count += 1;
         } else {
@@ -51,7 +51,7 @@ impl BasicState for RandState {
     }
 
     fn set_end(&mut self, expr: &mut Expr, index: End) {
-        if let Expr::Operator { end, .. } = expr {
+        if let Expr::Rand { end, .. } = expr {
             *end = index;
         } else {
             unreachable!()
