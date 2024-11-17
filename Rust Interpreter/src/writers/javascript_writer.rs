@@ -460,7 +460,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
             format!("Math.{name}({})", write_expr(exprs, *index, indent))
         }
         Expr::Rand { indexes, .. } => {
-            format!("rand({})", write_exprs(exprs, indexes, ", ", indent))
+            format!("get_random({})", write_exprs(exprs, indexes, ", ", indent))
         }
     }
 }
@@ -471,16 +471,21 @@ fn write_exprs(
     delimeter: &str,
     indent: &mut usize,
 ) -> String {
-    if indexes.len() == 0 {
-        return "".to_string();
-    }
-    let mut ret = String::new();
-    ret += write_expr(exprs, indexes[0], indent).as_str();
-    for index in &indexes[1..] {
-        if *index != usize::MAX {
-            ret += delimeter;
-            ret += write_expr(exprs, *index, indent).as_str();
-        }
-    }
-    ret
+    // if indexes.len() == 0 {
+    //     return "".to_string();
+    // }
+    // let mut ret = String::new();
+    // ret += write_expr(exprs, indexes[0], indent).as_str();
+    // for index in &indexes[1..] {
+    //     if *index != usize::MAX {
+    //         ret += delimeter;
+    //         ret += write_expr(exprs, *index, indent).as_str();
+    //     }
+    // }
+    // ret
+    indexes
+        .into_iter()
+        .filter_map(|&index| (index != usize::MAX).then(|| write_expr(exprs, index, indent)))
+        .collect::<Vec<_>>()
+        .join(delimeter)
 }

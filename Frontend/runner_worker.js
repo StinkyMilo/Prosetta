@@ -1,5 +1,5 @@
 var functions = [];
-onmessage = async function(e) {
+onmessage = async function (e) {
   let command = e.data.command;
   let data = e.data.data;
   switch (command) {
@@ -93,6 +93,25 @@ function get_color(...color) {
       return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
   }
 }
+
+function get_random(...args) {
+  let a = 0, b = 0;
+  switch (args.length) {
+    case 0:
+      return Math.random();
+    case 1:
+      a = args[0];
+      break;
+    case 2:
+      a = args[0];
+      b = args[1];
+      break;
+  }
+  let range = Math.abs(a - b);
+  let offset = Math.min(a, b);
+  return Math.floor(Math.random() * range) + offset;
+}
+
 
 function end_shape() {
   queue_function("end_shape", arguments);
