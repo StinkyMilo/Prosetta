@@ -37,6 +37,35 @@ div>canvas {
   margin-bottom: 10px;
 }
 
+.posTabBtn{
+  border-radius: 5px;
+}
+
+.posTabBtn.active {
+  background-color: gray;
+  color: white;
+  border-radius: 5px;
+}
+
+.posTabGroup{
+  display: flex;
+  margin-bottom: 12px;
+}
+
+.posTabContent {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  color: white;
+  font-size: 12px;
+  cursor: pointer
+}
+
+.posTabContent > div {
+  width: 33.33%;
+  padding: 5px;
+}
+
 .tabBtn {
   margin-right: 5px;
   border-radius: 5px;
@@ -90,8 +119,8 @@ body {
   position: absolute;
   background-color: darkslategrey;
   color: rgb(0, 0, 0);
-  width: 20vw;
-  height: 10vw;
+  width: 30vw;
+  height: 20vw;
   border: 1px solid black;
   border-radius: 0.5vw;
   box-shadow: 2px 4px 8px 2px rgba(0, 0, 0, 0.5);
@@ -101,13 +130,6 @@ body {
   overflow-y: scroll;
   overflow-x: hidden;
   z-index: 2;
-}
-
-.tooltip > p {
-  color: white;
-  margin-left:10px;
-  font-size: 10px;
-  cursor: pointer
 }
 
 .tooltip > h1{
