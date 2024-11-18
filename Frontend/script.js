@@ -1,7 +1,7 @@
 import { allWords, wordsForAliases, partsOfSpeech } from './wordsForAliases.js';
 import { Import } from './wasm-bindings/prosetta.js';
 
-var jscode, sourcecode, cnsl, curr_ctx, curr_canvas, displayed_ctx, displayed_canvas;
+var jscode, sourcecode, cnsl, curr_ctx, stack, curr_canvas, displayed_ctx, displayed_canvas, play_icon, pause_icon, toggle_btn;
 var x = 0, y = 0, rotation = 0;
 var has_drawn_shape = false;
 var last_shape = "none";
@@ -14,6 +14,7 @@ var curr_frame = 0;
 var latest_frame = 0;
 var last_frame_timestamp = Date.now();
 var target_fps = 30;
+var was_playing = true;
 
 function init_canvas() {
   cnsl.innerText = "";
@@ -274,6 +275,8 @@ function runCode() {
   // cnsl.scrollTop = cnsl.scrollHeight;
 }
 
+<<<<<<< HEAD
+=======
 function openTab(event, tab) {
   openTabGeneric("tabContent","tabBtn",event,tab, "block");
 }
@@ -295,6 +298,7 @@ function openTabGeneric(contentClassName, buttonClassName, event, tab, defaultDi
   event.currentTarget.className += " active";
 }
 
+>>>>>>> e9a572012cad68272561649d1552b5fdfda846e5
 function updateCode() {
   if (editor == null) {
     return;
@@ -307,14 +311,16 @@ async function initialize(startingCode) {
   language_worker?.terminate();
   sourcecode = document.getElementById("code");
   jscode = document.getElementById("js");
+  stack = document.getElementById("stack");
   curr_canvas = document.getElementById("outputcanvas");
   displayed_canvas = document.getElementById("outputcanvas2");
   curr_ctx = curr_canvas.getContext('2d');
   displayed_ctx = displayed_canvas.getContext('2d');
+  toggle_btn = document.getElementById("toggle-play");
+  play_icon = document.getElementById("play-icon");
+  pause_icon = document.getElementById("pause-icon");
   jscode.innerText = "";
   cnsl = document.getElementById("console");
-  let tabs = document.getElementsByClassName("tabBtn tabDefault");
-  tabs[0].click();
 
   setup_webworker();
   language_worker.postMessage({ command: "initialize" });
@@ -331,19 +337,19 @@ function msg_worker(command, data) {
   language_worker.postMessage({ command: command, data: data });
 }
 
-function getWordsOfLength(len,mod10){
-  if(mod10){
-    return allWords.filter((word)=>{
-      return word.length%10==len;
+function getWordsOfLength(len, mod10) {
+  if (mod10) {
+    return allWords.filter((word) => {
+      return word.length % 10 == len;
     })
   }
-  return allWords.filter((word)=>{
+  return allWords.filter((word) => {
     return word.length == len;
   });
 }
 
-function getWordsThatContain(substr){
-  return allWords.filter((word)=>{
+function getWordsThatContain(substr) {
+  return allWords.filter((word) => {
     return word.indexOf(substr.toLowerCase()) > -1;
   });
 }
@@ -367,17 +373,17 @@ function setup_editor(startingCode) {
     let header = document.createElement("h1");
     let u = document.createElement("u");
     let words;
-    if(tooltip.type == "alias"){
+    if (tooltip.type == "alias") {
       words = wordsForAliases[tooltip.value];
       u.innerHTML = "Words that trigger " + tooltip.value;
-    }else if(tooltip.type == "length"){
-      words = getWordsOfLength(tooltip.len,tooltip.mod10);
-      if(tooltip.mod10){
-        u.innerHTML = "Words of length " + tooltip.len + ", " + (tooltip.len+10) + " etc.";
-      }else{
+    } else if (tooltip.type == "length") {
+      words = getWordsOfLength(tooltip.len, tooltip.mod10);
+      if (tooltip.mod10) {
+        u.innerHTML = "Words of length " + tooltip.len + ", " + (tooltip.len + 10) + " etc.";
+      } else {
         u.innerHTML = "Words of length " + tooltip.len;
       }
-    }else if(tooltip.type == "variable"){
+    } else if (tooltip.type == "variable") {
       words = getWordsThatContain(tooltip.name);
       u.innerHTML = "Words that contain the variable " + tooltip.name;
     }
@@ -432,8 +438,8 @@ function setup_editor(startingCode) {
   let removeTimeout;
   let currentWordStart = { line: -1, ch: -1 };
   let currentWordEnd = { line: -1, ch: -1 };
-  let nextWordStart = {line: -1, ch: -1};
-  let nextWordEnd = {line: -1, ch: -1};
+  let nextWordStart = { line: -1, ch: -1 };
+  let nextWordEnd = { line: -1, ch: -1 };
 
   function clearWidget() {
     // removeWithFadeout(activeWidget);
@@ -675,9 +681,19 @@ function has_import(imp) {
   return imports.indexOf(imp) >= 0;
 }
 
+function toggle() {
+  if (frameInterval) {
+    pause();
+  } else {
+    play();
+  }
+}
 function play() {
   pause();
+  play_icon.style.display = "none";
+  pause_icon.style.display = "block";
   if (has_import(Import.Frame)) {
+    toggle_btn.style.display = "block"
     last_frame_timestamp = Date.now();
     frameInterval = setInterval(draw_frame);
   }
@@ -685,6 +701,13 @@ function play() {
 
 function pause() {
   clearInterval(frameInterval);
+  frameInterval = null;
+  play_icon.style.display = "block";
+  pause_icon.style.display = "none";
+}
+
+function reset() {
+  initialize(editor.getValue());
 }
 
 function draw_frame() {
@@ -706,8 +729,24 @@ function swap_canvases() {
   curr_canvas = temp_canvas;
 }
 
-window.pause = pause;
-window.play = play;
-window.openTab = openTab;
+function update_output() {
+  let checkbox = document.getElementById("output-toggle");
+  if (checkbox.checked) {
+    stack.style.display = "none";
+    jscode.style.display = "block";
+    was_playing = !!frameInterval;
+    pause();
+  } else {
+    stack.style.display = "block";
+    jscode.style.display = "none";
+    if (was_playing) {
+      play();
+    }
+  }
+}
+
+window.reset = reset;
+window.toggle = toggle;
+window.update_output = update_output;
 export default initialize;
 
