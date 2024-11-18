@@ -64,6 +64,41 @@ div>canvas {
   margin-right: 4px;
 }
 
+.posTabBtn{
+  border-radius: 5px;
+}
+
+.posTabBtn.active {
+  background-color: gray;
+  color: white;
+  border-radius: 5px;
+}
+
+.posTabGroup{
+  display: flex;
+  margin-bottom: 12px;
+}
+
+.posTabContent {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  color: white;
+  font-size: 12px;
+  cursor: pointer
+}
+
+.posTabContent > div {
+  width: 33.33%;
+  padding: 5px;
+}
+
+.tabBtn {
+  margin-right: 5px;
+  border-radius: 5px;
+>>>>>>> e9a572012cad68272561649d1552b5fdfda846e5
+}
+
 .switch input {
   opacity: 0;
   width: 0;
@@ -158,8 +193,8 @@ body {
   position: absolute;
   background-color: darkslategrey;
   color: rgb(0, 0, 0);
-  width: 20vw;
-  height: 10vw;
+  width: 30vw;
+  height: 20vw;
   border: 1px solid black;
   border-radius: 0.5vw;
   box-shadow: 2px 4px 8px 2px rgba(0, 0, 0, 0.5);
@@ -171,6 +206,7 @@ body {
   z-index: 2;
 }
 
+<<<<<<< HEAD
 .tooltip>p {
   color: white;
   margin-left: 10px;
@@ -179,6 +215,9 @@ body {
 }
 
 .tooltip>h1 {
+=======
+.tooltip > h1{
+>>>>>>> e9a572012cad68272561649d1552b5fdfda846e5
   color: white;
   font-size: 16px;
   margin-top: 1px;

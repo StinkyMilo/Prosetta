@@ -51,44 +51,28 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
             String::from_utf8_lossy(&var.name),
             write_expr(exprs, *value_index, indent)
         ),
-        Expr::Line {
-            locs: _,
-            indexes,
-            end: _,
-        } => {
+        Expr::Line { indexes, .. } => {
             format!(
                 "{}draw_line({});",
                 get_indent(indent),
                 write_exprs(exprs, indexes, ", ", indent)
             )
         }
-        Expr::Bezier {
-            locs: _,
-            indexes,
-            end: _,
-        } => {
+        Expr::Bezier { indexes, .. } => {
             format!(
                 "{}draw_bezier({});",
                 get_indent(indent),
                 write_exprs(exprs, indexes, ", ", indent)
             )
         }
-        Expr::Arc {
-            locs: _,
-            indexes,
-            end: _,
-        } => {
+        Expr::Arc { indexes, .. } => {
             format!(
                 "{}draw_ellipse({});",
                 get_indent(indent),
                 write_exprs(exprs, indexes, ", ", indent)
             )
         }
-        Expr::Rect {
-            locs: _,
-            indexes,
-            end: _,
-        } => {
+        Expr::Rect { indexes, .. } => {
             format!(
                 "{}draw_rect({});",
                 get_indent(indent),
@@ -96,17 +80,9 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
             )
         }
         Expr::Var { var } => format!("{}_var", String::from_utf8_lossy(&var.name).to_string()),
-        Expr::WordNum {
-            locs: _,
-            str_start: _,
-            str_len,
-            end: _,
-        } => str_len.to_string(),
+        Expr::WordNum { str_len, .. } => str_len.to_string(),
         Expr::Operator {
-            locs: _,
-            func_type,
-            indexes,
-            end: _,
+            func_type, indexes, ..
         } => {
             let ret = match func_type {
                 OperatorType::Log => {
@@ -189,11 +165,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
             }
             // format!("{} {}", name, write_exprs(exprs, indexes))
         }
-        Expr::LitNum {
-            str_start: _,
-            str_length: _,
-            value,
-        } => value.to_string(),
+        Expr::LitNum { value, .. } => value.to_string(),
         Expr::MultiLitNum {
             values,
             single_value,
@@ -470,9 +442,25 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
         }
         Expr::Frame { .. } => {
             format!("_frame")
-        },
+        }
         Expr::Comment { comment, .. } => {
-            format!("/* {} */",str::replace(&String::from_utf8_lossy(comment),"*/","* /"))
+            format!(
+                "/* {} */",
+                str::replace(&String::from_utf8_lossy(comment), "*/", "* /")
+            )
+        }
+        Expr::Trig {
+            func_type, index, ..
+        } => {
+            let name = match func_type {
+                TrigType::Sin => "sin",
+                TrigType::Cos => "cos",
+                TrigType::Tan => "tan",
+            };
+            format!("Math.{name}({}*Math.PI/180)", write_expr(exprs, *index, indent))
+        }
+        Expr::Rand { indexes, .. } => {
+            format!("get_random({})", write_exprs(exprs, indexes, ", ", indent))
         }
     }
 }
@@ -483,16 +471,21 @@ fn write_exprs(
     delimeter: &str,
     indent: &mut usize,
 ) -> String {
-    if indexes.len() == 0 {
-        return "".to_string();
-    }
-    let mut ret = String::new();
-    ret += write_expr(exprs, indexes[0], indent).as_str();
-    for index in &indexes[1..] {
-        if *index != usize::MAX {
-            ret += delimeter;
-            ret += write_expr(exprs, *index, indent).as_str();
-        }
-    }
-    ret
+    // if indexes.len() == 0 {
+    //     return "".to_string();
+    // }
+    // let mut ret = String::new();
+    // ret += write_expr(exprs, indexes[0], indent).as_str();
+    // for index in &indexes[1..] {
+    //     if *index != usize::MAX {
+    //         ret += delimeter;
+    //         ret += write_expr(exprs, *index, indent).as_str();
+    //     }
+    // }
+    // ret
+    indexes
+        .into_iter()
+        .filter_map(|&index| (index != usize::MAX).then(|| write_expr(exprs, index, indent)))
+        .collect::<Vec<_>>()
+        .join(delimeter)
 }

@@ -9,6 +9,8 @@ export enum Import {
   Func = 1,
   Graph = 2,
   Frame = 3,
+  Trig = 4,
+  Rand = 5,
 }
 export class Highlight {
   free(): void;

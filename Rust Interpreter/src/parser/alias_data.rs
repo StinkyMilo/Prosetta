@@ -34,6 +34,12 @@ const LIST_EXPR_ALIASES: &[ExprTrigger] = &[
 ];
 const GRAPH_EXPR_ALIASES: &[ExprTrigger] = &[(b"col", Types::Color)];
 const FRAME_EXPR_ALIASES: &[ExprTrigger] = &[(b"fra", Types::Number)];
+const TRIG_EXPR_ALIASES: &[ExprTrigger] = &[
+    (b"sin", Types::Number),
+    (b"cos", Types::Number),
+    (b"tan", Types::Number),
+];
+const RAND_EXPR_ALIASES: &[ExprTrigger] = &[(b"ran", Types::Number)];
 
 const BASE_STAT_ALIASES: &[StatTrigger] = &[b"was", b"pri", b"whe", b"whi", b"els", b"not"];
 
@@ -70,6 +76,13 @@ fn get_expr_state(alias: &'static [u8]) -> Box<dyn ParseState> {
         b"ind" => get_state!(index::IndexState::new()),
         b"cou" => get_state!(len::LengthState::new()),
         b"fra" => get_state!(frame::FrameState::new()),
+
+        b"sin" => get_state!(trig::TrigState::new_sin()),
+        b"cos" => get_state!(trig::TrigState::new_cos()),
+        b"tan" => get_state!(trig::TrigState::new_tan()),
+
+        b"ran" => get_state!(rand::RandState::new()),
+
         _ => unreachable!("Got unknown alias {}", std::str::from_utf8(alias).unwrap()),
     }
 }
@@ -189,6 +202,8 @@ impl AliasData {
             Import::Func => (&[], FUNC_STAT_ALIASES),
             Import::Graph => (GRAPH_EXPR_ALIASES, GRAPH_STAT_ALIASES),
             Import::Frame => (FRAME_EXPR_ALIASES, &[]),
+            Import::Trig => (TRIG_EXPR_ALIASES, &[]),
+            Import::Rand => (RAND_EXPR_ALIASES, &[]),
         }
     }
 }
