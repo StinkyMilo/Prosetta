@@ -1,7 +1,7 @@
 import { allWords, wordsForAliases } from './wordsForAliases.js';
 import { Import } from './wasm-bindings/prosetta.js';
 
-var jscode, sourcecode, cnsl, curr_ctx, stack, curr_canvas, displayed_ctx, displayed_canvas, toggle_icon, toggle_btn;
+var jscode, sourcecode, cnsl, curr_ctx, stack, curr_canvas, displayed_ctx, displayed_canvas, play_icon, pause_icon, toggle_btn;
 var x = 0, y = 0, rotation = 0;
 var has_drawn_shape = false;
 var last_shape = "none";
@@ -293,7 +293,8 @@ async function initialize(startingCode) {
   curr_ctx = curr_canvas.getContext('2d');
   displayed_ctx = displayed_canvas.getContext('2d');
   toggle_btn = document.getElementById("toggle-play");
-  toggle_icon = toggle_btn.children[0];
+  play_icon = document.getElementById("play-icon");
+  pause_icon = document.getElementById("pause-icon");
   jscode.innerText = "";
   cnsl = document.getElementById("console");
 
@@ -633,7 +634,8 @@ function toggle() {
 }
 function play() {
   pause();
-  toggle_icon.src = "icons/pause.svg";
+  play_icon.style.display = "none";
+  pause_icon.style.display = "block";
   if (has_import(Import.Frame)) {
     toggle_btn.style.display = "block"
     last_frame_timestamp = Date.now();
@@ -644,7 +646,8 @@ function play() {
 function pause() {
   clearInterval(frameInterval);
   frameInterval = null;
-  toggle_icon.src = "icons/play.svg";
+  play_icon.style.display = "block";
+  pause_icon.style.display = "none";
 }
 
 function reset() {
