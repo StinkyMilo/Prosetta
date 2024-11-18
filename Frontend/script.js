@@ -275,8 +275,6 @@ function runCode() {
   // cnsl.scrollTop = cnsl.scrollHeight;
 }
 
-<<<<<<< HEAD
-=======
 function openTab(event, tab) {
   openTabGeneric("tabContent", "tabBtn", event, tab, "block");
 }
@@ -298,7 +296,6 @@ function openTabGeneric(contentClassName, buttonClassName, event, tab, defaultDi
   event.currentTarget.className += " active";
 }
 
->>>>>>> e9a572012cad68272561649d1552b5fdfda846e5
 function updateCode() {
   if (editor == null) {
     return;
