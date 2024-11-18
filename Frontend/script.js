@@ -275,10 +275,10 @@ function runCode() {
 }
 
 function openTab(event, tab) {
-  openTabGeneric("tabContent","tabBtn",event,tab, "block");
+  openTabGeneric("tabContent", "tabBtn", event, tab, "block");
 }
 
-function openTabGeneric(contentClassName, buttonClassName, event, tab, defaultDisplay){
+function openTabGeneric(contentClassName, buttonClassName, event, tab, defaultDisplay) {
   let tabContents = document.getElementsByClassName(contentClassName);
   for (let i = 0; i < tabContents.length; i++) {
     if (tabContents[i].id == tab) {
@@ -355,7 +355,7 @@ function setup_editor(startingCode) {
   });
   editor.setSize("100%", "100%");
 
-  const PARTS_OF_SPEECH = ["noun","verb","adjective","adverb","other"];
+  const PARTS_OF_SPEECH = ["noun", "verb", "adjective", "adverb", "other"];
   /*
     Returns a node that contains the alternate word suggestions
   */
@@ -385,23 +385,23 @@ function setup_editor(startingCode) {
     buttonContainer.className = "posTabGroup";
     let tabContainer = document.createElement("div");
     let tabContents = {};
-    for(let i = 0; i < PARTS_OF_SPEECH.length; i++){
+    for (let i = 0; i < PARTS_OF_SPEECH.length; i++) {
       let pos = PARTS_OF_SPEECH[i];
       let posTabButton = document.createElement("button");
       let posTabContent = document.createElement("div");
       posTabContent.id = pos;
       posTabButton.innerHTML = pos;
       posTabButton.className = "posTabBtn";
-      if(i == 0){
+      if (i == 0) {
         posTabButton.className += " active";
         posTabContent.style.display = "flex";
-      }else{
+      } else {
         posTabContent.style.display = "none";
       }
       posTabContent.className = "posTabContent";
-      posTabButton.onclick = (e)=>{
+      posTabButton.onclick = (e) => {
         console.log("Button clicked");
-        openTabGeneric("posTabContent","posTabBtn",e,pos,"flex");
+        openTabGeneric("posTabContent", "posTabBtn", e, pos, "flex");
       }
       buttonContainer.appendChild(posTabButton);
       tabContainer.appendChild(posTabContent);
@@ -413,7 +413,7 @@ function setup_editor(startingCode) {
     widget.appendChild(tabContainer);
     for (let i = 0; i < words.length; i++) {
       let matchingPos = partsOfSpeech[words[i]];
-      for(let j = 0; j < matchingPos.length; j++){
+      for (let j = 0; j < matchingPos.length; j++) {
         let wordElement = document.createElement("div");
         wordElement.innerHTML = words[i];
         wordElement.onclick = () => {
@@ -710,4 +710,3 @@ window.pause = pause;
 window.play = play;
 window.openTab = openTab;
 export default initialize;
-

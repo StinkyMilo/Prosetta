@@ -37,7 +37,16 @@ div>canvas {
   margin-bottom: 10px;
 }
 
-.posTabBtn{
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 20px;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.posTabBtn {
   border-radius: 5px;
 }
 
@@ -47,7 +56,7 @@ div>canvas {
   border-radius: 5px;
 }
 
-.posTabGroup{
+.posTabGroup {
   display: flex;
   margin-bottom: 12px;
 }
@@ -61,7 +70,7 @@ div>canvas {
   cursor: pointer
 }
 
-.posTabContent > div {
+.posTabContent>div {
   width: 33.33%;
   padding: 5px;
 }
@@ -132,7 +141,14 @@ body {
   z-index: 2;
 }
 
-.tooltip > h1{
+.tooltip>p {
+  color: white;
+  margin-left: 10px;
+  font-size: 10px;
+  cursor: pointer
+}
+
+.tooltip>h1 {
   color: white;
   font-size: 16px;
   margin-top: 1px;
