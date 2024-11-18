@@ -30,9 +30,13 @@ It is truly a miracle that they lived.
 </head>
 
 <body>
-  <div id="tabGroup">
-    <button class="tabBtn tabDefault" onclick="openTab(event, 'code')">Code</button>
-    <button class="tabBtn" onclick="openTab(event, 'js')">JS</button>
+  <div id="output-toggle-container">
+    Canvas
+    <label class="switch">
+      <input id="output-toggle" type="checkbox" onchange="update_output();">
+      <span class="slider"></span>
+    </label>
+    JavaScript
   </div>
   <div id="codespace">
     <div class="tabContent noScroll" id="code"></div>
@@ -42,8 +46,13 @@ It is truly a miracle that they lived.
       <canvas id="outputcanvas2" style="visibility: hidden;" width="400px" height="400px"></canvas>
     </div>
   </div>
-  <button onclick="play()">⏵</button>
-  <button onclick="pause()">⏸</button>
+  <div id="controls">
+    <button id="reset" onclick="reset()"><img src="icons/reset.svg"></img></button>
+    <button id="toggle-play" style="display: none;" onclick="toggle()">
+      <img id="pause-icon" src="icons/pause.svg"></img>
+      <img id="play-icon" src="icons/play.svg"></img>
+    </button>
+  </div>
   <div id="console" />
 </body>
 
