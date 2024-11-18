@@ -14,6 +14,8 @@ mod test_operators;
 mod test_other;
 mod test_print;
 mod test_shapes;
+mod test_trig;
 mod test_types_cache;
+mod test_rand_floor;
 
 mod testing;

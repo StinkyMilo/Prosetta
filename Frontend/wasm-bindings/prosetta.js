@@ -232,7 +232,7 @@ function logError(f, args) {
     }
 }
 
-export const Import = Object.freeze({ List:0,"0":"List",Func:1,"1":"Func",Graph:2,"2":"Graph",Frame:3,"3":"Frame", });
+export const Import = Object.freeze({ List:0,"0":"List",Func:1,"1":"Func",Graph:2,"2":"Graph",Frame:3,"3":"Frame",Trig:4,"4":"Trig",Rand:5,"5":"Rand", });
 
 const HighlightFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
