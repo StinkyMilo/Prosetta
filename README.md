@@ -9,3 +9,5 @@ Other word frequency items
 https://www.kaggle.com/datasets/rtatman/english-word-frequency?resource=download
 
 https://github.com/verachell/English-word-lists-parts-of-speech-approximate
+
+https://github.com/dwyl/english-words
