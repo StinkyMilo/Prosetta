@@ -356,7 +356,8 @@ function setup_editor(startingCode) {
     value: "",
     mode: "plaintext",
     lineWrapping:true,
-    lineNumbers:true
+    lineNumbers:true,
+    theme:"xq-dark"
   });
   editor.setSize("100%", "100%");
 
