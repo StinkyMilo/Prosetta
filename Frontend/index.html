@@ -32,10 +32,9 @@ It is truly a miracle that they lived.
 <body>
   <div id="output-toggle-container">
     Canvas
-    <label class="switch">
-      <input id="output-toggle" type="checkbox" onchange="update_output();">
+    <div class="switch" id="output-toggle" onmousedown="toggle_canvas();">
       <span class="slider"></span>
-    </label>
+    </div>
     JavaScript
   </div>
   <div id="codespace">
@@ -47,8 +46,8 @@ It is truly a miracle that they lived.
     </div>
   </div>
   <div id="controls">
-    <button id="reset" onclick="reset()"><img src="icons/reset.svg"></img></button>
-    <button id="toggle-play" style="display: none;" onclick="toggle()">
+    <button id="reset" onmousedown="reset()"><img src="icons/reset.svg"></img></button>
+    <button id="toggle-play" style="display: none;" onmousedown="toggle()">
       <img id="pause-icon" src="icons/pause.svg"></img>
       <img id="play-icon" src="icons/play.svg"></img>
     </button>

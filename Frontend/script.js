@@ -1,7 +1,7 @@
 import { allWords, wordsForAliases, partsOfSpeech } from './wordsForAliases.js';
 import { Import } from './wasm-bindings/prosetta.js';
 
-var jscode, sourcecode, cnsl, curr_ctx, stack, curr_canvas, displayed_ctx, displayed_canvas, play_icon, pause_icon, toggle_btn;
+var jscode, sourcecode, cnsl, curr_ctx, stack, curr_canvas, displayed_ctx, displayed_canvas, play_icon, pause_icon, toggle_btn, output_toggle_btn;
 var x = 0, y = 0, rotation = 0;
 var has_drawn_shape = false;
 var last_shape = "none";
@@ -306,6 +306,7 @@ function updateCode() {
 
 async function initialize(startingCode) {
   language_worker?.terminate();
+  output_toggle_btn = document.getElementById("output-toggle");
   sourcecode = document.getElementById("code");
   jscode = document.getElementById("js");
   stack = document.getElementById("stack");
@@ -318,6 +319,8 @@ async function initialize(startingCode) {
   pause_icon = document.getElementById("pause-icon");
   jscode.innerText = "";
   cnsl = document.getElementById("console");
+  showing_canvas = true;
+  update_output();
 
   setup_webworker();
   language_worker.postMessage({ command: "initialize" });
@@ -727,22 +730,36 @@ function swap_canvases() {
 }
 
 function update_output() {
-  let checkbox = document.getElementById("output-toggle");
-  if (checkbox.checked) {
-    stack.style.display = "none";
-    jscode.style.display = "block";
-    was_playing = !!frameInterval;
-    pause();
-  } else {
+  if (showing_canvas) {
+    output_toggle_btn.style.backgroundColor = "lightGrey";
+    output_toggle_btn.children[0].style.webkitTransform = "translateX(0px)";
+    output_toggle_btn.children[0].style.msTransform = "translateX(0px)";
+    output_toggle_btn.children[0].style.transform = "translateX(0px)";
     stack.style.display = "block";
     jscode.style.display = "none";
     if (was_playing) {
       play();
     }
+  } else {
+    output_toggle_btn.style.backgroundColor = "black";
+    output_toggle_btn.children[0].style.webkitTransform = "translateX(26px)";
+    output_toggle_btn.children[0].style.msTransform = "translateX(26px)";
+    output_toggle_btn.children[0].style.transform = "translateX(26px)";
+    stack.style.display = "none";
+    jscode.style.display = "block";
+    was_playing = !!frameInterval;
+    pause();
   }
+}
+
+var showing_canvas = true;
+function toggle_canvas() {
+  showing_canvas = !showing_canvas;
+  update_output();
 }
 
 window.reset = reset;
 window.toggle = toggle;
+window.toggle_canvas = toggle_canvas;
 window.update_output = update_output;
 export default initialize;
