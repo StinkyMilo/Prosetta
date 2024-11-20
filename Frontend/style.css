@@ -1,8 +1,8 @@
-div {
+#stack {
   position: relative;
 }
 
-div>canvas {
+#stack>canvas {
   position: absolute;
   background: white;
   margin-left: 10px;
@@ -31,7 +31,7 @@ div>canvas {
 
 .tabContent {
   box-sizing: border-box;
-  width: 533px;
+  width: 800px;
   height: 400px;
   overflow: scroll;
   margin-right: 10px;
