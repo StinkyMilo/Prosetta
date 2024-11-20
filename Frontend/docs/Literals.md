@@ -4,7 +4,7 @@ Integer literals can be constructed in a few different ways. To hide them among 
 
 # Colors
 
-Colors can be constructed with the color constructor, but their names can be directly stated. This works for any color recognized as a string in JavaScript/CSS, a list of which can be found here. For colors that are multiple words, you can break them up at the word level. For example, `darkslategrey`, `dark slategrey`, `darkslate grey`, and `dark slate grey` will all evaluate to `darkslategrey`. These color literals are stored as strings in JS and can be passed into any function that takes a color.
+Colors can be constructed with the color constructor, but their names can be directly stated. This works for any color recognized as a string in JavaScript/CSS (except for `tan` due to its conflicts with the [tan](Tangent.md) alias), a list of which can be found here. For colors that are multiple words, you can break them up at the word level. For example, `darkslategrey`, `dark slategrey`, `darkslate grey`, and `dark slate grey` will all evaluate to `darkslategrey`. These color literals are stored as strings in JS and can be passed into any function that takes a color.
 
 # Strings
 

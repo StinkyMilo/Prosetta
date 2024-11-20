@@ -38,7 +38,7 @@ pub fn get_color_word(word_so_far: &[u8], word: &[u8]) -> LitColorFoundResult {
             | b"palevioletred" | b"papayawhip" | b"peachpuff" | b"peru" | b"pink" | b"plum" | b"powderblue"
             | b"rebeccapurple" | b"rosybrown" | b"royalblue" | b"saddlebrown" | b"salmon"
             | b"sandybrown" | b"seagreen" | b"seashell" | b"sienna" | b"skyblue" | b"slateblue"
-            | b"slategray" | b"slategrey" | b"snow" | b"springgreen" | b"steelblue" | b"tan"
+            | b"slategray" | b"slategrey" | b"snow" | b"springgreen" | b"steelblue"
             | b"thistle" | b"tomato" | b"transparent" | b"turquoise" | b"violet" | b"wheat"
             | b"whitesmoke" | b"yellowgreen"
                 => LitColorFoundResult::Found,
