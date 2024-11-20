@@ -1,6 +1,7 @@
 - Language Overview
     - [Using the Language](README.md#using-the-language)
     - [The Alias System](README.md#the-alias-system)
+    - [Types](README.md#types-in-prosetta)
     - [Imports](Imports.md)
     - [Key Vocabulary](Glossary.md)
         - [Word](Glossary.md#Word)
