@@ -354,7 +354,9 @@ function getWordsThatContain(substr) {
 function setup_editor(startingCode) {
   editor = CodeMirror(document.getElementById("code"), {
     value: "",
-    mode: "plaintext"
+    mode: "plaintext",
+    lineWrapping:true,
+    lineNumbers:true
   });
   editor.setSize("100%", "100%");
 
