@@ -18,7 +18,7 @@ impl BasicState for ReturnState {
     }
 
     fn get_child_type(&self) -> Types {
-        Types::Number
+        Types::Any
     }
 
     fn can_happen(&self, env: &mut Environment) -> bool {
