@@ -1,6 +1,6 @@
 # Tan - Tangent
 
-Tangent function. Takes a number in degrees and returns its tangent. Due to floating point precision errors, values that should be zero are instead very close to 0.
+Tangent function. Takes a number in degrees and returns its tangent. Due to floating point precision errors, values that should be zero are instead very close to 0. When writing minimal code, make sure to add at least one letter to the alias to avoid conflicting with the `tan` color literal.
 
 ## Arguments
 
@@ -13,7 +13,7 @@ Tangent Example
 by Milo Jacobs and The Trigonometry Baby\n
 was num 0.
 whi les num 360.
-    pri "Tangent of num is" tan num..
+    pri "Tangent of num is" tang num..
     was num add num 45..
 .
 `'

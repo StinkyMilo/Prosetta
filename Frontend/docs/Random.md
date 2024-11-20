@@ -18,7 +18,7 @@ Random number generator. With no arguments, it generates a random float between 
 <editor :code="`
 Random Example
 by Milo Jacobs and Randall Markov\n
-pri rand. rand 11. rand 1 7..
+pri ran. ran 11. ran 1 7..
 `" 
 :code-wordier="`
 Random Example
