@@ -34,8 +34,8 @@ mod test_docs {
                     ParserSource::from_string(code.as_bytes().to_vec()),
                 );
                 assert_eq!(
-                    js_output.as_ref().unwrap().to_string(),
                     get_js(&data),
+                    js_output.as_ref().unwrap().to_string(),
                     "For file path {}",
                     path
                 );
@@ -50,7 +50,7 @@ mod test_docs {
                         runner_flags.clone(),
                         ParserSource::from_string(code.as_bytes().to_vec()),
                     );
-                    assert_eq!(js, get_js(&data), "For file path {}", path);
+                    assert_eq!(get_js(&data), js, "For file path {}", path);
                 }
                 None => (),
             }
