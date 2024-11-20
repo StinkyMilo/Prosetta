@@ -1,3 +1,5 @@
+use bitflags::iter::Iter;
+use std::iter::Map;
 use std::ops::Index;
 
 use crate::parser::multi_lit_num::VarOrInt;
@@ -20,7 +22,7 @@ bitflags! {
     }
 }
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 pub enum ReturnType {
     Void,
     Number,
@@ -29,6 +31,28 @@ pub enum ReturnType {
     Color,
     List,
     Any,
+}
+
+impl Types {
+    pub fn get_return(self) -> ReturnType {
+        match self {
+            Types::Number => ReturnType::Number,
+            Types::Bool => ReturnType::Bool,
+            Types::String => ReturnType::String,
+            Types::Color => ReturnType::Color,
+            Types::List => ReturnType::List,
+            Types::Any => ReturnType::Any,
+            _ => ReturnType::Void,
+        }
+    }
+
+    pub fn get_iter(self) -> Vec<ReturnType> {
+        if self == Types::Void {
+            vec![ReturnType::Void]
+        } else {
+            self.iter().map(Self::get_return).collect()
+        }
+    }
 }
 
 #[derive(PartialEq, Debug, Clone, Copy)]

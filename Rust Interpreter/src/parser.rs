@@ -171,8 +171,6 @@ pub struct Parser<'a> {
     cached_fails: FailMap,
     ///does the parser need to parse a title
     parse_title: bool,
-    //has the parser skipped a non Noneexpr state cache fail
-    has_skipped_cache_fail: bool,
 }
 
 impl<'a> Parser<'a> {
@@ -210,7 +208,6 @@ impl<'a> Parser<'a> {
             repeat_count: 0,
             stat_indexes: Vec::new(),
             cached_fails: FailMap::new(),
-            has_skipped_cache_fail: false,
         }
     }
     ///get the last state
@@ -301,25 +298,17 @@ impl<'a> Parser<'a> {
 
         // cache
         if !cfg!(feature = "no-cache") {
-            // give states a one step buffer into fail territory:
-            // noneexprs should always fail
-            // states that just started always fail
+            // only nonestates get cached
             if frame.state.get_type() == StateType::None
-                || matches!(self.last_result, LastMatchResult::New(..))
-                || self.has_skipped_cache_fail
+                && !matches!(self.last_result, LastMatchResult::Matched(..))
             {
-                let id = frame.state.get_name();
                 // does the failing range of the state include the current parsing location
-                let must_fail = self
-                    .cached_fails
-                    .contains(id, frame.types, frame.last_parse);
+                let must_fail = self.cached_fails.contains(frame.types, frame.last_parse);
 
                 if must_fail {
                     self.failed_func(None);
                     return ParserResult::CachedFail;
                 }
-            } else {
-                self.has_skipped_cache_fail = true;
             }
         }
         // should always be in bounds
@@ -439,11 +428,13 @@ impl<'a> Parser<'a> {
             {
                 self.stat_indexes.pop();
             }
-        } else if let Some(index) = rest_pos {
-            //insert the range of parsed words into map
-            let id = state.state.get_name();
-            self.cached_fails
-                .insert(id, state.types, state.first_parse..index);
+        } else if state_type == StateType::None {
+            if let Some(index) = rest_pos {
+                //insert the range of parsed words into map if none
+
+                self.cached_fails
+                    .insert(state.types, state.first_parse..index);
+            }
         }
 
         let state_pos = state.expr_index;
@@ -452,7 +443,6 @@ impl<'a> Parser<'a> {
         self.repeat_count = 0;
         self.last_state = Some(state);
         self.last_result = LastMatchResult::Failed;
-        self.has_skipped_cache_fail = false;
 
         // failed final stat - couldn't parse anything on line
         if self.stack.is_empty() {
@@ -505,7 +495,6 @@ impl<'a> Parser<'a> {
 
         self.repeat_count = 0;
         self.last_result = LastMatchResult::New(locs);
-        self.has_skipped_cache_fail = false;
 
         ParserResult::ContinueWith
     }
@@ -526,7 +515,6 @@ impl<'a> Parser<'a> {
             self.cached_fails.clear();
         }
         self.last_state = Some(state);
-        self.has_skipped_cache_fail = false;
 
         // matched final stat
         if self.stack.is_empty() {
@@ -559,8 +547,6 @@ impl<'a> Parser<'a> {
             let parent_state = self.stack.last_mut().unwrap();
             parent_state.last_parse = index;
 
-            // remove parent expr from cachefail map
-            self.cached_fails.remove(parent_state.state.get_name());
             ParserResult::Matched
         }
     }
