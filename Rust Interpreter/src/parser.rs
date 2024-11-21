@@ -296,6 +296,11 @@ impl<'a> Parser<'a> {
         let (parents, frame_arr) = self.stack.split_at_mut(stack_index);
         let frame = &mut frame_arr[0];
 
+        // setup slice
+        let line = self.data.source.get_line();
+        let mut start = frame.last_parse;
+        let (mut word, mut rest) = Self::get_slice(line, start);
+
         // cache
         if !cfg!(feature = "no-cache") {
             // only nonestates get cached
@@ -306,7 +311,7 @@ impl<'a> Parser<'a> {
                 let must_fail = self.cached_fails.contains(frame.types, frame.last_parse);
 
                 if must_fail {
-                    self.failed_func(None);
+                    self.failed_func(rest.pos);
                     return ParserResult::CachedFail;
                 }
             }
@@ -340,11 +345,6 @@ impl<'a> Parser<'a> {
         //     // let last_stat_index = self.data.exprs[last_stat];
         //     last_stat = split1.0.get_mut(index);
         // }
-
-        // setup slice
-        let line = self.data.source.get_line();
-        let mut start = frame.last_parse;
-        let (mut word, mut rest) = Self::get_slice(line, start);
 
         //New ignore code location
         while self.data.nots.try_get_val(&word, 0).is_some() {
@@ -409,13 +409,13 @@ impl<'a> Parser<'a> {
             // continue with me
             MatchResult::Continue(index) => self.continue_func(rest.pos + index),
             // I failed, go back on stack with fail
-            MatchResult::Failed => self.failed_func(Some(rest.pos)),
+            MatchResult::Failed => self.failed_func(rest.pos),
         }
     }
 
     ///this function is called if the step fails
     /// takes the postion of the rest of string if not cachedfailed
-    fn failed_func(&mut self, rest_pos: Option<usize>) -> ParserResult {
+    fn failed_func(&mut self, rest_pos: usize) -> ParserResult {
         let state = self.stack.pop().unwrap();
 
         let state_type = state.state.get_type();
@@ -429,12 +429,10 @@ impl<'a> Parser<'a> {
                 self.stat_indexes.pop();
             }
         } else if state_type == StateType::None {
-            if let Some(index) = rest_pos {
-                //insert the range of parsed words into map if none
+            //insert the range of parsed words into map if none
 
-                self.cached_fails
-                    .insert(state.types, state.first_parse..index);
-            }
+            self.cached_fails
+                .insert(state.types, state.first_parse..rest_pos);
         }
 
         let state_pos = state.expr_index;
