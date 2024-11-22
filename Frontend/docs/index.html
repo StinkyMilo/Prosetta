@@ -3,11 +3,12 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Document</title>
+  <title>Prosetta</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <meta name="description" content="Description">
+  <meta name="description" content="Poetic graphical esolang">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="../node_modules/docsify/lib/themes/vue.css">
+  <link rel="stylesheet" href="../node_modules/codemirror/theme/xq-dark.css">
   <style>
     .content {
       left: 200px;
@@ -55,12 +56,11 @@
           'template':
             `
             <button class="changeModeBtn" @click="switchMode()" v-show="codeWordier != null">Mode: {{mode}}</button>
-            <div>
+            <div id="output-toggle-container">
               Canvas
-              <label class="switch">
-                <input id="output-toggle" type="checkbox" onchange="update_output();">
+              <div class="switch" id="output-toggle" onmousedown="toggle_canvas();">
                 <span class="slider"></span>
-              </label>
+              </div>
               JavaScript
             </div>
             <div id="codespace">
@@ -74,8 +74,8 @@
                 </div>
             </div>
             <div id="controls">
-              <button id="reset" onclick="reset()"><img src="../icons/reset.svg"></img></button>
-              <button id="toggle-play" style="display: none;" onclick="toggle()">
+              <button id="reset" onmousedown="reset()"><img src="../icons/reset.svg"></img></button>
+              <button id="toggle-play" style="display: none;" onmousedown="toggle()">
                 <img id="pause-icon" src="../icons/pause.svg"></img>
                 <img id="play-icon" src="../icons/play.svg"></img>
               </button>

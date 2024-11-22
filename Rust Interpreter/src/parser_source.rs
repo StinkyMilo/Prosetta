@@ -2,6 +2,7 @@ use std::{
     fmt::Debug,
     io::{stdin, BufRead, StdinLock},
     iter::{self, Flatten},
+    mem,
 };
 
 use bstr::{ByteSlice, ByteVec};
@@ -61,17 +62,38 @@ impl<'a> ParserSource<'a> {
         self
     }
 
-    pub fn add_string(mut self, mut str: Vec<u8>) -> Self {
+    pub fn add_string(mut self, str: Vec<u8>) -> Self {
         // if last is not newline - add it
-        if does_str_need_newline(&str) {
-            str.push(b'\n');
+        // if does_str_need_newline(&str) {
+        //     str.push(b'\n');
+        // }
+        let mut paragraph = Vec::new();
+        let mut empty_line = false;
+        let mut first_text = false;
+        for slice in str.split_str("\n") {
+            // if is empty line -- change empty line
+            if slice.trim().len() == 0 {
+                empty_line = true;
+            } else {
+                // if empty line found -- make new buffer
+                if empty_line && first_text {
+                    println!("{:?}", paragraph);
+                    self.sources.push(Source::String {
+                        str: mem::take(&mut paragraph),
+                        first: true,
+                    });
+                }
+                empty_line = false;
+                first_text = true;
+            }
+            paragraph.push_str(slice);
+            paragraph.push(b'\n');
         }
-
-        for slice in str.split_str("\n\n") {
-            let mut str = slice.to_vec();
-            str.push_str(b"\n\n");
-            self.sources.push(Source::String { str, first: true });
-        }
+        println!("{:?}", paragraph);
+        self.sources.push(Source::String {
+            str: paragraph,
+            first: true,
+        });
 
         self
     }

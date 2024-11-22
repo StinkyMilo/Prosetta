@@ -1,8 +1,8 @@
-div {
+#stack {
   position: relative;
 }
 
-div>canvas {
+#stack>canvas {
   position: absolute;
   background: white;
   margin-left: 10px;
@@ -31,7 +31,7 @@ div>canvas {
 
 .tabContent {
   box-sizing: border-box;
-  width: 533px;
+  width: 800px;
   height: 400px;
   overflow: scroll;
   margin-right: 10px;
@@ -98,12 +98,6 @@ div>canvas {
   border-radius: 5px;
 }
 
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
 .slider {
   position: absolute;
   cursor: pointer;
@@ -111,7 +105,7 @@ div>canvas {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #ccc;
+  background-color: transparent;
   -webkit-transition: .1s;
   transition: .1s;
 }
@@ -126,20 +120,6 @@ div>canvas {
   background-color: white;
   -webkit-transition: .1s;
   transition: .1s;
-}
-
-input:checked+.slider {
-  background-color: black;
-}
-
-input:focus+.slider {
-  box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked+.slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
 }
 
 #output-toggle {
@@ -203,6 +183,7 @@ body {
   overflow-y: scroll;
   overflow-x: hidden;
   z-index: 2;
+  scrollbar-width: thin;
 }
 
 .tooltip>p {

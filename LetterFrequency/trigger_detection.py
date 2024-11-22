@@ -119,7 +119,11 @@ aliases = [
     "fin",
     "cou",
     "bez",
-    "fra"
+    "fra",
+    "ran",
+    "sin",
+    "cos",
+    "tan"
 ]
 
 if __name__ == "__main__":

@@ -34,7 +34,7 @@ fn main() {
                 Ok(v) => {
                     let path = v.path();
                     // We're only using ASCII so I think this is fine
-                    let path_str = path.display().to_string();
+                    let path_str = str::replace(&path.display().to_string(),"\\","/");
 
                     if path.is_file() && path_str.ends_with(".md") {
                         path_strs.push(path_str.clone());

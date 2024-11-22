@@ -1,6 +1,7 @@
 - Language Overview
     - [Using the Language](README.md#using-the-language)
     - [The Alias System](README.md#the-alias-system)
+    - [Types](README.md#types-in-prosetta)
     - [Imports](Imports.md)
     - [Key Vocabulary](Glossary.md)
         - [Word](Glossary.md#Word)
@@ -30,13 +31,17 @@
     - [fra - Frame](Frame.md)
 - Numbers and Math
     - [app - List Append](Append.md)
+    - [cos - Cosine](Cosine.md)
     - [cou - Length](Length.md)
     - [del - Delete](Delete.md)
     - [fin - Find](Find.md)
     - [ind - Index](Index.md)
     - [lis - List Constructor](List.md)
     - [pri - Print](Print.md)
+    - [ran - Random](Random.md)
     - [rep - List Replace](Replace.md)
+    - [sin - Sine](Sine.md)
+    - [tan - Tangent](Tangent.md)
     - [was - Variable Assign](Variable.md)
 - Boolean Operators
     - [als - And](And.md)
