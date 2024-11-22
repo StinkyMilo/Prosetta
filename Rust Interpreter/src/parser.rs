@@ -447,6 +447,7 @@ impl<'a> Parser<'a> {
             self.parsing_line = false;
             self.parse_title = false;
             self.data.stat_starts.pop();
+            self.cached_fails.clear();
             ParserResult::FailedLine
         } else {
             // setup result for next step
