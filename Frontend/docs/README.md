@@ -16,4 +16,10 @@ Each word triggers only one alias. If a word contains multiple aliases as subseq
 
 All aliases are essentially functions. Similar to Lisp, everything is written in prefix notation, meaning that code traditionally written as "2+3" would instead be written in Prosetta as "add 2 3.". Commands are implicitly opened when their alias is triggered and are closed by punctuation. Different punctuation closes different numbers of commands so as to facilitate closing of large amounts of punctuation at once.
 
+# Types in Prosetta
+
+Prosetta has a mix of strong and loose typing. Variables, like in JS, can be any type. Therefore, when using variables in functions and aliases, it's important to check that they are the proper type. 
+
+Aliases have specific types they are looking for, in a specific order. For example, the `fil` alias will look for a color, a single number, or 3 numbers. If you provide two numbers and a color, the alias will not close until it receives a third number. However, if you provide two numbers and a variable, it will close even if that variable happens to be a color. This will not fill with the color you expect, so it should be avoided!
+
 

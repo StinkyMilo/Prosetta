@@ -85,10 +85,38 @@ Any author with the substring _func_ in their name will import the functions lib
 ### Example
 ```
 The Rat Sandwich
-by Steve and John Perfunctory.
+by Milo Jacobs and John Perfunctory.
 ```
 
 ### Library
 The functions library imports the following aliases
 - [fun - Function](Function.md)
 - [ret - Return](Return.md)
+
+## Rand - Randomization
+Any author with the substring _rand_ in their name will import the random library.
+
+### Example
+```
+The Unpredictable Beast
+by Flynn Duniho and Randall Thunderton
+```
+
+### Library
+The random library imports the following aliases
+- [ran - Random](Random.md)
+
+## Trig - Trigonometry
+Any author with the substring _trig_ in their name will import the trigonometry library.
+
+### Example
+```
+The Mysterious Triangle
+by Nate Westfall and The Trigonometry Baby
+```
+
+### Library
+The trigonometry library imports the following aliases
+- [sin - Sine](Sine.md)
+- [cos - Cosine](Cosine.md)
+- [tan - Tangen](Tangent.md)
