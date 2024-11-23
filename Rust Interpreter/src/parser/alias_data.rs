@@ -43,7 +43,7 @@ const RAND_EXPR_ALIASES: &[ExprTrigger] = &[(b"ran", Types::Number)];
 
 const BASE_STAT_ALIASES: &[StatTrigger] = &[
     b"was", b"pri", b"whe", b"whi", b"els",
-    // b"not"
+    b"not"
 ];
 
 const LIST_STAT_ALIASES: &[StatTrigger] = &[b"fre", b"del", b"app", b"rep"];
