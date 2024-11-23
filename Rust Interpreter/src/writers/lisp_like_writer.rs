@@ -481,6 +481,13 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 write_start_space(write_exprs(exprs, indexes))
             )
         }
+        Expr::Floor { locs, index, end } => {
+            format!(
+                "(floor{} {})",
+                join_locs(locs, Some(*end)),
+                write_expr(exprs, *index, 0)
+            )
+        }
     }
 }
 fn write_start_space(str: String) -> String {

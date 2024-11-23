@@ -55,6 +55,7 @@ mod trig;
 mod var;
 mod while_stat;
 mod word_num;
+mod floor;
 
 #[path = "testing/mod.rs"]
 mod testing;

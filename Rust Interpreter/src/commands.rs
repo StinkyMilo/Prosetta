@@ -267,6 +267,11 @@ pub enum Expr {
         indexes: [usize; 2],
         end: End,
     },
+    Floor {
+        locs: Vec<usize>,
+        index: usize,
+        end: End,
+    },
 }
 
 impl Expr {

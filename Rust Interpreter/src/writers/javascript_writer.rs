@@ -457,10 +457,16 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
                 TrigType::Cos => "cos",
                 TrigType::Tan => "tan",
             };
-            format!("Math.{name}({}*Math.PI/180)", write_expr(exprs, *index, indent))
+            format!(
+                "Math.{name}({}*Math.PI/180)",
+                write_expr(exprs, *index, indent)
+            )
         }
         Expr::Rand { indexes, .. } => {
             format!("get_random({})", write_exprs(exprs, indexes, ", ", indent))
+        }
+        Expr::Floor { index, .. } => {
+            format!("Math.floor({})", write_expr(exprs, *index, indent))
         }
     }
 }
