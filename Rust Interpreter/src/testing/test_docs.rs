@@ -26,7 +26,7 @@ mod test_docs {
                 js_output = Some(
                     fs::read_to_string(output_path)
                         .expect("File not found")
-                        .replace("/r", ""),
+                        .replace("\r", ""),
                 );
                 let data = get_parsed_data(
                     parser_flags.clone(),
