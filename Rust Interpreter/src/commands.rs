@@ -82,6 +82,36 @@ pub enum Expr {
         indexes: [usize; 4],
         end: End,
     },
+    Star {
+        locs: Vec<usize>,
+        indexes: [usize; 4],
+        end: End,
+    },
+    Polygon {
+        locs: Vec<usize>,
+        indexes: [usize; 4],
+        end: End,
+    },
+    Triangle {
+        locs: Vec<usize>,
+        indexes: [usize; 4],
+        end: End,
+    },
+    Heart {
+        locs: Vec<usize>,
+        indexes: [usize; 4],
+        end: End,
+    },
+    RoundRec {
+        locs: Vec<usize>,
+        indexes: [usize; 4],
+        end: End,
+    },
+    Kirby {
+        locs: Vec<usize>,
+        indexes: [usize; 4],
+        end: End,
+    },
     Assign {
         locs: Vec<usize>,
         var: SubStrData,

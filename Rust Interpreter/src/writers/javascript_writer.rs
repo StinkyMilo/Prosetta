@@ -79,6 +79,48 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
                 write_exprs(exprs, indexes, ", ", indent)
             )
         }
+        Expr::Star { indexes, .. } => {
+            format!(
+                "{}draw_star({});",
+                get_indent(indent),
+                write_exprs(exprs, indexes, ", ", indent)
+            )
+        }
+        Expr::Polygon { indexes, .. } => {
+            format!(
+                "{}draw_poly({});",
+                get_indent(indent),
+                write_exprs(exprs, indexes, ", ", indent)
+            )
+        }
+        Expr::Triangle { indexes, .. } => {
+            format!(
+                "{}draw_tri({});",
+                get_indent(indent),
+                write_exprs(exprs, indexes, ", ", indent)
+            )
+        }
+        Expr::Heart { indexes, .. } => {
+            format!(
+                "{}draw_heart({});",
+                get_indent(indent),
+                write_exprs(exprs, indexes, ", ", indent)
+            )
+        }
+        Expr::RoundRec { indexes, .. } => {
+            format!(
+                "{}draw_round_rec({});",
+                get_indent(indent),
+                write_exprs(exprs, indexes, ", ", indent)
+            )
+        }
+        Expr::Kirby { indexes, .. } => {
+            format!(
+                "{}draw_kirby({});",
+                get_indent(indent),
+                write_exprs(exprs, indexes, ", ", indent)
+            )
+        }
         Expr::Var { var } => format!("{}_var", String::from_utf8_lossy(&var.name).to_string()),
         Expr::WordNum { str_len, .. } => str_len.to_string(),
         Expr::Operator {
@@ -457,7 +499,10 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
                 TrigType::Cos => "cos",
                 TrigType::Tan => "tan",
             };
-            format!("Math.{name}({}*Math.PI/180)", write_expr(exprs, *index, indent))
+            format!(
+                "Math.{name}({}*Math.PI/180)",
+                write_expr(exprs, *index, indent)
+            )
         }
         Expr::Rand { indexes, .. } => {
             format!("get_random({})", write_exprs(exprs, indexes, ", ", indent))
