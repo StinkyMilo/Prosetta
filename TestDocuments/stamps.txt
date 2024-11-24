@@ -1,7 +1,9 @@
 Title
 by Me, Stamp, Graph, fram, trig.
+tur ide fra 2..
 kir 400.
 pen 5.
+tur ide fra -2..
 sta 400.
 sto red.
 fil 0.
