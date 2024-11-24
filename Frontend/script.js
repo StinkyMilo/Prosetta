@@ -21,7 +21,8 @@ var was_playing = true;
 var currPath2D = null;
 /** @type Image
  */
-var kirby_image = null;
+var kirby_image = new Image();
+kirby_image.src = "icons/kirby.jpg";
 
 function init_canvas() {
   cnsl.innerText = "";
@@ -378,10 +379,6 @@ function draw_kirby() {
   curr_ctx.translate(x, y);
   curr_ctx.rotate(-rotation_radians());
   curr_ctx.translate(-width / 2, -height / 2);
-  if (kirby_image == null) {
-    kirby_image = new Image();
-    kirby_image.src = "icons/kirby.jpg";
-  }
   curr_ctx.drawImage(kirby_image, 0, 0, width, height);
   curr_ctx.restore();
   last_shape = "kirby";
