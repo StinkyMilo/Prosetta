@@ -48,6 +48,7 @@ mod rect;
 mod replace;
 mod return_stat;
 mod rotate;
+mod stamps;
 pub(crate) mod string_lit;
 mod stroke;
 mod title;
@@ -77,6 +78,7 @@ pub enum Import {
     Frame,
     Trig,
     Rand,
+    Stamp,
 }
 
 impl Import {
@@ -88,6 +90,7 @@ impl Import {
             Import::Frame => "Frame",
             Import::Trig => "Trig",
             Import::Rand => "Rand",
+            Import::Stamp => "Stamp",
         }
     }
     pub fn get_all() -> &'static [(Import, &'static [u8])] {
@@ -98,6 +101,7 @@ impl Import {
             (Import::Frame, b"fram"),
             (Import::Trig, b"trig"),
             (Import::Rand, b"rand"),
+            (Import::Stamp, b"stamp"),
         ]
     }
 }

@@ -1,0 +1,16 @@
+Title
+by Me, Stamp, Graph, fram, trig.
+kir 400.
+pen 5.
+sta 400.
+sto red.
+fil 0.
+tur fra.
+pol add tim sin tim frame 8.. 20. 80. add 3 mod ide fra 5. 8!.
+tur tim -2 fra..
+sto light blue.
+tri add tim sin tim fra 8.. 5. 20..
+tur tim ide -5 10. fra!
+roc 200 300 50.
+tur tim ide -5 10. fra!
+hea 200.

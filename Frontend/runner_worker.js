@@ -1,5 +1,5 @@
 var functions = [];
-onmessage = async function (e) {
+onmessage = async function(e) {
   let command = e.data.command;
   let data = e.data.data;
   switch (command) {
@@ -47,6 +47,30 @@ function reset_rotation() {
 
 function draw_rect() {
   queue_function("draw_rect", arguments);
+}
+
+function draw_star() {
+  queue_function("draw_star", arguments);
+}
+
+function draw_poly() {
+  queue_function("draw_poly", arguments);
+}
+
+function draw_tri() {
+  queue_function("draw_tri", arguments);
+}
+
+function draw_heart() {
+  queue_function("draw_heart", arguments);
+}
+
+function draw_round_rec() {
+  queue_function("draw_round_rec", arguments);
+}
+
+function draw_kirby() {
+  queue_function("draw_kirby", arguments);
 }
 
 function draw_ellipse() {
