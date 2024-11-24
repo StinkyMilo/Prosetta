@@ -21,8 +21,7 @@ var was_playing = true;
 var currPath2D = null;
 /** @type Image
  */
-var kirby_image = new Image();
-kirby_image.src = "icons/kirby.jpg";
+var kirby_image = null;
 
 function init_canvas() {
   cnsl.innerText = "";
@@ -352,7 +351,7 @@ function draw_round_rec() {
   last_shape = "round_rect";
 }
 
-function draw_kirby() {
+async function draw_kirby() {
   let width, height;
   switch (arguments.length) {
     case 1:
@@ -379,6 +378,14 @@ function draw_kirby() {
   curr_ctx.translate(x, y);
   curr_ctx.rotate(-rotation_radians());
   curr_ctx.translate(-width / 2, -height / 2);
+  if (kirby_image == null) {
+    kirby_image = await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = (err) => reject(err);
+      img.src = "icons/kirby.jpg";
+    });
+  }
   curr_ctx.drawImage(kirby_image, 0, 0, width, height);
   curr_ctx.restore();
   last_shape = "kirby";
@@ -843,13 +850,13 @@ function setup_runner() {
     "set_line_width": set_line_width,
     "end_shape": end_shape,
   };
-  runner_worker.onmessage = e => {
+  runner_worker.onmessage = async e => {
     let command = e.data.command;
     let data = e.data.data;
     switch (command) {
       case "finished":
         for (let funcCall of data) {
-          function_dict[funcCall.name](...funcCall.args);
+          await function_dict[funcCall.name](...funcCall.args);
         }
         if (has_import(Import.Frame)) {
           print_console("fps:", Math.round(1000 / (Date.now() - last_frame_timestamp)));
