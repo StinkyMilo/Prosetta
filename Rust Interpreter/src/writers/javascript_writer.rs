@@ -507,6 +507,9 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
         Expr::Rand { indexes, .. } => {
             format!("get_random({})", write_exprs(exprs, indexes, ", ", indent))
         }
+        Expr::Floor { index, .. } => {
+            format!("Math.floor({})", write_expr(exprs, *index, indent))
+        }
     }
 }
 
@@ -530,7 +533,11 @@ fn write_exprs(
     // ret
     indexes
         .into_iter()
-        .filter_map(|&index| (index != usize::MAX).then(|| write_expr(exprs, index, indent)))
+        .filter_map(|&index| {
+            (index != usize::MAX)
+                .then(|| write_expr(exprs, index, indent))
+                .filter(|e| !e.is_empty())
+        })
         .collect::<Vec<_>>()
         .join(delimeter)
 }
