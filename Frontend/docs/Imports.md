@@ -125,12 +125,12 @@ by Robert Dog and Stampton G. Stampton
 
 ### Library
 The stamp library imports the following aliases
-- [sta - Star](Star.md)
-- [pol - Polygon](Polygon.md)
-- [tri - Triangle](Triangle.md)
 - [hea - Heart](Heart.md)
-- [roc - Rounded Rectangle](RoundedRectangle.md)
 - [kir - Kirby](Kirby.md)
+- [pol - Polygon](Polygon.md)
+- [roc - Rounded Rectangle](RoundedRectangle.md)
+- [sta - Star](Star.md)
+- [tri - Triangle](Triangle.md)
 
 
 ## Trig - Trigonometry
