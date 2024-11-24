@@ -491,7 +491,11 @@ fn write_exprs(
     // ret
     indexes
         .into_iter()
-        .filter_map(|&index| (index != usize::MAX).then(|| write_expr(exprs, index, indent)))
+        .filter_map(|&index| {
+            (index != usize::MAX)
+                .then(|| write_expr(exprs, index, indent))
+                .filter(|e| !e.is_empty())
+        })
         .collect::<Vec<_>>()
         .join(delimeter)
 }

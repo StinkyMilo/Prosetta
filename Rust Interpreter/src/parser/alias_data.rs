@@ -17,6 +17,7 @@ const BASE_EXPR_ALIASES: &[ExprTrigger] = &[
     (b"mod", Types::Number),
     (b"log", Types::Number),
     (b"exp", Types::Number),
+    (b"flo", Types::Number),
     // boolean operators
     (b"les", Types::Bool),
     (b"mor", Types::Bool),
@@ -67,6 +68,7 @@ fn get_expr_state(alias: &'static [u8]) -> Box<dyn ParseState> {
         b"oth" => get_state!(operator::OperatorState::new_or()),
         b"par" => get_state!(operator::OperatorState::new_equals()),
         b"inv" => get_state!(operator::OperatorState::new_not()),
+        b"flo" => get_state!(floor::FloorState::new()),
 
         b"lit" => get_state!(multi_lit_num::MultiLitNumState::new()),
         b"int" => get_state!(word_num::WordNumState::new()),

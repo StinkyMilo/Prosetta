@@ -59,7 +59,7 @@ impl ParseState for FloorState {
 }
 
 impl FloorState {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self
     }
 }

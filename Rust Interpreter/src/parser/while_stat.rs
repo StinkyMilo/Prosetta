@@ -59,8 +59,11 @@ impl ParseState for WhileState {
                 }
             } else {
                 //and stat child
-                if let Some((index, _)) = child_index {
-                    self.has_stat = true;
+                if let Some((index, return_type)) = child_index {
+                    // needs to return void
+                    if return_type == ReturnType::Void {
+                        self.has_stat = true;
+                    }
                     indexes.push(index);
                 }
 
