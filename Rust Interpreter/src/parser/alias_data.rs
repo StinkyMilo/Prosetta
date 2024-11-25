@@ -17,6 +17,7 @@ const BASE_EXPR_ALIASES: &[ExprTrigger] = &[
     (b"mod", Types::Number),
     (b"log", Types::Number),
     (b"exp", Types::Number),
+    (b"flo", Types::Number),
     // boolean operators
     (b"les", Types::Bool),
     (b"mor", Types::Bool),
@@ -51,6 +52,8 @@ const GRAPH_STAT_ALIASES: &[StatTrigger] = &[
     b"sto", b"fil", b"pen", // shape modifiers
 ];
 
+const STAMP_STAT_ALIASES: &[StatTrigger] = &[b"sta", b"pol", b"tri", b"hea", b"roc", b"kir"];
+
 ///match alias to expr
 fn get_expr_state(alias: &'static [u8]) -> Box<dyn ParseState> {
     match alias {
@@ -67,6 +70,7 @@ fn get_expr_state(alias: &'static [u8]) -> Box<dyn ParseState> {
         b"oth" => get_state!(operator::OperatorState::new_or()),
         b"par" => get_state!(operator::OperatorState::new_equals()),
         b"inv" => get_state!(operator::OperatorState::new_not()),
+        b"flo" => get_state!(floor::FloorState::new()),
 
         b"lit" => get_state!(multi_lit_num::MultiLitNumState::new()),
         b"int" => get_state!(word_num::WordNumState::new()),
@@ -90,6 +94,12 @@ fn get_expr_state(alias: &'static [u8]) -> Box<dyn ParseState> {
 /// match alias to stat
 fn get_stat_state(alias: &'static [u8]) -> Box<dyn ParseState> {
     match alias {
+        b"sta" => get_state!(stamps::StarState::new()),
+        b"pol" => get_state!(stamps::PolygonState::new()),
+        b"tri" => get_state!(stamps::TriangleState::new()),
+        b"hea" => get_state!(stamps::HeartState::new()),
+        b"roc" => get_state!(stamps::RoundRecState::new()),
+        b"kir" => get_state!(stamps::KirbyState::new()),
         b"arc" => get_state!(circle::CircleState::new()),
         b"lin" => get_state!(line::LineState::new()),
         b"bez" => get_state!(bezier::BezierState::new()),
@@ -204,6 +214,7 @@ impl AliasData {
             Import::Frame => (FRAME_EXPR_ALIASES, &[]),
             Import::Trig => (TRIG_EXPR_ALIASES, &[]),
             Import::Rand => (RAND_EXPR_ALIASES, &[]),
+            Import::Stamp => (&[], STAMP_STAT_ALIASES),
         }
     }
 }

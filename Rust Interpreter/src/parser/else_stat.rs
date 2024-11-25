@@ -65,8 +65,11 @@ impl ParseState for ElseState {
         self.first = false;
         if let Expr::If { else_index, .. } = &mut env.before[self.if_index] {
             if let Expr::Else { end, indexes, .. } = env.expr {
-                if let Some((index, _)) = child_index {
-                    self.has_stat = true;
+                if let Some((index, return_type)) = child_index {
+                    // needs to return void
+                    if return_type == ReturnType::Void {
+                        self.has_stat = true;
+                    }
                     indexes.push(index);
                 }
 

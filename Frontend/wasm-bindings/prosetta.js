@@ -184,13 +184,6 @@ function takeObject(idx) {
     dropObject(idx);
     return ret;
 }
-/**
- * @returns {number}
- */
-export function get_heap_size() {
-    const ret = wasm.get_heap_size();
-    return ret >>> 0;
-}
 
 function _assertNum(n) {
     if (typeof(n) !== 'number') throw new Error(`expected a number argument, found ${typeof(n)}`);
@@ -231,8 +224,15 @@ function logError(f, args) {
         throw e;
     }
 }
+/**
+ * @returns {number}
+ */
+export function get_heap_size() {
+    const ret = wasm.get_heap_size();
+    return ret >>> 0;
+}
 
-export const Import = Object.freeze({ List:0,"0":"List",Func:1,"1":"Func",Graph:2,"2":"Graph",Frame:3,"3":"Frame",Trig:4,"4":"Trig",Rand:5,"5":"Rand", });
+export const Import = Object.freeze({ List:0,"0":"List",Func:1,"1":"Func",Graph:2,"2":"Graph",Frame:3,"3":"Frame",Trig:4,"4":"Trig",Rand:5,"5":"Rand",Stamp:6,"6":"Stamp", });
 
 const HighlightFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }

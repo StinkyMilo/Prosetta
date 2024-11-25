@@ -26,6 +26,39 @@ rec tim frame frame!
 :code-wordier=null
 output-method='canvas'></editor>
 
+## Fram - Animation
+Any author with the substring _fram_ in their name will import the graphics library.
+
+Additionally, importing this enables animation as a whole. See [Frame](Frame.md).
+
+### Example
+```
+The Picture
+by Flynn Duniho and Sir Framingham the Mighty.
+```
+
+### Library
+The graphics library imports the following aliases:
+- [fra - Frame](Frame.md)
+
+
+
+## Func - Functions
+Any author with the substring _func_ in their name will import the functions library.
+
+### Example
+```
+The Rat Sandwich
+by Milo Jacobs and John Perfunctory.
+```
+
+### Library
+The functions library imports the following aliases
+- [fun - Function](Function.md)
+- [ret - Return](Return.md)
+
+
+
 ## Graph - Graphics
 Any author with the word _graph_ in their name will import the graphics library.
 
@@ -49,20 +82,6 @@ The graphics library imports the following aliases:
 - [Tur - Rotate](Rotate.md)
 
 
-## Fram - Animation
-Any author with the substring _fram_ in their name will import the graphics library.
-
-Additionally, importing this enables animation as a whole. See [Frame](Frame.md).
-
-### Example
-```
-The Picture
-by Flynn Duniho and Sir Framingham the Mighty.
-```
-
-### Library
-The graphics library imports the following aliases:
-- [fra - Frame](Frame.md)
 
 
 ## List - Lists
@@ -79,19 +98,6 @@ The graphics library imports the following aliases:
 - [fra - Frame](Frame.md)
 
 
-## Func - Functions
-Any author with the substring _func_ in their name will import the functions library.
-
-### Example
-```
-The Rat Sandwich
-by Milo Jacobs and John Perfunctory.
-```
-
-### Library
-The functions library imports the following aliases
-- [fun - Function](Function.md)
-- [ret - Return](Return.md)
 
 ## Rand - Randomization
 Any author with the substring _rand_ in their name will import the random library.
@@ -105,6 +111,27 @@ by Flynn Duniho and Randall Thunderton
 ### Library
 The random library imports the following aliases
 - [ran - Random](Random.md)
+
+
+
+## Stamp - Stamps
+These are special graphics functions to draw pre-made complex shapes. By default, they are drawn at the turtle's position, but they can all also be drawn at a specified x and y coordinate. Some can be stretched on individual axes while some can only be scaled evenly. Some have an additional parameter to further customize the shape.
+
+### Example
+```
+The Best Salesman
+by Robert Dog and Stampton G. Stampton
+```
+
+### Library
+The stamp library imports the following aliases
+- [hea - Heart](Heart.md)
+- [kir - Kirby](Kirby.md)
+- [pol - Polygon](Polygon.md)
+- [roc - Rounded Rectangle](RoundedRectangle.md)
+- [sta - Star](Star.md)
+- [tri - Triangle](Triangle.md)
+
 
 ## Trig - Trigonometry
 Any author with the substring _trig_ in their name will import the trigonometry library.

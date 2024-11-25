@@ -1,7 +1,10 @@
 import { allWords, wordsForAliases, partsOfSpeech } from './wordsForAliases.js';
 import { Import } from './wasm-bindings/prosetta.js';
 
-var jscode, sourcecode, cnsl, curr_ctx, stack, curr_canvas, displayed_ctx, displayed_canvas, play_icon, pause_icon, toggle_btn, output_toggle_btn;
+var jscode, sourcecode, cnsl, stack, curr_canvas, displayed_ctx, displayed_canvas, play_icon, pause_icon, toggle_btn, output_toggle_btn;
+/** @type CanvasRenderingContext2D
+ */
+var curr_ctx;
 var x = 0, y = 0, rotation = 0;
 var has_drawn_shape = false;
 var last_shape = "none";
@@ -15,6 +18,10 @@ var latest_frame = 0;
 var last_frame_timestamp = Date.now();
 var target_fps = 30;
 var was_playing = true;
+var currPath2D = null;
+/** @type Image
+ */
+var kirby_image = null;
 
 function init_canvas() {
   cnsl.innerText = "";
@@ -43,6 +50,11 @@ function print_console() {
 function end_shape() {
   if (last_shape == "none" || last_shape == "move") {
     return;
+  }
+  if (currPath2D != null) {
+    curr_ctx.fill(currPath2D);
+    curr_ctx.stroke(currPath2D);
+    currPath2D = null;
   }
   curr_ctx.fill();
   curr_ctx.stroke();
@@ -212,6 +224,173 @@ function draw_rect() {
   last_shape = "rect";
 }
 
+function draw_star() {
+  let diameter;
+  switch (arguments.length) {
+    case 1:
+      diameter = arguments[0];
+      break;
+    case 3:
+      _move_to(arguments[0], arguments[1]);
+      diameter = arguments[2];
+      break;
+  }
+  start_shape();
+  // let x1, y1, x2, y2, x3, y3, x4, y4;
+  let rad = rotation_radians()
+  let [x1, y1] = rotate_point(x, y, rad, x, y - diameter / 2);
+  curr_ctx.moveTo(x1, y1);
+  for (let i = 1; i < 10; i++) {
+    let x2, y2;
+    if (i % 2 == 0) {
+      [x2, y2] = rotate_point(x, y, rad + (i * 2 * Math.PI / 10), x, y - diameter / 2);
+    }
+    else {
+      [x2, y2] = rotate_point(x, y, rad + (i * 2 * Math.PI / 10), x, y - diameter / 4);
+    }
+    curr_ctx.lineTo(x2, y2);
+  }
+  curr_ctx.closePath();
+  last_shape = "star";
+}
+
+function draw_poly() {
+  let diameter, sides;
+  switch (arguments.length) {
+    case 2:
+      diameter = arguments[0];
+      sides = arguments[1];
+      break;
+    case 4:
+      _move_to(arguments[0], arguments[1]);
+      diameter = arguments[2];
+      sides = arguments[3];
+      break;
+  }
+  sides = Math.floor(sides);
+  start_shape();
+  // let x1, y1, x2, y2, x3, y3, x4, y4;
+  let rad = rotation_radians()
+  let [x1, y1] = rotate_point(x, y, rad, x, y - diameter / 2);
+  curr_ctx.moveTo(x1, y1);
+  for (let i = 1; i < sides; i++) {
+    let [x2, y2] = rotate_point(x, y, rad + (i * 2 * Math.PI / sides), x, y - diameter / 2);
+    curr_ctx.lineTo(x2, y2);
+  }
+  curr_ctx.closePath();
+  last_shape = "poly";
+}
+
+function draw_tri() { draw_poly(...arguments, 3); }
+function draw_heart() {
+  let width, height;
+  switch (arguments.length) {
+    case 1:
+      width = arguments[0];
+      height = arguments[0];
+      break;
+    case 2:
+      width = arguments[0];
+      height = arguments[1];
+      break;
+    case 3:
+      _move_to(arguments[0], arguments[1]);
+      width = arguments[2];
+      height = arguments[2];
+      break;
+    case 4:
+      _move_to(arguments[0], arguments[1]);
+      width = arguments[2];
+      height = arguments[3];
+      break;
+  }
+  start_shape();
+  let xform = new DOMMatrix()
+    .translate(x, y)
+    .rotate(rotation)
+    .translate(-width / 2, -height / 2)
+    .scale(width / 100, height / 100);
+  currPath2D = new Path2D();
+  currPath2D.addPath(new Path2D("M 23.476563,3.295099 C 11.106703,3.2427741 0,11.644689 0,30.849786 0,57.679623 37.633692,72.409016 49.999998,96.70721 62.366306,72.409016 100,57.679623 100,30.849786 100,-3.2926084 64.896424,-3.293564 49.999998,17.654474 43.482815,8.4897074 33.097564,3.3357966 23.476563,3.295099 Z"), xform);
+  last_shape = "heart";
+}
+
+function draw_round_rec() {
+  let radius, width, height;
+  switch (arguments.length) {
+    case 2:
+      width = arguments[0];
+      height = arguments[0];
+      radius = arguments[1];
+      break;
+    case 3:
+      width = arguments[0];
+      height = arguments[1];
+      radius = arguments[2];
+      break;
+    case 4:
+      _move_to(arguments[0], arguments[1]);
+      width = arguments[2];
+      height = arguments[2];
+      radius = arguments[3];
+      break;
+    case 5:
+      _move_to(arguments[0], arguments[1]);
+      width = arguments[2];
+      height = arguments[3];
+      radius = arguments[4];
+      break;
+  }
+  radius = Math.min(width / 2, height / 2, radius);
+  start_shape();
+  curr_ctx.save();
+  curr_ctx.translate(x, y);
+  curr_ctx.rotate(-rotation_radians());
+  curr_ctx.roundRect(-width / 2, -height / 2, width, height, radius);
+  curr_ctx.restore();
+  last_shape = "round_rect";
+}
+
+async function draw_kirby() {
+  let width, height;
+  switch (arguments.length) {
+    case 1:
+      width = arguments[0];
+      height = arguments[0];
+      break;
+    case 2:
+      width = arguments[0];
+      height = arguments[1];
+      break;
+    case 3:
+      _move_to(arguments[0], arguments[1]);
+      width = arguments[2];
+      height = arguments[2];
+      break;
+    case 4:
+      _move_to(arguments[0], arguments[1]);
+      width = arguments[2];
+      height = arguments[3];
+      break;
+  }
+  start_shape();
+  curr_ctx.save();
+  curr_ctx.translate(x, y);
+  curr_ctx.rotate(-rotation_radians());
+  curr_ctx.translate(-width / 2, -height / 2);
+  if (kirby_image == null) {
+    kirby_image = await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = (err) => reject(err);
+      img.src = "icons/kirby.jpg";
+    });
+  }
+  curr_ctx.drawImage(kirby_image, 0, 0, width, height);
+  curr_ctx.restore();
+  last_shape = "kirby";
+}
+
 function draw_ellipse() {
   let width, height;
   switch (arguments.length) {
@@ -355,12 +534,16 @@ function getWordsThatContain(substr) {
 }
 
 function setup_editor(startingCode) {
-  editor = CodeMirror(document.getElementById("code"), {
+  let code = document.getElementById("code");
+  while (code.hasChildNodes()) {
+    code.removeChild(code.firstChild);
+  }
+  editor = CodeMirror(code, {
     value: "",
     mode: "plaintext",
-    lineWrapping:true,
-    lineNumbers:true,
-    theme:"xq-dark"
+    lineWrapping: true,
+    lineNumbers: true,
+    theme: "xq-dark"
   });
   editor.setSize("100%", "100%");
 
@@ -651,6 +834,12 @@ function setup_runner() {
     "bezier_point": bezier_point,
     "draw_bezier": draw_bezier,
     "draw_line": draw_line,
+    "draw_star": draw_star,
+    "draw_poly": draw_poly,
+    "draw_tri": draw_tri,
+    "draw_heart": draw_heart,
+    "draw_round_rec": draw_round_rec,
+    "draw_kirby": draw_kirby,
     "move_to": move_to,
     "rotate_delta": rotate_delta,
     "reset_rotation": reset_rotation,
@@ -661,13 +850,13 @@ function setup_runner() {
     "set_line_width": set_line_width,
     "end_shape": end_shape,
   };
-  runner_worker.onmessage = e => {
+  runner_worker.onmessage = async e => {
     let command = e.data.command;
     let data = e.data.data;
     switch (command) {
       case "finished":
         for (let funcCall of data) {
-          function_dict[funcCall.name](...funcCall.args);
+          await function_dict[funcCall.name](...funcCall.args);
         }
         if (has_import(Import.Frame)) {
           print_console("fps:", Math.round(1000 / (Date.now() - last_frame_timestamp)));

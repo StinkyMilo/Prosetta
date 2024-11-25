@@ -9,19 +9,22 @@ use bitflags::bitflags;
 bitflags! {
     #[derive(Debug,Clone,Copy,Hash,PartialEq,Eq)]
     pub struct Types: u32 {
-        const Void =   0;
-        const Number = 0b1;
-        const Bool =   0b10;
-        const Booly =  0b11;
-        const String = 0b100;
-        const Color =  0b1000;
-        const List =   0b10000;
-        const Any =    0b11111;
+        const Null =   0;
+        const Void =   0b1;
+
+        const Number = 0b10;
+        const Bool =   0b100;
+        const Booly =  0b110;
+        const String = 0b1000;
+        const Color =  0b10000;
+        const List =   0b100000;
+        const Any =    0b111110;
     }
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum ReturnType {
+    Null,
     Void,
     Number,
     Bool,
@@ -78,6 +81,36 @@ pub enum Expr {
         end: End,
     },
     Rect {
+        locs: Vec<usize>,
+        indexes: [usize; 4],
+        end: End,
+    },
+    Star {
+        locs: Vec<usize>,
+        indexes: [usize; 4],
+        end: End,
+    },
+    Polygon {
+        locs: Vec<usize>,
+        indexes: [usize; 4],
+        end: End,
+    },
+    Triangle {
+        locs: Vec<usize>,
+        indexes: [usize; 4],
+        end: End,
+    },
+    Heart {
+        locs: Vec<usize>,
+        indexes: [usize; 4],
+        end: End,
+    },
+    RoundRec {
+        locs: Vec<usize>,
+        indexes: [usize; 4],
+        end: End,
+    },
+    Kirby {
         locs: Vec<usize>,
         indexes: [usize; 4],
         end: End,
@@ -267,6 +300,11 @@ pub enum Expr {
         indexes: [usize; 2],
         end: End,
     },
+    Floor {
+        locs: Vec<usize>,
+        index: usize,
+        end: End,
+    },
 }
 
 impl Expr {
@@ -277,14 +315,6 @@ impl Expr {
             _ => false,
         }
     }
-    // pub fn is_stat(&self) -> bool {
-    //     match self {
-    //         Expr::Arc { .. } | Expr::Line { .. } | Expr::Rect { .. } => true,
-    //         Expr::Assign { .. } | Expr::Print { .. } => true,
-    //         Expr::If { .. } | Expr::Else { .. } | Expr::While { .. } => true,
-    //         _ => false,
-    //     }
-    // }
 }
 
 #[derive(Debug)]

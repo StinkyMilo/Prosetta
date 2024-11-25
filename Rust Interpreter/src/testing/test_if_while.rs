@@ -94,3 +94,15 @@ fn test_if_inside_fail() {
             (print@35,36,37$42 (litnum 2@39$$3))\n)"
     );
 }
+
+#[test]
+#[timeout(1000)]
+fn test_if_not() {
+    let data = run_parser!(b"whe one not two! pri one!");
+    check_lisp!(
+        data,
+        "(if@0,1,2$24 (litnum 1@4$$3) then:\n  \
+        (not@8,9,10$15 @12$$3 \"two\")\n  \
+        (print@17,18,19$24 (litnum 1@21$$3))\n)"
+    );
+}

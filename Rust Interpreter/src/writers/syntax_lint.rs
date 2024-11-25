@@ -278,6 +278,36 @@ impl<T: Renderer> SyntaxLinter<T> {
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
+            Expr::Star { locs, indexes, end } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.add_end(source, *end, stack_index);
+            }
+            Expr::Polygon { locs, indexes, end } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.add_end(source, *end, stack_index);
+            }
+            Expr::Triangle { locs, indexes, end } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.add_end(source, *end, stack_index);
+            }
+            Expr::Heart { locs, indexes, end } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.add_end(source, *end, stack_index);
+            }
+            Expr::RoundRec { locs, indexes, end } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.add_end(source, *end, stack_index);
+            }
+            Expr::Kirby { locs, indexes, end } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.add_end(source, *end, stack_index);
+            }
             Expr::Var { var } => self.write_var(source, var, VAR_COLOR),
             Expr::WordNum {
                 locs,
@@ -512,6 +542,11 @@ impl<T: Renderer> SyntaxLinter<T> {
             Expr::Rand { locs, indexes, end } => {
                 self.write_locs(source, locs, stack_index);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
+                self.add_end(source, *end, stack_index);
+            }
+            Expr::Floor { locs, index, end } => {
+                self.write_locs(source, locs, stack_index);
+                self.write_expr(source, exprs, *index, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
 

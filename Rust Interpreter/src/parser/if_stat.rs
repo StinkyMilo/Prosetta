@@ -48,7 +48,7 @@ impl ParseState for IfState {
         if let Expr::If { indexes, end, .. } = env.expr {
             if !self.has_condition {
                 //add child and find stats
-                if let Some((index,_)) = child_index {
+                if let Some((index, _)) = child_index {
                     self.has_condition = true;
                     indexes.push(index);
                     MatchResult::ContinueWith(
@@ -62,8 +62,11 @@ impl ParseState for IfState {
                 }
             } else {
                 //and stat child
-                if let Some((index,_)) = child_index {
-                    self.has_stat = true;
+                if let Some((index, return_type)) = child_index {
+                    // needs to return void
+                    if return_type == ReturnType::Void {
+                        self.has_stat = true;
+                    }
                     indexes.push(index);
                 }
 

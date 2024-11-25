@@ -119,6 +119,48 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 write_exprs(exprs, indexes),
             )
         }
+        Expr::Star { locs, indexes, end } => {
+            format!(
+                "(star{} {})",
+                join_locs(locs, Some(*end)),
+                write_exprs(exprs, indexes),
+            )
+        }
+        Expr::Polygon { locs, indexes, end } => {
+            format!(
+                "(poly{} {})",
+                join_locs(locs, Some(*end)),
+                write_exprs(exprs, indexes),
+            )
+        }
+        Expr::Triangle { locs, indexes, end } => {
+            format!(
+                "(tri{} {})",
+                join_locs(locs, Some(*end)),
+                write_exprs(exprs, indexes),
+            )
+        }
+        Expr::Heart { locs, indexes, end } => {
+            format!(
+                "(heart{} {})",
+                join_locs(locs, Some(*end)),
+                write_exprs(exprs, indexes),
+            )
+        }
+        Expr::RoundRec { locs, indexes, end } => {
+            format!(
+                "(roundRec{} {})",
+                join_locs(locs, Some(*end)),
+                write_exprs(exprs, indexes),
+            )
+        }
+        Expr::Kirby { locs, indexes, end } => {
+            format!(
+                "(kirby{} {})",
+                join_locs(locs, Some(*end)),
+                write_exprs(exprs, indexes),
+            )
+        }
         Expr::Var { var } => format!("(var {})", write_var(var)),
         Expr::WordNum {
             locs,
@@ -479,6 +521,13 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 "(rand{}{})",
                 join_locs(locs, Some(*end)),
                 write_start_space(write_exprs(exprs, indexes))
+            )
+        }
+        Expr::Floor { locs, index, end } => {
+            format!(
+                "(floor{} {})",
+                join_locs(locs, Some(*end)),
+                write_expr(exprs, *index, 0)
             )
         }
     }

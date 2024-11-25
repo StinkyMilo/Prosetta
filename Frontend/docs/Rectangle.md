@@ -4,7 +4,7 @@ Draws a rectangle centered at the turtle's current coordinates. Turtle rotation 
 
 ## Arguments
 
-### Saure, Relative
+### Square, Relative
 
 ```sideLength (number)```
 

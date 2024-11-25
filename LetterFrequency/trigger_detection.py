@@ -123,7 +123,14 @@ aliases = [
     "ran",
     "sin",
     "cos",
-    "tan"
+    "tan",
+    "flo",
+    "sta",
+    "pol",
+    "tri",
+    "hea",
+    "roc",
+    "kir"
 ]
 
 if __name__ == "__main__":
