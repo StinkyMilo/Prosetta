@@ -1,5 +1,5 @@
 Intro to Prosetta
-by Milo Jacobs, Flynn Duniho, Nate Westfall, Steve Graphton, The Trigonometry Baby, Lord Framingham
+by Milo Jacobs, Flynn Duniho, Nate Westfall, Steve Graphton, The Trigonometry Baby, and Lord Framingham
 
 Prosetta is an esoteric programming language where code is a "hidden message" within a poem or other piece of writing. Its primary focus is on graphical output.
 
@@ -7,12 +7,21 @@ Whereas many Esolangs have very light language capabilities --- often intentiona
 
 One of the ways we do this is through an online editor that gives the user timely information and pointers about how they can best hide their code within poems as well as syntax highlighting...
 
-motivation pastime constrained this. many. tim sin this. many..
-arc 60 40.
-pen 3.
-arc 25.
+A major motivation for the use of Prosetta is the pastime of the constrained writing challenge. This type of challenge can involve omitting a specific letter, requiring the use of many pre-determined words, or hiding a secret word in the first letter of each sentence. 
+Prosetta allows the creation of multimedia art involving code, writing, and visuals. We hope that by using this language, many people will be able to create art that is at once code, poetry, and a digital drawing!
+
+To achieve the goal of a hidden message, most characters of Prosetta code are literally simply ignored. Prosetta has three-letter 'aliases' to represent each of the language's capabilities and functions!
+
+The placement of the three letters does not have to be contiguous, but the characters must be in the right order (i.e. they can be split or not.).
+
 was color light green.
 sto color.
 fil color.
 arc 15.
 fil black.
+
+
+
+
+
+
