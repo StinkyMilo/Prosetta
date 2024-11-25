@@ -1,0 +1,11 @@
+Fill Example
+by Milo Jacobs and John Graphton
+
+agriculture 50.
+fertilizer green.
+macroevolution 60.
+directory 50.
+field red.
+moving -300.
+difficulty blue.
+abstracts 300.
