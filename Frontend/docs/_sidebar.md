@@ -45,8 +45,11 @@
     - [ind - Index](Index.md)
     - [lis - List Constructor](List.md)
 - Numbers and Math
+    - [add - Add](Add.md)
     - [flo - Floor](Floor.md)
     - [ide - Divide](Divide.md)
+    - [int - Number from Word Length](Int.md)
+    - [lit - Big Number Constructor](Lit.md)
     - [pri - Print](Print.md)
     - [Random](Imports.md#rand---randomization)
         - [ran - Random](Random.md)
