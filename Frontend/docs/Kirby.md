@@ -1,4 +1,4 @@
-# Hea - Heart
+# Kir - Kirby
 
 Draws a photorealistic Kirby the dog, either at the turtle's position or at a specified relative position, of a specified size. It can be stretched along the x and y axes, but it is unaffected by stroke and fill color.
 
