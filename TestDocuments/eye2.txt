@@ -10,7 +10,7 @@ One of the ways we do this is through an online editor that gives the user timel
 A major motivation for the use of Prosetta is the pastime of the constrained writing challenge. This type of challenge can involve omitting a specific letter, requiring the use of many pre-determined words, or hiding a secret word in the first letter of each sentence. 
 Prosetta allows the creation of multimedia art involving code, writing, and visuals. We hope that by using this language, many people will be able to create art that is at once code, poetry, and a digital drawing or animation!
 
-To achieve the goal of a hidden message, most characters of Prosetta code are literally simply ignored. Prosetta has three-letter 'aliases' to represent each of the language's capabilities and functions!
+To achieve the goal of a hidden message, most characters of Prosetta code are quite literally simply ignored. Prosetta has three-letter 'aliases' to represent each of the language's capabilities and functions!
 
 The placement of the three letters does not have to be contiguous, but the characters must be in the right order (i.e. they can be split or not.). Prosetta is like lisp in that aliases act as prefix-notated function calls. 
 
