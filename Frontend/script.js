@@ -19,6 +19,7 @@ var last_frame_timestamp = Date.now();
 var target_fps = 30;
 var was_playing = true;
 var currPath2D = null;
+var version = 0;
 /** @type Image
  */
 var kirby_image = null;
@@ -209,6 +210,8 @@ function draw_rect() {
       height = arguments[3];
       break;
   }
+  width = Math.abs(width);
+  height = Math.abs(height);
   start_shape();
   // let x1, y1, x2, y2, x3, y3, x4, y4;
   let rad = rotation_radians()
@@ -267,6 +270,8 @@ function draw_poly() {
       sides = arguments[3];
       break;
   }
+  diameter = Math.abs(diameter);
+  sides = Math.abs(sides);
   sides = Math.floor(sides);
   start_shape();
   // let x1, y1, x2, y2, x3, y3, x4, y4;
@@ -341,6 +346,9 @@ function draw_round_rec() {
       radius = arguments[4];
       break;
   }
+  radius = Math.abs(radius);
+  width = Math.abs(width);
+  height = Math.abs(height);
   radius = Math.min(width / 2, height / 2, radius);
   start_shape();
   curr_ctx.save();
@@ -413,6 +421,8 @@ function draw_ellipse() {
       height = arguments[3];
       break;
   }
+  width = Math.abs(width);
+  height = Math.abs(height);
   start_shape();
   curr_ctx.ellipse(x, y, width / 2, height / 2, -rotation_radians(), 0, 2 * Math.PI);
   curr_ctx.closePath();
@@ -479,11 +489,13 @@ function updateCode() {
   if (editor == null) {
     return;
   }
+  version++;
   last_frame_timestamp = Date.now();
   msg_worker("changed", editor.getValue());
 }
 
 async function initialize(startingCode) {
+  version = 0;
   language_worker?.terminate();
   output_toggle_btn = document.getElementById("output-toggle");
   sourcecode = document.getElementById("code");
@@ -803,6 +815,9 @@ function setup_webworker() {
     let data = e.data.data;
     switch (command) {
       case "parsed":
+        if (version != data.version) {
+          break;
+        }
         setup_runner();
         imports = data.imports;
         jscode.innerText = data.js;
