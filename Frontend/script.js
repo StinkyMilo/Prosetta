@@ -450,6 +450,7 @@ function runCode() {
   print_console("Welcome to Prosetta!");
   print_console("---");
   print_console();
+  clearInterval(func_interval);
   runner_worker.postMessage({ command: "run", data: { code: jscode.innerText, frame: curr_frame } });
   // cnsl.scrollTop = cnsl.scrollHeight;
 }
@@ -829,44 +830,61 @@ function setup_webworker() {
 function setup_runner() {
   runner_worker?.terminate();
   runner_worker = new Worker(new URL("./runner_worker.js", import.meta.url));
-  let function_dict = {
-    "print_console": print_console,
-    "bezier_point": bezier_point,
-    "draw_bezier": draw_bezier,
-    "draw_line": draw_line,
-    "draw_star": draw_star,
-    "draw_poly": draw_poly,
-    "draw_tri": draw_tri,
-    "draw_heart": draw_heart,
-    "draw_round_rec": draw_round_rec,
-    "draw_kirby": draw_kirby,
-    "move_to": move_to,
-    "rotate_delta": rotate_delta,
-    "reset_rotation": reset_rotation,
-    "draw_rect": draw_rect,
-    "draw_ellipse": draw_ellipse,
-    "set_stroke": set_stroke,
-    "set_fill": set_fill,
-    "set_line_width": set_line_width,
-    "end_shape": end_shape,
-  };
   runner_worker.onmessage = async e => {
     let command = e.data.command;
     let data = e.data.data;
     switch (command) {
       case "finished":
-        for (let funcCall of data) {
-          await function_dict[funcCall.name](...funcCall.args);
-        }
-        if (has_import(Import.Frame)) {
-          print_console("fps:", Math.round(1000 / (Date.now() - last_frame_timestamp)));
-        }
-        last_frame_timestamp = Date.now();
-        latest_frame = curr_frame;
-        swap_canvases();
+        func_index = 0;
+        call_draw_funcs(data);
         break;
     }
   };
+}
+
+const function_dict = {
+  "print_console": print_console,
+  "bezier_point": bezier_point,
+  "draw_bezier": draw_bezier,
+  "draw_line": draw_line,
+  "draw_star": draw_star,
+  "draw_poly": draw_poly,
+  "draw_tri": draw_tri,
+  "draw_heart": draw_heart,
+  "draw_round_rec": draw_round_rec,
+  "draw_kirby": draw_kirby,
+  "move_to": move_to,
+  "rotate_delta": rotate_delta,
+  "reset_rotation": reset_rotation,
+  "draw_rect": draw_rect,
+  "draw_ellipse": draw_ellipse,
+  "set_stroke": set_stroke,
+  "set_fill": set_fill,
+  "set_line_width": set_line_width,
+  "end_shape": end_shape,
+};
+var func_index = 0;
+var func_interval = null;
+function call_draw_funcs(data) {
+  func_interval = setInterval(async () => {
+    if (func_index < data.length) {
+      const funcCall = data[func_index];
+      await function_dict[funcCall.name](...funcCall.args);
+      func_index++;
+    }
+    else {
+      clearInterval(func_interval);
+      await end_frame();
+    }
+  }, 0);
+}
+async function end_frame() {
+  if (has_import(Import.Frame)) {
+    print_console("fps:", Math.round(1000 / (Date.now() - last_frame_timestamp)));
+  }
+  last_frame_timestamp = Date.now();
+  latest_frame = curr_frame;
+  swap_canvases();
 }
 
 function has_import(imp) {
