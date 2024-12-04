@@ -184,7 +184,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
                 OperatorType::Not => "!",
             };
             match indexes.len() {
-                1 => format!("{}{}", name, write_expr(exprs, indexes[0], indent)),
+                1 => format!("({}{})", name, write_expr(exprs, indexes[0], indent)),
                 2 => format!(
                     "({} {} {})",
                     write_expr(exprs, indexes[0], indent),
