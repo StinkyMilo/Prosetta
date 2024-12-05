@@ -20,7 +20,7 @@ no-doc-tests = []
 [dependencies]
 wasm-bindgen = { version = "0.2.95", optional = true }
 cap = { version = "0.1.2", optional = true }
-bstr = "1.10.0"
+bstr = "1.11.0"
 quickscope = "0.2.0"
 rangemap = "1.5.1"
 itertools = "0.13.0"

@@ -12,6 +12,7 @@ export enum Import {
   Trig = 4,
   Rand = 5,
   Stamp = 6,
+  Not = 7,
 }
 export class Highlight {
   free(): void;
@@ -57,6 +58,16 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
+  readonly get_heap_size: () => number;
+  readonly __wbg_parserrunner_free: (a: number, b: number) => void;
+  readonly __wbg_parserrunnerdata_free: (a: number, b: number) => void;
+  readonly parserrunner_new: () => number;
+  readonly parserrunner_run_to_completion: (a: number, b: number, c: number) => number;
+  readonly parserrunnerdata_get_javascript: (a: number) => Array;
+  readonly parserrunnerdata_get_html: (a: number) => Array;
+  readonly parserrunnerdata_get_highlights: (a: number) => Array;
+  readonly parserrunnerdata_get_imports: (a: number) => Array;
+  readonly parserrunnerdata_get_triggers: (a: number) => Array;
   readonly __wbg_highlight_free: (a: number, b: number) => void;
   readonly __wbg_get_highlight_line: (a: number) => number;
   readonly __wbg_set_highlight_line: (a: number, b: number) => void;
@@ -64,22 +75,15 @@ export interface InitOutput {
   readonly __wbg_set_highlight_index: (a: number, b: number) => void;
   readonly __wbg_get_highlight_length: (a: number) => number;
   readonly __wbg_set_highlight_length: (a: number, b: number) => void;
-  readonly __wbg_get_highlight_color: (a: number, b: number) => void;
+  readonly __wbg_get_highlight_color: (a: number) => Array;
   readonly __wbg_set_highlight_color: (a: number, b: number, c: number) => void;
-  readonly get_heap_size: () => number;
-  readonly __wbg_parserrunner_free: (a: number, b: number) => void;
-  readonly __wbg_parserrunnerdata_free: (a: number, b: number) => void;
-  readonly parserrunner_new: () => number;
-  readonly parserrunner_run_to_completion: (a: number, b: number, c: number) => number;
-  readonly parserrunnerdata_get_javascript: (a: number, b: number) => void;
-  readonly parserrunnerdata_get_html: (a: number, b: number) => void;
-  readonly parserrunnerdata_get_highlights: (a: number, b: number) => void;
-  readonly parserrunnerdata_get_imports: (a: number, b: number) => void;
-  readonly parserrunnerdata_get_triggers: (a: number, b: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
-  readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
+  readonly __wbindgen_export_2: WebAssembly.Table;
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
+  readonly __externref_drop_slice: (a: number, b: number) => void;
+  readonly __externref_table_alloc: () => number;
+  readonly __wbindgen_start: () => void;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;

@@ -460,7 +460,7 @@ impl<T: Renderer> SyntaxLinter<T> {
                 func,
             } => {
                 self.write_locs(source, locs, stack_index);
-                self.write_var(source, func, VAR_COLOR);
+                self.write_var(source, func, LOC_COLOR[stack_index % 3]);
                 self.write_exprs(source, exprs, indexes, stack_index + 1);
                 self.add_end(source, *end, stack_index);
             }
