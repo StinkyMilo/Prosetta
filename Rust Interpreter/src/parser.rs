@@ -26,6 +26,7 @@ mod delete;
 mod else_stat;
 mod fill;
 mod find;
+mod floor;
 mod foreach;
 mod frame;
 mod function;
@@ -56,7 +57,6 @@ mod trig;
 mod var;
 mod while_stat;
 mod word_num;
-mod floor;
 
 #[path = "testing/mod.rs"]
 mod testing;
@@ -80,6 +80,7 @@ pub enum Import {
     Trig,
     Rand,
     Stamp,
+    Not,
 }
 
 impl Import {
@@ -92,6 +93,7 @@ impl Import {
             Import::Trig => "Trig",
             Import::Rand => "Rand",
             Import::Stamp => "Stamp",
+            Import::Not => "not",
         }
     }
     pub fn get_all() -> &'static [(Import, &'static [u8])] {
@@ -103,6 +105,7 @@ impl Import {
             (Import::Trig, b"trig"),
             (Import::Rand, b"rand"),
             (Import::Stamp, b"stamp"),
+            (Import::Not, b"not"),
         ]
     }
 }

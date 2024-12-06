@@ -42,7 +42,7 @@ const TRIG_EXPR_ALIASES: &[ExprTrigger] = &[
 ];
 const RAND_EXPR_ALIASES: &[ExprTrigger] = &[(b"ran", Types::Number)];
 
-const BASE_STAT_ALIASES: &[StatTrigger] = &[b"was", b"pri", b"whe", b"whi", b"els", b"not"];
+const BASE_STAT_ALIASES: &[StatTrigger] = &[b"was", b"pri", b"whe", b"whi", b"els"];
 
 const LIST_STAT_ALIASES: &[StatTrigger] = &[b"fre", b"del", b"app", b"rep"];
 const FUNC_STAT_ALIASES: &[StatTrigger] = &[b"fun", b"ret"];
@@ -53,6 +53,8 @@ const GRAPH_STAT_ALIASES: &[StatTrigger] = &[
 ];
 
 const STAMP_STAT_ALIASES: &[StatTrigger] = &[b"sta", b"pol", b"tri", b"hea", b"roc", b"kir"];
+
+const NOT_STAT_ALIASES: &[StatTrigger] = &[b"not"];
 
 ///match alias to expr
 fn get_expr_state(alias: &'static [u8]) -> Box<dyn ParseState> {
@@ -215,6 +217,7 @@ impl AliasData {
             Import::Trig => (TRIG_EXPR_ALIASES, &[]),
             Import::Rand => (RAND_EXPR_ALIASES, &[]),
             Import::Stamp => (&[], STAMP_STAT_ALIASES),
+            Import::Not => (&[], NOT_STAT_ALIASES),
         }
     }
 }
