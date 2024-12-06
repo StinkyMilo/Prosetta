@@ -27,7 +27,7 @@ Ellipse Example
 by Milo Jacobs and Sarah Regraph\n
 mov 30 30.
 arc 50.
-arc -30 -30 50 70.
+arc sub 30. sub 30. 50 70.
 `' 
 :code-wordier="`
 Ellipse Example
