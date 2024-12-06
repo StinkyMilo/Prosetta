@@ -1,0 +1,8 @@
+Intro to Prosetta
+by Milo Jacobs, Flynn Duniho, Nate Westfall, Steve Graphton,  John Perfunctory, The Trigonometry Baby, Lord Framingham
+
+was magnitude 80.
+was frame tim fra 5..
+mov tim cos frame. magnitude. tim sin frame. magnitude..
+arc 50.
+fil blue.

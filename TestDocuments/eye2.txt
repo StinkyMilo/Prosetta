@@ -1,0 +1,23 @@
+Intro to Prosetta
+by Milo Jacobs, Flynn Duniho, Nate Westfall, Steve Graphton, The Trigonometry Baby, and Lord Framingham
+
+Prosetta is an esoteric programming language where code is a "hidden message" within a poem or other piece of writing. Its primary focus is on graphical output.
+
+Whereas many Esolangs have very light language capabilities --- often intentionally minimizing usability --- a goal of Prosetta is to provide ample language features to enable user creativity.
+
+One of the ways we do this is through an online editor that gives the user timely information and pointers about how they can best hide their code within poems as well as syntax highlighting...
+
+A major motivation for the use of Prosetta is the pastime of the constrained writing challenge. This type of challenge can involve omitting a specific letter, requiring the use of many pre-determined words, or hiding a secret word in the first letter of each sentence. 
+Prosetta allows the creation of multimedia art involving code, writing, and visuals. We hope that by using this language, many people will be able to create art that is at once code, poetry, and a digital drawing or animation!
+
+To achieve the goal of a hidden message, most characters of Prosetta code are quite literally simply ignored. Prosetta has three-letter 'aliases' to represent each of the language's capabilities and functions!
+
+The placement of the three letters does not have to be contiguous, but the characters must be in the right order (i.e. they can be split or not.). Prosetta is like lisp in that aliases act as prefix-notated function calls. 
+
+Prosetta code tends to be quite well hidden within a larger text. For example, this intro was and still is a program that draws a light green, rotating eye.
+
+The story and output of Prosetta code can be poetically related. Alternatively, they can be firmly unrelated. Story and output can be related with varying effects: output can subvert, emphasize, or add entirely new meaning to the poem itself. 
+
+This research paper will highlight development methods: the way we made the program, as well as rationale: why we made the decisions we did and what purpose they fulfilled.
+The next page will show how the eye's flight is made. It will also show the poem's syntax highlighting. After that, we will move to the background literature review!
+

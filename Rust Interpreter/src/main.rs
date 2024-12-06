@@ -47,7 +47,7 @@ fn main() {
         let test_doc_path = "src/testing/test_docs.rs";
         let contents = fs::read_to_string(test_doc_path).expect("File not found");
         let start_str = "// START OF GENERATED TESTS";
-        let end_str = "    // END OF GENERATED TESTS";
+        let end_str = "// END OF GENERATED TESTS";
         let start_idx = contents.find(start_str).unwrap() + start_str.len();
         let end_idx = contents.find(end_str).unwrap();
         let test_str = path_strs

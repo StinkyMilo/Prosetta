@@ -1,0 +1,50 @@
+Intro to Prosetta
+by Milo Jacobs, Flynn Duniho, Nate Westfall, Steve Graphton, and Stampton G. Stampton
+
+arc 100.
+fil light grey.
+mov 40 40.
+tur 45.
+tri 40.
+mov -40 40.
+tur -90.
+tri 40.
+
+tur 45.
+mov -20 10.
+arc 24 20.
+fil light green.
+arc 15.
+fil black.
+mov 40.
+arc 24 20..
+fil light green.
+arc 15.
+fil black.
+
+mov 0 -4.
+pen 4.
+tur 90.
+lin 10.
+
+fil 0.
+tur 60.
+lin 10.
+mov 0 -14.
+tur 240.
+lin 10.
+
+mov 20 -14.
+pen 2.
+tur -40.
+lin 40.
+tur 20.
+mov 20 -16.
+lin 40.
+mov -20 -14.
+pen 2.
+tur 180.
+lin 40.
+mov -20 -16.
+tur -20.
+lin 40.
