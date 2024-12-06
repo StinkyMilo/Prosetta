@@ -491,7 +491,25 @@ function updateCode() {
   }
   version++;
   last_frame_timestamp = Date.now();
-  msg_worker("changed", editor.getValue());
+  const src = editor.getValue();
+  const replace_chars = {
+    "–": "--",
+    "—": "---",
+    "…": "...",
+    "“": '"',
+    "”": '"',
+    "‘": "'",
+    "’": "'",
+  }
+  let newsrc = src;
+  for (const [key, val] of Object.entries(replace_chars)) {
+    newsrc = newsrc.replaceAll(key, val);
+  }
+  if (newsrc != src) {
+    editor.setValue(newsrc);
+    return;
+  }
+  msg_worker("changed", src);
 }
 
 async function initialize(startingCode) {
