@@ -1,5 +1,5 @@
 `Ignore Example`;
-"By Milo Jacobs";
+"By Milo Jacobs, Nothaniel";
 
 
 let stew_var = 3;

@@ -10,7 +10,7 @@ Adds the next word to the global ignored words list. Any word that substring mat
 
 <editor :code='`
 Ignore Example
-by Milo Jacobs\n
+by Milo Jacobs and Nothaniel\n
 not was.
 was soup two.
 wizards stew three.
