@@ -8,6 +8,7 @@ use std::{
 
 use super::{alias::WordTriggerArena, alias_data::AliasData, Expr, ReturnType, Types};
 
+///returns str_index, str, index
 pub fn try_get_best_val<'a>(
     name: &[u8],
     iter: &mut dyn Iterator<Item = &'a [u8]>,
@@ -61,36 +62,13 @@ fn convert_skip_indexes(skip_indexes: &mut Vec<u8>, var_start: u8, var_len: u8) 
     start
 }
 
-fn try_get_from_iter<'a>(
-    word: &Slice,
-    iter: &mut dyn Iterator<Item = &'a [u8]>,
-    global_index: usize,
-    pred: &dyn Fn(&[u8]) -> bool,
-) -> Option<SubStrData> {
-    if word.len() > 255 {
-        return None;
-    }
-    // remove ' and make lowercase
-    let (name, mut skip_indexes) = get_var_name_and_skips(word.str);
-    let var_data = try_get_best_val(&name, iter, pred);
-
-    if let Some((var_start, name, _)) = var_data {
-        let start = convert_skip_indexes(&mut skip_indexes, var_start, name.len() as u8);
-
-        Some(SubStrData {
-            start: global_index + word.pos + start as usize,
-            name: name.to_vec(),
-            skip_indexes,
-        })
-    } else {
-        None
-    }
-}
 enum Symbol {
     ///symbol is a varible
     Var(ReturnType),
     ///symbol is a function with a number of arguments
-    Func(u8),
+    Func(Vec<Types>, ReturnType),
+    ///symbol is a var with a range of arguments
+    FuncVar(Types),
 }
 
 pub struct SymbolSet {
@@ -131,7 +109,7 @@ impl SymbolSet {
     ///returns (index in word, varible name)
     ///
     pub fn try_get_var(&self, word: &Slice, global_index: usize) -> Option<SubStrData> {
-        try_get_from_iter(
+        try_get_symbol(
             word,
             &mut self.set.keys().map(|e| e.as_slice()),
             global_index,
@@ -140,12 +118,38 @@ impl SymbolSet {
     }
 
     pub fn try_get_func(&self, word: &Slice, global_index: usize) -> Option<SubStrData> {
-        try_get_from_iter(
+        try_get_symbol(
             word,
             &mut self.set.keys().map(|e| e.as_slice()),
             global_index,
             &|name| matches!(self.set.get(name), Some(Symbol::Func(..))),
         )
+    }
+
+    fn try_get_symbol<'a>(
+        word: &Slice,
+        iter: &mut dyn Iterator<Item = &'a [u8]>,
+        global_index: usize,
+        pred: &dyn Fn(&[u8]) -> bool,
+    ) -> Option<(SubStrData, ReturnType)> {
+        if word.len() > 255 {
+            return None;
+        }
+        // remove ' and make lowercase
+        let (name, mut skip_indexes) = get_var_name_and_skips(word.str);
+        let var_data = try_get_best_val(&name, iter, pred);
+
+        if let Some((var_start, name, _)) = var_data {
+            let start = convert_skip_indexes(&mut skip_indexes, var_start, name.len() as u8);
+
+            Some((SubStrData {
+                start: global_index + word.pos + start as usize,
+                name: name.to_vec(),
+                skip_indexes,
+            },))
+        } else {
+            None
+        }
     }
 }
 impl Debug for SymbolSet {

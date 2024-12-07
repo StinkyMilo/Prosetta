@@ -11,13 +11,14 @@ impl ParseState for WhileState {
             *env.expr = Expr::While {
                 locs: env.locs.take().unwrap_or_default(),
                 indexes: Vec::new(),
+                is_for: false,
                 end: End::none(),
             };
             env.symbols.add_layer();
             // setup child state
             MatchResult::ContinueWith(
                 word.pos,
-                Types::Booly,
+                Types::Bool | Types::Number,
                 Box::new(alias::NoneState::new_expr_cont()),
             )
         } else if self.has_stat {
@@ -42,12 +43,21 @@ impl ParseState for WhileState {
         word: &Slice,
         _rest: &Slice,
     ) -> MatchResult {
-        if let Expr::While { indexes, end, .. } = env.expr {
+        if let Expr::While {
+            indexes,
+            end,
+            is_for,
+            ..
+        } = env.expr
+        {
             if !self.has_condition {
                 //add child and find stats
-                if let Some((index, _)) = child_index {
+                if let Some((index, return_type)) = child_index {
                     self.has_condition = true;
                     indexes.push(index);
+                    if return_type == ReturnType::Number {
+                        *is_for = true;
+                    }
                     MatchResult::ContinueWith(
                         word.pos,
                         Types::Void,

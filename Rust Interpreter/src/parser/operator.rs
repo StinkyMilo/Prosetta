@@ -38,7 +38,7 @@ impl BasicState for OperatorState {
             | OperatorType::Log => ReturnType::Number,
             OperatorType::LessThan | OperatorType::GreaterThan => ReturnType::Bool,
             OperatorType::And | OperatorType::Or | OperatorType::Not => ReturnType::Number,
-            OperatorType::Equals => ReturnType::Any,
+            OperatorType::Equals => ReturnType::Bool,
         }
     }
 

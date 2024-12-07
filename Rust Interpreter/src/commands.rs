@@ -12,13 +12,16 @@ bitflags! {
         const Null =   0;
         const Void =   0b1;
 
-        const Number = 0b10;
-        const Bool =   0b100;
-        const Booly =  0b110;
-        const String = 0b1000;
-        const Color =  0b10000;
-        const List =   0b100000;
-        const Any =    0b111110;
+        const Number =       0b10;
+        const Bool =         0b100;
+        const String =       0b1000;
+        const Color =        0b10000;
+        const List =         0b100000;
+        const ListOfNumber = 0b1000000;
+        const ListOfBool =   0b10000000;
+        const ListOfString = 0b100000000;
+        const ListOfColor =  0b1000000000;
+        const Any =          0b1111111110;
     }
 }
 
@@ -31,7 +34,6 @@ pub enum ReturnType {
     String,
     Color,
     List,
-    Any,
 }
 
 #[derive(PartialEq, Debug, Clone, Copy)]
@@ -138,6 +140,7 @@ pub enum Expr {
     While {
         locs: Vec<usize>,
         indexes: Vec<usize>,
+        is_for: bool,
         end: End,
     },
     Else {
