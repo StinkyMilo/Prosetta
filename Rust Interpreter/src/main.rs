@@ -1,6 +1,7 @@
 #![cfg(not(feature = "wasm"))]
 
 use std::{
+    fs,
     io::{self, Read},
     mem,
 };
@@ -22,48 +23,52 @@ use docs_lib::{gen_output, gen_test};
 use parser::ParserSource;
 use parser_runner::{run_parser, RunnerFlags};
 
+fn generate_tests() {
+    println!("Generating JS output...");
+    let paths = fs::read_dir("../Frontend/docs").unwrap();
+    let mut path_strs: Vec<String> = Vec::new();
+
+    for p in paths {
+        match p {
+            Ok(v) => {
+                let path = v.path();
+                // We're only using ASCII so I think this is fine
+                let path_str = str::replace(&path.display().to_string(), "\\", "/");
+
+                if path.is_file() && path_str.ends_with(".md") {
+                    path_strs.push(path_str.clone());
+                    gen_output(&path_str);
+                }
+            }
+            Err(e) => println!("{}", e),
+        }
+    }
+    path_strs.sort();
+    let test_doc_path = "src/testing/test_docs.rs";
+    let contents = fs::read_to_string(test_doc_path).expect("File not found");
+    let start_str = "// START OF GENERATED TESTS";
+    let end_str = "// END OF GENERATED TESTS";
+    let start_idx = contents.find(start_str).unwrap() + start_str.len();
+    let end_idx = contents.find(end_str).unwrap();
+    let test_str = path_strs
+        .iter()
+        .map(gen_test)
+        .collect::<Vec<String>>()
+        .join("\n");
+    _ = fs::write(
+        test_doc_path,
+        format!(
+            "{}{}{}",
+            &contents[..start_idx],
+            test_str,
+            &contents[end_idx..]
+        ),
+    );
+}
+
 fn main() {
     if cfg!(feature = "gen-doc-output") {
-        use std::fs;
-        println!("Generating JS output...");
-        let paths = fs::read_dir("../Frontend/docs").unwrap();
-        let mut path_strs: Vec<String> = Vec::new();
-
-        for p in paths {
-            match p {
-                Ok(v) => {
-                    let path = v.path();
-                    // We're only using ASCII so I think this is fine
-                    let path_str = str::replace(&path.display().to_string(),"\\","/");
-
-                    if path.is_file() && path_str.ends_with(".md") {
-                        path_strs.push(path_str.clone());
-                        gen_output(&path_str);
-                    }
-                }
-                Err(e) => println!("{}", e),
-            }
-        }
-        let test_doc_path = "src/testing/test_docs.rs";
-        let contents = fs::read_to_string(test_doc_path).expect("File not found");
-        let start_str = "// START OF GENERATED TESTS";
-        let end_str = "// END OF GENERATED TESTS";
-        let start_idx = contents.find(start_str).unwrap() + start_str.len();
-        let end_idx = contents.find(end_str).unwrap();
-        let test_str = path_strs
-            .iter()
-            .map(gen_test)
-            .collect::<Vec<String>>()
-            .join("\n");
-        _ = fs::write(
-            test_doc_path,
-            format!(
-                "{}{}{}",
-                &contents[..start_idx],
-                test_str,
-                &contents[end_idx..]
-            ),
-        );
+        generate_tests();
         return;
     }
     println!("size of parser: {}", mem::size_of::<Parser>());

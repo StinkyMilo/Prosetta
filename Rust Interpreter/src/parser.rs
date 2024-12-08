@@ -93,18 +93,18 @@ impl Import {
             Import::Trig => "Trig",
             Import::Rand => "Rand",
             Import::Stamp => "Stamp",
-            Import::Not => "not",
+            Import::Not => "Not",
         }
     }
     pub fn get_all() -> &'static [(Import, &'static [u8])] {
         &[
-            (Import::List, b"list"),
-            (Import::Func, b"func"),
-            (Import::Graph, b"graph"),
+            (Import::List, b"lis"),
+            (Import::Func, b"fun"),
+            (Import::Graph, b"gra"),
             (Import::Frame, b"fram"),
-            (Import::Trig, b"trig"),
-            (Import::Rand, b"rand"),
-            (Import::Stamp, b"stamp"),
+            (Import::Trig, b"tri"),
+            (Import::Rand, b"ran"),
+            (Import::Stamp, b"tam"),
             (Import::Not, b"not"),
         ]
     }

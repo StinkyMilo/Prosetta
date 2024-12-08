@@ -20,7 +20,7 @@ impl ParseState for IfState {
             // setup child state
             MatchResult::ContinueWith(
                 word.pos,
-                Types::Booly,
+                Types::Bool | Types::Number,
                 Box::new(alias::NoneState::new_expr_cont()),
             )
         } else if self.has_stat {

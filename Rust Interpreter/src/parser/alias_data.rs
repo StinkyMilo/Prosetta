@@ -42,9 +42,9 @@ const TRIG_EXPR_ALIASES: &[ExprTrigger] = &[
 ];
 const RAND_EXPR_ALIASES: &[ExprTrigger] = &[(b"ran", Types::Number)];
 
-const BASE_STAT_ALIASES: &[StatTrigger] = &[b"was", b"pri", b"whe", b"whi", b"els"];
+const BASE_STAT_ALIASES: &[StatTrigger] = &[b"was", b"pri", b"whe", b"whi", b"els", b"fre"];
 
-const LIST_STAT_ALIASES: &[StatTrigger] = &[b"fre", b"del", b"app", b"rep"];
+const LIST_STAT_ALIASES: &[StatTrigger] = &[b"del", b"app", b"rep"];
 const FUNC_STAT_ALIASES: &[StatTrigger] = &[b"fun", b"ret"];
 const GRAPH_STAT_ALIASES: &[StatTrigger] = &[
     b"arc", b"rec", //shapes
