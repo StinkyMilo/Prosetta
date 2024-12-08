@@ -269,7 +269,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
             let ind = get_indent(indent);
             *indent += 1;
             let str = format!(
-                "{}while ({}) {{\n{}\n{}}}",
+                "{}while_loop(()=>({}),()=>{{\n{}\n{}}});",
                 ind,
                 write_expr(exprs, indexes[0], indent),
                 write_exprs(exprs, &indexes[1..], "\n", indent),
@@ -425,10 +425,10 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
             let ind = get_indent(indent);
             *indent += 1;
             let str = format!(
-                "{}for(let {}_var of {}) {{\n{}\n{}}}",
+                "{}for_loop({},({}_var)=>{{\n{}\n{}}});",
                 ind,
-                String::from_utf8_lossy(&var.name),
                 write_expr(exprs, indexes[0], indent),
+                String::from_utf8_lossy(&var.name),
                 write_exprs(exprs, &indexes[1..], "\n", indent),
                 ind
             );

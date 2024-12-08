@@ -29,7 +29,7 @@ impl ParseState for ForEachState {
                 }
                 MatchResult::ContinueWith(
                     rest.pos,
-                    Types::List,
+                    Types::List | Types::Number,
                     Box::new(alias::NoneState::new_expr_cont()),
                 )
             } else if self.has_stat {

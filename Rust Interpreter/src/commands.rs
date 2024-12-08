@@ -14,7 +14,6 @@ bitflags! {
 
         const Number = 0b10;
         const Bool =   0b100;
-        const Booly =  0b110;
         const String = 0b1000;
         const Color =  0b10000;
         const List =   0b100000;
