@@ -94,11 +94,11 @@ pub fn gen_test(path: &String) -> String {
     let p = Path::new(path);
     format!(
         "
-    #[test]
-    #[timeout(2000)]
-    fn test_{} () -> () {{
-        test_file(\"{}\");
-    }}
+#[test]
+#[timeout(2000)]
+fn test_{} () -> () {{
+    test_file(\"{}\");
+}}
 ",
         p.file_stem()
             .unwrap()
