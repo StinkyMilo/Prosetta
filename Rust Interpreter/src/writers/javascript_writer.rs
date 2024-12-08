@@ -269,7 +269,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
             let ind = get_indent(indent);
             *indent += 1;
             let str = format!(
-                "{}while_loop(()=>({}),()=>{{\n{}\n{}}});",
+                "{}while_loop(() => {}, () => {{\n{}\n{}}});",
                 ind,
                 write_expr(exprs, indexes[0], indent),
                 write_exprs(exprs, &indexes[1..], "\n", indent),
@@ -425,7 +425,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
             let ind = get_indent(indent);
             *indent += 1;
             let str = format!(
-                "{}for_loop({},({}_var)=>{{\n{}\n{}}});",
+                "{}for_loop({}, ({}_var) => {{\n{}\n{}}});",
                 ind,
                 write_expr(exprs, indexes[0], indent),
                 String::from_utf8_lossy(&var.name),
@@ -500,7 +500,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
                 TrigType::Tan => "tan",
             };
             format!(
-                "Math.{name}({}*Math.PI/180)",
+                "Math.{name}({} * Math.PI / 180)",
                 write_expr(exprs, *index, indent)
             )
         }
