@@ -367,15 +367,15 @@ fn test_file(path: &str) -> () {
 
     #[test]
     #[timeout(2000)]
-    fn test_random () -> () {
-        test_file("../Frontend/docs/Random.md");
+    fn test_readme () -> () {
+        test_file("../Frontend/docs/README.md");
     }
 
 
     #[test]
     #[timeout(2000)]
-    fn test_readme () -> () {
-        test_file("../Frontend/docs/README.md");
+    fn test_random () -> () {
+        test_file("../Frontend/docs/Random.md");
     }
 
 
