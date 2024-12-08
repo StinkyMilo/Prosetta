@@ -100,7 +100,12 @@ pub fn gen_test(path: &String) -> String {
         test_file(\"{}\");
     }}
 ",
-        p.file_stem().unwrap().to_str().unwrap().to_lowercase(),
+        p.file_stem()
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .to_lowercase()
+            .replace("_", ""),
         path
     )
 }
