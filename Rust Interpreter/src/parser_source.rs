@@ -77,7 +77,7 @@ impl<'a> ParserSource<'a> {
             } else {
                 // if empty line found -- make new buffer
                 if empty_line && first_text {
-                    println!("{:?}", paragraph);
+                    // println!("{:?}", paragraph);
                     self.sources.push(Source::String {
                         str: mem::take(&mut paragraph),
                         first: true,

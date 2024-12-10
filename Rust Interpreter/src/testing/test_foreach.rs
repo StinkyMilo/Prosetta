@@ -21,3 +21,12 @@ fn test_for_each() {
             \n  (print@21,22,23$30 (var \"value\"@25))\n)"
         );
 }
+
+#[test]
+#[timeout(1000)]
+fn test_for_each_num() {
+    let data = run_parser!(b"fre value 3. pri value..");
+    check_lisp!(data,
+            "(foreach@0,1,2$23 value (litnum 3@10$$1) then:\n  (print@13,14,15$22 (var \"value\"@17))\n)"
+        );
+}
