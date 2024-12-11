@@ -35,7 +35,7 @@ impl BasicState for RandState {
 
     fn add_child(&mut self, expr: &mut Expr, index: usize, _: ReturnType) {
         if let Expr::Rand { indexes, .. } = expr {
-            indexes[self.next_child_index as usize] = index;
+            indexes[(self.next_child_index - 1) as usize] = index;
             self.next_child_index += 1;
         } else {
             unreachable!()
@@ -45,8 +45,8 @@ impl BasicState for RandState {
     // this is a mess
     fn can_close(&self) -> CloseType {
         match self.next_child_index {
-            0..=1 => CloseType::Able,
-            2 => CloseType::Force,
+            0..=2 => CloseType::Able,
+            3 => CloseType::Force,
             _ => unreachable!(),
         }
     }
@@ -62,6 +62,8 @@ impl BasicState for RandState {
 
 impl RandState {
     pub fn new() -> Self {
-        Self { next_child_index: 0 }
+        Self {
+            next_child_index: 0,
+        }
     }
 }
