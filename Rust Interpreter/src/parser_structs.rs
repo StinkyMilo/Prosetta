@@ -596,7 +596,7 @@ pub fn find_word_end<'a>(slice: &'a Slice<'a>, start: usize) -> Slice<'a> {
 }
 
 /// returns (close, rest) after finding close
-pub fn find_close_slice<'a>(slice: &'a Slice<'a>, mut start: usize) -> Option<(Slice, Slice)> {
+pub fn find_close_slice<'a>(slice: &'a Slice<'a>, mut start: usize) -> Option<(Slice<'a>, Slice<'a>)> {
     // find end char
     let mut close_len = 0;
     while start < slice.len() {
@@ -626,7 +626,7 @@ pub fn find_close_slice<'a>(slice: &'a Slice<'a>, mut start: usize) -> Option<(S
 }
 
 /// returns the rest after finding the next closing character
-pub fn find_close<'a>(slice: &'a Slice<'a>, start: usize) -> Option<Slice<'_>> {
+pub fn find_close<'a>(slice: &'a Slice<'a>, start: usize) -> Option<Slice<'a>> {
     find_close_slice(slice, start).map(|s| s.1)
 }
 
@@ -672,7 +672,7 @@ pub fn try_get_symbol_word(word: &Slice, global_index: usize) -> Option<SubStrDa
     }
 }
 ///get a slice that starts at the next \n
-pub fn find_newline<'a>(slice: &'a Slice<'a>, mut start: usize) -> Option<Slice<'_>> {
+pub fn find_newline<'a>(slice: &'a Slice<'a>, mut start: usize) -> Option<Slice<'a>> {
     while start < slice.len() {
         let char = slice.str[start];
         if char == b'\n' {

@@ -85,7 +85,7 @@ impl ParseState for PrintState {
                 MatchResult::ContinueWith(
                     word.pos,
                     Types::Any,
-                    get_state!(alias::NoneState::new_expr_cont()),
+                    get_state!(alias::NoneState::new_expr()),
                 )
             } else {
                 MatchResult::Continue(0)

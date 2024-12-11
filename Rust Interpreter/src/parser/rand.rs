@@ -4,7 +4,7 @@ use super::*;
 
 #[derive(Debug)]
 pub struct RandState {
-    count: u8,
+    next_child_index: u8,
 }
 
 impl BasicState for RandState {
@@ -20,22 +20,23 @@ impl BasicState for RandState {
         Types::Number
     }
 
-    fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {
-        let ret = self.count == 0;
+    fn do_first(&mut self, expr: &mut Expr, locs: Vec<usize>) -> bool {
+        let ret = self.next_child_index == 0;
         if ret {
             *expr = Expr::Rand {
                 locs,
                 indexes: [usize::MAX; 2],
                 end: End::none(),
             };
+            self.next_child_index += 1;
         }
         ret
     }
 
     fn add_child(&mut self, expr: &mut Expr, index: usize, _: ReturnType) {
         if let Expr::Rand { indexes, .. } = expr {
-            indexes[self.count as usize] = index;
-            self.count += 1;
+            indexes[(self.next_child_index - 1) as usize] = index;
+            self.next_child_index += 1;
         } else {
             unreachable!()
         }
@@ -43,9 +44,9 @@ impl BasicState for RandState {
 
     // this is a mess
     fn can_close(&self) -> CloseType {
-        match self.count {
-            0..=1 => CloseType::Able,
-            2 => CloseType::Force,
+        match self.next_child_index {
+            0..=2 => CloseType::Able,
+            3 => CloseType::Force,
             _ => unreachable!(),
         }
     }
@@ -61,6 +62,8 @@ impl BasicState for RandState {
 
 impl RandState {
     pub fn new() -> Self {
-        Self { count: 0 }
+        Self {
+            next_child_index: 0,
+        }
     }
 }
