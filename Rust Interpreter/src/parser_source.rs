@@ -149,7 +149,7 @@ impl<'a> ParserSource<'a> {
             }
         }
     }
-    pub fn get_iter<'b>(&'b self) -> ParserSourceIter {
+    pub fn get_iter(&self) -> ParserSourceIter {
         let mut ret = Vec::new();
         let mut add_newline = false;
         for s in &self.sources {
