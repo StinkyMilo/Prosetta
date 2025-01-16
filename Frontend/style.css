@@ -186,6 +186,10 @@ body {
   scrollbar-width: thin;
 }
 
+a{
+  color:greenyellow;
+}
+
 .tooltip>p {
   color: white;
   margin-left: 10px;

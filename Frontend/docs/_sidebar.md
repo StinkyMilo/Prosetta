@@ -44,6 +44,7 @@
     - [fin - Find](Find.md)
     - [ind - Index](Index.md)
     - [lis - List Constructor](List.md)
+    - [rep - List Replace](Replace.md)
 - Numbers and Math
     - [add - Add](Add.md)
     - [exp - Exponentiate](Exponentiate.md)
@@ -56,7 +57,6 @@
     - [pri - Print](Print.md)
     - [Random](Imports.md#rand---randomization)
         - [ran - Random](Random.md)
-    - [rep - List Replace](Replace.md)
     - [sub - Subtract](Subtract.md)
     - [tim - Multiply](Multiply.md)
     - [Trigonometry](Imports.md#trig---trigonometry)
