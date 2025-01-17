@@ -1,6 +1,6 @@
 # Quickstart - Part 2
 
-Next, we will write a basic starter program. Using (the main editor)[https://stinkymilo.github.io/Prosetta/Frontend/], start with the program below.
+Next, we will write a basic starter program. Using [the main editor](https://stinkymilo.github.io/Prosetta/Frontend/), start with the program below.
 
 ```
 Quickstart Example
