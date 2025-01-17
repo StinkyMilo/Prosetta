@@ -1,3 +1,6 @@
+- Quickstart
+    - [Quickstart Part 1](Quickstart_1.md)
+    - [Quickstart Part 2](Quickstart_2.md)
 - Language Overview
     - [Using the Language](README.md#using-the-language)
     - [The Alias System](README.md#the-alias-system)
@@ -44,6 +47,7 @@
     - [fin - Find](Find.md)
     - [ind - Index](Index.md)
     - [lis - List Constructor](List.md)
+    - [rep - List Replace](Replace.md)
 - Numbers and Math
     - [add - Add](Add.md)
     - [exp - Exponentiate](Exponentiate.md)
@@ -56,7 +60,6 @@
     - [pri - Print](Print.md)
     - [Random](Imports.md#rand---randomization)
         - [ran - Random](Random.md)
-    - [rep - List Replace](Replace.md)
     - [sub - Subtract](Subtract.md)
     - [tim - Multiply](Multiply.md)
     - [Trigonometry](Imports.md#trig---trigonometry)
