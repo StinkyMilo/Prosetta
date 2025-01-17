@@ -13,7 +13,7 @@ pub trait BasicState {
     fn get_name(&self) -> &'static str;
 
     /// set expr and return whether it is first
-    fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool;
+    fn do_first(&mut self, expr: &mut Expr, locs: Vec<usize>) -> bool;
 
     /// add children at index to self
     fn add_child(&mut self, expr: &mut Expr, index: usize, return_type: ReturnType);
