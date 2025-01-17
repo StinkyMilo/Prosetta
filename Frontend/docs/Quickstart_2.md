@@ -99,7 +99,7 @@ arc inside.
 fil red.
 `" 
 :code-wordier="`
-Evil Demon Time
+Quickstart Example
 by Milo Jacobs and John Graphton\n
 There I was, inside the Elite Demon Conference!
 I needed to sacrifice a goat to get inside.

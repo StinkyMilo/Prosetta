@@ -367,6 +367,20 @@ fn test_punctuation () -> () {
 
 #[test]
 #[timeout(2000)]
+fn test_quickstart1 () -> () {
+    test_file("../Frontend/docs/Quickstart_1.md");
+}
+
+
+#[test]
+#[timeout(2000)]
+fn test_quickstart2 () -> () {
+    test_file("../Frontend/docs/Quickstart_2.md");
+}
+
+
+#[test]
+#[timeout(2000)]
 fn test_readme () -> () {
     test_file("../Frontend/docs/README.md");
 }
