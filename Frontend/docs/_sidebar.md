@@ -2,9 +2,9 @@
     - [Quickstart Part 1](Quickstart_1.md)
     - [Quickstart Part 2](Quickstart_2.md)
 - Language Overview
-    - [Using the Language](README.md#using-the-language)
-    - [The Alias System](README.md#the-alias-system)
-    - [Types](README.md#types-in-prosetta)
+    - [Using the Language](Overview.md#using-the-language)
+    - [The Alias System](Overview.md#the-alias-system)
+    - [Types](Overview.md#types-in-prosetta)
     - [Imports](Imports.md)
     - [Key Vocabulary](Glossary.md)
         - [Word](Glossary.md#Word)

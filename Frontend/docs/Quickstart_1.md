@@ -26,7 +26,9 @@ output-method='canvas'></editor>
 The editor in the documentation pages will have both a "minimal" and "wordier" version. You can click the button at the top to switch between those two modes. The minimal version shows you just the aliases; in other words, only the parts of the program that the compiler pays attention to. The wordier version gives an idea of how you could turn the minimal version into a program.
 
 ### Canvas vs. JavaScript
-Prosetta's "compiler" is actually a "transpiler", meaning it converts your code to JavaScript then runs the JavaScript code. Switching the toggle at the top of the editor will let you view that code, which is useful for debugging purposes.
+Prosetta's "compiler" is actually a *transpiler*, meaning it converts your code to JavaScript then runs the JavaScript code. Switching the toggle at the top of the editor will let you view that code, which is useful for debugging purposes.
 
 ### Word Suggestions
-If you hover over an alias with your mouse, you can view suggestions for words that you can use in place of the current word that will trigger the same command. These words are in order of their frequency of use, so more common words will appear first. You can click the buttons on the popup to filter by different parts of speech. If you click any of the words, the editor will insert that word for you, and if you click the name of the alias (highlighted in green) you can view the documentation page for that alias. These suggestions will be very useful for converting "minimal" programs to "wordier" ones.
+If you hover over an alias with your mouse, you can view suggestions for words that you can use in place of the current word that will trigger the same alias. These words are in order of their frequency of use, so more common words will appear first. You can click the buttons on the popup to filter by different parts of speech. If you click any of the words, the editor will insert that word for you, and if you click the name of the alias (highlighted in green) you can view the documentation page for that alias. These suggestions will be very useful for converting "minimal" programs to "wordier" ones.
+
+Move to [Part 2](Quickstart_2.md) to walk through the full process of building a program.

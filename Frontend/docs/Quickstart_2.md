@@ -80,6 +80,11 @@ With this info, let's try replacing the ugly `..` at the end of line 4 with `!`.
 
 For more information on punctuation, see [Punctuation](Punctuation.md)
 
+### How Aliases Work
+
+We're about to start turning this code into a poem, so we should understand how that process works. Aliases are triggered by words that contain them as a *subsequence*. This is different from a substring in that, although all letters of the alias must be present in the correct order, the subsequence may be interrupted by other letters. For example, the word `wizards` triggers the alias `was`, because it contains w then a then s, even though there are other letters between them. 
+
+
 ### Let's Write a Poem! 
 
 Let's take a look at our new code below. This, of course, doesn't really look like a poem yet, but that can be changed! Try hovering your mouse over `fil` and clicking `familiar`. Then we can turn line 6 into a sentence. Maybe, `The sky glowed a familiar red.` Notice all the new letters we added are not highlighted. This means the compiler ignores them entirely.
@@ -109,6 +114,7 @@ They searched inside the building for anyone out of place.
 The filthy floor was red with the blood of those they found.
 `"
 output-method='canvas'></editor>
+
 
 ## Dealing with Errors
 You'll likely run into problems using Prosetta. Unlike other languages, Prosetta will never throw an error. Instead, it will simply ignore any part of the code it doesn't understand. This can make debugging difficult when compared to other languages. Our main recommendation is to pay attention to syntax highlighting and JavaScript output. When code isn't giving you the output you expect, check what parts are being ignored. Common errors include using the wrong number of arguments and not closing a function with the proper punctuation.
