@@ -4,6 +4,7 @@ var parser;
 var version = 0;
 
 onmessage = async function(e) {
+  console.log("recv msg");
   let command = e.data.command;
   let data = e.data.data;
   if (!has_initialized && command != "initialize") {

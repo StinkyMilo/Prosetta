@@ -531,8 +531,7 @@ async function initialize(startingCode) {
   showing_canvas = true;
   update_output();
 
-  setup_webworker();
-  language_worker.postMessage({ command: "initialize" });
+  setup_lang_worker();
   init_canvas();
   print_console("Welcome to Prosetta!");
   print_console("---");
@@ -580,59 +579,59 @@ function setup_editor(startingCode) {
   const PARTS_OF_SPEECH = ["noun", "verb", "adjective", "adverb", "other"];
   const BASE_URL = "https://stinkymilo.github.io/Prosetta/Frontend/docs/#/"
   const URLS = {
-    "fra":"Frame",
-    "als":"And",
-    "inv":"Not",
-    "les":"LessThan",
-    "mor":"GreaterThan",
-    "oth":"Or",
-    "par":"Comparison",
-    "els":"Else",
-    "fre":"Foreach",
-    "not":"Ignore",
-    "whe":"If",
-    "whi":"While",
-    "fun":"Function",
-    "ret":"Return",
-    "arc":"Ellipse",
-    "bez":"Bezier",
-    "col":"Color",
-    "fil":"Fill",
-    "lin":"Line",
-    "mov":"MoveTo",
-    "pen":"LineWidth",
-    "rec":"Rectangle",
-    "sto":"Stroke",
-    "tur":"Rotate",
-    "app":"Append",
-    "cou":"Length",
-    "del":"Delete",
-    "fin":"Find",
-    "ind":"Index",
-    "lis":"List",
-    "add":"Add",
-    "exp":"Exponentiate",
-    "flo":"Floor",
-    "ide":"Divide",
-    "int":"Int",
-    "lit":"Lit",
-    "log":"Log",
-    "mod":"Modulo",
-    "pri":"Print",
-    "ran":"Random",
-    "rep":"Replace",
-    "sub":"Subtract",
-    "tim":"Multiply",
-    "cos":"Cosine",
-    "sin":"Sine",
-    "tan":"Tangent",
-    "was":"Variable",
-    "hea":"Heart",
-    "kir":"Kirby",
-    "pol":"Polygon",
-    "roc":"RoundedRectangle",
-    "sta":"Star",
-    "tri":"Triangle"
+    "fra": "Frame",
+    "als": "And",
+    "inv": "Not",
+    "les": "LessThan",
+    "mor": "GreaterThan",
+    "oth": "Or",
+    "par": "Comparison",
+    "els": "Else",
+    "fre": "Foreach",
+    "not": "Ignore",
+    "whe": "If",
+    "whi": "While",
+    "fun": "Function",
+    "ret": "Return",
+    "arc": "Ellipse",
+    "bez": "Bezier",
+    "col": "Color",
+    "fil": "Fill",
+    "lin": "Line",
+    "mov": "MoveTo",
+    "pen": "LineWidth",
+    "rec": "Rectangle",
+    "sto": "Stroke",
+    "tur": "Rotate",
+    "app": "Append",
+    "cou": "Length",
+    "del": "Delete",
+    "fin": "Find",
+    "ind": "Index",
+    "lis": "List",
+    "add": "Add",
+    "exp": "Exponentiate",
+    "flo": "Floor",
+    "ide": "Divide",
+    "int": "Int",
+    "lit": "Lit",
+    "log": "Log",
+    "mod": "Modulo",
+    "pri": "Print",
+    "ran": "Random",
+    "rep": "Replace",
+    "sub": "Subtract",
+    "tim": "Multiply",
+    "cos": "Cosine",
+    "sin": "Sine",
+    "tan": "Tangent",
+    "was": "Variable",
+    "hea": "Heart",
+    "kir": "Kirby",
+    "pol": "Polygon",
+    "roc": "RoundedRectangle",
+    "sta": "Star",
+    "tri": "Triangle"
   }
   /*
     Returns a node that contains the alternate word suggestions
@@ -882,8 +881,11 @@ function setup_editor(startingCode) {
   */
 }
 
-function setup_webworker() {
+function setup_lang_worker() {
+  language_worker?.terminate();
+  version = 0;
   language_worker = new Worker(new URL("./language_worker.js", import.meta.url));
+  language_worker.postMessage({ command: "initialize" });
   language_worker.onmessage = e => {
     let command = e.data.command;
     let data = e.data.data;
@@ -913,6 +915,10 @@ function setup_webworker() {
         break;
     }
   };
+  if (editor) {
+    editor.doc.getAllMarks().forEach(marker => marker.clear());
+    editor.setValue(editor.getValue());
+  }
 }
 
 function setup_runner() {
@@ -988,7 +994,7 @@ function pause() {
 }
 
 function reset() {
-  initialize(editor.getValue());
+  setup_lang_worker();
 }
 
 function draw_frame() {
