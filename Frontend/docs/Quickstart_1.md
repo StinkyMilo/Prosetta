@@ -1,6 +1,8 @@
 # Quickstart - Part 1
 
-Prosetta is an esoteric programming language in which code sounds like poetry. A common goal of Prosetta programs is to hide the code you write within a poem or piece of prose. This is accomplished by looking for specific aliases within your code that trigger commands. An alias is a subsequence of letters that triggers a command, and a command is a function or other standard programming language feature. When the parser reaches a word that contains an alias, the corresponding command is triggered, and the next part of the poem will be used to provide arguments to that command. Every piece of text that doesn't trigger an alias or otherwise parse will be ignored. 
+Prosetta is an esoteric programming language in which code sounds like poetry. A common goal of Prosetta programs is to hide the code you write within a poem or piece of prose. This is accomplished by looking for specific aliases within your code that trigger commands. When the parser reaches a word that contains an alias, the corresponding command is triggered, and the next part of the poem will be used to provide arguments to that command. Every piece of text that doesn't trigger an alias or otherwise parse will be ignored. 
+
+Using this language, you can make a poem about nature that parses to an image of a flower or a poem about a calculator that prints out some calculations, or you can hide an animation of a rotating eye in what seems to be an introduction to a programming language (not this introduction, sadly, but we'll link to one here eventually!) 
 
 This tutorial will guide you through getting started with Prosetta. It will assume you have some programming experience, but it will not require that you know any one language (though JavaScript will be particularly helpful).
 
