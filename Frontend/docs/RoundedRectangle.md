@@ -1,4 +1,4 @@
-# Hea - Heart
+# Roc - Rounded Rectangle
 
 Draws a rounded rectangle, either at the turtle's position or at a specified relative position, of a specified size. It can be stretched along the x and y axes. The final argument is the border radius in pixels.
 
