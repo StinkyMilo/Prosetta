@@ -578,6 +578,62 @@ function setup_editor(startingCode) {
   editor.setSize("100%", "100%");
 
   const PARTS_OF_SPEECH = ["noun", "verb", "adjective", "adverb", "other"];
+  const BASE_URL = "https://stinkymilo.github.io/Prosetta/Frontend/docs/#/"
+  const URLS = {
+    "fra":"Frame",
+    "als":"And",
+    "inv":"Not",
+    "les":"LessThan",
+    "mor":"GreaterThan",
+    "oth":"Or",
+    "par":"Comparison",
+    "els":"Else",
+    "fre":"Foreach",
+    "not":"Ignore",
+    "whe":"If",
+    "whi":"While",
+    "fun":"Function",
+    "ret":"Return",
+    "arc":"Ellipse",
+    "bez":"Bezier",
+    "col":"Color",
+    "fil":"Fill",
+    "lin":"Line",
+    "mov":"MoveTo",
+    "pen":"LineWidth",
+    "rec":"Rectangle",
+    "sto":"Stroke",
+    "tur":"Rotate",
+    "app":"Append",
+    "cou":"Length",
+    "del":"Delete",
+    "fin":"Find",
+    "ind":"Index",
+    "lis":"List",
+    "add":"Add",
+    "exp":"Exponentiate",
+    "flo":"Floor",
+    "ide":"Divide",
+    "int":"Int",
+    "lit":"Lit",
+    "log":"Log",
+    "mod":"Modulo",
+    "pri":"Print",
+    "ran":"Random",
+    "rep":"Replace",
+    "sub":"Subtract",
+    "tim":"Multiply",
+    "cos":"Cosine",
+    "sin":"Sine",
+    "tan":"Tangent",
+    "was":"Variable",
+    "hea":"Heart",
+    "kir":"Kirby",
+    "pol":"Polygon",
+    "roc":"RoundedRectangle",
+    "sta":"Star",
+    "tri":"Triangle"
+  }
   /*
     Returns a node that contains the alternate word suggestions
   */
@@ -591,7 +647,7 @@ function setup_editor(startingCode) {
     let words;
     if (tooltip.type == "alias") {
       words = wordsForAliases[tooltip.value];
-      u.innerHTML = "Words that trigger " + tooltip.value;
+      u.innerHTML = "Words that trigger <a href='" + BASE_URL + URLS[tooltip.value] + "' rel='noopener noreferrer' target='_blank'>" + tooltip.value + "</a>";
     } else if (tooltip.type == "length") {
       words = getWordsOfLength(tooltip.len, tooltip.mod10);
       if (tooltip.mod10) {

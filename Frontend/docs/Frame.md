@@ -9,16 +9,14 @@ Any word that triggers `fra` is treated like a variable, which means that, unlik
 <editor :code='`
 Frame Example
 by Milo Jacobs, Lord Framingham III, and John Graphton.\n
-arc 0 sub mod tim 4 fra. 400. 200. 30.
-fil blue.
+tur fra.
+rec 200 5.
 `' 
 :code-wordier="`
 Frame Example
 by Milo Jacobs, Lord Framingham III, and John Graphton.\n
-March, you litany.
-    Subtract a modicum of time from four to frame. 
-    Walk four-hundred yards, then two-hundred, then thirty.
-fil blue.
+The future is fractured into a million pieces.
+Reach two-hundred lightyears ahead!
 `"
 output-method='canvas'></editor>
 

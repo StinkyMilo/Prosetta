@@ -23,7 +23,7 @@ impl BasicState for IndexState {
         }
     }
 
-    fn do_first(&self, expr: &mut Expr, locs: Vec<usize>) -> bool {
+    fn do_first(&mut self, expr: &mut Expr, locs: Vec<usize>) -> bool {
         let ret = self.count == 0;
         if ret {
             *expr = Expr::Index {

@@ -1,6 +1,6 @@
 # Whe - If
 
-An if statement. If the condition (first argument) is true, execute all other arguments as statements. Uses JavaScript truthiness.
+An if statement. If the condition (first argument) is true, execute all other arguments as statements. Uses JavaScript truthiness. An if statement can be followed by an [else](Else.md) statement.
 
 ## Arguments
 

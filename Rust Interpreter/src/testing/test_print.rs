@@ -36,3 +36,25 @@ fn test_pri_varible_casing() {
             (print@26,27,28$45 (var \"hi1\"@30) (var \"hi1\"@34) (var \"hi2\"@38) (var \"hi2\"@42))"
         );
 }
+
+#[test]
+#[timeout(1000)]
+fn test_pri_find_close_after_string() {
+    let data = run_parser!(b"programming \"a message\" well.\nwas unprint \"another thing\".");
+    check_lisp!(data,
+            "(print@0,1,8$28 \"a message\"@12)\n(assign@30,31,32$57 \"unprint\"@34 \"another thing\"@42)"
+        );
+}
+
+#[test]
+#[timeout(1000)]
+fn test_pri_find_close_after_expr() {
+    let data = run_parser!(
+        b"programming \"one plus two\" add one two. well.\nwas unprint \"another thing\"."
+    );
+    check_lisp!(
+        data,
+        "(print@0,1,8$44 \"one plus two\"@12 (+@27,28,29$38 (litnum 1@31$$3) (litnum 2@35$$3)))\n\
+        (assign@46,47,48$73 \"unprint\"@50 \"another thing\"@58)"
+    );
+}

@@ -346,6 +346,13 @@ fn test_or () -> () {
 
 #[test]
 #[timeout(2000)]
+fn test_overview () -> () {
+    test_file("../Frontend/docs/Overview.md");
+}
+
+
+#[test]
+#[timeout(2000)]
 fn test_polygon () -> () {
     test_file("../Frontend/docs/Polygon.md");
 }
@@ -362,6 +369,20 @@ fn test_print () -> () {
 #[timeout(2000)]
 fn test_punctuation () -> () {
     test_file("../Frontend/docs/Punctuation.md");
+}
+
+
+#[test]
+#[timeout(2000)]
+fn test_quickstart1 () -> () {
+    test_file("../Frontend/docs/Quickstart_1.md");
+}
+
+
+#[test]
+#[timeout(2000)]
+fn test_quickstart2 () -> () {
+    test_file("../Frontend/docs/Quickstart_2.md");
 }
 
 

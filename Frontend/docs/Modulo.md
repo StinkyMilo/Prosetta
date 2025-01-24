@@ -1,6 +1,6 @@
-# Log - Logarithm
+# Mod - Modulo
 
-Modulo operator. Given two arguments, returns the remainder when dividing one by the other. Consistent with JavaScript's modulo operator. Unlike in other languages, this must be in prefix notation, meaning the word containing "mod" as a subsequence must come before its arguments. 
+The modulo operator. Given two arguments, returns the remainder when dividing one by the other. Consistent with JavaScript's modulo operator. Unlike in other languages, this must be in prefix notation, meaning the word containing "mod" as a subsequence must come before its arguments. 
 
 ## Arguments
 
