@@ -20,7 +20,7 @@ Draws a photorealistic Kirby the dog, either at the turtle's position or at a sp
 
 <editor :code="`
 Kirby Example
-by Milo Jacobs and Stampton G. Stampton
+by Milo Jacobs and Stampton G. Stampton\n
 kir 400 400.
 `"
 :code-wordier="`
