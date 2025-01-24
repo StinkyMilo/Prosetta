@@ -1,9 +1,3 @@
 `My Poem`;
-"By Milo Jacobs, John Graphton, Alice Framingham";
+"By Milo Jacobs, John Graphton, Alice Framingham, t was frame ide fra 5, whi mor frame 20, was frame sub frame 20, tur ide tim frame frame, 2, rec tim frame frame";
 
-let frame_var = (_frame / 5);
-while_loop(() => (frame_var > 20), () => {
-  frame_var = (frame_var - 20);
-});
-rotate_delta(((frame_var * frame_var) / 2));
-draw_rect((frame_var * frame_var));
