@@ -513,6 +513,9 @@ function updateCode() {
 }
 
 async function initialize(startingCode) {
+  for (const tooltip of document.getElementsByClassName("tooltip")) {
+    tooltip.remove();
+  }
   version = 0;
   language_worker?.terminate();
   output_toggle_btn = document.getElementById("output-toggle");
@@ -580,59 +583,59 @@ function setup_editor(startingCode) {
   const PARTS_OF_SPEECH = ["noun", "verb", "adjective", "adverb", "other"];
   const BASE_URL = "https://stinkymilo.github.io/Prosetta/Frontend/docs/#/"
   const URLS = {
-    "fra":"Frame",
-    "als":"And",
-    "inv":"Not",
-    "les":"LessThan",
-    "mor":"GreaterThan",
-    "oth":"Or",
-    "par":"Comparison",
-    "els":"Else",
-    "fre":"Foreach",
-    "not":"Ignore",
-    "whe":"If",
-    "whi":"While",
-    "fun":"Function",
-    "ret":"Return",
-    "arc":"Ellipse",
-    "bez":"Bezier",
-    "col":"Color",
-    "fil":"Fill",
-    "lin":"Line",
-    "mov":"MoveTo",
-    "pen":"LineWidth",
-    "rec":"Rectangle",
-    "sto":"Stroke",
-    "tur":"Rotate",
-    "app":"Append",
-    "cou":"Length",
-    "del":"Delete",
-    "fin":"Find",
-    "ind":"Index",
-    "lis":"List",
-    "add":"Add",
-    "exp":"Exponentiate",
-    "flo":"Floor",
-    "ide":"Divide",
-    "int":"Int",
-    "lit":"Lit",
-    "log":"Log",
-    "mod":"Modulo",
-    "pri":"Print",
-    "ran":"Random",
-    "rep":"Replace",
-    "sub":"Subtract",
-    "tim":"Multiply",
-    "cos":"Cosine",
-    "sin":"Sine",
-    "tan":"Tangent",
-    "was":"Variable",
-    "hea":"Heart",
-    "kir":"Kirby",
-    "pol":"Polygon",
-    "roc":"RoundedRectangle",
-    "sta":"Star",
-    "tri":"Triangle"
+    "fra": "Frame",
+    "als": "And",
+    "inv": "Not",
+    "les": "LessThan",
+    "mor": "GreaterThan",
+    "oth": "Or",
+    "par": "Comparison",
+    "els": "Else",
+    "fre": "Foreach",
+    "not": "Ignore",
+    "whe": "If",
+    "whi": "While",
+    "fun": "Function",
+    "ret": "Return",
+    "arc": "Ellipse",
+    "bez": "Bezier",
+    "col": "Color",
+    "fil": "Fill",
+    "lin": "Line",
+    "mov": "MoveTo",
+    "pen": "LineWidth",
+    "rec": "Rectangle",
+    "sto": "Stroke",
+    "tur": "Rotate",
+    "app": "Append",
+    "cou": "Length",
+    "del": "Delete",
+    "fin": "Find",
+    "ind": "Index",
+    "lis": "List",
+    "add": "Add",
+    "exp": "Exponentiate",
+    "flo": "Floor",
+    "ide": "Divide",
+    "int": "Int",
+    "lit": "Lit",
+    "log": "Log",
+    "mod": "Modulo",
+    "pri": "Print",
+    "ran": "Random",
+    "rep": "Replace",
+    "sub": "Subtract",
+    "tim": "Multiply",
+    "cos": "Cosine",
+    "sin": "Sine",
+    "tan": "Tangent",
+    "was": "Variable",
+    "hea": "Heart",
+    "kir": "Kirby",
+    "pol": "Polygon",
+    "roc": "RoundedRectangle",
+    "sta": "Star",
+    "tri": "Triangle"
   }
   /*
     Returns a node that contains the alternate word suggestions
@@ -647,17 +650,17 @@ function setup_editor(startingCode) {
     let words;
     if (tooltip.type == "alias") {
       words = wordsForAliases[tooltip.value];
-      u.innerHTML = "Words that trigger <a href='" + BASE_URL + URLS[tooltip.value] + "' rel='noopener noreferrer' target='_blank'>" + tooltip.value + "</a>";
+      u.innerHTML = `Words that trigger <a href='${BASE_URL}${URLS[tooltip.value]}' rel='noopener noreferrer' target='_blank'>${tooltip.value}</a>`;
     } else if (tooltip.type == "length") {
       words = getWordsOfLength(tooltip.len, tooltip.mod10);
       if (tooltip.mod10) {
-        u.innerHTML = "Words of length " + tooltip.len + ", " + (tooltip.len + 10) + " etc.";
+        u.innerHTML = `Words of length ${tooltip.len}, ${tooltip.len + 10} etc.`;
       } else {
-        u.innerHTML = "Words of length " + tooltip.len;
+        u.innerHTML = `Words of length ${tooltip.len}`;
       }
     } else if (tooltip.type == "variable") {
       words = getWordsThatContain(tooltip.name);
-      u.innerHTML = "Words that contain the variable " + tooltip.name;
+      u.innerHTML = `Words that contain the variable ${tooltip.name}`;
     }
     let buttonContainer = document.createElement("div");
     buttonContainer.className = "posTabGroup";
@@ -704,7 +707,7 @@ function setup_editor(startingCode) {
     return widget;
   }
 
-  let activeWidget;
+  let activeWidget = null;
   let lastWordPos = { line: -1, ch: -1 };
   let displayTimeout;
   let removeTimeout;
@@ -754,7 +757,7 @@ function setup_editor(startingCode) {
     let thisTooltip = null;
     let txtInd = editor.indexFromPos(textPos);
     for (let i = 0; i < tooltips.length; i++) {
-      if (tooltips[i].start <= txtInd && txtInd <= tooltips[i].end) {
+      if (tooltips[i].start <= txtInd && txtInd < tooltips[i].end) {
         thisTooltip = tooltips[i];
         break;
       }
@@ -842,8 +845,14 @@ function setup_editor(startingCode) {
         currentWordEnd = wordPos.head;
         clearWidget();
         activeWidget = getNewTooltip(thisTooltip);
+        document.body.appendChild(activeWidget);
+        activeWidget.style.position = "absolute";
+        activeWidget.style.left = e.pageX + "px";
+        activeWidget.style.top = e.pageY + "px";
+        console.log(activeWidget);
         lastWordPos = midPos;
-        editor.addWidget(midPos, activeWidget);
+        // editor.addWidget(midPos, activeWidget);
+        // sourcecode.appendChild(activeWidget);
       }, 500);
       if (removeTimeout != null) {
         clearTimeout(removeTimeout);
