@@ -44,17 +44,11 @@ impl ParseState for TitleState {
                 self.is_author_closed = false;
                 MatchResult::Continue(0)
                 // is name close
-            } else if separator.only_forced {
+            } else {
                 self.is_author_closed = true;
                 self.data.delim.push((word.pos, separator.close_length));
 
                 MatchResult::Continue(0)
-                // is total close
-            } else {
-                self.data.delim.push((word.pos, separator.close_length));
-                let title = mem::replace(&mut self.data, Title::new());
-                *env.expr = Expr::Title { data: title };
-                MatchResult::Matched(word.pos, ReturnType::Void, true)
             }
         } else if word.len() >= 2 && word.str.to_ascii_lowercase() == b"by" {
             self.data
