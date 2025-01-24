@@ -1,6 +1,6 @@
 # Imports
 
-To prevent accidental triggering of aliases, Prosetta requires you to _import_ libraries of aliases. Some aliases are imported by default, while some are parts of a library. Aliases are generally organized by library in these docs, but to be fully sure you should check the documentation's example of each alias to determine which library it is from.
+It's easy to accidentally trigger aliases in Prosetta. For that reason, Prosetta requires you to _import_ libraries of aliases. Libraries are general categories of aliases that tend to be used together and that may not be used in every program. Many aliases are imported by default, while some are parts of a library. Aliases are generally organized by library in these docs, but to be fully sure you should check the documentation's example of each alias to determine which library it is from.
 
 Poems written in Prosetta all have a title and can have any number of authors. The first author can be anything you want, but we recommend writing your own name! The _second_ author and beyond are used for importing libraries. Libraries are [substrings](Glossary.md#substring-matching) within author names. Libraries and examples are shown below.
 

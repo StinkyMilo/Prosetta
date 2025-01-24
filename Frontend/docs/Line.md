@@ -24,12 +24,19 @@ Draws a line without ending the current shape. The relative-coordinate overrides
 
 <editor :code="`
 Line Example
-by Milo Jacobs and John Graphton\n
+by Milo Jacobs and John Graham\n
 lin 10 10.
+lin 50.
+lin 30 30 40.
+lin 20 20 30 30.
 `" 
 :code-wordier="`
 Line Example
-by Milo Jacobs and John Graphton\n
+by Milo Jacobs and John Graham\n
 Line up at ten past ten!
+Line up with 50 people per row!
+Line up thirty people in thirty rows and forty columns!
+Make a line of 20 by 20, 30 by 30, five hundred by a thousand! 
+I don't care, just do it!
 `"
 output-method='canvas'></editor>
