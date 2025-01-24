@@ -1,6 +1,6 @@
 # Quickstart - Part 2
 
-Next, we will write a basic starter program. Using [the main editor](https://stinkymilo.github.io/Prosetta/Frontend/), start with the program below.
+Next, we will write a basic starter program. Click [here](https://stinkymilo.github.io/Prosetta/Frontend/) to go to [the main editor](https://stinkymilo.github.io/Prosetta/Frontend/), then delete everything and paste in the program below.
 
 ```
 Quickstart Example
@@ -12,7 +12,7 @@ by Milo Jacobs and John Graphton
 
 ### The Header
 
-The title and header are written for you. The title is mandatory, but it isn't evaluated. The poem also must have at least one author. The first author is ignored; you may write whatever name you'd like. All other authors are used for *imports*. John Graphton isn't a real person, but writing his name imports the *Graph*ics library.
+The title and header are written for you. The title is mandatory, but it isn't evaluated. The poem also must have at least one author. The first author is ignored; you may write whatever name you'd like. All other authors are used for [Imports](Imports.md). John Graphton isn't a real person, but writing his name imports the *Gra*phics library. Imports exist to prevent you from activating aliases you don't want to use. Since not every program has graphics, you need to import them. 
 
 ### Drawing a Circle
 
