@@ -534,13 +534,13 @@ async function initialize(startingCode) {
   showing_canvas = true;
   update_output();
 
-  setup_webworker();
-  language_worker.postMessage({ command: "initialize" });
   init_canvas();
   print_console("Welcome to Prosetta!");
   print_console("---");
   print_console();
-  let editor = setup_editor(startingCode);
+  let editor = setup_editor();
+  setup_lang_worker();
+  editor.setValue(startingCode);
   return editor;
 }
 
@@ -566,7 +566,7 @@ function getWordsThatContain(substr) {
   });
 }
 
-function setup_editor(startingCode) {
+function setup_editor() {
   let code = document.getElementById("code");
   while (code.hasChildNodes()) {
     code.removeChild(code.firstChild);
@@ -864,7 +864,6 @@ function setup_editor(startingCode) {
   editor.on("change", (cm, change) => {
     updateCode();
   });
-  editor.setValue(startingCode);
   return editor;
   /**
    * cursorActivity event gets when cursor or selection moves
@@ -886,13 +885,14 @@ function setup_editor(startingCode) {
         Start a new timeout
       If a timeout completes,
         Create a tooltip for the corresponding word, put at the word's end position
-        
-  
   */
 }
 
-function setup_webworker() {
+function setup_lang_worker() {
+  language_worker?.terminate();
+  version = 0;
   language_worker = new Worker(new URL("./language_worker.js", import.meta.url));
+  language_worker.postMessage({ command: "initialize" });
   language_worker.onmessage = e => {
     let command = e.data.command;
     let data = e.data.data;
@@ -901,6 +901,7 @@ function setup_webworker() {
         if (version != data.version) {
           break;
         }
+        console.log(data.js);
         setup_runner();
         imports = data.imports;
         jscode.innerText = data.js;
@@ -922,6 +923,10 @@ function setup_webworker() {
         break;
     }
   };
+  if (editor) {
+    editor.doc.getAllMarks().forEach(marker => marker.clear());
+    editor.setValue(editor.getValue());
+  }
 }
 
 function setup_runner() {
@@ -996,10 +1001,6 @@ function pause() {
   pause_icon.style.display = "none";
 }
 
-function reset() {
-  initialize(editor.getValue());
-}
-
 function draw_frame() {
   let now = Date.now();
   if (latest_frame == curr_frame && (now - last_frame_timestamp) > 1000 / target_fps) {
@@ -1048,7 +1049,7 @@ function toggle_canvas() {
   update_output();
 }
 
-window.reset = reset;
+window.reset = setup_lang_worker;
 window.toggle = toggle;
 window.toggle_canvas = toggle_canvas;
 window.update_output = update_output;
