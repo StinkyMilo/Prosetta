@@ -699,7 +699,13 @@ function setup_editor(startingCode) {
       tabContents[pos] = posTabContent;
     }
     header.appendChild(u);
+    let closeButton = document.createElement("button");
+    closeButton.innerHTML = "x";
+    closeButton.className="close-button";
+    closeButton.onclick = clearWidget;
+    //Start adding to widget directly.
     widget.appendChild(header);
+    widget.appendChild(closeButton);
     if(tooltip.type != "import"){
       widget.appendChild(buttonContainer);
       widget.appendChild(tabContainer); 
