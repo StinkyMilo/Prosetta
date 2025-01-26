@@ -26,8 +26,8 @@ rec tim frame frame!
 :code-wordier=null
 output-method='canvas'></editor>
 
-## Fram - Animation
-Any author with the substring _fram_ in their name will import the graphics library.
+## Fra - Animation
+Any author with the substring _fra_ in their name will import the graphics library.
 
 Additionally, importing this enables animation as a whole. See [Frame](Frame.md).
 
@@ -38,13 +38,13 @@ by Flynn Duniho and Sir Framingham the Mighty.
 ```
 
 ### Library
-The graphics library imports the following aliases:
+The frame library imports the following aliases:
 - [fra - Frame](Frame.md)
 
 
 
-## Func - Functions
-Any author with the substring _func_ in their name will import the functions library.
+## Fun - Functions
+Any author with the substring _fun_ in their name will import the functions library.
 
 ### Example
 ```
@@ -59,8 +59,8 @@ The functions library imports the following aliases
 
 
 
-## Graph - Graphics
-Any author with the word _graph_ in their name will import the graphics library.
+## Gra - Graphics
+Any author with the word _gra_ in their name will import the graphics library.
 
 ### Example
 ```
@@ -84,8 +84,8 @@ The graphics library imports the following aliases:
 
 
 
-## List - Lists
-Any author with the word _list_ in their name will import the lists library.
+## Lis - Lists
+Any author with the word _lis_ in their name will import the lists library.
 
 ### Example
 ```
@@ -99,7 +99,7 @@ The graphics library imports the following aliases:
 
 
 
-## Rand - Randomization
+## Ran - Randomization
 Any author with the substring _rand_ in their name will import the random library.
 
 ### Example
@@ -114,8 +114,8 @@ The random library imports the following aliases
 
 
 
-## Stamp - Stamps
-These are special graphics functions to draw pre-made complex shapes. By default, they are drawn at the turtle's position, but they can all also be drawn at a specified x and y coordinate. Some can be stretched on individual axes while some can only be scaled evenly. Some have an additional parameter to further customize the shape.
+## Tam - Stamps
+Any author with the substring _tam_ in their name will import the random library. These are special graphics functions to draw pre-made complex shapes. By default, they are drawn at the turtle's position, but they can all also be drawn at a specified x and y coordinate. Some can be stretched on individual axes while some can only be scaled evenly. Some have an additional parameter to further customize the shape.
 
 ### Example
 ```
@@ -133,8 +133,8 @@ The stamp library imports the following aliases
 - [tri - Triangle](Triangle.md)
 
 
-## Trig - Trigonometry
-Any author with the substring _trig_ in their name will import the trigonometry library.
+## Tri - Trigonometry
+Any author with the substring _tri_ in their name will import the trigonometry library.
 
 ### Example
 ```

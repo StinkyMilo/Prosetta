@@ -18,4 +18,4 @@ See [The Alias System](Overview.md#the-alias-system).
 	
 Variables, functions, and ignored values all use substring matching. Unlike subsequence matching, all letters in the string must be in a single contiguous block in order for the string to match. This means that you can, for example, declare a function called "walk" and then the word "walked" will evaluate to that variable.
 
-If multiple substrings are matched, the longer substring takes priority.
+If multiple substrings are matched, the longer substring takes priority (e.g. with variables `abc` and `abcd`, `abcde` matchess `abcd`). If both substrings are the same length, the one that starts first takes priority (e.g. with variables `bcd` and `abc`, `abcd` matches `abc`).
