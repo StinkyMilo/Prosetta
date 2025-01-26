@@ -636,7 +636,7 @@ function setup_editor(startingCode) {
     "tri":"Triangle"
   };
   const IMPORTS = {
-    "fram":"Animations",
+    "fram":"Animation",
     "fun":"Functions",
     "gra":"Graphics",
     "lis":"Lists",
@@ -670,7 +670,7 @@ function setup_editor(startingCode) {
       u.innerHTML = "Words that contain the variable " + tooltip.name;
     }else if(tooltip.type == "import"){
       words = [];
-      u.innerHTML = `Import: <a href='${BASE_URL_IMPORTS+tooltip.name}-${IMPORTS[tooltip.name]}'>${IMPORTS[tooltip.name]}</a> Library`;
+      u.innerHTML = `Import: <a href='${BASE_URL_IMPORTS+tooltip.name}-${IMPORTS[tooltip.name].toLowerCase()}' rel='noopener noreferrer' target='_blank'>${IMPORTS[tooltip.name]}</a> Library`;
     }
     let buttonContainer = document.createElement("div");
     buttonContainer.className = "posTabGroup";
