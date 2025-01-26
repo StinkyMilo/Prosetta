@@ -578,7 +578,8 @@ function setup_editor(startingCode) {
   editor.setSize("100%", "100%");
 
   const PARTS_OF_SPEECH = ["noun", "verb", "adjective", "adverb", "other"];
-  const BASE_URL = "https://stinkymilo.github.io/Prosetta/Frontend/docs/#/"
+  const BASE_URL = "https://stinkymilo.github.io/Prosetta/Frontend/docs/#/";
+  const BASE_URL_IMPORTS = BASE_URL + "Imports#";
   const URLS = {
     "fra":"Frame",
     "als":"And",
@@ -633,7 +634,16 @@ function setup_editor(startingCode) {
     "roc":"RoundedRectangle",
     "sta":"Star",
     "tri":"Triangle"
-  }
+  };
+  const IMPORTS = {
+    "fram":"Animations",
+    "fun":"Functions",
+    "gra":"Graphics",
+    "lis":"Lists",
+    "ran":"Randomization",
+    "tam":"Stamps",
+    "tri":"Trigonometry"
+  };
   /*
     Returns a node that contains the alternate word suggestions
   */
@@ -658,6 +668,9 @@ function setup_editor(startingCode) {
     } else if (tooltip.type == "variable") {
       words = getWordsThatContain(tooltip.name);
       u.innerHTML = "Words that contain the variable " + tooltip.name;
+    }else if(tooltip.type == "import"){
+      words = [];
+      u.innerHTML = `Import: <a href='${BASE_URL_IMPORTS+tooltip.name}-${IMPORTS[tooltip.name]}'>${IMPORTS[tooltip.name]}</a> Library`;
     }
     let buttonContainer = document.createElement("div");
     buttonContainer.className = "posTabGroup";
@@ -687,19 +700,23 @@ function setup_editor(startingCode) {
     }
     header.appendChild(u);
     widget.appendChild(header);
-    widget.appendChild(buttonContainer);
-    widget.appendChild(tabContainer);
-    for (let i = 0; i < words.length; i++) {
-      let matchingPos = partsOfSpeech[words[i]];
-      for (let j = 0; j < matchingPos.length; j++) {
-        let wordElement = document.createElement("div");
-        wordElement.innerHTML = words[i];
-        wordElement.onclick = () => {
-          editor.replaceRange(words[i], currentWordStart, currentWordEnd);
-          currentWordEnd = { line: currentWordStart.line, ch: currentWordStart.ch + words[i].length };
-        };
-        tabContents[matchingPos[j]].appendChild(wordElement);
+    if(tooltip.type != "import"){
+      widget.appendChild(buttonContainer);
+      widget.appendChild(tabContainer); 
+      for (let i = 0; i < words.length; i++) {
+        let matchingPos = partsOfSpeech[words[i]];
+        for (let j = 0; j < matchingPos.length; j++) {
+          let wordElement = document.createElement("div");
+          wordElement.innerHTML = words[i];
+          wordElement.onclick = () => {
+            editor.replaceRange(words[i], currentWordStart, currentWordEnd);
+            currentWordEnd = { line: currentWordStart.line, ch: currentWordStart.ch + words[i].length };
+          };
+          tabContents[matchingPos[j]].appendChild(wordElement);
+        }
       }
+    }else{
+      widget.style.height = "auto";
     }
     return widget;
   }
