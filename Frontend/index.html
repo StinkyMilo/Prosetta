@@ -41,9 +41,11 @@ It is truly a miracle that they lived.
   <div id="codespace">
     <div class="tabContent noScroll" id="code"></div>
     <pre style="display: none;" readonly="true" class="tabContent" id="js">JavaScript</pre>
-    <div id="stack">
-      <canvas id="outputcanvas" width="400px" height="400px"></canvas>
-      <canvas id="outputcanvas2" style="visibility: hidden;" width="400px" height="400px"></canvas>
+    <div id="primary">
+      <div id="stack">
+        <canvas id="outputcanvas" width="400px" height="400px"></canvas>
+        <canvas id="outputcanvas2" style="visibility: hidden;" width="400px" height="400px"></canvas>
+      </div>
     </div>
   </div>
   <div id="controls">
@@ -53,7 +55,9 @@ It is truly a miracle that they lived.
       <img id="play-icon" src="icons/play.svg"></img>
     </button>
   </div>
-  <div id="console" />
+  <div id="secondary">
+    <div id="console" />
+  </div>
 </body>
 
 </html>
