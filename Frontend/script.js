@@ -512,7 +512,7 @@ function updateCode() {
   msg_worker("changed", src);
 }
 
-async function initialize(startingCode) {
+export async function initialize(startingCode) {
   for (const tooltip of document.getElementsByClassName("tooltip")) {
     tooltip.remove();
   }
