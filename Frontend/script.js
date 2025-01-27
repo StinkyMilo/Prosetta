@@ -439,10 +439,9 @@ function set_fill(...color) {
 
 function get_color(...color) {
   switch (color.length) {
+    case 0:
+      return "transparent";
     case 1:
-      if (color[0] == 0) {
-        return "transparent";
-      }
       return color[0];
     case 3:
       return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
