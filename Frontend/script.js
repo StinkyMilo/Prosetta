@@ -512,7 +512,7 @@ function updateCode() {
   msg_worker("changed", src);
 }
 
-async function initialize(startingCode) {
+export async function initialize(startingCode) {
   version = 0;
   language_worker?.terminate();
   output_toggle_btn = document.getElementById("output-toggle");
@@ -1056,6 +1056,10 @@ function update_output() {
   }
 }
 
+export function updateValue(newValue){
+  editor.setValue(newValue);
+}
+
 var showing_canvas = true;
 function toggle_canvas() {
   showing_canvas = !showing_canvas;
@@ -1066,4 +1070,5 @@ window.reset = reset;
 window.toggle = toggle;
 window.toggle_canvas = toggle_canvas;
 window.update_output = update_output;
-export default initialize;
+
+export default {initialize, updateValue};
