@@ -512,7 +512,10 @@ function updateCode() {
   msg_worker("changed", src);
 }
 
-export async function initialize(startingCode) {
+async function initialize(startingCode) {
+  for (const tooltip of document.getElementsByClassName("tooltip")) {
+    tooltip.remove();
+  }
   version = 0;
   language_worker?.terminate();
   output_toggle_btn = document.getElementById("output-toggle");
@@ -531,13 +534,13 @@ export async function initialize(startingCode) {
   showing_canvas = true;
   update_output();
 
-  setup_webworker();
-  language_worker.postMessage({ command: "initialize" });
   init_canvas();
   print_console("Welcome to Prosetta!");
   print_console("---");
   print_console();
-  let editor = setup_editor(startingCode);
+  let editor = setup_editor();
+  setup_lang_worker();
+  editor.setValue(startingCode);
   return editor;
 }
 
@@ -563,7 +566,7 @@ function getWordsThatContain(substr) {
   });
 }
 
-function setup_editor(startingCode) {
+function setup_editor() {
   let code = document.getElementById("code");
   while (code.hasChildNodes()) {
     code.removeChild(code.firstChild);
@@ -657,13 +660,13 @@ function setup_editor(startingCode) {
     let words;
     if (tooltip.type == "alias") {
       words = wordsForAliases[tooltip.value];
-      u.innerHTML = "Words that trigger <a href='" + BASE_URL + URLS[tooltip.value] + "' rel='noopener noreferrer' target='_blank'>" + tooltip.value + "</a>";
+      u.innerHTML = `Words that trigger <a href='${BASE_URL}${URLS[tooltip.value]}' rel='noopener noreferrer' target='_blank'>${tooltip.value}</a>`;
     } else if (tooltip.type == "length") {
       words = getWordsOfLength(tooltip.len, tooltip.mod10);
       if (tooltip.mod10) {
-        u.innerHTML = "Words of length " + tooltip.len + ", " + (tooltip.len + 10) + " etc.";
+        u.innerHTML = `Words of length ${tooltip.len}, ${tooltip.len + 10} etc.`;
       } else {
-        u.innerHTML = "Words of length " + tooltip.len;
+        u.innerHTML = `Words of length ${tooltip.len}`;
       }
     } else if (tooltip.type == "variable") {
       words = getWordsThatContain(tooltip.name);
@@ -727,7 +730,7 @@ function setup_editor(startingCode) {
     return widget;
   }
 
-  let activeWidget;
+  let activeWidget = null;
   let lastWordPos = { line: -1, ch: -1 };
   let displayTimeout;
   let removeTimeout;
@@ -777,7 +780,7 @@ function setup_editor(startingCode) {
     let thisTooltip = null;
     let txtInd = editor.indexFromPos(textPos);
     for (let i = 0; i < tooltips.length; i++) {
-      if (tooltips[i].start <= txtInd && txtInd <= tooltips[i].end) {
+      if (tooltips[i].start <= txtInd && txtInd < tooltips[i].end) {
         thisTooltip = tooltips[i];
         break;
       }
@@ -865,8 +868,14 @@ function setup_editor(startingCode) {
         currentWordEnd = wordPos.head;
         clearWidget();
         activeWidget = getNewTooltip(thisTooltip);
+        document.body.appendChild(activeWidget);
+        activeWidget.style.position = "absolute";
+        activeWidget.style.left = e.pageX + "px";
+        activeWidget.style.top = e.pageY + "px";
+        console.log(activeWidget);
         lastWordPos = midPos;
-        editor.addWidget(midPos, activeWidget);
+        // editor.addWidget(midPos, activeWidget);
+        // sourcecode.appendChild(activeWidget);
       }, 500);
       if (removeTimeout != null) {
         clearTimeout(removeTimeout);
@@ -878,7 +887,6 @@ function setup_editor(startingCode) {
   editor.on("change", (cm, change) => {
     updateCode();
   });
-  editor.setValue(startingCode);
   return editor;
   /**
    * cursorActivity event gets when cursor or selection moves
@@ -900,13 +908,14 @@ function setup_editor(startingCode) {
         Start a new timeout
       If a timeout completes,
         Create a tooltip for the corresponding word, put at the word's end position
-        
-  
   */
 }
 
-function setup_webworker() {
+function setup_lang_worker() {
+  language_worker?.terminate();
+  version = 0;
   language_worker = new Worker(new URL("./language_worker.js", import.meta.url));
+  language_worker.postMessage({ command: "initialize" });
   language_worker.onmessage = e => {
     let command = e.data.command;
     let data = e.data.data;
@@ -915,6 +924,7 @@ function setup_webworker() {
         if (version != data.version) {
           break;
         }
+        console.log(data.js);
         setup_runner();
         imports = data.imports;
         jscode.innerText = data.js;
@@ -936,6 +946,10 @@ function setup_webworker() {
         break;
     }
   };
+  if (editor) {
+    editor.doc.getAllMarks().forEach(marker => marker.clear());
+    editor.setValue(editor.getValue());
+  }
 }
 
 function setup_runner() {
@@ -1010,10 +1024,6 @@ function pause() {
   pause_icon.style.display = "none";
 }
 
-function reset() {
-  initialize(editor.getValue());
-}
-
 function draw_frame() {
   let now = Date.now();
   if (latest_frame == curr_frame && (now - last_frame_timestamp) > 1000 / target_fps) {
@@ -1066,7 +1076,7 @@ function toggle_canvas() {
   update_output();
 }
 
-window.reset = reset;
+window.reset = setup_lang_worker;
 window.toggle = toggle;
 window.toggle_canvas = toggle_canvas;
 window.update_output = update_output;

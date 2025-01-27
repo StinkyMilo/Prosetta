@@ -346,6 +346,13 @@ fn test_or () -> () {
 
 #[test]
 #[timeout(2000)]
+fn test_overview () -> () {
+    test_file("../Frontend/docs/Overview.md");
+}
+
+
+#[test]
+#[timeout(2000)]
 fn test_polygon () -> () {
     test_file("../Frontend/docs/Polygon.md");
 }
