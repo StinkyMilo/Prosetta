@@ -186,6 +186,18 @@ body {
   scrollbar-width: thin;
 }
 
+.close-button{
+  top:0;
+  right:0;
+  position:absolute;
+  background-color: darkred;
+  color:white;
+  width:1vw;
+  height:1vw;
+  border:1px solid black;
+  cursor:pointer;
+}
+
 a{
   color:greenyellow;
 }

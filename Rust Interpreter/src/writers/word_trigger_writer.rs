@@ -15,6 +15,9 @@ pub fn write(trigger_word_data: &Vec<WordTrigger>) -> String {
             },
             WordTriggerType::Variable(var_name) => {
                 format!("\"type\":\"variable\", \"name\":\"{}\"",String::from_utf8_lossy(&var_name.to_vec()))
+            },
+            WordTriggerType::Import(import_name) =>{
+                format!("\"type\":\"import\",\"name\":\"{}\"",String::from_utf8_lossy(&import_name.to_vec()))
             }
         };
         str += &format!("{{\"start\":{}, \"end\":{}, {}}},",statement.word_start, statement.word_end, internal);

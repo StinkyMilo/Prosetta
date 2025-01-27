@@ -512,7 +512,7 @@ function updateCode() {
   msg_worker("changed", src);
 }
 
-async function initialize(startingCode) {
+export async function initialize(startingCode) {
   for (const tooltip of document.getElementsByClassName("tooltip")) {
     tooltip.remove();
   }
@@ -581,62 +581,72 @@ function setup_editor() {
   editor.setSize("100%", "100%");
 
   const PARTS_OF_SPEECH = ["noun", "verb", "adjective", "adverb", "other"];
-  const BASE_URL = "https://stinkymilo.github.io/Prosetta/Frontend/docs/#/"
+  const BASE_URL = "https://stinkymilo.github.io/Prosetta/Frontend/docs/#/";
+  const BASE_URL_IMPORTS = BASE_URL + "Imports#";
   const URLS = {
-    "fra": "Frame",
-    "als": "And",
-    "inv": "Not",
-    "les": "LessThan",
-    "mor": "GreaterThan",
-    "oth": "Or",
-    "par": "Comparison",
-    "els": "Else",
-    "fre": "Foreach",
-    "not": "Ignore",
-    "whe": "If",
-    "whi": "While",
-    "fun": "Function",
-    "ret": "Return",
-    "arc": "Ellipse",
-    "bez": "Bezier",
-    "col": "Color",
-    "fil": "Fill",
-    "lin": "Line",
-    "mov": "MoveTo",
-    "pen": "LineWidth",
-    "rec": "Rectangle",
-    "sto": "Stroke",
-    "tur": "Rotate",
-    "app": "Append",
-    "cou": "Length",
-    "del": "Delete",
-    "fin": "Find",
-    "ind": "Index",
-    "lis": "List",
-    "add": "Add",
-    "exp": "Exponentiate",
-    "flo": "Floor",
-    "ide": "Divide",
-    "int": "Int",
-    "lit": "Lit",
-    "log": "Log",
-    "mod": "Modulo",
-    "pri": "Print",
-    "ran": "Random",
-    "rep": "Replace",
-    "sub": "Subtract",
-    "tim": "Multiply",
-    "cos": "Cosine",
-    "sin": "Sine",
-    "tan": "Tangent",
-    "was": "Variable",
-    "hea": "Heart",
-    "kir": "Kirby",
-    "pol": "Polygon",
-    "roc": "RoundedRectangle",
-    "sta": "Star",
-    "tri": "Triangle"
-  }
+    "fra":"Frame",
+    "als":"And",
+    "inv":"Not",
+    "les":"LessThan",
+    "mor":"GreaterThan",
+    "oth":"Or",
+    "par":"Comparison",
+    "els":"Else",
+    "fre":"Foreach",
+    "not":"Ignore",
+    "whe":"If",
+    "whi":"While",
+    "fun":"Function",
+    "ret":"Return",
+    "arc":"Ellipse",
+    "bez":"Bezier",
+    "col":"Color",
+    "fil":"Fill",
+    "lin":"Line",
+    "mov":"MoveTo",
+    "pen":"LineWidth",
+    "rec":"Rectangle",
+    "sto":"Stroke",
+    "tur":"Rotate",
+    "app":"Append",
+    "cou":"Length",
+    "del":"Delete",
+    "fin":"Find",
+    "ind":"Index",
+    "lis":"List",
+    "add":"Add",
+    "exp":"Exponentiate",
+    "flo":"Floor",
+    "ide":"Divide",
+    "int":"Int",
+    "lit":"Lit",
+    "log":"Log",
+    "mod":"Modulo",
+    "pri":"Print",
+    "ran":"Random",
+    "rep":"Replace",
+    "sub":"Subtract",
+    "tim":"Multiply",
+    "cos":"Cosine",
+    "sin":"Sine",
+    "tan":"Tangent",
+    "was":"Variable",
+    "hea":"Heart",
+    "kir":"Kirby",
+    "pol":"Polygon",
+    "roc":"RoundedRectangle",
+    "sta":"Star",
+    "tri":"Triangle"
+  };
+  const IMPORTS = {
+    "fram":"Animation",
+    "fun":"Functions",
+    "gra":"Graphics",
+    "lis":"Lists",
+    "ran":"Randomization",
+    "tam":"Stamps",
+    "tri":"Trigonometry"
+  };
   /*
     Returns a node that contains the alternate word suggestions
   */
@@ -660,7 +670,10 @@ function setup_editor() {
       }
     } else if (tooltip.type == "variable") {
       words = getWordsThatContain(tooltip.name);
-      u.innerHTML = `Words that contain the variable ${tooltip.name}`;
+      u.innerHTML = "Words that contain the variable " + tooltip.name;
+    }else if(tooltip.type == "import"){
+      words = [];
+      u.innerHTML = `Import: <a href='${BASE_URL_IMPORTS+tooltip.name}-${IMPORTS[tooltip.name].toLowerCase()}' rel='noopener noreferrer' target='_blank'>${IMPORTS[tooltip.name]}</a> Library`;
     }
     let buttonContainer = document.createElement("div");
     buttonContainer.className = "posTabGroup";
@@ -689,20 +702,30 @@ function setup_editor() {
       tabContents[pos] = posTabContent;
     }
     header.appendChild(u);
+    let closeButton = document.createElement("button");
+    closeButton.innerHTML = "x";
+    closeButton.className="close-button";
+    closeButton.onclick = clearWidget;
+    //Start adding to widget directly.
     widget.appendChild(header);
-    widget.appendChild(buttonContainer);
-    widget.appendChild(tabContainer);
-    for (let i = 0; i < words.length; i++) {
-      let matchingPos = partsOfSpeech[words[i]];
-      for (let j = 0; j < matchingPos.length; j++) {
-        let wordElement = document.createElement("div");
-        wordElement.innerHTML = words[i];
-        wordElement.onclick = () => {
-          editor.replaceRange(words[i], currentWordStart, currentWordEnd);
-          currentWordEnd = { line: currentWordStart.line, ch: currentWordStart.ch + words[i].length };
-        };
-        tabContents[matchingPos[j]].appendChild(wordElement);
+    widget.appendChild(closeButton);
+    if(tooltip.type != "import"){
+      widget.appendChild(buttonContainer);
+      widget.appendChild(tabContainer); 
+      for (let i = 0; i < words.length; i++) {
+        let matchingPos = partsOfSpeech[words[i]];
+        for (let j = 0; j < matchingPos.length; j++) {
+          let wordElement = document.createElement("div");
+          wordElement.innerHTML = words[i];
+          wordElement.onclick = () => {
+            editor.replaceRange(words[i], currentWordStart, currentWordEnd);
+            currentWordEnd = { line: currentWordStart.line, ch: currentWordStart.ch + words[i].length };
+          };
+          tabContents[matchingPos[j]].appendChild(wordElement);
+        }
       }
+    }else{
+      widget.style.height = "auto";
     }
     return widget;
   }
@@ -1043,6 +1066,10 @@ function update_output() {
   }
 }
 
+export function updateValue(newValue){
+  editor.setValue(newValue);
+}
+
 var showing_canvas = true;
 function toggle_canvas() {
   showing_canvas = !showing_canvas;
@@ -1053,4 +1080,5 @@ window.reset = setup_lang_worker;
 window.toggle = toggle;
 window.toggle_canvas = toggle_canvas;
 window.update_output = update_output;
-export default initialize;
+
+export default {initialize, updateValue};
