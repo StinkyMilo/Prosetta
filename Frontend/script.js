@@ -1,7 +1,7 @@
 import { allWords, wordsForAliases, partsOfSpeech } from './wordsForAliases.js';
 import { Import } from './wasm-bindings/prosetta.js';
 
-var jscode, sourcecode, cnsl, stack, curr_canvas, displayed_ctx, displayed_canvas, play_icon, pause_icon, toggle_btn, output_toggle_btn;
+var jscode, sourcecode, cnsl, stack, curr_canvas, displayed_ctx, displayed_canvas, play_icon, pause_icon, toggle_btn, output_toggle_btn, primary, secondary;
 /** @type CanvasRenderingContext2D
  */
 var curr_ctx;
@@ -11,6 +11,7 @@ var last_shape = "none";
 var language_worker, runner_worker;
 var editor;
 let tooltips = [];
+/** @type int[] */
 var imports = [];
 var frameInterval;
 var curr_frame = 0;
@@ -518,6 +519,8 @@ export async function initialize(startingCode) {
   }
   version = 0;
   language_worker?.terminate();
+  primary = document.getElementById("primary");
+  secondary = document.getElementById("secondary");
   output_toggle_btn = document.getElementById("output-toggle");
   sourcecode = document.getElementById("code");
   jscode = document.getElementById("js");
@@ -924,12 +927,10 @@ function setup_lang_worker() {
         if (version != data.version) {
           break;
         }
-        console.log(data.js);
         setup_runner();
         imports = data.imports;
         jscode.innerText = data.js;
         tooltips = JSON.parse(data.wordTriggers);
-        console.log(tooltips);
         let highlights = data.hl;
         editor.doc.getAllMarks().forEach(marker => marker.clear());
         for (let hl of highlights) {
@@ -939,6 +940,32 @@ function setup_lang_worker() {
             { className: hl.color.at(-1) }
           );
         }
+
+        const doesPrint = tooltips.filter(x => x.type == "alias").map(x => x.value).some(x => x == "pri") || imports.find(x => x == Import.Frame) != undefined;
+        const doesDraw = imports.find(x => x == Import.Graph) != undefined || imports.find(x => x == Import.Stamp) != undefined;
+        console.log(doesPrint, doesDraw);
+        if (doesDraw && doesPrint) {
+          console.log("both console and canvas");
+          primary.style.display = "inherit";
+          primary.appendChild(stack);
+          secondary.style.display = "inherit";
+          secondary.appendChild(cnsl);
+        }
+        else if (doesDraw) {
+          console.log("only canvas");
+          primary.style.display = "inherit";
+          primary.appendChild(stack);
+          secondary.style.display = "none";
+          secondary.appendChild(cnsl);
+        }
+        else {
+          console.log("only console");
+          primary.style.display = "inherit";
+          primary.appendChild(cnsl);
+          secondary.style.display = "none";
+          secondary.appendChild(stack);
+        }
+
         pause();
         curr_frame = 0;
         runCode();
