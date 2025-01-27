@@ -1,6 +1,10 @@
 import {updateValue} from './script.js';
 const examples = {
-    blank:``,
+    blank:`TITLE
+by YOUR NAME and IMPORTS
+
+CODE HERE
+`,
     summerRose:`The Wreck of the Summer Rose
 by Milo Jacobs, Steve Graphton, and Lord Framingham.
 
