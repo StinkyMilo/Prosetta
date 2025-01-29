@@ -27,16 +27,15 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
         Expr::NoneStat => "(todo stat)".to_string(),
         Expr::NoneExpr => "(todo expr)".to_string(),
         Expr::Title { data } => {
-            let author_str = data
-                .authors
-                .iter()
-                .map(|name| String::from_utf8_lossy(&name.0))
+            let import_str = data.imports.iter().map(
+                |i| i.0.get_name().to_string())
                 .collect::<Vec<_>>()
                 .join(", ");
             format!(
-                "`{}`;\n\"By {}\";\n",
+                "/*\nTitle: {};\n\"Primary author: {}\";\nImports:{}\n*/\n",
                 String::from_utf8_lossy(&data.title),
-                author_str
+                String::from_utf8_lossy(&data.authors[0].0),
+                import_str
             )
         }
         Expr::Assign {
