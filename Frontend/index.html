@@ -19,8 +19,8 @@
       else {
         editor = await initialize(localCode);
       }
-      document.addEventListener("codeChanged", code => {
-        localStorage.setItem("code", code["code"]);
+      document.addEventListener("codeChanged", e => {
+        localStorage.setItem("code", e.detail);
       });
     });
     document.getElementById("poemSelect").oninput = updateExample;
