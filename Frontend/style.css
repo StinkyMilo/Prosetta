@@ -205,8 +205,10 @@ body {
   position: absolute;
   background-color: darkred;
   color: white;
-  width: 1vw;
-  height: 1vw;
+  width: 15px;
+  height: 15px;
+  padding: 0;
+  margin: 0;
   border: 1px solid black;
   cursor: pointer;
 }
