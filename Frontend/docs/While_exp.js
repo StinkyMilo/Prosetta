@@ -1,5 +1,8 @@
-`While Example`;
-"By Milo Jacobs";
+/*
+Title: While Example;
+"Primary author: Milo Jacobs";
+Imports: 
+*/
 
 let var_var = 1;
 while_loop(() => (var_var < 10), () => {

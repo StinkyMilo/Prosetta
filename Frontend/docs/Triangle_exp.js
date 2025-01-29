@@ -1,5 +1,8 @@
-`Triangle Example`;
-"By Milo Jacobs, John Graphics, Stampton G, Stampton";
+/*
+Title: Triangle Example;
+"Primary author: Milo Jacobs";
+Imports: Graph, Stamp, Stamp
+*/
 
 draw_tri(80);
 set_fill("yellow");

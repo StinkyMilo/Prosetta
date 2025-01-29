@@ -1,5 +1,8 @@
-`Quickstart Example`;
-"By Milo Jacobs, John Graphton";
+/*
+Title: Quickstart Example;
+"Primary author: Milo Jacobs";
+Imports: Graph
+*/
 
 let inside_var = 50;
 draw_ellipse(inside_var);

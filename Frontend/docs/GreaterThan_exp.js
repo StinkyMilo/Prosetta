@@ -1,5 +1,8 @@
-`Greater Than Example`;
-"By Milo Jacobs";
+/*
+Title: Greater Than Example;
+"Primary author: Milo Jacobs";
+Imports: 
+*/
 
 let var_var = 20;
 while_loop(() => (var_var > 10), () => {

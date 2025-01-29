@@ -1,5 +1,8 @@
-`Floor Example`;
-"By Milo Jacobs";
+/*
+Title: Floor Example;
+"Primary author: Milo Jacobs";
+Imports: 
+*/
 
 let value_var = (51 / 2);
 print_console(value_var);

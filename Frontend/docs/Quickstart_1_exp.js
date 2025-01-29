@@ -1,5 +1,8 @@
-`Editor Example`;
-"By Milo Jacobs, John Graphton";
+/*
+Title: Editor Example;
+"Primary author: Milo Jacobs";
+Imports: Graph
+*/
 
 draw_ellipse(50);
 set_fill("red");

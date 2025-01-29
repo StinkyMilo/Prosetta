@@ -32,7 +32,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
                 .collect::<Vec<_>>()
                 .join(", ");
             format!(
-                "/*\nTitle: {};\n\"Primary author: {}\";\nImports:{}\n*/\n",
+                "/*\nTitle: {};\n\"Primary author: {}\";\nImports: {}\n*/\n",
                 String::from_utf8_lossy(&data.title),
                 String::from_utf8_lossy(&data.authors[0].0),
                 import_str

@@ -1,5 +1,8 @@
-`Append Example`;
-"By Milo Jacobs, Miss Listerine";
+/*
+Title: Append Example;
+"Primary author: Milo Jacobs";
+Imports: List
+*/
 
 let list_var = [1, 2, 3];
 list_var.push(4);

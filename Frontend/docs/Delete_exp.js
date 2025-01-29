@@ -1,5 +1,8 @@
-`Delete Example`;
-"By Milo Jacobs, Miss Listerine";
+/*
+Title: Delete Example;
+"Primary author: Milo Jacobs";
+Imports: List
+*/
 
 let list_var = [1, 2, 3];
 list_var.splice(1,1);

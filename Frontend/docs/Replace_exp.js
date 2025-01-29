@@ -1,5 +1,8 @@
-`Replace Example`;
-"By Milo Jacobs, Miss Listerine";
+/*
+Title: Replace Example;
+"Primary author: Milo Jacobs";
+Imports: List
+*/
 
 let list_var = [1, 2, 3];
 list_var[1]=1;

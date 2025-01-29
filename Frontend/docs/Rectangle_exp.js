@@ -1,4 +1,7 @@
-`Rectangle Example`;
-"By Milo Jacobs, John Graphics";
+/*
+Title: Rectangle Example;
+"Primary author: Milo Jacobs";
+Imports: Graph
+*/
 
 draw_rect(30, 50);
