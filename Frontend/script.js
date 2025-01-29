@@ -510,6 +510,8 @@ function updateCode() {
     editor.setValue(newsrc);
     return;
   }
+  const codeUpdateEvent = new CustomEvent("codeChanged", { code: src });
+  document.dispatchEvent(codeUpdateEvent);
   msg_worker("changed", src);
 }
 

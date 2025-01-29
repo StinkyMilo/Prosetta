@@ -10,8 +10,18 @@
     import {initialize} from './script.js';
     import updateExample from './examples.js';
     document.addEventListener("DOMContentLoaded", async () => {
-      await initialize("");
-      updateExample();
+      const localCode = localStorage.getItem("code");
+      let editor;
+      if (localCode == null) {
+        editor = await initialize("");
+        updateExample();
+      }
+      else {
+        editor = await initialize(localCode);
+      }
+      document.addEventListener("codeChanged", code => {
+        localStorage.setItem("code", code["code"]);
+      });
     });
     document.getElementById("poemSelect").oninput = updateExample;
   </script>
