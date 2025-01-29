@@ -1,6 +1,6 @@
 # Tri - Triangle
 
-Draws an equilateral, either at the turtle's position or at a specified relative position, of a specified size. The star _cannot be stretched_. If you want to draw non-equilateral triangles, use the [Line](Line.md) alias and calculate the points yourself. 
+Draws an equilateral triangle, either at the turtle's position or at a specified relative position, of a specified size. The star _cannot be stretched_. If you want to draw non-equilateral triangles, use the [Line](Line.md) alias and calculate the points yourself. 
 
 ## Arguments
 

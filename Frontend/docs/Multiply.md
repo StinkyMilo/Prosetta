@@ -4,7 +4,7 @@ Multiplication operator. Multiplies two or more values and returns the new value
 
 ## Arguments
 
-```n1, n2, ... (numbers)```
+```n1, n2, ...```
 
 ## Example
 <editor :code='`
