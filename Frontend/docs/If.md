@@ -4,7 +4,7 @@ An if statement. If the condition (first argument) is true, execute all other ar
 
 ## Arguments
 
-```condition (any), st1, st2, st3… (statements)```
+```condition (any), st1, [st_2, ... st_∞] (statements)```
 
 ## Example
 <editor :code='`

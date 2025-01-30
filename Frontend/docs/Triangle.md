@@ -8,7 +8,7 @@ Draws an equilateral triangle, either at the turtle's position or at a specified
 ```size (number)```
 
 ### Absolute
-```x (number) y (number) size (number)```
+```x (number), y (number), size (number)```
 
 ## Example
 

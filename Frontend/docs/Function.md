@@ -4,7 +4,7 @@ Defines a function. After defining it, all words until the next punctuation are 
 
 ## Arguments
 
-```w1, w2, … (words) [CLOSING PUNCTUATION], s1, s2, … (statements)```
+```[word_1, ... word_∞] (words) [CLOSING PUNCTUATION], [st_1, ... st_∞] (statements)```
 
 ## Example
 <editor :code='`

@@ -4,7 +4,7 @@ Adds two or more numbers together and returns the total value. Unlike in other l
 
 ## Arguments
 
-```n1, n2, [num_3 ... num_∞]```
+```num_1, num_2, [num_3 ... num_∞] (numbers)```
 
 ## Example
 <editor :code='`

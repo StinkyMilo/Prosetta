@@ -4,7 +4,7 @@ Constructs a new list from any number of arguments, each of any type.
 
 ## Arguments
 
-```elem1, elem2, … (any)```
+```[elem_1, ... elem_∞] (any)```
 
 ## Example
 <editor :code='`

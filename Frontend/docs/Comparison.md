@@ -4,7 +4,7 @@ Equals (or Com*par*ison) operator. Compares two values to see if they are the sa
 
 ## Arguments
 
-```v1, v2, … (any)```
+```v_1, v_2, [v_3, ... v_∞] (any)```
 
 ## Example
 <editor :code="`
