@@ -946,24 +946,17 @@ function setup_lang_worker() {
 
         const doesPrint = tooltips.filter(x => x.type == "alias").map(x => x.value).some(x => x == "pri") || imports.find(x => x == Import.Frame) != undefined;
         const doesDraw = imports.find(x => x == Import.Graph) != undefined || imports.find(x => x == Import.Stamp) != undefined;
-        console.log(doesPrint, doesDraw);
         if (doesDraw && doesPrint) {
-          console.log("both console and canvas");
-          primary.style.display = "inherit";
           primary.appendChild(stack);
           secondary.style.display = "inherit";
           secondary.appendChild(cnsl);
         }
         else if (doesDraw) {
-          console.log("only canvas");
-          primary.style.display = "inherit";
           primary.appendChild(stack);
           secondary.style.display = "none";
           secondary.appendChild(cnsl);
         }
         else {
-          console.log("only console");
-          primary.style.display = "inherit";
           primary.appendChild(cnsl);
           secondary.style.display = "none";
           secondary.appendChild(stack);
