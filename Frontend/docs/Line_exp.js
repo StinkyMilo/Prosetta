@@ -1,5 +1,8 @@
-`Line Example`;
-"By Milo Jacobs, John Graham";
+/*
+Title: Line Example
+Primary author: Milo Jacobs
+Imports: Graph
+*/
 
 draw_line(10, 10);
 draw_line(50);

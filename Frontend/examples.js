@@ -1,11 +1,11 @@
-import {updateValue} from './script.js';
+import { updateValue } from './script.js';
 const examples = {
-    blank:`TITLE
+  blank: `TITLE
 by YOUR NAME and IMPORTS
 
 CODE HERE
 `,
-    summerRose:`The Wreck of the Summer Rose
+  summerRose: `The Wreck of the Summer Rose
 by Milo Jacobs, Steve Graphton, and Lord Framingham.
 
 The waves rose ten yards out from the sea.
@@ -19,7 +19,7 @@ The wreck of the Summer Rose left few survivors.
     As the waters rose, those who were left abandoned the 
     Summer Rose and swam 10 hours before finding rescue!
 It is truly a miracle that they lived.`,
-    paperIntro:`Intro to Prosetta
+  paperIntro: `Intro to Prosetta
 by Milo Jacobs, Flynn Duniho, Nate Westfall, Steve Graphton, The Trigonometry Baby, and Lord Framingham
 
 Prosetta is an esoteric programming language where code is a "hidden message" within a poem or other piece of writing. Its primary focus is on graphical output.
@@ -47,11 +47,10 @@ The next part will cover the ways the language was implemented and our reasons f
 
 Lastly, we will cover the assessment of the language: how we determined whether we had fulfilled the goals of the language as well as how others have used it.
 `
-    
+
 }
-function updateExample(){
-    let poem = examples[document.getElementById("poemSelect").value];
-    console.log(poem)
-    updateValue(poem);
+function updateExample() {
+  let poem = examples[document.getElementById("poemSelect").value];
+  updateValue(poem);
 }
 export default updateExample;

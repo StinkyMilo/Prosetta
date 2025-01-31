@@ -510,6 +510,9 @@ function updateCode() {
     editor.setValue(newsrc);
     return;
   }
+  console.log(src);
+  const codeUpdateEvent = new CustomEvent("codeChanged", { detail: src });
+  document.dispatchEvent(codeUpdateEvent);
   msg_worker("changed", src);
 }
 
@@ -587,68 +590,68 @@ function setup_editor() {
   const BASE_URL = "https://stinkymilo.github.io/Prosetta/Frontend/docs/#/";
   const BASE_URL_IMPORTS = BASE_URL + "Imports#";
   const URLS = {
-    "fra":"Frame",
-    "als":"And",
-    "inv":"Not",
-    "les":"LessThan",
-    "mor":"GreaterThan",
-    "oth":"Or",
-    "par":"Comparison",
-    "els":"Else",
-    "fre":"Foreach",
-    "not":"Ignore",
-    "whe":"If",
-    "whi":"While",
-    "fun":"Function",
-    "ret":"Return",
-    "arc":"Ellipse",
-    "bez":"Bezier",
-    "col":"Color",
-    "fil":"Fill",
-    "lin":"Line",
-    "mov":"MoveTo",
-    "pen":"LineWidth",
-    "rec":"Rectangle",
-    "sto":"Stroke",
-    "tur":"Rotate",
-    "app":"Append",
-    "cou":"Length",
-    "del":"Delete",
-    "fin":"Find",
-    "ind":"Index",
-    "lis":"List",
-    "add":"Add",
-    "exp":"Exponentiate",
-    "flo":"Floor",
-    "ide":"Divide",
-    "int":"Int",
-    "lit":"Lit",
-    "log":"Log",
-    "mod":"Modulo",
-    "pri":"Print",
-    "ran":"Random",
-    "rep":"Replace",
-    "sub":"Subtract",
-    "tim":"Multiply",
-    "cos":"Cosine",
-    "sin":"Sine",
-    "tan":"Tangent",
-    "was":"Variable",
-    "hea":"Heart",
-    "kir":"Kirby",
-    "pol":"Polygon",
-    "roc":"RoundedRectangle",
-    "sta":"Star",
-    "tri":"Triangle"
+    "fra": "Frame",
+    "als": "And",
+    "inv": "Not",
+    "les": "LessThan",
+    "mor": "GreaterThan",
+    "oth": "Or",
+    "par": "Comparison",
+    "els": "Else",
+    "fre": "Foreach",
+    "not": "Ignore",
+    "whe": "If",
+    "whi": "While",
+    "fun": "Function",
+    "ret": "Return",
+    "arc": "Ellipse",
+    "bez": "Bezier",
+    "col": "Color",
+    "fil": "Fill",
+    "lin": "Line",
+    "mov": "MoveTo",
+    "pen": "LineWidth",
+    "rec": "Rectangle",
+    "sto": "Stroke",
+    "tur": "Rotate",
+    "app": "Append",
+    "cou": "Length",
+    "del": "Delete",
+    "fin": "Find",
+    "ind": "Index",
+    "lis": "List",
+    "add": "Add",
+    "exp": "Exponentiate",
+    "flo": "Floor",
+    "ide": "Divide",
+    "int": "Int",
+    "lit": "Lit",
+    "log": "Log",
+    "mod": "Modulo",
+    "pri": "Print",
+    "ran": "Random",
+    "rep": "Replace",
+    "sub": "Subtract",
+    "tim": "Multiply",
+    "cos": "Cosine",
+    "sin": "Sine",
+    "tan": "Tangent",
+    "was": "Variable",
+    "hea": "Heart",
+    "kir": "Kirby",
+    "pol": "Polygon",
+    "roc": "RoundedRectangle",
+    "sta": "Star",
+    "tri": "Triangle"
   };
   const IMPORTS = {
-    "fram":"Animation",
-    "fun":"Functions",
-    "gra":"Graphics",
-    "lis":"Lists",
-    "ran":"Randomization",
-    "tam":"Stamps",
-    "tri":"Trigonometry"
+    "fram": "Animation",
+    "fun": "Functions",
+    "gra": "Graphics",
+    "lis": "Lists",
+    "ran": "Randomization",
+    "tam": "Stamps",
+    "tri": "Trigonometry"
   };
   /*
     Returns a node that contains the alternate word suggestions
@@ -674,9 +677,9 @@ function setup_editor() {
     } else if (tooltip.type == "variable") {
       words = getWordsThatContain(tooltip.name);
       u.innerHTML = "Words that contain the variable " + tooltip.name;
-    }else if(tooltip.type == "import"){
+    } else if (tooltip.type == "import") {
       words = [];
-      u.innerHTML = `Import: <a href='${BASE_URL_IMPORTS+tooltip.name}-${IMPORTS[tooltip.name].toLowerCase()}' rel='noopener noreferrer' target='_blank'>${IMPORTS[tooltip.name]}</a> Library`;
+      u.innerHTML = `Import: <a href='${BASE_URL_IMPORTS + tooltip.name}-${IMPORTS[tooltip.name].toLowerCase()}' rel='noopener noreferrer' target='_blank'>${IMPORTS[tooltip.name]}</a> Library`;
     }
     let buttonContainer = document.createElement("div");
     buttonContainer.className = "posTabGroup";
@@ -707,14 +710,14 @@ function setup_editor() {
     header.appendChild(u);
     let closeButton = document.createElement("button");
     closeButton.innerHTML = "x";
-    closeButton.className="close-button";
+    closeButton.className = "close-button";
     closeButton.onclick = clearWidget;
     //Start adding to widget directly.
     widget.appendChild(header);
     widget.appendChild(closeButton);
-    if(tooltip.type != "import"){
+    if (tooltip.type != "import") {
       widget.appendChild(buttonContainer);
-      widget.appendChild(tabContainer); 
+      widget.appendChild(tabContainer);
       for (let i = 0; i < words.length; i++) {
         let matchingPos = partsOfSpeech[words[i]];
         for (let j = 0; j < matchingPos.length; j++) {
@@ -727,7 +730,7 @@ function setup_editor() {
           tabContents[matchingPos[j]].appendChild(wordElement);
         }
       }
-    }else{
+    } else {
       widget.style.height = "auto";
     }
     return widget;
@@ -1076,7 +1079,7 @@ function update_output() {
     output_toggle_btn.children[0].style.webkitTransform = "translateX(0px)";
     output_toggle_btn.children[0].style.msTransform = "translateX(0px)";
     output_toggle_btn.children[0].style.transform = "translateX(0px)";
-    stack.style.display = "block";
+    primary.style.display = "block";
     jscode.style.display = "none";
     if (was_playing) {
       play();
@@ -1086,14 +1089,14 @@ function update_output() {
     output_toggle_btn.children[0].style.webkitTransform = "translateX(26px)";
     output_toggle_btn.children[0].style.msTransform = "translateX(26px)";
     output_toggle_btn.children[0].style.transform = "translateX(26px)";
-    stack.style.display = "none";
+    primary.style.display = "none";
     jscode.style.display = "block";
     was_playing = !!frameInterval;
     pause();
   }
 }
 
-export function updateValue(newValue){
+export function updateValue(newValue) {
   editor.setValue(newValue);
 }
 
@@ -1108,4 +1111,4 @@ window.toggle = toggle;
 window.toggle_canvas = toggle_canvas;
 window.update_output = update_output;
 
-export default {initialize, updateValue};
+export default { initialize, updateValue };

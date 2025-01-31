@@ -1,5 +1,8 @@
-`Function Example`;
-"By Milo Jacobs, Lisa Perfunctory";
+/*
+Title: Function Example
+Primary author: Milo Jacobs
+Imports: List, Func
+*/
 
 function factorial_var(man_var) {
   if (man_var == 1) {

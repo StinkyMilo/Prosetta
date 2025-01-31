@@ -1,5 +1,8 @@
-`Print Example`;
-"By Milo Jacobs";
+/*
+Title: Print Example
+Primary author: Milo Jacobs
+Imports: 
+*/
 
 print_console("fizzbuzz");
 let mario_var = 2;

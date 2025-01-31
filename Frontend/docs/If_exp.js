@@ -1,5 +1,8 @@
-`If Example`;
-"By Milo Jacobs";
+/*
+Title: If Example
+Primary author: Milo Jacobs
+Imports: 
+*/
 
 let var_var = 1;
 if (var_var == 1) {
