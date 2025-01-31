@@ -1,5 +1,8 @@
-`Rotate Example`;
-"By Milo Jacobs, John Graphton";
+/*
+Title: Rotate Example
+Primary author: Milo Jacobs
+Imports: Graph
+*/
 
 rotate_delta(45);
 set_line_width(15);

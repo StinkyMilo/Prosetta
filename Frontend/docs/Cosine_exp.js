@@ -1,5 +1,8 @@
-`Cosine Example`;
-"By Milo Jacobs, The Trigonometry Baby";
+/*
+Title: Cosine Example
+Primary author: Milo Jacobs
+Imports: Trig
+*/
 
 let num_var = 0;
 while_loop(() => (num_var < 360), () => {

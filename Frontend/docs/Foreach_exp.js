@@ -1,5 +1,8 @@
-`Foreach Example`;
-"By Milo Jacobs, Miss Listerine";
+/*
+Title: Foreach Example
+Primary author: Milo Jacobs
+Imports: List
+*/
 
 let value_var = [1, 2, 3];
 for_loop(value_var, (that_var) => {

@@ -1,5 +1,8 @@
-`Ignore Example`;
-"By Milo Jacobs, Nothaniel";
+/*
+Title: Ignore Example
+Primary author: Milo Jacobs
+Imports: Not
+*/
 
 
 let stew_var = 3;
