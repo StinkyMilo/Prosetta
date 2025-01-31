@@ -709,7 +709,33 @@ function setup_editor() {
     }
     header.appendChild(u);
     let closeButton = document.createElement("button");
-    closeButton.innerHTML = "x";
+    closeButton.innerHTML = `
+    <svg style="width: 10px; height: 10px; margin: 2px; margin: 0; padding: 0; padding-bottom: 0px; padding-bottom: 2.5px;"
+   width="25"
+   height="25"
+   viewBox="0 0 6.6145832 6.6145833"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     id="layer1"
+     style="fill:#ffffff;fill-opacity:1">
+    <path
+       id="path4"
+       style="stroke-width:0.199999;fill:#ffffff;fill-opacity:1"
+       d="M 0 0 L 0 1.3229166 L 5.2916666 6.6145832 L 6.6145832 6.6145832 L 6.6145832 5.2916666 L 1.3229166 0 L 0 0 z " />
+    <path
+       id="path3"
+       style="stroke-width:0.200243;fill:#ffffff;fill-opacity:1"
+       d="M 5.3614298 0 L 0 5.2167358 L 0 6.6145832 L 1.2531535 6.6145832 L 6.6145832 1.3978475 L 6.6145832 0 L 5.3614298 0 z " />
+  </g>
+</svg>`;
+    // xImg.src = "icons/x.svg";
+    // xImg.style.width = "100%";
+    // xImg.style.height = "100%";
     closeButton.className = "close-button";
     closeButton.onclick = clearWidget;
     //Start adding to widget directly.
