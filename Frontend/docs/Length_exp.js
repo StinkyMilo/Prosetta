@@ -1,6 +1,6 @@
 /*
-Title: List Length Example;
-"Primary author: Milo Jacobs";
+Title: List Length Example
+Primary author: Milo Jacobs
 Imports: List
 */
 

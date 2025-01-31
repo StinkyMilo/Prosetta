@@ -1,6 +1,6 @@
 /*
-Title: Cosine Example;
-"Primary author: Milo Jacobs";
+Title: Cosine Example
+Primary author: Milo Jacobs
 Imports: Trig
 */
 

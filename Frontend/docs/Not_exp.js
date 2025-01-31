@@ -1,6 +1,6 @@
 /*
-Title: Not Example;
-"Primary author: Milo Jacobs";
+Title: Not Example
+Primary author: Milo Jacobs
 Imports: 
 */
 

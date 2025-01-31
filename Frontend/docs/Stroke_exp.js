@@ -1,6 +1,6 @@
 /*
-Title: Stroke Example;
-"Primary author: Milo Jacobs";
+Title: Stroke Example
+Primary author: Milo Jacobs
 Imports: Graph
 */
 

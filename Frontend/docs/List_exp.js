@@ -1,6 +1,6 @@
 /*
-Title: List Example;
-"Primary author: Milo Jacobs";
+Title: List Example
+Primary author: Milo Jacobs
 Imports: List
 */
 

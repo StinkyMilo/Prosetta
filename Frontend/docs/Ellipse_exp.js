@@ -1,6 +1,6 @@
 /*
-Title: Ellipse Example;
-"Primary author: Milo Jacobs";
+Title: Ellipse Example
+Primary author: Milo Jacobs
 Imports: Graph
 */
 

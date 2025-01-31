@@ -1,6 +1,6 @@
 /*
-Title: Random Example;
-"Primary author: Milo Jacobs";
+Title: Random Example
+Primary author: Milo Jacobs
 Imports: Rand
 */
 

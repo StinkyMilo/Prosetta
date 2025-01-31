@@ -1,6 +1,6 @@
 /*
-Title: Tangent Example;
-"Primary author: Milo Jacobs";
+Title: Tangent Example
+Primary author: Milo Jacobs
 Imports: Trig
 */
 

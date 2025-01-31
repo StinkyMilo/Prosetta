@@ -1,6 +1,6 @@
 /*
-Title: Rectangle Example;
-"Primary author: Milo Jacobs";
+Title: Rectangle Example
+Primary author: Milo Jacobs
 Imports: Graph
 */
 

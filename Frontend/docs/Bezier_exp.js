@@ -1,6 +1,6 @@
 /*
-Title: Bezier Example;
-"Primary author: Milo Jacobs";
+Title: Bezier Example
+Primary author: Milo Jacobs
 Imports: Graph
 */
 

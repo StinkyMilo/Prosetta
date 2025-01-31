@@ -1,6 +1,6 @@
 /*
-Title: Quickstart Example;
-"Primary author: Milo Jacobs";
+Title: Quickstart Example
+Primary author: Milo Jacobs
 Imports: Graph
 */
 

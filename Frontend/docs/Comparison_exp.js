@@ -1,6 +1,6 @@
 /*
-Title: Comparison Example;
-"Primary author: Milo Jacobs";
+Title: Comparison Example
+Primary author: Milo Jacobs
 Imports: 
 */
 

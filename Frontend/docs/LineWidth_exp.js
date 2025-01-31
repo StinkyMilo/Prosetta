@@ -1,6 +1,6 @@
 /*
-Title: Line Width Example;
-"Primary author: Milo Jacobs";
+Title: Line Width Example
+Primary author: Milo Jacobs
 Imports: Graph
 */
 

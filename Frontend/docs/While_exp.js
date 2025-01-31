@@ -1,6 +1,6 @@
 /*
-Title: While Example;
-"Primary author: Milo Jacobs";
+Title: While Example
+Primary author: Milo Jacobs
 Imports: 
 */
 

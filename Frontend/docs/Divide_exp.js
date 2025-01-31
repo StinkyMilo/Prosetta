@@ -1,6 +1,6 @@
 /*
-Title: Divide Example;
-"Primary author: Milo Jacobs";
+Title: Divide Example
+Primary author: Milo Jacobs
 Imports: 
 */
 

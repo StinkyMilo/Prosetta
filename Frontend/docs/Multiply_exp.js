@@ -1,6 +1,6 @@
 /*
-Title: Multiply Example;
-"Primary author: Milo Jacobs";
+Title: Multiply Example
+Primary author: Milo Jacobs
 Imports: 
 */
 

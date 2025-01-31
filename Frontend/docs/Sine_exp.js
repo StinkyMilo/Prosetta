@@ -1,6 +1,6 @@
 /*
-Title: Sine Example;
-"Primary author: Milo Jacobs";
+Title: Sine Example
+Primary author: Milo Jacobs
 Imports: Trig
 */
 

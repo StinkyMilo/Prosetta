@@ -1,6 +1,6 @@
 /*
-Title: Function Example;
-"Primary author: Milo Jacobs";
+Title: Function Example
+Primary author: Milo Jacobs
 Imports: List, Func
 */
 

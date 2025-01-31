@@ -1,6 +1,6 @@
 /*
-Title: Rounded Rectangle Example;
-"Primary author: Milo Jacobs";
+Title: Rounded Rectangle Example
+Primary author: Milo Jacobs
 Imports: Graph, Stamp, Stamp
 */
 

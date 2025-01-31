@@ -1,6 +1,6 @@
 /*
-Title: Return Example;
-"Primary author: Milo Jacobs";
+Title: Return Example
+Primary author: Milo Jacobs
 Imports: List, Func
 */
 

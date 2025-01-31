@@ -1,6 +1,6 @@
 /*
-Title: Modulo Example;
-"Primary author: Milo Jacobs";
+Title: Modulo Example
+Primary author: Milo Jacobs
 Imports: 
 */
 

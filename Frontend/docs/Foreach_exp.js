@@ -1,6 +1,6 @@
 /*
-Title: Foreach Example;
-"Primary author: Milo Jacobs";
+Title: Foreach Example
+Primary author: Milo Jacobs
 Imports: List
 */
 

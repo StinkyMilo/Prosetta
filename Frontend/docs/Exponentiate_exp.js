@@ -1,6 +1,6 @@
 /*
-Title: Exponentiate Example;
-"Primary author: Milo Jacobs";
+Title: Exponentiate Example
+Primary author: Milo Jacobs
 Imports: 
 */
 

@@ -1,6 +1,6 @@
 /*
-Title: Variable Example;
-"Primary author: Milo Jacobs";
+Title: Variable Example
+Primary author: Milo Jacobs
 Imports: 
 */
 

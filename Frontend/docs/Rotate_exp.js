@@ -1,6 +1,6 @@
 /*
-Title: Rotate Example;
-"Primary author: Milo Jacobs";
+Title: Rotate Example
+Primary author: Milo Jacobs
 Imports: Graph
 */
 

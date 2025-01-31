@@ -1,6 +1,6 @@
 /*
-Title: Kirby Example;
-"Primary author: Milo Jacobs";
+Title: Kirby Example
+Primary author: Milo Jacobs
 Imports: Stamp, Stamp
 */
 

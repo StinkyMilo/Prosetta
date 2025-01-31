@@ -1,6 +1,6 @@
 /*
-Title: Frame Example;
-"Primary author: Milo Jacobs";
+Title: Frame Example
+Primary author: Milo Jacobs
 Imports: Frame, Graph
 */
 

@@ -1,6 +1,6 @@
 /*
-Title: Heart Example;
-"Primary author: Milo Jacobs";
+Title: Heart Example
+Primary author: Milo Jacobs
 Imports: Graph, Stamp, Stamp
 */
 
