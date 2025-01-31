@@ -800,8 +800,6 @@ function setup_editor() {
   window.onmousemove = function(e) {
     let pos = { left: e.clientX, top: e.clientY + window.scrollY };
     let textPos = editor.coordsChar(pos);
-    // console.log(pos,textPos);
-    // console.log(editor.charCoords({ch:0,line:0}),pos);
     let wordPos = editor.findWordAt(textPos);
     let midPos = { line: 0, ch: 0 };
     if (wordPos.head.line == wordPos.anchor.line) {
@@ -819,20 +817,22 @@ function setup_editor() {
     }
     //Whether the cursor is outside the current word
     let outsideCurrentWord = (
-      textPos.outside ||
-      (
+      !sourcecode.contains(e.target) ||
+      (textPos.outside ||
         (
-          textPos.line > currentWordEnd.line ||
           (
-            textPos.line == currentWordEnd.line &&
-            textPos.ch > currentWordEnd.ch
-          )
-        ) ||
-        (
-          textPos.line < nextWordStart.line ||
+            textPos.line > currentWordEnd.line ||
+            (
+              textPos.line == currentWordEnd.line &&
+              textPos.ch > currentWordEnd.ch
+            )
+          ) ||
           (
-            textPos.line == nextWordStart.line &&
-            textPos.ch < nextWordStart.ch
+            textPos.line < nextWordStart.line ||
+            (
+              textPos.line == nextWordStart.line &&
+              textPos.ch < nextWordStart.ch
+            )
           )
         )
       )
@@ -861,24 +861,26 @@ function setup_editor() {
     }
     //Conditions for cancelling adding of a new tooltip
     if (
+      !sourcecode.contains(e.target) ||
       //There is a plan to add a widget
-      displayTimeout != null &&
-      //Text pos is outside the bounds of that new widget
-      outsideCurrentWord
+      (displayTimeout != null &&
+        //Text pos is outside the bounds of that new widget
+        outsideCurrentWord)
     ) {
       clearTimeout(displayTimeout);
       displayTimeout = null;
     }
     //Conditions for removing current tooltip
     if (
+      !sourcecode.contains(e.target) ||
       //There is a current widget that isn't already being removed
-      removeTimeout == null &&
-      activeWidget != null &&
-      (
-        outsideCurrentWord &&
-        //Cursor is not over the widget
-        !overWidget
-      )
+      (removeTimeout == null &&
+        activeWidget != null &&
+        (
+          outsideCurrentWord &&
+          //Cursor is not over the widget
+          !overWidget
+        ))
     ) {
       removeTimeout = setTimeout(() => {
         clearWidget();
@@ -886,12 +888,14 @@ function setup_editor() {
     }
     //Conditions for adding a new tooltip
     if (
-      //Not already trying to add one
-      displayTimeout == null &&
-      //There is a tooltip here
-      thisTooltip != null &&
-      //Cursor is not over an existing widget
-      !overWidget
+      sourcecode.contains(e.target) &&
+      (//Not already trying to add one
+        displayTimeout == null &&
+        //There is a tooltip here
+        thisTooltip != null &&
+        //Cursor is not over an existing widget
+        !overWidget
+      )
     ) {
       nextWordStart = wordPos.anchor;
       nextWordEnd = wordPos.head;
