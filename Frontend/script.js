@@ -10,6 +10,7 @@ var x = 0, y = 0, rotation = 0;
 var has_drawn_shape = false;
 var last_shape = "none";
 var language_worker, runner_worker;
+/** @type CodeMirror.Editor */
 var editor;
 let tooltips = [];
 var imports = [];
@@ -583,61 +584,6 @@ function setup_editor() {
 
   const PARTS_OF_SPEECH = ["noun", "verb", "adjective", "adverb", "other"];
   const BASE_URL = "https://stinkymilo.github.io/Prosetta/Frontend/docs/#/"
-  // const URLS = {
-  //   "fra": "Frame",
-  //   "als": "And",
-  //   "inv": "Not",
-  //   "les": "LessThan",
-  //   "mor": "GreaterThan",
-  //   "oth": "Or",
-  //   "par": "Comparison",
-  //   "els": "Else",
-  //   "fre": "Foreach",
-  //   "not": "Ignore",
-  //   "whe": "If",
-  //   "whi": "While",
-  //   "fun": "Function",
-  //   "ret": "Return",
-  //   "arc": "Ellipse",
-  //   "bez": "Bezier",
-  //   "col": "Color",
-  //   "fil": "Fill",
-  //   "lin": "Line",
-  //   "mov": "MoveTo",
-  //   "pen": "LineWidth",
-  //   "rec": "Rectangle",
-  //   "sto": "Stroke",
-  //   "tur": "Rotate",
-  //   "app": "Append",
-  //   "cou": "Length",
-  //   "del": "Delete",
-  //   "fin": "Find",
-  //   "ind": "Index",
-  //   "lis": "List",
-  //   "add": "Add",
-  //   "exp": "Exponentiate",
-  //   "flo": "Floor",
-  //   "ide": "Divide",
-  //   "int": "Int",
-  //   "lit": "Lit",
-  //   "log": "Log",
-  //   "mod": "Modulo",
-  //   "pri": "Print",
-  //   "ran": "Random",
-  //   "rep": "Replace",
-  //   "sub": "Subtract",
-  //   "tim": "Multiply",
-  //   "cos": "Cosine",
-  //   "sin": "Sine",
-  //   "tan": "Tangent",
-  //   "was": "Variable",
-  //   "hea": "Heart",
-  //   "kir": "Kirby",
-  //   "pol": "Polygon",
-  //   "roc": "RoundedRectangle",
-  //   "sta": "Star",
-  //   "tri": "Triangle"
-  // }
   /*
     Returns a node that contains the alternate word suggestions
   */
@@ -651,7 +597,7 @@ function setup_editor() {
     let words;
     if (tooltip.type == "alias") {
       words = wordsForAliases[tooltip.value];
-      u.innerHTML = `Words that trigger <a href='${BASE_URL}${ALIAS_DATA[tooltip.value].url}' rel='noopener noreferrer' target='_blank'>${tooltip.value}</a>`;
+      u.innerHTML = `Words that trigger <a href='${BASE_URL}${ALIAS_DATA[tooltip.value].url}' rel='noopener noreferrer' target='_blank'>${tooltip.value} (${ALIAS_DATA[tooltip.value].name})</a>`;
     } else if (tooltip.type == "length") {
       words = getWordsOfLength(tooltip.len, tooltip.mod10);
       if (tooltip.mod10) {
@@ -889,6 +835,55 @@ function setup_editor() {
   */
 }
 
+function remove_auto_tooltips() {
+  [...document.getElementsByClassName("auto-tooltip")].map(e => document.body.removeChild(e))
+}
+
+function try_add_autocomplete() {
+  remove_auto_tooltips();
+  let pos = editor.getCursor();
+  let txt_index = editor.indexFromPos(pos);
+  let thisTooltip = null;
+  // look for start index in tooltip array
+  for (let i = 0; i < tooltips.length; i++) {
+    if (tooltips[i].start < txt_index && txt_index <= tooltips[i].end) {
+      thisTooltip = tooltips[i];
+      break;
+    }
+  }
+
+  if (thisTooltip && thisTooltip.type == "alias" && !thisTooltip.has_matched) {
+    add_autocomplete(thisTooltip.value, pos);
+  }
+}
+
+function add_autocomplete(tooltip_name, pos) {
+  let usage = ALIAS_DATA[tooltip_name].usage;
+
+  let widget = document.createElement("div");
+  widget.className = "auto-tooltip"
+  // widget.innerHTML = `<h1>Autocomplete for ${tooltip_name}</h1>`;
+
+  for (let use of usage) {
+    let span = document.createElement("div");
+    span.innerText = use.format;
+    span.onclick = () => handle_autocomplete(use, pos);
+    widget.appendChild(span);
+  }
+
+  document.body.appendChild(widget);
+  let coords = editor.charCoords(pos);
+  widget.style.position = "absolute";
+  widget.style.left = coords.left + "px";
+  widget.style.top = coords.bottom + "px";
+}
+
+function handle_autocomplete(usage, pos) {
+  editor.replaceRange(usage.func(), pos, pos)
+  remove_auto_tooltips();
+  updateCode();
+}
+
 function setup_lang_worker() {
   language_worker?.terminate();
   version = 0;
@@ -917,6 +912,7 @@ function setup_lang_worker() {
             { className: hl.color.at(-1) }
           );
         }
+        try_add_autocomplete();
         pause();
         curr_frame = 0;
         runCode();

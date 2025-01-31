@@ -4,21 +4,25 @@
  */
 function format(...args) {
     let ret = "";
-    for (let arg in args) {
+    for (let arg of args) {
         if (arg instanceof Function) {
-            ret += arg();
+            ret += " " + arg();
         } else {
-            ret += arg;
+            ret += " " + arg;
         }
     }
     return ret;
+}
+
+function random(min, max) {
+    return Math.floor(Math.random() * (max - min) + min);
 }
 
 /**
  * @param copies 
  */
 function copy_between(min, max, arg) {
-    let copy_num = random_num_inclusive(min, max);
+    let copy_num = random(min, max + 1);
     return copy_count(copy_num, arg);
 }
 
@@ -33,7 +37,15 @@ function copy_count(num, arg) {
  * @return {number} between min and max (inclusive)
  */
 function random_num_inclusive(min, max) {
-    return () => Math.floor(Math.random() * (max - min + 1) + min);
+    return () => random(min, max + 1)
+}
+
+/**
+ * @return {string} color
+ */
+function random_color() {
+    let colors = ["red", "orange", "yellow", "green", "blue", "purple"];
+    return () => colors[random_num_inclusive(0, 5)];
 }
 
 /*
@@ -52,6 +64,7 @@ interface Usage {
 export const ALIAS_DATA = {
     "add": {
         url: "Add",
+        name: "Add",
         usage: [
             {
                 id: "arguments",
@@ -62,159 +75,92 @@ export const ALIAS_DATA = {
     },
     "als": {
         url: "And",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "And",
+        usage: []
     },
     "app": {
         url: "Append",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Append",
+        usage: []
     },
     "arc": {
         url: "Ellipse",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Ellipse",
+        usage: []
     },
     "bez": {
         url: "Bezier",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Bezier",
+        usage: []
     },
     "col": {
         url: "Color",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Color",
+        usage: []
     },
     "cos": {
         url: "Cosine",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Cosine",
+        usage: []
     },
     "cou": {
         url: "Length",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Length",
+        usage: []
     },
     "del": {
         url: "Delete",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Delete",
+        usage: []
     },
     "els": {
         url: "Else",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Else",
+        usage: []
     },
     "exp": {
         url: "Exponentiate",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Exponentiate",
+        usage: []
     },
     "fil": {
         url: "Fill",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Fill",
+        usage: []
     },
     "fin": {
         url: "Find",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Find",
+        usage: []
     },
     "flo": {
         url: "Floor",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Floor",
+        usage: []
     },
     "fra": {
         url: "Frame",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Frame",
+        usage: []
     },
     "fre": {
         url: "Foreach",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "For Each",
+        usage: []
     },
     "fun": {
         url: "Function",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Function",
+        usage: []
     },
     "hea": {
         url: "Heart",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Heart",
+        usage: []
     },
     "ide": {
         url: "Divide",
+        name: "Divide",
         usage: [
             {
                 id: "arguments",
@@ -229,240 +175,137 @@ export const ALIAS_DATA = {
     },
     "ind": {
         url: "Index",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Index",
+        usage: []
     },
     "int": {
         url: "Int",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Small Number",
+        usage: []
     },
     "inv": {
         url: "Not",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Not",
+        usage: []
     },
     "kir": {
         url: "Kirby",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Kirby",
+        usage: []
     },
     "les": {
         url: "LessThan",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Less Than",
+        usage: []
     },
     "lin": {
         url: "Line",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Line",
+        usage: []
     },
     "lis": {
         url: "List",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "List",
+        usage: []
     },
     "lit": {
         url: "Lit",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Big Number",
+        usage: []
     },
     "log": {
         url: "Log",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Log",
+        usage: []
     },
     "mod": {
         url: "Modulo",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Modulo",
+        usage: []
     },
     "mor": {
         url: "GreaterThan",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Greater Than",
+        usage: []
     },
     "mov": {
         url: "MoveTo",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Move To",
+        usage: []
     },
     "not": {
         url: "Ignore",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Ignore",
+        usage: []
     },
     "oth": {
         url: "Or",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Or",
+        usage: []
     },
     "par": {
         url: "Comparison",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Comparison",
+        usage: []
     },
     "pen": {
         url: "LineWidth",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Line Width",
+        usage: []
     },
     "pol": {
         url: "Polygon",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Polygon",
+        usage: []
     },
     "pri": {
         url: "Print",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Print",
+        usage: []
     },
     "ran": {
         url: "Random",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Random",
+        usage: []
     },
     "rec": {
         url: "Rectangle",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Rectangle",
+        usage: []
     },
     "rep": {
         url: "Replace",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Replace",
+        usage: []
     },
     "ret": {
         url: "Return",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Return",
+        usage: []
     },
     "roc": {
         url: "RoundedRectangle",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Rounded Rectangle",
+        usage: []
     },
     "sin": {
         url: "Sine",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Sine",
+        usage: []
     },
     "sta": {
         url: "Star",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Star",
+        usage: []
     },
     "sto": {
         url: "Stroke",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Stroke",
+        usage: []
     },
     "sub": {
         url: "Subtract",
+        name: "Subtract",
         usage: [
             {
                 id: "one-argument-opposite",
@@ -478,15 +321,12 @@ export const ALIAS_DATA = {
     },
     "tan": {
         url: "Tangent",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Tangent",
+        usage: []
     },
     "tim": {
         url: "Multiply",
+        name: "Multiply",
         usage: [
             {
                 id: "arguments",
@@ -497,48 +337,28 @@ export const ALIAS_DATA = {
     },
     "tri": {
         url: "Triangle",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Triangle",
+        usage: []
     },
     "tur": {
         url: "Rotate",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Rotate",
+        usage: []
     },
     "was": {
         url: "Variable",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "Variable Assigneme",
+        usage: []
     },
     "whe": {
         url: "If",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "If",
+        usage: []
     },
     "whi": {
         url: "While",
-        usage: [
-            {
-                format: "FORMAT",
-                func: () => "f"
-            }
-        ]
+        name: "While",
+        usage: []
     },
 
 }

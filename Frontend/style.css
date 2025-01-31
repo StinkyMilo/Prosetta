@@ -185,6 +185,20 @@ body {
   z-index: 2;
   scrollbar-width: thin;
 }
+.auto-tooltip {
+  position: absolute;
+  background-color: darkslategrey;
+  color: rgb(0, 0, 0);
+  width: fit-content;
+  height: fit-content;
+  border: 1px solid black;
+  border-radius: 0.5vw;
+  box-shadow: 2px 4px 8px 2px rgba(0, 0, 0, 0.5);
+  animation: fadeInAnimation ease 0.2s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  z-index: 2;
+}
 
 a{
   color:greenyellow;
