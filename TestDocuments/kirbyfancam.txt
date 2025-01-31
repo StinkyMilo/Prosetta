@@ -1,0 +1,17 @@
+Kirby Fancam
+by Milo Jacobs, Graham Funnyman, Tammie Cheng, and Randall Framingham
+
+tur ran -15 15..
+kir 200.
+
+fun happy.
+  mov ran -200 200. ran -200 200..
+  hea 40.
+  sto red.
+  fil pink.
+.
+
+whi 10,
+	tur ran -15 15..
+	happy.
+.
