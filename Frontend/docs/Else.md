@@ -4,7 +4,7 @@ An else statement. It must immediately follow an if and contain at least one sta
 
 ## Arguments
 
-```st1, st2, … (statements)```
+```st_1, [st_2 ... st_∞] (statements)```
 
 ## Example
 

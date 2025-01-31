@@ -6,7 +6,7 @@ There are three ways the constructor interprets words as numbers. First, if the 
 
 ## Arguments
 
-```w1, w2, ... (words)```
+```[word_1, ... word_∞] (words)```
 
 ## Example
 <editor :code='`

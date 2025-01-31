@@ -6,11 +6,11 @@ If the boolean condition is instead a number, the statements will all be activat
 
 ## Arguments
 
-```condition (any), st1, st2, st3… (statements)```
+```condition (any), [st_1, ... st_∞] (statements)```
 
 ## Special Case
 
-```repeat (number), st1, st2, ... (statements)```
+```repeat (number), [st_1, ... st_∞] (statements)```
 
 ## Example
 <editor :code='`

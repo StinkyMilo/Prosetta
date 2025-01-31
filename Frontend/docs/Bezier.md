@@ -4,7 +4,7 @@ Draws a bezier curve with any number of control points followed by an endpoint. 
 
 ## Arguments
 
-```pointX, pointY, … (numbers, must be an even number of args), endX (number), endY (number)```
+```x_1, y_1, x_2, y_2, [x_3, y_3, ... x_∞, y_∞] (numbers)```
 
 ## Example
 
