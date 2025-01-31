@@ -7,7 +7,7 @@ If `fre` is provided a number *n* rather than a list, it will use the list [0, 1
 ## Arguments
 ```name (word), list (list), [st_1, ... st_∞] (statements)```
 
-```name (word), range (number), [st_1, ... st_∞], ... (statements)```
+```name (word), range (number), [st_1, ... st_∞] (statements)```
 
 ## Example
 <editor :code='`
