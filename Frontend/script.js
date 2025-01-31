@@ -844,6 +844,7 @@ function setup_editor() {
         activeWidget.contains(e.target)
       )
     );
+    console.log("OVER WIDGET",overWidget);
     //Conditions for cancelling removal of a current tooltip
     if (
       //There is a plan to remove the current widget
@@ -861,7 +862,6 @@ function setup_editor() {
     }
     //Conditions for cancelling adding of a new tooltip
     if (
-      !sourcecode.contains(e.target) ||
       //There is a plan to add a widget
       (displayTimeout != null &&
         //Text pos is outside the bounds of that new widget
@@ -872,7 +872,6 @@ function setup_editor() {
     }
     //Conditions for removing current tooltip
     if (
-      !sourcecode.contains(e.target) ||
       //There is a current widget that isn't already being removed
       (removeTimeout == null &&
         activeWidget != null &&
