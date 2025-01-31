@@ -859,12 +859,14 @@ function setup_editor() {
     }
     //Conditions for adding a new tooltip
     if (
-      //Not already trying to add one
-      displayTimeout == null &&
-      //There is a tooltip here
-      thisTooltip != null &&
-      //Cursor is not over an existing widget
-      !overWidget
+      sourcecode.contains(e.target) &&
+      (//Not already trying to add one
+        displayTimeout == null &&
+        //There is a tooltip here
+        thisTooltip != null &&
+        //Cursor is not over an existing widget
+        !overWidget
+      )
     ) {
       nextWordStart = wordPos.anchor;
       nextWordEnd = wordPos.head;
