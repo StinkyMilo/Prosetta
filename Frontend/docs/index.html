@@ -28,7 +28,8 @@
 
 <body>
   <div id="app"></div>
-  <script>const observeUrlChange = () => {
+  <script>
+    const observeUrlChange = () => {
       let oldHref = document.location.href;
       const body = document.querySelector('body');
       const observer = new MutationObserver(mutations => {
@@ -48,6 +49,7 @@
     import {initialize} from "../script.js";
     let editor;
     window.$docsify = {
+      search: 'auto',
       name: '',
       repo: '',
       loadSidebar: true,
@@ -122,10 +124,10 @@
         ignoreHeaders: ['Arguments', 'Example']
       }
     }
-
   </script>
   <!-- Docsify v4 -->
-  <script src="../node_modules/docsify/lib/docsify.js"></script>
+  <script type="module" src="../node_modules/docsify/lib/docsify.js"></script>
+  <script type="module" src="../node_modules/docsify/lib/plugins/search.js"></script>
 </body>
 
 </html>
