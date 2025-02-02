@@ -304,6 +304,11 @@ pub enum Expr {
         index: usize,
         end: End,
     },
+    Abs {
+        locs: Vec<usize>,
+        index: usize,
+        end: End
+    }
 }
 
 impl Expr {

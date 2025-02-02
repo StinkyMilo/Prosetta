@@ -510,7 +510,10 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
         }
         Expr::Floor { index, .. } => {
             format!("Math.floor({})", write_expr(exprs, *index, indent))
-        }
+        },
+        Expr::Abs { index, .. } => {
+            format!("Math.abs({})", write_expr(exprs, *index, indent))
+        },
     }
 }
 

@@ -642,7 +642,8 @@ function setup_editor() {
     "pol": "Polygon",
     "roc": "RoundedRectangle",
     "sta": "Star",
-    "tri": "Triangle"
+    "tri": "Triangle",
+    "abs": "AbsoluteValue"
   };
   const IMPORTS = {
     "fram": "Animation",
