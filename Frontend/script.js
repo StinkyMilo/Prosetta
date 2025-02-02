@@ -815,7 +815,7 @@ function setup_editor() {
         break;
       }
     }
-    const isMouseInCode = sourcecode.contains(e.target) || thisTooltip.contains(e.target);
+    const isMouseInCode = sourcecode.contains(e.target) || (activeWidget != null && activeWidget.contains(e.target));
     //Whether the cursor is outside the current word
     let outsideCurrentWord = (
       !isMouseInCode ||
