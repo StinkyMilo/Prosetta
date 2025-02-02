@@ -20,6 +20,7 @@ Absolute Value Example
 by Milo Jacobs\n
 I was first place in the golf tournament with -15 points!
 Chris was second. He had 15 points.
-I'm a professional, abs first, abs second!
+I'm a professional, the absolute first in my class, 
+and Chris is the absolute second!
 `"
 output-method='console'></editor>
