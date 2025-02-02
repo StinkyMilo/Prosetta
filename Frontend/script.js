@@ -815,9 +815,10 @@ function setup_editor() {
         break;
       }
     }
+    const isMouseInCode = sourcecode.contains(e.target) || thisTooltip.contains(e.target);
     //Whether the cursor is outside the current word
     let outsideCurrentWord = (
-      !sourcecode.contains(e.target) ||
+      !isMouseInCode ||
       (textPos.outside ||
         (
           (
@@ -861,7 +862,7 @@ function setup_editor() {
     }
     //Conditions for cancelling adding of a new tooltip
     if (
-      !sourcecode.contains(e.target) ||
+      !isMouseInCode ||
       //There is a plan to add a widget
       (displayTimeout != null &&
         //Text pos is outside the bounds of that new widget
@@ -872,7 +873,7 @@ function setup_editor() {
     }
     //Conditions for removing current tooltip
     if (
-      !sourcecode.contains(e.target) ||
+      !isMouseInCode ||
       //There is a current widget that isn't already being removed
       (removeTimeout == null &&
         activeWidget != null &&
@@ -888,7 +889,7 @@ function setup_editor() {
     }
     //Conditions for adding a new tooltip
     if (
-      sourcecode.contains(e.target) &&
+      isMouseInCode &&
       (//Not already trying to add one
         displayTimeout == null &&
         //There is a tooltip here
