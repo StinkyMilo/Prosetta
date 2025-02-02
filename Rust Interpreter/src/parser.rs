@@ -12,6 +12,7 @@ pub(crate) use parser_structs::*;
 pub(crate) mod fail_map;
 pub(crate) use fail_map::*;
 
+mod abs;
 pub(crate) mod alias;
 pub(crate) mod alias_data;
 mod append;
