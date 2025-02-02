@@ -7,30 +7,35 @@
   <script src="./node_modules/codemirror/lib/codemirror.js"></script>
   <script src="./node_modules/codemirror/mode/javascript/javascript.js"></script>
   <script type="module">
-    import initialize from './script.js';
-    document.addEventListener("DOMContentLoaded", () => {
-      initialize(`The Wreck of the Summer Rose
-by Milo Jacobs, Steve Graphton, and Lord Framingham.
-
-The waves rose ten yards out from the sea.
-The storm of the dark red moon had taken our best men.
-The open waters pulled them into the depths!
-The water whipped at the boat,
-    releasing its rose-tinted wood three-hundred fathoms below.
-  The wreck of the Summer Rose left few survivors.
-    Nature's tide had taken all our formidable men and left only 2.
-    The storm gave no respite.
-    As the waters rose, those who were left abandoned the 
-    Summer Rose and swam 10 hours before finding rescue!
-It is truly a miracle that they lived.
-      `);
+    import {initialize} from './script.js';
+    import updateExample from './examples.js';
+    document.addEventListener("DOMContentLoaded", async () => {
+      const localCode = localStorage.getItem("code");
+      let editor;
+      if (localCode == null) {
+        editor = await initialize("");
+        updateExample();
+      }
+      else {
+        editor = await initialize(localCode);
+      }
+      document.addEventListener("codeChanged", e => {
+        localStorage.setItem("code", e.detail);
+      });
     });
+    document.getElementById("poemSelect").oninput = updateExample;
   </script>
   <link rel="stylesheet" href="./style.css">
   <link rel="stylesheet" href="./color.css">
 </head>
 
 <body>
+  <label for="poemSelect">Examples</label>
+  <select id="poemSelect">
+    <option value="blank" selected>Blank</option>
+    <option value="summerRose">The Wreck of the Summer Rose</option>
+    <option value="paperIntro">Paper Introduction</option>
+  </select>
   <div id="output-toggle-container">
     Canvas
     <div class="switch" id="output-toggle" onmousedown="toggle_canvas();">
@@ -41,9 +46,11 @@ It is truly a miracle that they lived.
   <div id="codespace">
     <div class="tabContent noScroll" id="code"></div>
     <pre style="display: none;" readonly="true" class="tabContent" id="js">JavaScript</pre>
-    <div id="stack">
-      <canvas id="outputcanvas" width="400px" height="400px"></canvas>
-      <canvas id="outputcanvas2" style="visibility: hidden;" width="400px" height="400px"></canvas>
+    <div id="primary">
+      <div id="stack">
+        <canvas id="outputcanvas" width="400px" height="400px"></canvas>
+        <canvas id="outputcanvas2" style="visibility: hidden;" width="400px" height="400px"></canvas>
+      </div>
     </div>
   </div>
   <div id="controls">
@@ -53,7 +60,9 @@ It is truly a miracle that they lived.
       <img id="play-icon" src="icons/play.svg"></img>
     </button>
   </div>
-  <div id="console" />
+  <div id="secondary">
+    <div id="console" />
+  </div>
 </body>
 
 </html>

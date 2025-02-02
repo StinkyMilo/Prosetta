@@ -5,7 +5,6 @@
 #stack>canvas {
   position: absolute;
   background: white;
-  margin-left: 10px;
   border-color: slategray;
   border-width: 1px;
   border-style: solid;
@@ -131,17 +130,31 @@
   font-family: var(--mono-font);
   text-wrap: nowrap;
   width: 400px;
+  min-width: 400px;
+  margin-left: 10px;
   margin-top: 0;
   margin-bottom: 0;
 }
 
-#console {
+#secondary {
   margin-top: 10px;
-  overflow: scroll;
   height: 300px;
+}
+
+#primary {
+  margin-left: 10px;
+  height: 400px;
+  width: 400px;
+  min-width: 400px;
+}
+
+#console {
+  overflow: scroll;
   font-family: var(--mono-font);
   background: black;
   color: white;
+  height: 100%;
+  width: 100%;
 }
 
 :root {
@@ -186,8 +199,22 @@ body {
   scrollbar-width: thin;
 }
 
-a{
-  color:greenyellow;
+.close-button {
+  top: 0;
+  right: 0;
+  position: absolute;
+  background-color: darkred;
+  color: white;
+  width: 15px;
+  height: 15px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid black;
+  cursor: pointer;
+}
+
+a {
+  color: greenyellow;
 }
 
 .tooltip>p {

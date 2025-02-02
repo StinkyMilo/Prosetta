@@ -18,7 +18,8 @@ enum MatchState {
 pub enum WordTriggerType{
     Alias(Vec<u8>),
     Length(usize, bool),
-    Variable(Vec<u8>)
+    Variable(Vec<u8>),
+    Import(Vec<u8>)
 }
 
 #[derive(Debug, PartialEq)]

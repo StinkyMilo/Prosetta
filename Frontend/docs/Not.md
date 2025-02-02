@@ -4,7 +4,7 @@ Boolean not operator, which takes a single argument and returns false if the var
 
 ## Arguments
 
-```x (any)```
+```x (boolean or number)```
 
 ## Example
 <editor :code="`

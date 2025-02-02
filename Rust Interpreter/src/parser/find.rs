@@ -17,7 +17,7 @@ impl BasicState for FindState {
 
     fn get_child_type(&self) -> Types {
         match self.count {
-            0 => Types::List,
+            0 => Types::List | Types::String,
             1 => Types::Any,
             _ => unreachable!(),
         }
