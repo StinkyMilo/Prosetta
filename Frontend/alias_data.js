@@ -18,13 +18,13 @@ function random(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
 }
 
-/**
- * @param copies 
- */
-function copy_between(min, max, arg) {
-    let copy_num = random(min, max + 1);
-    return copy_count(copy_num, arg);
-}
+// /**
+//  * @param copies 
+//  */
+// function copy_between(min, max, arg) {
+//     let copy_num = random(min, max + 1);
+//     return copy_count(copy_num, arg);
+// }
 
 /**
  * @param copies 
@@ -36,15 +36,22 @@ function copy_count(num, arg) {
 /**
  * @return {number} between min and max (inclusive)
  */
-function random_num_inclusive(min, max) {
-    return () => random(min, max + 1)
+function random_digit() {
+    return random(0, 10)
+}
+
+/**
+ * @return {number} between min and max (inclusive)
+ */
+function random_angle() {
+    return random(1, 4) * 15
 }
 
 /**
  * @return {string} color
  */
 function random_color() {
-    let colors = ["red", "orange", "yellow", "green", "blue", "purple"];
+    let colors = ["blue", "cyan", "gold", "gray", "grey", "lime", "navy", "pink", "plum", "snow", "teal"];
     return () => colors[random_num_inclusive(0, 5)];
 }
 
@@ -68,8 +75,8 @@ export const ALIAS_DATA = {
         usage: [
             {
                 id: "arguments",
-                format: "num_1 num_2 [num_3 ... num_∞]",
-                func: () => format(...copy_between(2, 4, random_num_inclusive(1, 10)), ".")
+                format: "num_1 num_2 [num_3 ... num_∞].",
+                func: () => `${random_digit()} ${random_digit()} . `
             }
         ]
     },
@@ -168,7 +175,7 @@ export const ALIAS_DATA = {
                 func: () => {
                     let val1 = random_num_inclusive(2, 5);
                     let val2 = random_num_inclusive(2, 5);
-                    format(val1 * val2, val1, ".")
+                    return `${val1 * val2} ${val1}. `
                 }
             }
         ]
@@ -310,12 +317,12 @@ export const ALIAS_DATA = {
             {
                 id: "one-argument-opposite",
                 format: "num",
-                func: () => format(random_num_inclusive(1, 10), ".")
+                func: () => `${random_digit()}. `
             },
             {
                 id: "standard",
                 format: "num_1 num_2",
-                func: () => format(...copy_count(2, random_num_inclusive(1, 10)), ".")
+                func: () => `${random_digit()} ${random_digit()}. `
             }
         ]
     },
@@ -330,8 +337,8 @@ export const ALIAS_DATA = {
         usage: [
             {
                 id: "arguments",
-                format: "num_1 num_2 [num_3 ... num_∞]",
-                func: () => format(...copy_between(2, 4, random_num_inclusive(2, 5)), ".")
+                format: "num_1 num_2 [num_3 ... num_∞].",
+                func: () => `${random_digit()} ${random_digit()} . `
             }
         ]
     },
@@ -343,7 +350,13 @@ export const ALIAS_DATA = {
     "tur": {
         url: "Rotate",
         name: "Rotate",
-        usage: []
+        usage: [
+            {
+                id: "arguments",
+                format: "degrees (number)",
+                func: () => `${random_angle()}. `
+            }
+        ]
     },
     "was": {
         url: "Variable",

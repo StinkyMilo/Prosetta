@@ -568,6 +568,7 @@ function getWordsThatContain(substr) {
   });
 }
 
+const BASE_URL = "https://stinkymilo.github.io/Prosetta/Frontend/docs/#/"
 function setup_editor() {
   let code = document.getElementById("code");
   while (code.hasChildNodes()) {
@@ -580,10 +581,10 @@ function setup_editor() {
     lineNumbers: true,
     theme: "xq-dark"
   });
+  editor.on("keydown", key_press_handler);
   editor.setSize("100%", "100%");
 
   const PARTS_OF_SPEECH = ["noun", "verb", "adjective", "adverb", "other"];
-  const BASE_URL = "https://stinkymilo.github.io/Prosetta/Frontend/docs/#/"
   /*
     Returns a node that contains the alternate word suggestions
   */
@@ -807,7 +808,6 @@ function setup_editor() {
       }
     }
   }
-
   editor.on("change", (cm, change) => {
     updateCode();
   });
@@ -835,12 +835,10 @@ function setup_editor() {
   */
 }
 
-function remove_auto_tooltips() {
-  [...document.getElementsByClassName("auto-tooltip")].map(e => document.body.removeChild(e))
-}
+
 
 function try_add_autocomplete() {
-  remove_auto_tooltips();
+  remove_auto_tooltip();
   let pos = editor.getCursor();
   let txt_index = editor.indexFromPos(pos);
   let thisTooltip = null;
@@ -857,31 +855,82 @@ function try_add_autocomplete() {
   }
 }
 
+
+let autocomplete_widget = null;
+let autocomplete_index = null;
+let autocomplete_usage = null;
+let autocomplete_position = null;
+
 function add_autocomplete(tooltip_name, pos) {
-  let usage = ALIAS_DATA[tooltip_name].usage;
+  let data = ALIAS_DATA[tooltip_name];
 
-  let widget = document.createElement("div");
-  widget.className = "auto-tooltip"
-  // widget.innerHTML = `<h1>Autocomplete for ${tooltip_name}</h1>`;
+  autocomplete_position = pos;
+  autocomplete_usage = data.usage;
 
-  for (let use of usage) {
-    let span = document.createElement("div");
-    span.innerText = use.format;
-    span.onclick = () => handle_autocomplete(use, pos);
-    widget.appendChild(span);
+  if (autocomplete_usage.length) {
+    autocomplete_index = 0;
+    autocomplete_widget = document.createElement("div");
+    autocomplete_widget.className = "auto-tooltip"
+
+    for (let index = 0; index < autocomplete_usage.length; index++) {
+      let line = document.createElement("div");
+
+      let link = document.createElement("a");
+      link.innerText = "🔗"
+      link.href = `${BASE_URL}${data.url}?id=${autocomplete_usage[index].id}`;
+      line.appendChild(link);
+
+      let format = document.createElement("span");
+      format.innerText = " " + autocomplete_usage[index].format;
+      format.onclick = () => handle_autocomplete(index);
+      line.appendChild(format);
+
+      line.className = index == 0 ? "selected" : "";
+      autocomplete_widget.appendChild(line);
+    }
+
+    document.body.appendChild(autocomplete_widget);
+    let coords = editor.charCoords(pos);
+    autocomplete_widget.style.position = "absolute";
+    autocomplete_widget.style.left = coords.left + "px";
+    autocomplete_widget.style.top = coords.bottom + "px";
   }
-
-  document.body.appendChild(widget);
-  let coords = editor.charCoords(pos);
-  widget.style.position = "absolute";
-  widget.style.left = coords.left + "px";
-  widget.style.top = coords.bottom + "px";
 }
 
-function handle_autocomplete(usage, pos) {
-  editor.replaceRange(usage.func(), pos, pos)
-  remove_auto_tooltips();
+function remove_auto_tooltip() {
+  if (autocomplete_widget) {
+    document.body.removeChild(autocomplete_widget);
+    autocomplete_widget = null;
+  }
+}
+
+function handle_autocomplete(index) {
+  editor.replaceRange(" " + autocomplete_usage[index].func(), autocomplete_position, autocomplete_position)
+  remove_auto_tooltip();
   updateCode();
+}
+
+function change_autocomplete(offset) {
+  autocomplete_widget.children[autocomplete_index].className = "";
+  autocomplete_index = ((autocomplete_index + offset + autocomplete_usage.length) % autocomplete_usage.length);
+  autocomplete_widget.children[autocomplete_index].className = "selected";
+}
+
+function key_press_handler(cm, ev) {
+  if (autocomplete_widget) {
+    if (ev.key == "ArrowUp") {
+      ev.preventDefault();
+      change_autocomplete(-1);
+    }
+    if (ev.key == "ArrowDown" || ev.key == "Enter") {
+      ev.preventDefault();
+      change_autocomplete(1);
+    }
+    if (ev.key == "Tab") {
+      ev.preventDefault();
+      handle_autocomplete(autocomplete_index)
+    }
+  }
 }
 
 function setup_lang_worker() {
@@ -1045,6 +1094,8 @@ function toggle_canvas() {
   showing_canvas = !showing_canvas;
   update_output();
 }
+
+
 
 window.reset = setup_lang_worker;
 window.toggle = toggle;
