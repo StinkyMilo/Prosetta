@@ -130,7 +130,8 @@ aliases = [
     "tri",
     "hea",
     "roc",
-    "kir"
+    "kir",
+    "abs"
 ]
 
 if __name__ == "__main__":

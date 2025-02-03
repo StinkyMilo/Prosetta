@@ -25,6 +25,7 @@
         - [sub - Subtract](Subtract.md)
         - [tim - Multiply](Multiply.md)
     - Other Operators
+        - [abs - Absolute Value](AbsoluteValue.md)
         - [exp - Exponentiate](Exponentiate.md)
         - [flo - Floor](Floor.md)
         - [log - Log](Log.md)
