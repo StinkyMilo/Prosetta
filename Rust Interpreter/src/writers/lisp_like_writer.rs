@@ -532,7 +532,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
         }
         Expr::Abs { locs, index, end } => {
             format!(
-                "(floor{} {})",
+                "(abs{} {})",
                 join_locs(locs, Some(*end)),
                 write_expr(exprs, *index, 0)
             )

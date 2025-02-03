@@ -66,6 +66,13 @@ fn test_file(path: &str) -> () {
 // START OF GENERATED TESTS
 #[test]
 #[timeout(2000)]
+fn test_absolutevalue () -> () {
+    test_file("../Frontend/docs/AbsoluteValue.md");
+}
+
+
+#[test]
+#[timeout(2000)]
 fn test_add () -> () {
     test_file("../Frontend/docs/Add.md");
 }
