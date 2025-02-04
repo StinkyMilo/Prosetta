@@ -52,7 +52,14 @@ function random_angle() {
  */
 function random_color() {
     let colors = ["blue", "cyan", "gold", "gray", "grey", "lime", "navy", "pink", "plum", "snow", "teal"];
-    return () => colors[random_num_inclusive(0, 5)];
+    return colors[random_num_inclusive(0, 5)];
+}
+
+/**
+ * @return {string} color
+ */
+function random_bool() {
+    return colors[random_num_inclusive(0, 1)];
 }
 
 /*
@@ -83,7 +90,14 @@ export const ALIAS_DATA = {
     "als": {
         url: "And",
         name: "And",
-        usage: []
+        usage: [
+            {
+                id: "arguments",
+                format: "cond_1, cond_2, [cond3 ... cond_∞] (booleans or numbers)",
+                func: () => `${random_digit()} ${random_digit()} . `
+            }
+        ]
+
     },
     "app": {
         url: "Append",
@@ -360,7 +374,7 @@ export const ALIAS_DATA = {
     },
     "was": {
         url: "Variable",
-        name: "Variable Assigneme",
+        name: "Variable Assignement",
         usage: []
     },
     "whe": {

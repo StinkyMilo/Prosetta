@@ -594,22 +594,30 @@ function setup_editor() {
     let widget = document.createElement("div");
     widget.className = "tooltip";
     let header = document.createElement("h1");
-    let u = document.createElement("u");
+    let span = document.createElement("span");
+    header.appendChild(span);
     let words;
     if (tooltip.type == "alias") {
       words = wordsForAliases[tooltip.value];
-      u.innerHTML = `Words that trigger <a href='${BASE_URL}${ALIAS_DATA[tooltip.value].url}' rel='noopener noreferrer' target='_blank'>${tooltip.value} (${ALIAS_DATA[tooltip.value].name})</a>`;
+      span.innerText = `Words that trigger`
+      header.insertAdjacentHTML("beforeend",
+        `<a href='${BASE_URL}${ALIAS_DATA[tooltip.value].url}' rel='noopener noreferrer'\
+        target='_blank'>🔗${tooltip.value} (${ALIAS_DATA[tooltip.value].name})</a>`);
     } else if (tooltip.type == "length") {
       words = getWordsOfLength(tooltip.len, tooltip.mod10);
       if (tooltip.mod10) {
-        u.innerHTML = `Words of length ${tooltip.len}, ${tooltip.len + 10} etc.`;
+        span.innerHTML =
+          `Words of length <span class='term_b_green'>${tooltip.len}</span>, <span class='term_b_green'>${tooltip.len + 10}</span> etc.`;
       } else {
-        u.innerHTML = `Words of length ${tooltip.len}`;
+        span.innerHTML =
+          `Words of length <span class='term_b_green'>${tooltip.len}</span>`;
       }
     } else if (tooltip.type == "variable") {
       words = getWordsThatContain(tooltip.name);
-      u.innerHTML = `Words that contain the variable ${tooltip.name}`;
+      span.innerHTML =
+        `Words that contain the variable <span class='term_b_cyan'>${tooltip.name}</span>`;
     }
+
     let buttonContainer = document.createElement("div");
     buttonContainer.className = "posTabGroup";
     let tabContainer = document.createElement("div");
@@ -636,7 +644,6 @@ function setup_editor() {
       tabContainer.appendChild(posTabContent);
       tabContents[pos] = posTabContent;
     }
-    header.appendChild(u);
     widget.appendChild(header);
     widget.appendChild(buttonContainer);
     widget.appendChild(tabContainer);
