@@ -1,19 +1,3 @@
-/**
- * @param takes list of functions or values
- * @return {string}
- */
-function format(...args) {
-    let ret = "";
-    for (let arg of args) {
-        if (arg instanceof Function) {
-            ret += " " + arg();
-        } else {
-            ret += " " + arg;
-        }
-    }
-    return ret;
-}
-
 function random(min, max = NaN, step = NaN) {
     if (isNaN(max)) {
         max = min;
@@ -27,28 +11,17 @@ function random(min, max = NaN, step = NaN) {
     return Math.floor(Math.random() * (max - min) / step + min / step) * step;
 }
 
+/**
+ * @return {number} between min and max (inclusive)
+ */
 function random_num_inclusive(min, max) {
     return random(min, max, 1)
 }
 
-// /**
-//  * @param copies 
-//  */
-// function copy_between(min, max, arg) {
-//     let copy_num = random(min, max + 1);
-//     return copy_count(copy_num, arg);
-// }
-
-/**
- * @return {number} between min and max (inclusive)
- */
 function random_digit() {
     return random(0, 10)
 }
 
-/**
- * @return {number} between min and max (inclusive)
- */
 function random_digit_neg() {
     return random(-9, 9, 1)
 }
@@ -57,58 +30,116 @@ function random_byte() {
     return random(255)
 }
 
-/**
- * @return {number} between min and max (inclusive)
- */
 function random_angle() {
     return random(15, 90, 15)
 }
 
-/**
- * @return {number} between min and max (inclusive)
- */
 function random_trig_angle() {
     return random(-90, 270, 15)
 }
 
-/**
- * @return {number} between min and max (inclusive)
- */
+
 function random_size() {
     return random(10, 90, 10)
 }
 
-/**
- * @return {number} between min and max (inclusive)
- */
+
 function random_location() {
     return random(-75, 75, 25)
 }
 
-/**
- * @return {number} between min and max (inclusive)
- */
+
 function random_list(min_start, length = 3) {
     let start = random_num_inclusive(min_start, 10 - length);
     let arr = [...new Array(length).keys()].map((_, i) => i + start)
     return arr
 }
+//https://www.geeksforgeeks.org/3-letter-words/
+let VAR_NAMES =
+    ['and', 'fix', 'own', 'are', 'fly', 'odd', 'ape', 'fry',
+        'our', 'ace', 'for', 'pet', 'act', 'got', 'pat', 'ask',
+        'get', 'peg', 'arm', 'god', 'paw', 'age', 'gel', 'pup',
+        'ago', 'gas', 'pit', 'air', 'hat', 'put', 'ate', 'hit',
+        'pot', 'all', 'has', 'pop', 'but', 'had', 'pin', 'bye',
+        'how', 'rat', 'bad', 'her', 'rag', 'big', 'his', 'rub',
+        'bed', 'hen', 'row', 'bat', 'ink', 'rug', 'boy', 'ice',
+        'run', 'bus', 'ill', 'rap', 'bag', 'jab', 'ram', 'box',
+        'jug', 'sow', 'bit', 'jet', 'see', 'bee', 'jam', 'saw',
+        'buy', 'jar', 'set', 'bun', 'job', 'sit', 'cub', 'jog',
+        'sir', 'cat', 'kit', 'sat', 'car', 'key', 'sob', 'cut',
+        'lot', 'tap', 'cow', 'lit', 'tip', 'cry', 'let', 'top',
+        'cab', 'lay', 'tug', 'can', 'mat', 'tow', 'dad', 'man',
+        'toe', 'dab', 'mad', 'tan', 'dam', 'mug', 'ten', 'did',
+        'mix', 'two', 'dug', 'map', 'use', 'den', 'mum', 'van',
+        'dot', 'mud', 'vet', 'dip', 'mom', 'was', 'day', 'may',
+        'wet', 'ear', 'met', 'win', 'eye', 'net', 'won', 'eat',
+        'new', 'wig', 'end', 'nap', 'war', 'elf', 'now', 'why',
+        'egg', 'nod', 'who', 'far', 'net', 'way', 'fat', 'not',
+        'wow', 'few', 'nut', 'you', 'fan', 'oar', 'yes', 'fun',
+        'one', 'yak', 'fit', 'out', 'yet', 'fin', 'owl', 'zip',
+        'fox', 'old', 'zap'];
+function random_var_name() {
+    return VAR_NAMES[random(VAR_NAMES.length)]
+}
 
-
-/**
- * @return {string} color
- */
 function random_color() {
     let colors = ["blue", "cyan", "gold", "gray", "grey", "lime", "navy", "pink", "plum", "snow", "teal"];
     return colors[random_num_inclusive(0, 5)];
 }
 
-/**
- * @return {string} color
- */
 function random_bool() {
     return colors[random_num_inclusive(0, 1)];
 }
+
+function random_bool_equation() {
+    let num1, num2, op;
+    switch (random(3)) {
+        case 0:
+            op = "par"
+            num2 = num1 = random(0, 10);
+            break;
+        case 1:
+            op = "mor"
+            num1 = random(1, 10);
+            num2 = random(0, num1);
+            break;
+        case 2:
+            op = "les"
+            num1 = random(0, 9);
+            num2 = random(num1 + 1, 10);
+            break;
+    }
+    return `${op} ${num1} ${num2}.`;
+}
+
+function random_math() {
+    let num1, num2, op;
+    switch (random(4)) {
+        case 0:
+            op = "add"
+            num1 = random(1, 10);
+            num2 = random(1, 10);
+            break;
+        case 1:
+            op = "sub"
+            num1 = random(1, 10);
+            num2 = random(1, 10);
+            break;
+        case 2:
+            op = "tim"
+            num1 = random(2, 5);
+            num2 = random(2, 5);
+            break;
+        case 3:
+            op = "ide"
+            num2 = random_num_inclusive(2, 5);
+            let val = random_num_inclusive(2, 5);
+            num1 = val * num2
+            break;
+    }
+    return `${op} ${num1} ${num2}.`;
+}
+
 
 /*
 interface AliasData {
@@ -630,12 +661,12 @@ export const ALIAS_DATA = {
             {
                 id: "single-word",
                 format: "word (word)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_var_name()}. `
             },
             {
                 id: "default",
-                format: "```[x_1, ... x_∞] (any)`",
-                func: () => `${"TODO"}. `
+                format: "[x_1, ... x_∞] (any)",
+                func: () => `"${random_var_name()}" ${random_math()} . `
             }
         ]
     },
@@ -704,12 +735,12 @@ export const ALIAS_DATA = {
             {
                 id: "return-nothing",
                 format: "None",
-                func: () => `${"TODO"}. `
+                func: () => `. `
             },
             {
                 id: "return-value",
                 format: "value (any)",
-                func: () => `${"TODO"}. `
+                func: () => ` ${random_digit()}. `
             }
         ]
     },
@@ -757,12 +788,12 @@ export const ALIAS_DATA = {
             {
                 id: "relative",
                 format: "size (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_size()}. `
             },
             {
                 id: "absolute",
                 format: "x (number), y (number), size (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_location()} ${random_location()} ${random_size()}. `
             }
         ]
     },
@@ -827,12 +858,12 @@ export const ALIAS_DATA = {
             {
                 id: "relative",
                 format: "size (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_size()}. `
             },
             {
                 id: "absolute",
                 format: "x (number), y (number), size (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_location()} ${random_location()} ${random_size()}. `
             }
         ]
     },
@@ -854,7 +885,7 @@ export const ALIAS_DATA = {
             {
                 id: "arguments",
                 format: "name (word), value (any)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_var_name()} ${random_digit()}. `
             }
         ]
     },
@@ -865,7 +896,7 @@ export const ALIAS_DATA = {
             {
                 id: "Arguments",
                 format: "condition (boolean or number), st1, [st_2, ... st_∞] (statements)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_bool_equation()}\n[...]\n. `
             }
         ]
     },
@@ -876,12 +907,12 @@ export const ALIAS_DATA = {
             {
                 id: "arguments",
                 format: "condition (any), [st_1, ... st_∞] (statements)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_bool_equation()}\n[...]\n. `
             },
             {
                 id: "special-case",
                 format: "repeat (number), [st_1, ... st_∞] (statements)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_digit()}\n[...]\n. `
             },
         ]
     },

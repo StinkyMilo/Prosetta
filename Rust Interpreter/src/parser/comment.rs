@@ -17,7 +17,7 @@ impl ParseState for CommentState {
                     comment: rest.str[0..close].to_vec(),
                     end: close + rest.pos + env.global_index,
                 };
-                MatchResult::Matched(rest.pos + close, ReturnType::Null, false)
+                MatchResult::Matched(rest.pos + close, ReturnType::Void, false)
             } else {
                 MatchResult::Failed
             }
