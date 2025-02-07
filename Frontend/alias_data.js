@@ -159,13 +159,24 @@ interface Usage {
 */
 
 export const ALIAS_DATA = {
+    "abs": {
+        url: "AbsoluteValue",
+        name: "Absolute Value",
+        usage: [
+            {
+                id: "arguments",
+                format: "value (number)",
+                func: () => `${random_digit_neg()}. `
+            }
+        ]
+    },
     "add": {
         url: "Add",
         name: "Add",
         usage: [
             {
                 id: "arguments",
-                format: "num_1 num_2 [num_3 ... num_∞].",
+                format: "num_1 num_2 [num_3 ... num_∞]",
                 func: () => `${random_digit()} ${random_digit()} . `
             }
         ]
