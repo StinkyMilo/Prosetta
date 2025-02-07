@@ -15,8 +15,10 @@ enum MatchState {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum WordTriggerType{
-    Alias(Vec<u8>),
+pub enum WordTriggerType {
+    // name, has_matched
+    Alias(Vec<u8>, bool),
+    // length, is_mod_ten
     Length(usize, bool),
     Variable(Vec<u8>),
     Import(Vec<u8>)
@@ -26,7 +28,7 @@ pub enum WordTriggerType{
 pub struct WordTrigger {
     pub word_start: usize,
     pub word_end: usize,
-    pub trigger_data: WordTriggerType
+    pub trigger_data: WordTriggerType,
 }
 
 #[derive(Debug)]
@@ -36,20 +38,44 @@ pub struct WordTriggerArena {
 }
 
 impl WordTriggerArena {
+    pub fn try_update_alias_match_status(&mut self, word_start: usize) {
+        if let Some(&index) = self.start_positions.get(&word_start) {
+            if let WordTriggerType::Alias(_, has_matched) =
+                &mut self.word_triggers[index].trigger_data
+            {
+                *has_matched = true;
+            }
+        }
+    }
     pub fn add_val(&mut self, word_start: usize, word_end: usize, trigger_data: WordTriggerType) {
         let trigger_insert = WordTrigger {
-            word_start: word_start,
-            word_end: word_end,
-            trigger_data: trigger_data,
+            word_start,
+            word_end,
+            trigger_data,
         };
-        if let Some(val) = self.start_positions.get(&word_start) {
-            self.word_triggers[*val] = trigger_insert;
+
+        // if exists -- only override if matched
+        if let Some(&val) = self.start_positions.get(&word_start) {
+            // dont replace if non matched trigger trys to replace another non matched trigger
+            // aka get last trigger unless word trys to match two different alias and fails both
+            let should_replace = match (
+                &self.word_triggers[val].trigger_data,
+                &trigger_insert.trigger_data,
+            ) {
+                (WordTriggerType::Alias(_, false), WordTriggerType::Alias(_, false)) => false,
+                _ => true,
+            };
+
+            if should_replace {
+                self.word_triggers[val] = trigger_insert;
+            }
         } else {
             self.start_positions
                 .insert(word_start, self.word_triggers.len());
             self.word_triggers.push(trigger_insert);
         }
     }
+
     pub fn new() -> WordTriggerArena {
         WordTriggerArena {
             word_triggers: Vec::new(),
@@ -87,10 +113,13 @@ pub struct NoneState {
     next_match_state: MatchState,
     //alias finders
     alias_finder: AliasFinder,
+    /// last matched word start index
+    word_index: usize,
 }
 
 impl ParseState for NoneState {
     fn step(&mut self, env: &mut Environment, word: &Slice, rest: &Slice) -> MatchResult {
+        self.word_index = word.pos + env.global_index;
         let length = if self.data.is_expr {
             let vec = env
                 .aliases
@@ -120,6 +149,8 @@ impl ParseState for NoneState {
         rest: &Slice,
     ) -> MatchResult {
         if let Some((_, return_type)) = child_index {
+            env.trigger_word_data
+                .try_update_alias_match_status(self.word_index);
             // child matched successfully
             MatchResult::Matched(word.pos, return_type, false)
         } else {
@@ -160,6 +191,7 @@ impl NoneState {
                 offset: 0,
                 matched: 0,
             },
+            word_index: 0,
         }
     }
     ///reset state back to defaults for a new word
@@ -277,7 +309,7 @@ impl NoneState {
             env.trigger_word_data.add_val(
                 word.pos + env.global_index,
                 word.pos + env.global_index + word.len(),
-                WordTriggerType::Alias(alias.to_vec()),
+                WordTriggerType::Alias(alias.to_vec(), false),
             );
             //set up stack
             let state = (self.data.func)(alias);

@@ -2,10 +2,6 @@
 <html>
 
 <head>
-  <link rel="stylesheet" href="./node_modules/codemirror/lib/codemirror.css">
-  <link rel="stylesheet" href="./node_modules/codemirror/theme/xq-dark.css">
-  <script src="./node_modules/codemirror/lib/codemirror.js"></script>
-  <script src="./node_modules/codemirror/mode/javascript/javascript.js"></script>
   <script type="module">
     import {initialize} from './script.js';
     import updateExample from './examples.js';
@@ -25,6 +21,10 @@
     });
     document.getElementById("poemSelect").oninput = updateExample;
   </script>
+  <link rel="stylesheet" href="./node_modules/codemirror/lib/codemirror.css">
+  <link rel="stylesheet" href="./node_modules/codemirror/theme/xq-dark.css">
+  <script src="./node_modules/codemirror/lib/codemirror.js"></script>
+  <script src="./node_modules/codemirror/mode/javascript/javascript.js"></script>
   <link rel="stylesheet" href="./style.css">
   <link rel="stylesheet" href="./color.css">
 </head>
@@ -61,7 +61,7 @@
     </button>
   </div>
   <div id="secondary">
-    <div id="console" />
+    <div id="console" ></div>
   </div>
 </body>
 

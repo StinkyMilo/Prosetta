@@ -1,5 +1,6 @@
 import { allWords, wordsForAliases, partsOfSpeech } from './wordsForAliases.js';
 import { Import } from './wasm-bindings/prosetta.js';
+import { ALIAS_DATA } from './alias_data.js';
 
 var jscode, sourcecode, cnsl, stack, curr_canvas, displayed_ctx, displayed_canvas, play_icon, pause_icon, toggle_btn, output_toggle_btn, primary, secondary;
 /** @type CanvasRenderingContext2D
@@ -9,6 +10,7 @@ var x = 0, y = 0, rotation = 0;
 var has_drawn_shape = false;
 var last_shape = "none";
 var language_worker, runner_worker;
+/** @type CodeMirror.Editor */
 var editor;
 let tooltips = [];
 /** @type int[] */
@@ -572,6 +574,7 @@ function getWordsThatContain(substr) {
   });
 }
 
+const BASE_URL = "https://stinkymilo.github.io/Prosetta/Frontend/docs/#/"
 function setup_editor() {
   let code = document.getElementById("code");
   while (code.hasChildNodes()) {
@@ -584,67 +587,12 @@ function setup_editor() {
     lineNumbers: true,
     theme: "xq-dark"
   });
+  editor.on("keydown", key_press_handler);
   editor.setSize("100%", "100%");
 
   const PARTS_OF_SPEECH = ["noun", "verb", "adjective", "adverb", "other"];
-  const BASE_URL = "https://stinkymilo.github.io/Prosetta/Frontend/docs/#/";
+  const BASE_URL = "https://stinkymilo.github.io/Prosetta/Frontend/docs/#/"
   const BASE_URL_IMPORTS = BASE_URL + "Imports#";
-  const URLS = {
-    "fra": "Frame",
-    "als": "And",
-    "inv": "Not",
-    "les": "LessThan",
-    "mor": "GreaterThan",
-    "oth": "Or",
-    "par": "Comparison",
-    "els": "Else",
-    "fre": "Foreach",
-    "not": "Ignore",
-    "whe": "If",
-    "whi": "While",
-    "fun": "Function",
-    "ret": "Return",
-    "arc": "Ellipse",
-    "bez": "Bezier",
-    "col": "Color",
-    "fil": "Fill",
-    "lin": "Line",
-    "mov": "MoveTo",
-    "pen": "LineWidth",
-    "rec": "Rectangle",
-    "sto": "Stroke",
-    "tur": "Rotate",
-    "app": "Append",
-    "cou": "Length",
-    "del": "Delete",
-    "fin": "Find",
-    "ind": "Index",
-    "lis": "List",
-    "add": "Add",
-    "exp": "Exponentiate",
-    "flo": "Floor",
-    "ide": "Divide",
-    "int": "Int",
-    "lit": "Lit",
-    "log": "Log",
-    "mod": "Modulo",
-    "pri": "Print",
-    "ran": "Random",
-    "rep": "Replace",
-    "sub": "Subtract",
-    "tim": "Multiply",
-    "cos": "Cosine",
-    "sin": "Sine",
-    "tan": "Tangent",
-    "was": "Variable",
-    "hea": "Heart",
-    "kir": "Kirby",
-    "pol": "Polygon",
-    "roc": "RoundedRectangle",
-    "sta": "Star",
-    "tri": "Triangle",
-    "abs": "AbsoluteValue"
-  };
   const IMPORTS = {
     "fram": "Animation",
     "fun": "Functions",
@@ -652,7 +600,7 @@ function setup_editor() {
     "lis": "Lists",
     "ran": "Randomization",
     "tam": "Stamps",
-    "tri": "Trigonometry"
+    "tri": "Trigonometry",
   };
   /*
     Returns a node that contains the alternate word suggestions
@@ -663,25 +611,32 @@ function setup_editor() {
     let widget = document.createElement("div");
     widget.className = "tooltip";
     let header = document.createElement("h1");
-    let u = document.createElement("u");
+    let span = document.createElement("span");
+    header.appendChild(span);
     let words;
     if (tooltip.type == "alias") {
       words = wordsForAliases[tooltip.value];
-      u.innerHTML = `Words that trigger <a href='${BASE_URL}${URLS[tooltip.value]}' rel='noopener noreferrer' target='_blank'>${tooltip.value}</a>`;
+      span.innerText = `Words that trigger`
+      header.insertAdjacentHTML("beforeend",
+        `<a href='${BASE_URL}${ALIAS_DATA[tooltip.value].url}' rel='noopener noreferrer'\
+        target='_blank'>🔗${tooltip.value} (${ALIAS_DATA[tooltip.value].name})</a>`);
     } else if (tooltip.type == "length") {
       words = getWordsOfLength(tooltip.len, tooltip.mod10);
       if (tooltip.mod10) {
-        u.innerHTML = `Words of length ${tooltip.len}, ${tooltip.len + 10} etc.`;
+        span.innerHTML =
+          `Words of length <span class='term_b_green'>${tooltip.len}</span>, <span class='term_b_green'>${tooltip.len + 10}</span> etc.`;
       } else {
-        u.innerHTML = `Words of length ${tooltip.len}`;
+        span.innerHTML =
+          `Words of length <span class='term_b_green'>${tooltip.len}</span>`;
       }
     } else if (tooltip.type == "variable") {
       words = getWordsThatContain(tooltip.name);
-      u.innerHTML = "Words that contain the variable " + tooltip.name;
+      span.innerHTML = `Words that contain the variable <span class='term_b_blue'>${tooltip.name}</span>`;
     } else if (tooltip.type == "import") {
       words = [];
-      u.innerHTML = `Import: <a href='${BASE_URL_IMPORTS + tooltip.name}-${IMPORTS[tooltip.name].toLowerCase()}' rel='noopener noreferrer' target='_blank'>${IMPORTS[tooltip.name]}</a> Library`;
+      span.innerHTML = `Import: <a href='${BASE_URL_IMPORTS + tooltip.name}-${IMPORTS[tooltip.name].toLowerCase()}' rel='noopener noreferrer' target='_blank'>${IMPORTS[tooltip.name]}</a> Library`;
     }
+
     let buttonContainer = document.createElement("div");
     buttonContainer.className = "posTabGroup";
     let tabContainer = document.createElement("div");
@@ -708,7 +663,6 @@ function setup_editor() {
       tabContainer.appendChild(posTabContent);
       tabContents[pos] = posTabContent;
     }
-    header.appendChild(u);
     let closeButton = document.createElement("button");
     closeButton.innerHTML = `
     <svg style="width: 10px; height: 10px; margin: 2px; margin: 0; padding: 0; padding-bottom: 0px; padding-bottom: 2.5px;"
@@ -798,7 +752,7 @@ function setup_editor() {
     }, 500);
   }
 
-  window.onmousemove = function(e) {
+  window.onmousemove = function (e) {
     let pos = { left: e.clientX, top: e.clientY + window.scrollY };
     let textPos = editor.coordsChar(pos);
     let wordPos = editor.findWordAt(textPos);
@@ -921,7 +875,6 @@ function setup_editor() {
       }
     }
   }
-
   editor.on("change", (cm, change) => {
     updateCode();
   });
@@ -947,6 +900,104 @@ function setup_editor() {
       If a timeout completes,
         Create a tooltip for the corresponding word, put at the word's end position
   */
+}
+
+
+
+function try_add_autocomplete() {
+  remove_auto_tooltip();
+  let pos = editor.getCursor();
+  let txt_index = editor.indexFromPos(pos);
+  let thisTooltip = null;
+  // look for start index in tooltip array
+  for (let i = 0; i < tooltips.length; i++) {
+    if (tooltips[i].start < txt_index && txt_index <= tooltips[i].end) {
+      thisTooltip = tooltips[i];
+      break;
+    }
+  }
+
+  if (thisTooltip && thisTooltip.type == "alias" && !thisTooltip.has_matched) {
+    add_autocomplete(thisTooltip.value, pos);
+  }
+}
+
+
+let autocomplete_widget = null;
+let autocomplete_index = null;
+let autocomplete_usage = null;
+let autocomplete_position = null;
+
+function add_autocomplete(tooltip_name, pos) {
+  let data = ALIAS_DATA[tooltip_name];
+
+  autocomplete_position = pos;
+  autocomplete_usage = data.usage;
+
+  if (autocomplete_usage.length) {
+    autocomplete_index = 0;
+    autocomplete_widget = document.createElement("div");
+    autocomplete_widget.className = "auto-tooltip"
+
+    for (let index = 0; index < autocomplete_usage.length; index++) {
+      let line = document.createElement("div");
+
+      let link = document.createElement("a");
+      link.innerText = "🔗"
+      link.href = `${BASE_URL}${data.url}?id=${autocomplete_usage[index].id}`;
+      line.appendChild(link);
+
+      let format = document.createElement("span");
+      format.innerText = " " + autocomplete_usage[index].format;
+      format.onclick = () => handle_autocomplete(index);
+      line.appendChild(format);
+
+      line.className = index == 0 ? "selected" : "";
+      autocomplete_widget.appendChild(line);
+    }
+
+    document.body.appendChild(autocomplete_widget);
+    let coords = editor.charCoords(pos);
+    autocomplete_widget.style.position = "absolute";
+    autocomplete_widget.style.left = coords.left + "px";
+    autocomplete_widget.style.top = coords.bottom + "px";
+  }
+}
+
+function remove_auto_tooltip() {
+  if (autocomplete_widget) {
+    document.body.removeChild(autocomplete_widget);
+    autocomplete_widget = null;
+  }
+}
+
+function handle_autocomplete(index) {
+  editor.replaceRange(" " + autocomplete_usage[index].func(), autocomplete_position, autocomplete_position)
+  remove_auto_tooltip();
+  updateCode();
+}
+
+function change_autocomplete(offset) {
+  autocomplete_widget.children[autocomplete_index].className = "";
+  autocomplete_index = ((autocomplete_index + offset + autocomplete_usage.length) % autocomplete_usage.length);
+  autocomplete_widget.children[autocomplete_index].className = "selected";
+}
+
+function key_press_handler(cm, ev) {
+  if (autocomplete_widget) {
+    if (ev.key == "ArrowUp") {
+      ev.preventDefault();
+      change_autocomplete(-1);
+    }
+    if (ev.key == "ArrowDown" || ev.key == "Enter") {
+      ev.preventDefault();
+      change_autocomplete(1);
+    }
+    if (ev.key == "Tab") {
+      ev.preventDefault();
+      handle_autocomplete(autocomplete_index)
+    }
+  }
 }
 
 function setup_lang_worker() {
@@ -975,6 +1026,7 @@ function setup_lang_worker() {
             { className: hl.color.at(-1) }
           );
         }
+        try_add_autocomplete();
 
         const doesPrint = tooltips.filter(x => x.type == "alias").map(x => x.value).some(x => x == "pri") || imports.find(x => x == Import.Frame) != undefined;
         const doesDraw = imports.find(x => x == Import.Graph) != undefined || imports.find(x => x == Import.Stamp) != undefined;
@@ -1130,6 +1182,8 @@ function toggle_canvas() {
   showing_canvas = !showing_canvas;
   update_output();
 }
+
+
 
 window.reset = setup_lang_worker;
 window.toggle = toggle;
