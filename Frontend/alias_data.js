@@ -71,16 +71,16 @@ let VAR_NAMES =
         'jug', 'sow', 'bit', 'jet', 'see', 'bee', 'jam', 'saw',
         'buy', 'jar', 'set', 'bun', 'job', 'sit', 'cub', 'jog',
         'sir', 'cat', 'kit', 'sat', 'car', 'key', 'sob', 'cut',
-        'lot', 'tap', 'cow', 'lit', 'tip', 'cry', 'let', 'top',
+        'lot', 'tap', 'cow', 'tip', 'cry', 'let', 'top',
         'cab', 'lay', 'tug', 'can', 'mat', 'tow', 'dad', 'man',
-        'toe', 'dab', 'mad', 'tan', 'dam', 'mug', 'ten', 'did',
-        'mix', 'two', 'dug', 'map', 'use', 'den', 'mum', 'van',
-        'dot', 'mud', 'vet', 'dip', 'mom', 'was', 'day', 'may',
+        'toe', 'dab', 'mad', 'dam', 'mug', 'did',
+        'mix', 'dug', 'map', 'use', 'den', 'mum', 'van',
+        'dot', 'mud', 'vet', 'dip', 'mom', 'day', 'may',
         'wet', 'ear', 'met', 'win', 'eye', 'net', 'won', 'eat',
         'new', 'wig', 'end', 'nap', 'war', 'elf', 'now', 'why',
-        'egg', 'nod', 'who', 'far', 'net', 'way', 'fat', 'not',
-        'wow', 'few', 'nut', 'you', 'fan', 'oar', 'yes', 'fun',
-        'one', 'yak', 'fit', 'out', 'yet', 'fin', 'owl', 'zip',
+        'egg', 'nod', 'who', 'far', 'net', 'way', 'fat',
+        'wow', 'few', 'nut', 'you', 'fan', 'oar', 'yes',
+        'yak', 'fit', 'out', 'yet', 'fin', 'owl', 'zip',
         'fox', 'old', 'zap'];
 function random_var_name() {
     return VAR_NAMES[random(VAR_NAMES.length)]
