@@ -48,6 +48,10 @@ function random_location() {
     return random(-75, 75, 25)
 }
 
+function random_sides() {
+    return random(3, 8, 1)
+}
+
 
 function random_list(min_start, length = 3) {
     let start = random_num_inclusive(min_start, 10 - length);
@@ -236,7 +240,7 @@ export const ALIAS_DATA = {
             {
                 id: "arguments",
                 format: "x_1, y_1, x_2, y_2, [x_3, y_3, ... x_∞, y_∞] (numbers)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_location()} ${random_location()} ${random_location()} ${random_location()} . `
             }
         ]
     },
@@ -269,7 +273,7 @@ export const ALIAS_DATA = {
             {
                 id: "arguments",
                 format: "value (number)",
-                func: () => `lis ${random_list(2, random_num_inclusive(2, 3)).join(" ")} . . `
+                func: () => `lis ${random_list(2, random_num_inclusive(2, 3)).join(" ")} .. `
             }
         ]
     },
@@ -280,12 +284,22 @@ export const ALIAS_DATA = {
             {
                 id: "start-of-list",
                 format: "list (list)",
-                func: () => `${"TODO"}. `
+                func: () => {
+                    let list = random_list(3, 3);
+                    let index = 0;
+                    list.splice(index, 0, 1);
+                    return `lis ${list.join(' ')} .. `
+                }
             },
             {
                 id: "specified-location",
                 format: "list (list), index (number)",
-                func: () => `${"TODO"}. `
+                func: () => {
+                    let list = random_list(3, 3);
+                    let index = random(0, list.length);
+                    list.splice(index, 0, 1);
+                    return `lis ${list.join(' ')} . ${index}.`
+                }
             }
         ]
     },
@@ -296,7 +310,7 @@ export const ALIAS_DATA = {
             {
                 id: "arguments",
                 format: "st_1, [st_2 ... st_∞] (statements)",
-                func: () => `${"TODO"}. `
+                func: () => `\n[...]\n. `
             }
         ]
     },
@@ -305,15 +319,15 @@ export const ALIAS_DATA = {
         name: "Exponentiate",
         usage: [
             {
-                id: "standard",
-                format: "base (number), exp (number)",
-                func: () => `${"TODO"}. `
-            },
-            {
                 id: "ex",
                 format: "exp (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${1}. `
             },
+            {
+                id: "standard",
+                format: "base (number), exp (number)",
+                func: () => `${random_num_inclusive(2, 5)} ${random_num_inclusive(2, 3)}. `
+            }
         ]
     },
     "fil": {
@@ -339,7 +353,12 @@ export const ALIAS_DATA = {
             {
                 id: "arguments",
                 format: "toSearch (list or string), value (any)",
-                func: () => `${"TODO"}. `
+                func: () => {
+                    let list = random_list();
+                    let index = random(list.length);
+                    let item = list[index];
+                    return `lis ${random_list().join("")}. ${item}.`;
+                }
             }
         ]
     },
@@ -368,7 +387,18 @@ export const ALIAS_DATA = {
     "fre": {
         url: "Foreach",
         name: "For Each",
-        usage: []
+        usage: [
+            {
+                id: "",
+                format: "name (word), list (list), [st_1, ... st_∞] (statements)",
+                func: () => `${random_var_name()} lis ${random_list(1).join(" ")}.\n[...]\n. `
+            },
+            {
+                id: "",
+                format: "name (word), range (number), [st_1, ... st_∞] (statements)",
+                func: () => `${random_var_name()} ${random(1, 10)}\n[...]\n. `
+            }
+        ]
     },
     "fun": {
         url: "Function",
@@ -376,8 +406,8 @@ export const ALIAS_DATA = {
         usage: [
             {
                 id: "arguments",
-                format: "[arg_1, ... arg_∞] (words) [CLOSING PUNCTUATION], [st_1, ... st_∞] (statements)",
-                func: () => `${"TODO"}. `
+                format: "name (word), [arg_1, ... arg_∞] (words), [CLOSING PUNCTUATION], [st_1, ... st_∞] (statements)",
+                func: () => `${random_var_name()} ${random_var_name()}.\n[...]\n. `
             }
         ]
     },
@@ -388,22 +418,22 @@ export const ALIAS_DATA = {
             {
                 id: "relative-regular",
                 format: "size (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_size()}. `
             },
             {
                 id: "relative-stretched",
                 format: "width (number), height (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_size()} ${random_size()}. `
             },
             {
                 id: "absolute-regular",
                 format: "x (number), y (number), size (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_location()} ${random_location()} ${random_size()}. `
             },
             {
                 id: "absolute-stretched",
                 format: "x (number), y (number), width (number), height (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_location()} ${random_location()} ${random_size()} ${random_size()}. `
             }
         ]
     },
@@ -429,7 +459,11 @@ export const ALIAS_DATA = {
             {
                 id: "arguments",
                 format: "list (list), index (number)",
-                func: () => `${"TODO"}. `
+                func: () => {
+                    let list = random_list();
+                    let index = random(list.length);
+                    return `lis ${random_list().join(" ")}. ${index}. `;
+                }
             }
         ]
     },
@@ -440,7 +474,7 @@ export const ALIAS_DATA = {
             {
                 id: "arguments",
                 format: "word (word)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_var_name()}. `
             }
         ]
     },
@@ -462,22 +496,22 @@ export const ALIAS_DATA = {
             {
                 id: "relative-regular",
                 format: "size (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_size()}. `
             },
             {
                 id: "relative-stretched",
                 format: "width (number), height (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_size()} ${random_size()}. `
             },
             {
                 id: "absolute-regular",
                 format: "x (number), y (number), size (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_location()} ${random_location()} ${random_size()}. `
             },
             {
                 id: "absolute-stretched",
                 format: "x (number), y (number), width (number), height (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_location()} ${random_location()} ${random_size()} ${random_size()}. `
             }
         ]
     },
@@ -488,7 +522,11 @@ export const ALIAS_DATA = {
             {
                 id: "arguments",
                 format: "n1 (number), n2 (number)",
-                func: () => `${"TODO"}. `
+                func: () => {
+                    let num1 = random(1, 9);
+                    let num2 = random(0, num1);
+                    return `${num1} ${num2}. `
+                }
             }
         ]
     },
@@ -499,22 +537,22 @@ export const ALIAS_DATA = {
             {
                 id: "relative-angled",
                 format: "length (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_size()}. `
             },
             {
                 id: "relative-x-y",
                 format: "xMove (number), yMove (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_size()} ${random_size()}. `
             },
             {
                 id: "absolute-angled",
                 format: "xStart (number), yStart (number), length (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_location()} ${random_location()} ${random_size()}. `
             },
             {
                 id: "absolute-x-y",
                 format: "xStart (number), yStart (number), xMove (number), yMove (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_location()} ${random_location()} ${random_size()} ${random_size()}. `
             }
         ]
     },
@@ -536,7 +574,7 @@ export const ALIAS_DATA = {
             {
                 id: "arguments",
                 format: "[word_1, ... word_∞] (words)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_var_name()} ${random_var_name()} . `
             }
         ]
     },
@@ -563,7 +601,12 @@ export const ALIAS_DATA = {
             {
                 id: "arguments",
                 format: "n1 (number), n2 (number)",
-                func: () => `${"TODO"}. `
+                func: () => {
+                    let val1 = random_num_inclusive(2, 5);
+                    let val2 = random_num_inclusive(2, 5);
+                    let result = random(1, val1);
+                    return `${val1 * val2 + result} ${val1}. `
+                }
             }
         ]
     },
@@ -574,7 +617,11 @@ export const ALIAS_DATA = {
             {
                 id: "arguments",
                 format: "n1 (number), n2 (number)",
-                func: () => `${"TODO"}. `
+                func: () => {
+                    let num1 = random(0, 9);
+                    let num2 = random(num1 + 1, 10);
+                    return `${num1} ${num2}. `
+                }
             }
         ]
     },
@@ -583,14 +630,14 @@ export const ALIAS_DATA = {
         name: "Move To",
         usage: [
             {
-                id: "absolute",
-                format: "x (number), y (number)",
-                func: () => `${"TODO"}. `
-            },
-            {
                 id: "relative",
                 format: "length (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_size()}. `
+            },
+            {
+                id: "absolute",
+                format: "x (number), y (number)",
+                func: () => `${random_location()} ${random_location()}. `
             }
         ]
     },
@@ -601,7 +648,7 @@ export const ALIAS_DATA = {
             {
                 id: "arguments",
                 format: "ignored (word)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_var_name()}. `
             },
         ]
     },
@@ -645,12 +692,12 @@ export const ALIAS_DATA = {
             {
                 id: "relative",
                 format: "size (number), sides (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_size()} ${random_sides()}. `
             },
             {
                 id: "absolute",
                 format: "x (number), y (number), size (number), sides (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_location()} ${random_location()} ${random_size()} ${random_sides()}. `
             }
         ]
     },
@@ -698,22 +745,22 @@ export const ALIAS_DATA = {
             {
                 id: "square-relative",
                 format: "sideLength (number)",
-                func: () => `${"TODO"}. `
-            },
-            {
-                id: "square-absolute",
-                format: "x (number), y (number), sideLength (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_size()}. `
             },
             {
                 id: "rectangle-relative",
                 format: "width (number), height (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_size()} ${random_size()}. `
+            },
+            {
+                id: "square-absolute",
+                format: "x (number), y (number), sideLength (number)",
+                func: () => `${random_location()} ${random_location()} ${random_size()}. `
             },
             {
                 id: "rectangle-absolute",
                 format: "x (number), y (number), width (number), height (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_location()} ${random_location()} ${random_size()} ${random_size()}. `
             }
         ]
     },
@@ -724,7 +771,13 @@ export const ALIAS_DATA = {
             {
                 id: "arguments",
                 format: "list (list), index (number), value (any)",
-                func: () => `${"TODO"}. `
+                func: () => {
+                    let list = random_list(2, 4);
+                    let index = random(0, list.length);
+                    let item = list[index];
+                    list[index] = 0;
+                    return `lis ${list.join(' ')} . ${index} ${item}. `
+                }
             }
         ]
     },
@@ -751,22 +804,22 @@ export const ALIAS_DATA = {
             {
                 id: "relative-square",
                 format: "size (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_size()}. `
             },
             {
                 id: "relative-stretched",
                 format: "width (number), height (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_size()} ${random_size()}. `
             },
             {
                 id: "absolute-square",
                 format: "x (number), y (number), size (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_location()} ${random_location()} ${random_size()}. `
             },
             {
                 id: "absolute-stretched",
                 format: "x (number), y (number), width (number), height (number)",
-                func: () => `${"TODO"}. `
+                func: () => `${random_location()} ${random_location()} ${random_size()} ${random_size()}. `
             }
         ]
     },
