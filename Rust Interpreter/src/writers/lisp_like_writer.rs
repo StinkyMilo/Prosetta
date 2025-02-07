@@ -530,6 +530,13 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: usize) -> String {
                 write_expr(exprs, *index, 0)
             )
         }
+        Expr::Abs { locs, index, end } => {
+            format!(
+                "(abs{} {})",
+                join_locs(locs, Some(*end)),
+                write_expr(exprs, *index, 0)
+            )
+        }
     }
 }
 fn write_start_space(str: String) -> String {
