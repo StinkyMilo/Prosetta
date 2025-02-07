@@ -1082,7 +1082,7 @@ function pause() {
 
 function draw_frame() {
   let now = Date.now();
-  if ((now - last_frame_timestamp + 10) >= 1000 / target_fps) {
+  if (latest_frame == curr_frame && (now - last_frame_timestamp + 10) >= 1000 / target_fps) {
     curr_frame++;
     runCode();
   }
