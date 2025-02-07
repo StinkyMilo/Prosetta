@@ -631,7 +631,7 @@ function setup_editor() {
       }
     } else if (tooltip.type == "variable") {
       words = getWordsThatContain(tooltip.name);
-      span.innerHTML = "Words that contain the variable " + tooltip.name;
+      span.innerHTML = `Words that contain the variable <span class='term_b_blue'>${tooltip.name}</span>`;
     } else if (tooltip.type == "import") {
       words = [];
       span.innerHTML = `Import: <a href='${BASE_URL_IMPORTS + tooltip.name}-${IMPORTS[tooltip.name].toLowerCase()}' rel='noopener noreferrer' target='_blank'>${IMPORTS[tooltip.name]}</a> Library`;
@@ -663,7 +663,6 @@ function setup_editor() {
       tabContainer.appendChild(posTabContent);
       tabContents[pos] = posTabContent;
     }
-    header.appendChild(span);
     let closeButton = document.createElement("button");
     closeButton.innerHTML = `
     <svg style="width: 10px; height: 10px; margin: 2px; margin: 0; padding: 0; padding-bottom: 0px; padding-bottom: 2.5px;"
@@ -1026,6 +1025,26 @@ function setup_lang_worker() {
             { className: hl.color.at(-1) }
           );
         }
+        try_add_autocomplete();
+
+        const doesPrint = tooltips.filter(x => x.type == "alias").map(x => x.value).some(x => x == "pri") || imports.find(x => x == Import.Frame) != undefined;
+        const doesDraw = imports.find(x => x == Import.Graph) != undefined || imports.find(x => x == Import.Stamp) != undefined;
+        if (doesDraw && doesPrint) {
+          primary.appendChild(stack);
+          secondary.style.display = "inherit";
+          secondary.appendChild(cnsl);
+        }
+        else if (doesDraw) {
+          primary.appendChild(stack);
+          secondary.style.display = "none";
+          secondary.appendChild(cnsl);
+        }
+        else {
+          primary.appendChild(cnsl);
+          secondary.style.display = "none";
+          secondary.appendChild(stack);
+        }
+
         pause();
         curr_frame = 0;
         runCode();
