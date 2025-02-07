@@ -8,7 +8,7 @@ Prints a value to the console. Print can print any combination of variables and 
 ```word (word)```
 
 ### Default
-```x1, x2, ... (any)`
+```[x_1, ... x_∞] (any)`
 
 ## Example
 <editor :code="`

@@ -25,7 +25,7 @@ impl ParseState for TitleState {
                 if self.is_author_closed {
                     // first author already done
                     if self.data.authors.len() >= 1 {
-                        self.add_imports(word.str, word.pos);
+                        self.add_imports(env, word.str, word.pos);
                     }
                     self.data
                         .authors
@@ -38,7 +38,7 @@ impl ParseState for TitleState {
                     author.2 = word.end() - author.1;
                     // second author started
                     if self.data.authors.len() >= 2 {
-                        self.add_imports(word.str, word.pos);
+                        self.add_imports(env, word.str, word.pos);
                     }
                 }
                 self.is_author_closed = false;
@@ -117,7 +117,7 @@ impl TitleState {
             get_close_data(str)
         }
     }
-    fn add_imports(&mut self, name: &[u8], index: usize) {
+    fn add_imports(&mut self, env: &mut Environment, name: &[u8], index: usize) {
         let lower_name = name.to_ascii_lowercase();
         let imports = Import::get_all();
         if let Some((offset, _, imp_index)) =
@@ -125,6 +125,11 @@ impl TitleState {
                 true
             })
         {
+            env.trigger_word_data.add_val(
+                offset as usize + index, 
+                offset as usize + index + imports[imp_index].1.len() as usize, 
+                alias::WordTriggerType::Import(imports[imp_index].1.to_vec())
+            );
             self.data.imports.push((
                 imports[imp_index].0,
                 offset as usize + index,

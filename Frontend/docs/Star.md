@@ -8,7 +8,7 @@ Draws a five-pointed star, either at the turtle's position or at a specified rel
 ```size (number)```
 
 ### Absolute
-```x (number) y (number) size (number)```
+```x (number), y (number), size (number)```
 
 ## Example
 

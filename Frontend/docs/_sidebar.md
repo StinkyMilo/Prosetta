@@ -7,6 +7,9 @@
 - The Essentials
     - [Imports](Imports.md)
     - [Literals](Literals.md)
+        - [Number](Literals.md#numbers)
+        - [Color](Literals.md#colors)
+        - [String](Literals.md#strings)
     - [pri - Print](Print.md)
     - [Punctuation](Punctuation.md)
     - [was - Variable Declaration](Variable.md)

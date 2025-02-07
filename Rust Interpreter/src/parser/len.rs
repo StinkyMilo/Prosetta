@@ -18,7 +18,7 @@ impl BasicState for LengthState {
     }
 
     fn get_child_type(&self) -> Types {
-        Types::List
+        Types::List | Types::String
     }
 
     fn do_first(&mut self, expr: &mut Expr, locs: Vec<usize>) -> bool {

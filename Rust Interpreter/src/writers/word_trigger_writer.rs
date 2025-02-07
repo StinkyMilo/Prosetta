@@ -10,7 +10,7 @@ pub fn write(trigger_word_data: &Vec<WordTrigger>) -> String {
             WordTriggerType::Alias(alias_name, has_matched) => {
                 format!(
                     "\"type\":\"alias\", \"value\":\"{}\", \"has_matched\":{has_matched}",
-                    String::from_utf8_lossy(&alias_name.to_vec())
+                    String::from_utf8_lossy(alias_name)
                 )
             }
             WordTriggerType::Length(length, mod10) => {
@@ -22,7 +22,13 @@ pub fn write(trigger_word_data: &Vec<WordTrigger>) -> String {
             WordTriggerType::Variable(var_name) => {
                 format!(
                     "\"type\":\"variable\", \"name\":\"{}\"",
-                    String::from_utf8_lossy(&var_name.to_vec())
+                    String::from_utf8_lossy(var_name)
+                )
+            }
+            WordTriggerType::Import(import_name) => {
+                format!(
+                    "\"type\":\"import\",\"name\":\"{}\"",
+                    String::from_utf8_lossy(import_name)
                 )
             }
         };

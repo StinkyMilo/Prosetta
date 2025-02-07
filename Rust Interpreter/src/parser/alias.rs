@@ -20,8 +20,8 @@ pub enum WordTriggerType {
     Alias(Vec<u8>, bool),
     // length, is_mod_ten
     Length(usize, bool),
-    /// name
     Variable(Vec<u8>),
+    Import(Vec<u8>)
 }
 
 #[derive(Debug, PartialEq)]

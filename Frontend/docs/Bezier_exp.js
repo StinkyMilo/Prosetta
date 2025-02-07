@@ -1,5 +1,8 @@
-`Bezier Example`;
-"By Milo Jacobs, John Graphton";
+/*
+Title: Bezier Example
+Primary author: Milo Jacobs
+Imports: Graph
+*/
 
 set_fill("red");
 set_stroke(0);

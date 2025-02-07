@@ -2,7 +2,7 @@ import { allWords, wordsForAliases, partsOfSpeech } from './wordsForAliases.js';
 import { Import } from './wasm-bindings/prosetta.js';
 import { ALIAS_DATA } from './alias_data.js';
 
-var jscode, sourcecode, cnsl, stack, curr_canvas, displayed_ctx, displayed_canvas, play_icon, pause_icon, toggle_btn, output_toggle_btn;
+var jscode, sourcecode, cnsl, stack, curr_canvas, displayed_ctx, displayed_canvas, play_icon, pause_icon, toggle_btn, output_toggle_btn, primary, secondary;
 /** @type CanvasRenderingContext2D
  */
 var curr_ctx;
@@ -13,6 +13,7 @@ var language_worker, runner_worker;
 /** @type CodeMirror.Editor */
 var editor;
 let tooltips = [];
+/** @type int[] */
 var imports = [];
 var frameInterval;
 var curr_frame = 0;
@@ -511,15 +512,20 @@ function updateCode() {
     editor.setValue(newsrc);
     return;
   }
+  console.log(src);
+  const codeUpdateEvent = new CustomEvent("codeChanged", { detail: src });
+  document.dispatchEvent(codeUpdateEvent);
   msg_worker("changed", src);
 }
 
-async function initialize(startingCode) {
+export async function initialize(startingCode) {
   for (const tooltip of document.getElementsByClassName("tooltip")) {
     tooltip.remove();
   }
   version = 0;
   language_worker?.terminate();
+  primary = document.getElementById("primary");
+  secondary = document.getElementById("secondary");
   output_toggle_btn = document.getElementById("output-toggle");
   sourcecode = document.getElementById("code");
   jscode = document.getElementById("js");
@@ -585,6 +591,17 @@ function setup_editor() {
   editor.setSize("100%", "100%");
 
   const PARTS_OF_SPEECH = ["noun", "verb", "adjective", "adverb", "other"];
+  const BASE_URL = "https://stinkymilo.github.io/Prosetta/Frontend/docs/#/"
+  
+  const IMPORTS = {
+    "fram": "Animation",
+    "fun": "Functions",
+    "gra": "Graphics",
+    "lis": "Lists",
+    "ran": "Randomization",
+    "tam": "Stamps",
+    "tri": "Trigonometry"
+  };
   /*
     Returns a node that contains the alternate word suggestions
   */
@@ -614,8 +631,10 @@ function setup_editor() {
       }
     } else if (tooltip.type == "variable") {
       words = getWordsThatContain(tooltip.name);
-      span.innerHTML =
-        `Words that contain the variable <span class='term_b_cyan'>${tooltip.name}</span>`;
+      span.innerHTML = "Words that contain the variable " + tooltip.name;
+    } else if (tooltip.type == "import") {
+      words = [];
+      span.innerHTML = `Import: <a href='${BASE_URL_IMPORTS + tooltip.name}-${IMPORTS[tooltip.name].toLowerCase()}' rel='noopener noreferrer' target='_blank'>${IMPORTS[tooltip.name]}</a> Library`;
     }
 
     let buttonContainer = document.createElement("div");
@@ -644,20 +663,57 @@ function setup_editor() {
       tabContainer.appendChild(posTabContent);
       tabContents[pos] = posTabContent;
     }
+    header.appendChild(span);
+    let closeButton = document.createElement("button");
+    closeButton.innerHTML = `
+    <svg style="width: 10px; height: 10px; margin: 2px; margin: 0; padding: 0; padding-bottom: 0px; padding-bottom: 2.5px;"
+   width="25"
+   height="25"
+   viewBox="0 0 6.6145832 6.6145833"
+   version="1.1"
+   id="svg1"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <g
+     id="layer1"
+     style="fill:#ffffff;fill-opacity:1">
+    <path
+       id="path4"
+       style="stroke-width:0.199999;fill:#ffffff;fill-opacity:1"
+       d="M 0 0 L 0 1.3229166 L 5.2916666 6.6145832 L 6.6145832 6.6145832 L 6.6145832 5.2916666 L 1.3229166 0 L 0 0 z " />
+    <path
+       id="path3"
+       style="stroke-width:0.200243;fill:#ffffff;fill-opacity:1"
+       d="M 5.3614298 0 L 0 5.2167358 L 0 6.6145832 L 1.2531535 6.6145832 L 6.6145832 1.3978475 L 6.6145832 0 L 5.3614298 0 z " />
+  </g>
+</svg>`;
+    // xImg.src = "icons/x.svg";
+    // xImg.style.width = "100%";
+    // xImg.style.height = "100%";
+    closeButton.className = "close-button";
+    closeButton.onclick = clearWidget;
+    //Start adding to widget directly.
     widget.appendChild(header);
-    widget.appendChild(buttonContainer);
-    widget.appendChild(tabContainer);
-    for (let i = 0; i < words.length; i++) {
-      let matchingPos = partsOfSpeech[words[i]];
-      for (let j = 0; j < matchingPos.length; j++) {
-        let wordElement = document.createElement("div");
-        wordElement.innerHTML = words[i];
-        wordElement.onclick = () => {
-          editor.replaceRange(words[i], currentWordStart, currentWordEnd);
-          currentWordEnd = { line: currentWordStart.line, ch: currentWordStart.ch + words[i].length };
-        };
-        tabContents[matchingPos[j]].appendChild(wordElement);
+    widget.appendChild(closeButton);
+    if (tooltip.type != "import") {
+      widget.appendChild(buttonContainer);
+      widget.appendChild(tabContainer);
+      for (let i = 0; i < words.length; i++) {
+        let matchingPos = partsOfSpeech[words[i]];
+        for (let j = 0; j < matchingPos.length; j++) {
+          let wordElement = document.createElement("div");
+          wordElement.innerHTML = words[i];
+          wordElement.onclick = () => {
+            editor.replaceRange(words[i], currentWordStart, currentWordEnd);
+            currentWordEnd = { line: currentWordStart.line, ch: currentWordStart.ch + words[i].length };
+          };
+          tabContents[matchingPos[j]].appendChild(wordElement);
+        }
       }
+    } else {
+      widget.style.height = "auto";
     }
     return widget;
   }
@@ -700,8 +756,6 @@ function setup_editor() {
   window.onmousemove = function (e) {
     let pos = { left: e.clientX, top: e.clientY + window.scrollY };
     let textPos = editor.coordsChar(pos);
-    // console.log(pos,textPos);
-    // console.log(editor.charCoords({ch:0,line:0}),pos);
     let wordPos = editor.findWordAt(textPos);
     let midPos = { line: 0, ch: 0 };
     if (wordPos.head.line == wordPos.anchor.line) {
@@ -719,20 +773,22 @@ function setup_editor() {
     }
     //Whether the cursor is outside the current word
     let outsideCurrentWord = (
-      textPos.outside ||
-      (
+      !sourcecode.contains(e.target) ||
+      (textPos.outside ||
         (
-          textPos.line > currentWordEnd.line ||
           (
-            textPos.line == currentWordEnd.line &&
-            textPos.ch > currentWordEnd.ch
-          )
-        ) ||
-        (
-          textPos.line < nextWordStart.line ||
+            textPos.line > currentWordEnd.line ||
+            (
+              textPos.line == currentWordEnd.line &&
+              textPos.ch > currentWordEnd.ch
+            )
+          ) ||
           (
-            textPos.line == nextWordStart.line &&
-            textPos.ch < nextWordStart.ch
+            textPos.line < nextWordStart.line ||
+            (
+              textPos.line == nextWordStart.line &&
+              textPos.ch < nextWordStart.ch
+            )
           )
         )
       )
@@ -761,24 +817,26 @@ function setup_editor() {
     }
     //Conditions for cancelling adding of a new tooltip
     if (
+      !sourcecode.contains(e.target) ||
       //There is a plan to add a widget
-      displayTimeout != null &&
-      //Text pos is outside the bounds of that new widget
-      outsideCurrentWord
+      (displayTimeout != null &&
+        //Text pos is outside the bounds of that new widget
+        outsideCurrentWord)
     ) {
       clearTimeout(displayTimeout);
       displayTimeout = null;
     }
     //Conditions for removing current tooltip
     if (
+      !sourcecode.contains(e.target) ||
       //There is a current widget that isn't already being removed
-      removeTimeout == null &&
-      activeWidget != null &&
-      (
-        outsideCurrentWord &&
-        //Cursor is not over the widget
-        !overWidget
-      )
+      (removeTimeout == null &&
+        activeWidget != null &&
+        (
+          outsideCurrentWord &&
+          //Cursor is not over the widget
+          !overWidget
+        ))
     ) {
       removeTimeout = setTimeout(() => {
         clearWidget();
@@ -786,12 +844,14 @@ function setup_editor() {
     }
     //Conditions for adding a new tooltip
     if (
-      //Not already trying to add one
-      displayTimeout == null &&
-      //There is a tooltip here
-      thisTooltip != null &&
-      //Cursor is not over an existing widget
-      !overWidget
+      sourcecode.contains(e.target) &&
+      (//Not already trying to add one
+        displayTimeout == null &&
+        //There is a tooltip here
+        thisTooltip != null &&
+        //Cursor is not over an existing widget
+        !overWidget
+      )
     ) {
       nextWordStart = wordPos.anchor;
       nextWordEnd = wordPos.head;
@@ -953,12 +1013,10 @@ function setup_lang_worker() {
         if (version != data.version) {
           break;
         }
-        console.log(data.js);
         setup_runner();
         imports = data.imports;
         jscode.innerText = data.js;
         tooltips = JSON.parse(data.wordTriggers);
-        console.log(tooltips);
         let highlights = data.hl;
         editor.doc.getAllMarks().forEach(marker => marker.clear());
         for (let hl of highlights) {
@@ -968,7 +1026,6 @@ function setup_lang_worker() {
             { className: hl.color.at(-1) }
           );
         }
-        try_add_autocomplete();
         pause();
         curr_frame = 0;
         runCode();
@@ -1079,7 +1136,7 @@ function update_output() {
     output_toggle_btn.children[0].style.webkitTransform = "translateX(0px)";
     output_toggle_btn.children[0].style.msTransform = "translateX(0px)";
     output_toggle_btn.children[0].style.transform = "translateX(0px)";
-    stack.style.display = "block";
+    primary.style.display = "block";
     jscode.style.display = "none";
     if (was_playing) {
       play();
@@ -1089,11 +1146,15 @@ function update_output() {
     output_toggle_btn.children[0].style.webkitTransform = "translateX(26px)";
     output_toggle_btn.children[0].style.msTransform = "translateX(26px)";
     output_toggle_btn.children[0].style.transform = "translateX(26px)";
-    stack.style.display = "none";
+    primary.style.display = "none";
     jscode.style.display = "block";
     was_playing = !!frameInterval;
     pause();
   }
+}
+
+export function updateValue(newValue) {
+  editor.setValue(newValue);
 }
 
 var showing_canvas = true;
@@ -1108,4 +1169,5 @@ window.reset = setup_lang_worker;
 window.toggle = toggle;
 window.toggle_canvas = toggle_canvas;
 window.update_output = update_output;
-export default initialize;
+
+export default { initialize, updateValue };

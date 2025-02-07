@@ -4,7 +4,7 @@ Boolean and operator, which takes at least two arguments. If all provided argume
 
 ## Arguments
 
-```x1, x2, … (any)```
+```cond_1, cond_2, [cond3 ... cond_∞] (booleans or numbers)```
 
 ## Example
 <editor :code="`

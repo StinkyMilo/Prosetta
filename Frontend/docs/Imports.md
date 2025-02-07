@@ -17,17 +17,15 @@ This example imports graphics and frames
 My Poem
 by Milo Jacobs, John Graphton, and Alice Framingham.
 \t
-was frame ide fra 5!
-whi mor frame 20!
-was frame sub frame 20...
+was frame mod ide fra 5. 20!
 tur ide tim frame frame. 2!
 rec tim frame frame!
 `' 
 :code-wordier=null
 output-method='canvas'></editor>
 
-## Fra - Animation
-Any author with the substring _fra_ in their name will import the graphics library.
+## Fram - Animation
+Any author with the substring _fram_ in their name will import the animation library.
 
 Additionally, importing this enables animation as a whole. See [Frame](Frame.md).
 
