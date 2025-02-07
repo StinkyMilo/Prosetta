@@ -15,9 +15,9 @@ let tooltips = [];
 var imports = [];
 var frameInterval;
 var curr_frame = 0;
-var latest_frame = 0;
 var last_frame_timestamp = Date.now();
 var target_fps = 30;
+var actual_fps = 30;
 var was_playing = true;
 var currPath2D = null;
 var version = 0;
@@ -462,7 +462,6 @@ function runCode() {
   print_console("---");
   print_console();
   runner_worker.postMessage({ command: "run", data: { code: jscode.innerText, frame: curr_frame } });
-  // cnsl.scrollTop = cnsl.scrollHeight;
 }
 
 function openTab(event, tab) {
@@ -1040,10 +1039,10 @@ function setup_runner() {
           await function_dict[funcCall.name](...funcCall.args);
         }
         if (has_import(Import.Frame)) {
-          print_console("fps:", Math.round(1000 / (Date.now() - last_frame_timestamp)));
+          actual_fps = 1000 / (Date.now() - last_frame_timestamp);
+          print_console("fps:", Math.round(actual_fps));
         }
         last_frame_timestamp = Date.now();
-        latest_frame = curr_frame;
         swap_canvases();
         break;
     }
@@ -1054,6 +1053,7 @@ function has_import(imp) {
   return imports.indexOf(imp) >= 0;
 }
 
+var isPlaying = true;
 function toggle() {
   if (frameInterval) {
     pause();
@@ -1061,6 +1061,7 @@ function toggle() {
     play();
   }
 }
+
 function play() {
   pause();
   play_icon.style.display = "none";
@@ -1068,22 +1069,25 @@ function play() {
   if (has_import(Import.Frame)) {
     toggle_btn.style.display = "block"
     last_frame_timestamp = Date.now();
-    frameInterval = setInterval(draw_frame);
+    isPlaying = true;
+    draw_frame();
   }
 }
 
 function pause() {
-  clearInterval(frameInterval);
-  frameInterval = null;
   play_icon.style.display = "block";
   pause_icon.style.display = "none";
+  isPlaying = false;
 }
 
 function draw_frame() {
   let now = Date.now();
-  if (latest_frame == curr_frame && (now - last_frame_timestamp) > 1000 / target_fps) {
+  if ((now - last_frame_timestamp + 10) >= 1000 / target_fps) {
     curr_frame++;
     runCode();
+  }
+  if (isPlaying) {
+    requestAnimationFrame(draw_frame);
   }
 }
 
