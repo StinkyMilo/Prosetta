@@ -15,6 +15,7 @@ let tooltips = [];
 var imports = [];
 var frameInterval;
 var curr_frame = 0;
+var latest_frame = 0;
 var last_frame_timestamp = Date.now();
 var target_fps = 30;
 var actual_fps = 30;
