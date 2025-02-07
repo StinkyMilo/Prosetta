@@ -1043,6 +1043,7 @@ function setup_runner() {
           print_console("fps:", Math.round(actual_fps));
         }
         last_frame_timestamp = Date.now();
+        latest_frame = curr_frame;
         swap_canvases();
         break;
     }
