@@ -1,0 +1,22 @@
+stdout
+by Milo Jacobs and Graham Fundraiser
+
+fre xind 10
+	fre yind 10
+		was xval sub tim xind 40. 200..
+        was yval sub tim yind 40. 200..
+        mov xval yval.
+        whe par mod add yind xind. 2 . zero.
+        	tur 225.
+            lin 57.
+            sto black.
+            tur -225.
+        .
+        els
+        	tur -45.
+            lin 57.
+            sto black.
+            tur 45.
+        .
+	.
+.
