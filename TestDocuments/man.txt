@@ -14,13 +14,14 @@ fun iterate xpos ypos.
 was acx 0.
 was acy 0.
 was loopout -1.
+whe les length xpos legitimacys. 4..
 fre loop 20.
   was tmp add squareimaginaryx acx acy. xpos..
   was acy add squareimaginaryy acx acy. ypos..
   was acx tmp.
   whe mor length acx acy. 4..
   whe les loopout 0.
-  was loopout ide loop 20. . . . .
+  was loopout ide loop 20. . . . . .
 whe mor loopout 0.
 ret loopout..
 ret 1...
