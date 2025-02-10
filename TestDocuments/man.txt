@@ -34,7 +34,7 @@ pri xpos ypos.
   rec sub tim size xpos. sub 200 ide size 2. . . sub tim size ypos. sub 200 ide size 2. . . size size.
   was num 
   	iterate 
-    	ide sub sub xpos ide 200 size.. . scale.
+    	ide sub xpos ide 200 size.. scale.
      	ide sub ypos ide 200 size.. scale.
         . .
   fil tim num 255. tim num 255. tim num 255..
