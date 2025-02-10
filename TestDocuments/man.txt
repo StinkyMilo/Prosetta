@@ -25,18 +25,18 @@ whe mor loopout 0.
 ret loopout..
 ret 1...
 
-was size 100.
+was size 50.
+was scale 2.
 sto 0.
 fre xpos ide 400 size.
 fre ypos ide 400 size.
 pri xpos ypos.
-  arc sub tim size xpos. sub 200 ide size 2. . . sub tim size ypos. sub 200 ide size 2. . . size size.
+  rec sub tim size xpos. sub 200 ide size 2. . . sub tim size ypos. sub 200 ide size 2. . . size size.
   was num 
   	iterate 
-    	xpos
-     	ypos
+    	ide sub sub xpos ide 200 size.. . scale.
+     	ide sub ypos ide 200 size.. scale.
         . .
-        pri num.
   fil tim num 255. tim num 255. tim num 255..
 ...
 pri done.
