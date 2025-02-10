@@ -1,0 +1,42 @@
+title
+by name and gra fun.
+
+fun length xpos ypos.
+ret add tim xpos xpos. tim ypos ypos...
+
+fun squareimaginaryx xpos ypos.
+ret sub tim xpos xpos. tim ypos ypos...
+
+fun squareimaginaryy xpos ypos.
+ret tim 2 xpos ypos...
+
+fun iterate xpos ypos.
+was acx 0.
+was acy 0.
+was loopout -1.
+fre loop 20.
+  was tmp add squareimaginaryx acx acy. xpos..
+  was acy add squareimaginaryy acx acy. ypos..
+  was acx tmp.
+  whe mor length acx acy. 4..
+  whe les loopout 0.
+  was loopout ide loop 20. . . . .
+whe mor loopout 0.
+ret loopout..
+ret 1...
+
+was size 100.
+sto 0.
+fre xpos ide 400 size.
+fre ypos ide 400 size.
+pri xpos ypos.
+  arc sub tim size xpos. sub 200 ide size 2. . . sub tim size ypos. sub 200 ide size 2. . . size size.
+  was num 
+  	iterate 
+    	xpos
+     	ypos
+        . .
+        pri num.
+  fil tim num 255. tim num 255. tim num 255..
+...
+pri done.

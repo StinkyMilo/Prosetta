@@ -1,5 +1,5 @@
 var functions = [];
-onmessage = async function (e) {
+onmessage = async function(e) {
   let command = e.data.command;
   let data = e.data.data;
   switch (command) {
@@ -12,7 +12,7 @@ onmessage = async function (e) {
       } catch (error) {
         print_console(error);
       }
-      postMessage({ command: "finished", data: functions });
+      postMessage({ command: "finished", data: { functions: functions, prosetta: data.prosetta } });
       break;
   }
 }
