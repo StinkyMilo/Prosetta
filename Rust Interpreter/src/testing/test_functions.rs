@@ -39,17 +39,20 @@ fn test_multi_arg_function() {
 #[timeout(1000)]
 fn test_infinite_loop_function() {
     let data =
-        run_parser!(b"fun in'finite. infi'n'ite... 'infinite'? pri \"this will never print\".");
+        run_parser!(b"fun in'finite. infi'n'ite... 'infinite'? pri \"this will never print\"...");
     check_lisp!(
         data,
-        "(function@0,1,2$25$$3 \"infinite\"@4|2 (args) (\"infinite\"@15|4,6 ))\n\
-            (\"infinite\"@30|8 )\n(print@41,42,43$68 \"this will never print\"@45)"
+        "(function@0,1,2$68$$3 \"infinite\"@4|2 (args) (\"infinite\"@15|4,6 ) \
+        (\"infinite\"@30|8 ) (print@41,42,43$68$$3 \"this will never print\"@45))"
     );
 }
 
 #[test]
 #[timeout(1000)]
 fn test_function_fail() {
-    let data = run_parser!(b"fun func. pri hi.");
-    check_lisp!(data, "(function@4,5,6$16 \"pri\"@10 (args) )");
+    let data = run_parser!(b"fun func. pri hi..");
+    check_lisp!(
+        data,
+        "(function@0,1,2$17 \"func\"@4 (args) (print@10,11,12$16 \"hi\"@14))"
+    );
 }

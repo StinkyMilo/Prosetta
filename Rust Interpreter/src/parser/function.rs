@@ -90,13 +90,17 @@ impl ParseState for FunctionState {
             func, indexes, end, ..
         } = env.expr
         {
-            //and stat child
-            if let Some((index, _)) = child_index {
+            //add stat child
+            if let Some((index, return_type)) = child_index {
+                // needs to return void
+                if return_type == ReturnType::Void {
+                    self.has_stat = true;
+                }
                 indexes.push(index);
             }
 
             // close if have close
-            if is_mandatory_close(word) {
+            if self.has_stat && is_mandatory_close(word) {
                 *end = End::from_slice(&word, env.global_index);
                 env.symbols.remove_layer();
                 env.symbols

@@ -20,6 +20,9 @@ impl ParseState for WhileState {
                 Types::Bool | Types::Number,
                 Box::new(alias::NoneState::new_expr_cont()),
             )
+        } else if word.len() == 0 {
+            env.symbols.remove_layer();
+            MatchResult::Failed
         } else if self.has_stat {
             MatchResult::ContinueWith(
                 word.pos,
@@ -43,7 +46,10 @@ impl ParseState for WhileState {
         _rest: &Slice,
     ) -> MatchResult {
         if let Expr::While { indexes, end, .. } = env.expr {
-            if !self.has_condition {
+            if word.len() == 0 {
+                env.symbols.remove_layer();
+                MatchResult::Failed
+            } else if !self.has_condition {
                 //add child and find stats
                 if let Some((index, _)) = child_index {
                     self.has_condition = true;
