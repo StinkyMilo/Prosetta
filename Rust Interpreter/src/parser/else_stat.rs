@@ -67,7 +67,7 @@ impl ParseState for ElseState {
             if let Expr::Else { end, indexes, .. } = env.expr {
                 if let Some((index, return_type)) = child_index {
                     // needs to return void
-                    if return_type == ReturnType::Void {
+                    if return_type != ReturnType::Null {
                         self.has_stat = true;
                     }
                     indexes.push(index);
