@@ -4,5 +4,5 @@ Primary author: Milo Jacobs
 Imports: 
 */
 
-let that_var = (10 ** 100);
-print_console(that_var);
+let var_that = (10 ** 100);
+print_console(var_that);

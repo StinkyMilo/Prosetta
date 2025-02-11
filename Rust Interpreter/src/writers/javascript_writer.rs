@@ -46,7 +46,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
             first,
             ..
         } => format!(
-            "{}{}{}_var = {};",
+            "{}{}var_{} = {};",
             get_indent(indent),
             if *first { "let " } else { "" },
             String::from_utf8_lossy(&var.name),
@@ -122,7 +122,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
                 write_exprs(exprs, indexes, ", ", indent)
             )
         }
-        Expr::Var { var } => format!("{}_var", String::from_utf8_lossy(&var.name).to_string()),
+        Expr::Var { var } => format!("var_{}", String::from_utf8_lossy(&var.name).to_string()),
         Expr::WordNum { str_len, .. } => str_len.to_string(),
         Expr::Operator {
             func_type, indexes, ..
@@ -226,7 +226,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
                         is_first = false;
                     }
                     if let VarOrInt::Var(var) = val {
-                        output_vals += &format!("{}_var", String::from_utf8_lossy(&var.name));
+                        output_vals += &format!("var_{}", String::from_utf8_lossy(&var.name));
                     } else if let VarOrInt::Int(intval) = val {
                         output_vals += &format!("{}", intval);
                     }
@@ -331,7 +331,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
             let mut output: String = String::new();
             for val in str.iter() {
                 if let VarOrStr::Var(var) = val {
-                    let new_val = format!("${{{}_var}}", String::from_utf8_lossy(&var.name));
+                    let new_val = format!("${{var_{}}}", String::from_utf8_lossy(&var.name));
                     output += &new_val[..];
                 } else if let VarOrStr::Str(str) = val {
                     let new_val = String::from_utf8_lossy(str);
@@ -426,7 +426,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
             let ind = get_indent(indent);
             *indent += 1;
             let str = format!(
-                "{}for_loop({}, ({}_var) => {{\n{}\n{}}});",
+                "{}for_loop({}, (var_{}) => {{\n{}\n{}}});",
                 ind,
                 write_expr(exprs, indexes[0], indent),
                 String::from_utf8_lossy(&var.name),
@@ -444,13 +444,13 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
         } => {
             let args_str = args
                 .into_iter()
-                .map(|data| String::from_utf8_lossy(&data.name) + "_var")
+                .map(|data| format!("var_{}", String::from_utf8_lossy(&data.name)))
                 .collect::<Vec<_>>()
                 .join(", ");
 
             *indent += 1;
             let str = format!(
-                "function {}_var({}) {{\n{}\n}}",
+                "function var_{}({}) {{\n{}\n}}",
                 String::from_utf8_lossy(&func.name),
                 args_str,
                 write_exprs(exprs, indexes, "\n", indent)
@@ -461,7 +461,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
         Expr::FunctionCall { func, indexes, .. } => {
             //Trying without a semicolon since JS lets you forget them sometimes and function calls can be either expressions or statements
             format!(
-                "{}_var({})",
+                "var_{}({})",
                 String::from_utf8_lossy(&func.name),
                 write_exprs(exprs, indexes, ", ", indent)
             )
@@ -510,10 +510,10 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize) -> String {
         }
         Expr::Floor { index, .. } => {
             format!("Math.floor({})", write_expr(exprs, *index, indent))
-        },
+        }
         Expr::Abs { index, .. } => {
             format!("Math.abs({})", write_expr(exprs, *index, indent))
-        },
+        }
     }
 }
 
