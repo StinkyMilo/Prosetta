@@ -2,7 +2,7 @@ import { allWords, wordsForAliases, partsOfSpeech } from './wordsForAliases.js';
 import { Import } from './wasm-bindings/prosetta.js';
 import { ALIAS_DATA } from './alias_data.js';
 
-var jscode, sourcecode, cnsl, stack, curr_canvas, displayed_ctx, displayed_canvas, play_icon, pause_icon, toggle_btn, output_toggle_btn, primary, secondary;
+var jscode_element, sourcecode, cnsl, stack, curr_canvas, displayed_ctx, displayed_canvas, play_icon, pause_icon, toggle_btn, output_toggle_btn, primary, secondary;
 /** @type CanvasRenderingContext2D
  */
 var curr_ctx;
@@ -24,6 +24,7 @@ var actual_fps = 30;
 var was_playing = true;
 var currPath2D = null;
 var version = 0;
+var js_code = "";
 /** @type Image
  */
 var kirby_image = null;
@@ -49,7 +50,7 @@ function print_console() {
     args.push(arguments[i]);
   }
   let line = args.join(" ")
-  cnsl.innerText += line + "\n";
+  cnsl.innerHTML += line + "<br>";
 }
 
 function end_shape() {
@@ -464,7 +465,7 @@ function runCode() {
   print_console("Welcome to Prosetta!");
   print_console("---");
   print_console();
-  runner_worker.postMessage({ command: "run", data: { prosetta: editor.getValue(), code: jscode.innerText, frame: curr_frame } });
+  runner_worker.postMessage({ command: "run", data: { prosetta: editor.getValue(), code: js_code, frame: curr_frame } });
   // cnsl.scrollTop = cnsl.scrollHeight;
 }
 
@@ -526,7 +527,7 @@ export async function initialize(startingCode) {
   secondary = document.getElementById("secondary");
   output_toggle_btn = document.getElementById("output-toggle");
   sourcecode = document.getElementById("code");
-  jscode = document.getElementById("js");
+  jscode_element = document.getElementById("js");
   stack = document.getElementById("stack");
   curr_canvas = document.getElementById("outputcanvas");
   displayed_canvas = document.getElementById("outputcanvas2");
@@ -535,7 +536,7 @@ export async function initialize(startingCode) {
   toggle_btn = document.getElementById("toggle-play");
   play_icon = document.getElementById("play-icon");
   pause_icon = document.getElementById("pause-icon");
-  jscode.innerText = "";
+  jscode_element.innerText = "";
   cnsl = document.getElementById("console");
   showing_canvas = true;
   update_output();
@@ -1013,7 +1014,8 @@ function setup_lang_worker() {
         }
         setup_runner();
         imports = data.imports;
-        jscode.innerText = data.js;
+        jscode_element.innerHTML = data.js;
+        js_code = data.js;
         tooltips = JSON.parse(data.wordTriggers);
         let highlights = data.hl;
         editor.doc.getAllMarks().forEach(marker => marker.clear());
@@ -1163,7 +1165,7 @@ function update_output() {
     output_toggle_btn.children[0].style.msTransform = "translateX(0px)";
     output_toggle_btn.children[0].style.transform = "translateX(0px)";
     primary.style.display = "block";
-    jscode.style.display = "none";
+    jscode_element.style.display = "none";
     if (was_playing) {
       play();
     }
@@ -1173,7 +1175,7 @@ function update_output() {
     output_toggle_btn.children[0].style.msTransform = "translateX(26px)";
     output_toggle_btn.children[0].style.transform = "translateX(26px)";
     primary.style.display = "none";
-    jscode.style.display = "block";
+    jscode_element.style.display = "block";
     was_playing = !!frameInterval;
     pause();
   }
