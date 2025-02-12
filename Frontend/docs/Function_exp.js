@@ -4,11 +4,11 @@ Primary author: Milo Jacobs
 Imports: List, Func
 */
 
-function factorial_var(man_var) {
-  if (man_var == 1) {
+function var_factorial(var_man) {
+  if (var_man == 1) {
     return 1;
   }
-  return (man_var * factorial_var((man_var - 1)));
+  return (var_man * var_factorial((var_man - 1)));
 }
-let value_var = factorial_var(5);
-print_console(value_var);
+let var_value = var_factorial(5);
+print_console(var_value);
