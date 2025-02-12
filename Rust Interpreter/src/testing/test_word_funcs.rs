@@ -286,3 +286,10 @@ fn test_get_next_slice_newline() {
         (new_slice("a", 2), new_slice(" a", 3))
     );
 }
+
+#[test]
+fn test_manatory_close() {
+    assert!(!is_mandatory_close(&new_slice("", 0)));
+    assert!(!is_mandatory_close(&new_slice(",", 0)));
+    assert!(is_mandatory_close(&new_slice("...", 0)));
+}

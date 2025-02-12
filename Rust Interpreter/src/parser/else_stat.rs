@@ -38,6 +38,10 @@ impl ParseState for ElseState {
         // if "if" wasnt found
         if self.if_index == usize::MAX {
             MatchResult::Failed
+            // found end of buffer
+        } else if word.len() == 0 {
+            env.symbols.remove_layer();
+            MatchResult::Failed
         // non cont stat for seeing closes
         } else if self.has_stat {
             MatchResult::ContinueWith(
@@ -67,14 +71,17 @@ impl ParseState for ElseState {
             if let Expr::Else { end, indexes, .. } = env.expr {
                 if let Some((index, return_type)) = child_index {
                     // needs to return void
-                    if return_type == ReturnType::Void {
+                    if return_type != ReturnType::Null {
                         self.has_stat = true;
                     }
                     indexes.push(index);
                 }
-
-                // close if have close
-                if is_mandatory_close(word) {
+                //reach end of buffer
+                if word.len() == 0 {
+                    env.symbols.remove_layer();
+                    MatchResult::Failed
+                    // close if have close
+                } else if is_mandatory_close(word) {
                     *end = End::from_slice(&word, env.global_index);
                     *else_index = env.expr_index;
                     env.symbols.remove_layer();

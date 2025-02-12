@@ -23,6 +23,9 @@ impl ParseState for IfState {
                 Types::Bool | Types::Number,
                 Box::new(alias::NoneState::new_expr_cont()),
             )
+        } else if word.len() == 0 {
+            env.symbols.remove_layer();
+            MatchResult::Failed
         } else if self.has_stat {
             MatchResult::ContinueWith(
                 word.pos,
@@ -58,20 +61,25 @@ impl ParseState for IfState {
                     )
                 } else {
                     // if child match fail, I can never succeed
+                    env.symbols.remove_layer();
                     MatchResult::Failed
                 }
             } else {
-                //and stat child
+                //add stat child
                 if let Some((index, return_type)) = child_index {
                     // needs to return void
-                    if return_type == ReturnType::Void {
+                    if return_type != ReturnType::Null {
                         self.has_stat = true;
                     }
                     indexes.push(index);
                 }
 
-                // close if have close
-                if self.has_stat && is_mandatory_close(word) {
+                //reach end of buffer
+                if word.len() == 0 {
+                    env.symbols.remove_layer();
+                    MatchResult::Failed
+                    // close if have close
+                } else if self.has_stat && is_mandatory_close(word) {
                     *end = End::from_slice(&word, env.global_index);
                     env.symbols.remove_layer();
                     MatchResult::Matched(word.pos, ReturnType::Void, true)

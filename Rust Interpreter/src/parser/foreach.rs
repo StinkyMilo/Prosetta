@@ -19,9 +19,9 @@ impl ParseState for ForEachState {
             // setup child state
             // MatchResult::ContinueWith(rest.pos, Box::new(alias::NoneState::new_expr_cont()))
         }
-        let var_word = try_get_symbol_word(word, env.global_index);
-        if let Some(new_var) = var_word {
-            if !self.has_list {
+        if !self.has_list {
+            let var_word = try_get_symbol_word(word, env.global_index);
+            if let Some(new_var) = var_word {
                 if let Expr::ForEach { var, .. } = env.expr {
                     *var = new_var;
                 } else {
@@ -32,21 +32,25 @@ impl ParseState for ForEachState {
                     Types::List | Types::Number,
                     Box::new(alias::NoneState::new_expr_cont()),
                 )
-            } else if self.has_stat {
-                MatchResult::ContinueWith(
-                    word.pos,
-                    Types::Void,
-                    Box::new(alias::NoneState::new_stat()),
-                )
             } else {
-                MatchResult::ContinueWith(
-                    word.pos,
-                    Types::Void,
-                    Box::new(alias::NoneState::new_stat_cont()),
-                )
+                MatchResult::Continue(0)
             }
+            // reach end of buffer
+        } else if word.len() == 0 {
+            env.symbols.remove_layer();
+            MatchResult::Failed
+        } else if self.has_stat {
+            MatchResult::ContinueWith(
+                word.pos,
+                Types::Void,
+                Box::new(alias::NoneState::new_stat()),
+            )
         } else {
-            MatchResult::Continue(0)
+            MatchResult::ContinueWith(
+                word.pos,
+                Types::Void,
+                Box::new(alias::NoneState::new_stat_cont()),
+            )
         }
     }
 
@@ -81,7 +85,7 @@ impl ParseState for ForEachState {
                 //and stat child
                 if let Some((index, return_type)) = child_index {
                     // needs to return void
-                    if return_type == ReturnType::Void {
+                    if return_type != ReturnType::Null {
                         self.has_stat = true;
                     }
                     indexes.push(index);
@@ -89,7 +93,7 @@ impl ParseState for ForEachState {
                 if word.len() == 0 {
                     env.symbols.remove_layer();
                     MatchResult::Failed
-                } else if self.has_stat && is_close(word) {
+                } else if self.has_stat && is_mandatory_close(word) {
                     // close if have close
                     *end = End::from_slice(&word, env.global_index);
                     env.symbols.remove_layer();
