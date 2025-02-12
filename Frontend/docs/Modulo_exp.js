@@ -4,7 +4,7 @@ Primary author: Milo Jacobs
 Imports: 
 */
 
-let number_var = 2;
-if ((number_var % 2) == 0) {
-  print_console(number_var);
+let var_number = 2;
+if ((var_number % 2) == 0) {
+  print_console(var_number);
 }

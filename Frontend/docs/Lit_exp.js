@@ -5,5 +5,5 @@ Imports:
 */
 
 let var_var = 2;
-let then_var = get_concat_value(var_var, 3, 0);
-print_console(then_var);
+let var_then = get_concat_value(var_var, 3, 0);
+print_console(var_then);

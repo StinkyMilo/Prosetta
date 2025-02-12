@@ -4,6 +4,6 @@ Primary author: Milo Jacobs
 Imports: 
 */
 
-let value_var = (51 / 2);
-print_console(value_var);
-print_console(Math.floor(value_var));
+let var_value = (51 / 2);
+print_console(var_value);
+print_console(Math.floor(var_value));
