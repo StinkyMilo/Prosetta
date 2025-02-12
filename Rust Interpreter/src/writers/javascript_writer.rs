@@ -456,7 +456,7 @@ fn write_expr(exprs: &ExprArena, index: usize, indent: &mut usize, is_in_functio
             let ind = get_indent(indent);
             *indent += 1;
             let foreach_str = format!(
-                "for_loop({}, (var_{}_var) => {{\n{}\n{}return _RETURN;\n{}}});",
+                "for_loop({}, (var_{}) => {{\n{}\n{}return _RETURN;\n{}}});",
                 write_expr(exprs, indexes[0], indent, is_in_function),
                 String::from_utf8_lossy(&var.name),
                 write_exprs(exprs, &indexes[1..], "\n", indent, is_in_function),
