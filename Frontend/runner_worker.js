@@ -1,5 +1,5 @@
 var functions = [];
-onmessage = async function(e) {
+onmessage = async function (e) {
   let command = e.data.command;
   let data = e.data.data;
   switch (command) {
@@ -136,31 +136,46 @@ function get_random(...args) {
   return Math.floor(Math.random() * range) + offset;
 }
 
+const _RETURN = {};
+
 function while_loop(predicate, callback) {
   let pred_aws = predicate();
   if (typeof pred_aws == "number") {
     for (let j = 0; j < pred_aws; j++) {
-      callback();
+      let ret = callback();
+      if (ret != _RETURN) {
+        return ret;
+      }
     }
   } else {
     while (pred_aws) {
-      callback();
+      let ret = callback();
+      if (ret != _RETURN) {
+        return ret;
+      }
       pred_aws = predicate();
     }
   }
-
+  return _RETURN;
 }
 
 function for_loop(list, callback) {
   if (typeof list == "number") {
     for (let j = 0; j < list; j++) {
-      callback(j);
+      let ret = callback(j);
+      if (ret != _RETURN) {
+        return ret;
+      }
     }
   } else {
     for (x of list) {
-      callback(x);
+      let ret = callback(x);
+      if (ret != _RETURN) {
+        return ret;
+      }
     }
   }
+  return _RETURN;
 }
 
 function end_shape() {
