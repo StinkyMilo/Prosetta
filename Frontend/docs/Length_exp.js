@@ -4,6 +4,6 @@ Primary author: Milo Jacobs
 Imports: List
 */
 
-let list_var = [1, 2, 3];
-let the_var = list_var.length;
-print_console(the_var);
+let var_list = [1, 2, 3];
+let var_the = var_list.length;
+print_console(var_the);

@@ -464,7 +464,8 @@ function runCode() {
   print_console("Welcome to Prosetta!");
   print_console("---");
   print_console();
-  runner_worker.postMessage({ command: "run", data: { code: jscode.innerText, frame: curr_frame } });
+  runner_worker.postMessage({ command: "run", data: { prosetta: editor.getValue(), code: jscode.innerText, frame: curr_frame } });
+  // cnsl.scrollTop = cnsl.scrollHeight;
 }
 
 function openTab(event, tab) {
@@ -512,9 +513,6 @@ function updateCode() {
     editor.setValue(newsrc);
     return;
   }
-  console.log(src);
-  const codeUpdateEvent = new CustomEvent("codeChanged", { detail: src });
-  document.dispatchEvent(codeUpdateEvent);
   msg_worker("changed", src);
 }
 
@@ -752,7 +750,7 @@ function setup_editor() {
     }, 500);
   }
 
-  window.onmousemove = function (e) {
+  window.onmousemove = function(e) {
     let pos = { left: e.clientX, top: e.clientY + window.scrollY };
     let textPos = editor.coordsChar(pos);
     let wordPos = editor.findWordAt(textPos);
@@ -1088,9 +1086,11 @@ function setup_runner() {
     let data = e.data.data;
     switch (command) {
       case "finished":
-        for (let funcCall of data) {
+        for (let funcCall of data.functions) {
           await function_dict[funcCall.name](...funcCall.args);
         }
+        const codeUpdateEvent = new CustomEvent("codeChanged", { detail: data.prosetta });
+        document.dispatchEvent(codeUpdateEvent);
         if (has_import(Import.Frame)) {
           actual_fps = 1000 / (Date.now() - last_frame_timestamp);
           print_console("fps:", Math.round(actual_fps));

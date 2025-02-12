@@ -4,5 +4,5 @@ Primary author: Milo Jacobs
 Imports: 
 */
 
-let mario_var = 28;
-print_console(mario_var);
+let var_mario = 28;
+print_console(var_mario);

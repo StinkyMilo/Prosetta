@@ -5,5 +5,5 @@ Imports:
 */
 
 print_console("fizzbuzz");
-let mario_var = 2;
-print_console(mario_var, mario_var);
+let var_mario = 2;
+print_console(var_mario, var_mario);
