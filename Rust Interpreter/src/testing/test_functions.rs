@@ -42,8 +42,8 @@ fn test_infinite_loop_function() {
         run_parser!(b"fun in'finite. infi'n'ite... 'infinite'? pri \"this will never print\"...");
     check_lisp!(
         data,
-        "(function@0,1,2$68$$3 \"infinite\"@4|2 (args) (\"infinite\"@15|4,6 ) \
-        (\"infinite\"@30|8 ) (print@41,42,43$68$$3 \"this will never print\"@45))"
+        "(function@0,1,2$25$$3 \"infinite\"@4|2 (args) (\"infinite\"@15|4,6 ))\n\
+        (\"infinite\"@30|8 )\n(print@41,42,43$68$$3 \"this will never print\"@45)"
     );
 }
 
