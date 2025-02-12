@@ -153,6 +153,13 @@ function debugString(val) {
     // TODO we could test for more things here, like `Set`s and `Map`s.
     return className;
 }
+/**
+ * @returns {number}
+ */
+export function get_heap_size() {
+    const ret = wasm.get_heap_size();
+    return ret >>> 0;
+}
 
 function _assertNum(n) {
     if (typeof(n) !== 'number') throw new Error(`expected a number argument, found ${typeof(n)}`);
@@ -199,13 +206,6 @@ function logError(f, args) {
         console.error("wasm-bindgen: imported JS function that was not marked as `catch` threw an error:", error);
         throw e;
     }
-}
-/**
- * @returns {number}
- */
-export function get_heap_size() {
-    const ret = wasm.get_heap_size();
-    return ret >>> 0;
 }
 
 export const Import = Object.freeze({ List:0,"0":"List",Func:1,"1":"Func",Graph:2,"2":"Graph",Frame:3,"3":"Frame",Trig:4,"4":"Trig",Rand:5,"5":"Rand",Stamp:6,"6":"Stamp",Not:7,"7":"Not", });
