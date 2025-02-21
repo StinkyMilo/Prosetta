@@ -1,3 +1,3 @@
 # Prosetta Documentation
 
-Welcome to the Prosetta Documentation. If this is your first time using the language, start with the [Quickstart](Quickstart_1.md) to get right into coding or the [Language Overview](Overview.md) for a bird's eye view of Prosetta's features.
+Welcome to the Prosetta Documentation. If this is your first time using the language, start with the [Quickstart](Quickstart_1.md) to get right into coding or the [Language Overview](Overview.md) for a bird's eye view of Prosetta's features. The full page editor is accessible via the <a>+</a> button below or [here](https://stinkymilo.github.io/Prosetta/Frontend/). You can also take a look at our [Source Code](https://github.com/StinkyMilo/Prosetta).
