@@ -365,10 +365,10 @@ export const ALIAS_DATA = {
                 id: "arguments",
                 format: "toSearch (list or string), value (any)",
                 func: () => {
-                    let list = random_list();
+                    let list = random_list(2);
                     let index = random(list.length);
                     let item = list[index];
-                    return `lis ${random_list().join("")}. ${item}.`;
+                    return `lis ${list.join("")}. ${item}.`;
                 }
             }
         ]
@@ -471,9 +471,9 @@ export const ALIAS_DATA = {
                 id: "arguments",
                 format: "list (list), index (number)",
                 func: () => {
-                    let list = random_list();
+                    let list = random_list(2);
                     let index = random(list.length);
-                    return `lis ${random_list().join(" ")}. ${index}. `;
+                    return `lis ${list.join(" ")}. ${index}. `;
                 }
             }
         ]
