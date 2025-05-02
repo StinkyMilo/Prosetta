@@ -25,6 +25,8 @@
   <link rel="stylesheet" href="./node_modules/codemirror/theme/xq-dark.css">
   <script src="./node_modules/codemirror/lib/codemirror.js"></script>
   <script src="./node_modules/codemirror/mode/javascript/javascript.js"></script>
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
   <link rel="stylesheet" href="./style.css">
   <link rel="stylesheet" href="./color.css">
 </head>
@@ -32,8 +34,8 @@
 <body>
   <label for="poemSelect">Examples</label>
   <select id="poemSelect">
-    <option value="blank" selected>Blank</option>
-    <option value="summerRose">The Wreck of the Summer Rose</option>
+    <option value="blank">Blank</option>
+    <option value="summerRose" selected>The Wreck of the Summer Rose</option>
     <option value="paperIntro">Paper Introduction</option>
   </select>
   <div id="output-toggle-container">
@@ -63,6 +65,17 @@
   <div id="secondary">
     <div id="console"></div>
   </div>
+  <footer>
+    <a href="https://github.com/StinkyMilo/Prosetta/" target="_blank">
+      <ion-icon size="large" name="logo-github"></ion-icon>
+    </a>
+    <div style="margin-top: 5px;">
+      |
+      <a href="https://stinkymilo.github.io/Prosetta/Frontend/docs/" target="_blank">
+        Online Documentation
+      </a>
+    </div>
+  </footer>
 </body>
 
 </html>
