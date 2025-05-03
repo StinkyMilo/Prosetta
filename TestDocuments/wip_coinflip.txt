@@ -1,0 +1,14 @@
+Hello! This is Prosetta, an esoteric programming language
+by me, Milo Jacobs, me, Flynn Duniho, and me, Nate Westfall.
+Prosetta is a framework for code, poetry, and graphics that we tried to make as user-friendly as possible.
+
+It's an esoteric programming language where code is a "hidden message" within a poem or other piece of writing.
+
+was val lit two zero zero..
+One of the ways we do this multimedia val sin fra ---
+arc val this.
+whe letters this lit..
+	fil gold.
+. els
+	fil blue.
+.
